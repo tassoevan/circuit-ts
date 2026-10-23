@@ -22,7 +22,7 @@ Thanks to: Edward Calver for 15 new components and other improvements; Rodrigo H
 
 The web application is written in TypeScript and built with [Vite](https://vitejs.dev/). You'll need [Node.js](https://nodejs.org/) (which includes npm) — no Java, GWT, or Eclipse required.
 
-The repository is an npm workspaces monorepo: the web application lives in `ts/` and the C++ port's TypeScript test harness in `cxx/tools/`. Run `npm install` once from the repository root to install dependencies for every workspace; the root `dev`, `build`, `preview` and `test` scripts delegate to `ts/`.
+The repository is an npm workspaces monorepo: the web application lives in `ts/`. Run `npm install` once from the repository root to install dependencies for every workspace; the root `dev`, `build`, `preview` and `test` scripts delegate to `ts/`.
 
 ### Quick start
 

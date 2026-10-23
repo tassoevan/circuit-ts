@@ -1,6 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-# Shell scripts must keep LF and batch files CRLF, whatever core.autocrlf is
-*.sh  text eol=lf
-*.bat text eol=crlf
+# Shell scripts must keep LF, whatever core.autocrlf is
+*.sh text eol=lf

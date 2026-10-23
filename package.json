@@ -2,8 +2,7 @@
   "name": "@tassoevan/circuit-ts-monorepo",
   "private": true,
   "workspaces": [
-    "ts",
-    "cxx/tools"
+    "ts"
   ],
   "scripts": {
     "dev": "npm run dev -w ts --",
