@@ -21,6 +21,6 @@ indent_size = 2
 [*.txt]
 trim_trailing_whitespace = false
 
-[*.{gradle,xml}]
+[*.xml]
 indent_style = space
 indent_size = 4

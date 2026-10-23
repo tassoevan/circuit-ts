@@ -1,14 +1,4 @@
-#GWT cache
-gwt-unitCache/
-war/circuitjs1/
-war/circuitjs1/circuits/
 war/e-*.html
-war/WEB-INF/
-
-# GWT command line tools
-codeserver.log
-webserver.log
-build.xml
 circuitjs1.tar.gz
 
 # Editor configurations
@@ -58,7 +48,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Gradle build output
+# Build output
 /build
 /site
 
@@ -68,10 +58,7 @@ Temporary Items
 /offline
 /spice
 /tmp
-/.gradle
 *.tgz
-
-/.apt_generated/
 
 # ts/ app
 /ts/todo
