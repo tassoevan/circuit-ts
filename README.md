@@ -105,55 +105,6 @@ Copy everything under `site/` to your web server. Running `./dist.sh` again with
 
 For a quick unversioned build (used for local testing and the Electron/offline app below), use `./dist-offline.sh` instead, which produces the same `site/` layout without the version-numbered rename — the entry point stays `site/circuitjs.html`.
 
-## Docker/podman containers
-
-### Building and Running Circuitjs in docker containers
-
-*(replace the podman command with docker if you prefere docker)*
-
-- To build Docker image using podman: 
-
-```
-podman build -f circuitjs1.Containerfile -t circuitjs1:latest
-```
-
-- To then run Docker image using podman:
-
-```
-podman run --name=circuitjs1 --rm -d -p 8000:8000 circuitjs1:latest
-```
-
-CircuitJS1 should be accessable at: http://localhost:8000/circuitjs.html
-
-
-### Development using docker containers
-
-(replace the podman command with docker if you prefere docker)
-
-- To build the development Docker image using podman: 
-
-```
-podman build -f dev-start.Containerfile -t circuitjs1-dev:latest
-```
-
-- To then run the development Docker image using podman:
-
-```
-podman run --rm -it -p 127.0.0.1:5173:5173/tcp circuitjs1-dev:latest
-```
-
-CircuitJS1 should be accessable at: http://localhost:5173/circuitjs.html
-
-If you need to modify the files while the container is running (using Vite's live reload):
-
-```
-podman run --rm -it -v $(pwd):/src:Z -p 127.0.0.1:5173:5173/tcp circuitjs1-dev:latest
-```
-
-This will use the current directory inside the container.
-
-
-
 ## Embedding
 
 You can link to the full page version of the application using the link shown above.
