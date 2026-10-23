@@ -1,0 +1,17 @@
+{
+  "name": "@tassoevan/circuit-ts-monorepo",
+  "private": true,
+  "workspaces": [
+    "ts",
+    "cxx/tools"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w ts --",
+    "build": "npm run build -w ts",
+    "preview": "npm run preview -w ts --",
+    "test": "npm test -w ts"
+  },
+  "volta": {
+    "node": "24.22.1"
+  }
+}

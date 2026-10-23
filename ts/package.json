@@ -22,5 +22,9 @@
   },
   "dependencies": {
     "lz-string": "^1.5.0"
+  },
+  "private": true,
+  "volta": {
+    "extends": "../package.json"
   }
 }

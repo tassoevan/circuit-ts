@@ -75,5 +75,5 @@ Temporary Items
 
 # ts/ app
 /ts/todo
-/ts/node_modules
+node_modules/
 /ts/dist

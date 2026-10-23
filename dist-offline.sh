@@ -4,7 +4,7 @@ set -euo pipefail
 DIR="$(pwd)"
 
 echo "=== Building TypeScript app ==="
-( cd "$DIR/ts" && npm run build )
+( cd "$DIR" && npm run build )
 
 rm -rf site
 mkdir site

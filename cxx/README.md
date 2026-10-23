@@ -44,7 +44,7 @@ The command palette (Edit → Find Component/Command..., the toolbar's search bu
 or Shift twice) searches the menu commands, element modes and example circuits.
 
 ## Test
-    (cd tools && npm install)          # once, for the TS harness
+    npm install                         # once, from the repo root, for the TS harness
     tools/compare.py ../auto-tests/lrc.txt 2000
     tools/compare.py --all 2000
 

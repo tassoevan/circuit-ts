@@ -22,10 +22,11 @@ Thanks to: Edward Calver for 15 new components and other improvements; Rodrigo H
 
 The web application is written in TypeScript and built with [Vite](https://vitejs.dev/). You'll need [Node.js](https://nodejs.org/) (which includes npm) — no Java, GWT, or Eclipse required.
 
+The repository is an npm workspaces monorepo: the web application lives in `ts/` and the C++ port's TypeScript test harness in `cxx/tools/`. Run `npm install` once from the repository root to install dependencies for every workspace; the root `dev`, `build`, `preview` and `test` scripts delegate to `ts/`.
+
 ### Quick start
 
 ```bash
-cd ts
 npm install
 npm run dev
 ```
@@ -35,7 +36,6 @@ This starts a local dev server with live reload at `http://localhost:5173/circui
 ### Building for production
 
 ```bash
-cd ts
 npm run build
 ```
 
@@ -48,7 +48,6 @@ npm run preview
 ### Running the tests
 
 ```bash
-cd ts
 npm test
 ```
 
@@ -62,7 +61,7 @@ Once you have successfully connected your local VS Code to the remote workspace,
 
 4. Open a shell inside the dev container by pressing `Ctrl+Backtick` or pressing `F1` and typing "Create new Terminal".
 5. Make sure you are in the folder `/workspaces/circuitjs1` inside the container (necessary only once per newly created container).
-6. Run `cd ts && npm install`.
+6. Run `npm install`.
 7. Run `npm run dev -- --host` to start the dev server bound to all interfaces (needed for port forwarding to reach it).
 8. Make sure port 5173 is forwarded in the "Ports" tab (next to "Terminal"), then open it in your browser.
 9. Edit any `.ts` file in VS Code and the browser updates automatically via Vite's live reload.

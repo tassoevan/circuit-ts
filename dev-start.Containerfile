@@ -2,7 +2,7 @@ FROM docker.io/library/node:22
 
 COPY . /src
 
-WORKDIR /src/ts
+WORKDIR /src
 
 RUN npm install
 
