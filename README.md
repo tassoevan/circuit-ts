@@ -51,23 +51,6 @@ npm run preview
 npm test
 ```
 
-### Development using cloud containers
-
-1. Install [Visual Studio Code](https://code.visualstudio.com/) and the appropriate remote extension: either [Gitpod Extension](https://marketplace.visualstudio.com/items?itemName=gitpod.gitpod-desktop) or [Codespaces Extension](https://marketplace.visualstudio.com/items?itemName=GitHub.codespaces).
-2. Open your fork of the `circuitjs1` repository in your chosen provider's dev container.
-3. This should open a new tab in your browser showing VS Code. Click in the green button in the bottom left corner, then select "Open in VS Code Desktop" in the popup menu that opened. Click "Allow" in all URL popups and authenticate using github if asked.
-
-Once you have successfully connected your local VS Code to the remote workspace, you should be able to see the content of the remote container in your local VS Code. You can now continue with the setup:
-
-4. Open a shell inside the dev container by pressing `Ctrl+Backtick` or pressing `F1` and typing "Create new Terminal".
-5. Make sure you are in the folder `/workspaces/circuitjs1` inside the container (necessary only once per newly created container).
-6. Run `npm install`.
-7. Run `npm run dev -- --host` to start the dev server bound to all interfaces (needed for port forwarding to reach it).
-8. Make sure port 5173 is forwarded in the "Ports" tab (next to "Terminal"), then open it in your browser.
-9. Edit any `.ts` file in VS Code and the browser updates automatically via Vite's live reload.
-
-> ***Note:*** When running the web application server inside a remote dev container, port forwarding is necessary in order to access the remote server from your own computer. This port forwarding is provided by Visual Studio Code running on your local computer.
-
 ### Quick local test
 
 The included `test.sh` script builds the app and starts a local server in one step:
