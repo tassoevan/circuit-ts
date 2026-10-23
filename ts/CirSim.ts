@@ -239,8 +239,6 @@ export class CirSim {
             let cct = qp.getValue("cct");
             if (cct != null)
                 this.startCircuitText = cct.replace(/%24/g, "$");
-            if (this.startCircuitText == null)
-                this.startCircuitText = CirSim.getElectronStartCircuitText();
             const ctz = qp.getValue("ctz");
             if (ctz != null)
                 this.startCircuitText = this.decompress(ctz);
@@ -285,9 +283,6 @@ export class CirSim {
         } else if (this.startCircuitText != null) {
             this.menus.getSetupList(false);
             this.loader.readCircuit(this.startCircuitText);
-            const electronFileName = CirSim.getElectronStartCircuitFileName();
-            if (electronFileName != null)
-                this.setCircuitTitle(electronFileName);
             this.unsavedChanges = false;
         } else {
             if (this.stopMessage == null && this.startCircuitLink != null) {
@@ -437,20 +432,6 @@ export class CirSim {
 
     resetAction(): void { this.ui.resetAction(); }
 
-    static isElectron(): boolean {
-        return (window as any).openFile != undefined;
-    }
-
-    static getElectronStartCircuitText(): string | null {
-        return (window as any).startCircuitText ?? null;
-    }
-
-    static getElectronStartCircuitFileName(): string | null {
-        return (window as any).startCircuitFileName ?? null;
-    }
-
-    allowSave(b: boolean): void { this.ui.allowSave(b); }
-
     importCircuitFromText(circuitText: string | null, subcircuitsOnly: boolean): void {
         const RC_SUBCIRCUITS = 2, RC_RETAIN = 4;
         // subcircuit library files don't replace the circuit
@@ -462,7 +443,6 @@ export class CirSim {
         if (circuitText != null) {
             this.loader.readCircuit(circuitText, flags);
             ExportAsLocalFileDialog.setLastFileName(null);
-            this.allowSave(false);
             if (!subcircuitsOnly) {
                 this.unsavedChanges = false;
                 this.savedFlag = true;

@@ -80,7 +80,7 @@ export class Locale {
             if (nav.languages.length > 0)
                 return nav.languages[0];
             else
-                // In Electron, navigator.languages returns an empty array
+                // Some embedded browsers return an empty navigator.languages
                 return "en-US";
         } else {
             return nav.language || nav.userLanguage;

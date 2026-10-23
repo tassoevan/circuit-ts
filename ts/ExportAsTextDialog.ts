@@ -82,7 +82,6 @@ export class ExportAsTextDialog extends Dialog {
             this.closeDialog();
             if (text != null) {
                 this.sim.readCircuit(text);
-                this.sim.allowSave(false);
                 this.sim.unsavedChanges = false;
                 this.sim.savedFlag = true;
             }

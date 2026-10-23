@@ -139,7 +139,6 @@ export class CircuitLoader {
             if (response.ok) {
                 const text = await response.text();
                 this.readCircuit(text, CircuitLoader.RC_KEEP_TITLE);
-                this.app.allowSave(false);
                 this.app.unsavedChanges = false;
                 this.app.savedFlag = true;
             } else {
@@ -310,7 +309,6 @@ export class CircuitLoader {
 	    if (response.ok) {
 		const text = await response.text();
 		this.readCircuit(text, CircuitLoader.RC_KEEP_TITLE);
-		this.app.allowSave(false);
 		this.app.unsavedChanges = false;
 		this.app.savedFlag = true;
 	    } else {

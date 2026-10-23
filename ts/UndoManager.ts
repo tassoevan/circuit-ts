@@ -95,7 +95,6 @@ export class UndoManager {
     doRecover(): void {
         this.pushUndo();
         this.sim.loader.readCircuit(this.sim.recovery!);
-        this.sim.allowSave(false);
         this.sim.menus.recoverItem.setEnabled(false);
         this.sim.unsavedChanges = false;
     }

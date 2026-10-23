@@ -62,17 +62,8 @@ export class CommandManager {
             CirSim.aboutBox = new (window as any).AboutBox(CirSim.versionString);
         if (item == "importfromlocalfile") {
             this.app.undoManager?.pushUndo();
-            if (CirSim.isElectron())
-                CommandManager.electronOpenFile();
-            else
-                this.app.ui?.loadFileInput?.element.click();
+            this.app.ui?.loadFileInput?.element.click();
         }
-        if (item == "newwindow")
-            CommandManager.newElectronWindow();
-        if (item == "save")
-            CommandManager.electronSave(this.app.dumpCircuit());
-        if (item == "saveas")
-            CommandManager.electronSaveAs(this.app.dumpCircuit());
         if (item == "importfromtext")
             new ImportFromTextDialog(this.app);
         if (item == "importfromdropbox")
@@ -125,8 +116,6 @@ export class CommandManager {
         }
         if (menu == "options" && item == "other")
             this.doEdit(new EditOptions(this.app, this.app.sim));
-        if (item == "devtools")
-            CommandManager.toggleDevTools();
         if (item == "undo")
             this.app.undoManager?.doUndo();
         if (item == "redo")
@@ -662,54 +651,5 @@ export class CommandManager {
         }
         this.app.needAnalyze();
         this.app.undoManager?.writeRecoveryToStorage();
-    }
-
-    static electronSaveAsCallback(s: string): void {
-        s = s.substring(s.lastIndexOf('/') + 1);
-        s = s.substring(s.lastIndexOf('\\') + 1);
-        const app = CirSim.theApp;
-        app.setCircuitTitle(s);
-        app.allowSave(true);
-        app.savedFlag = true;
-        app.repaint();
-    }
-
-    static electronSaveCallback(): void {
-        const app = CirSim.theApp;
-        app.savedFlag = true;
-        app.repaint();
-    }
-
-    static newElectronWindow(): void {
-        (window as any).newWindow?.();
-    }
-
-    static electronSaveAs(dump: string): void {
-        (window as any).showSaveDialog?.().then((file: any) => {
-            if (file.canceled) return;
-            (window as any).saveFile(file, dump);
-            CommandManager.electronSaveAsCallback(file.filePath.toString());
-        });
-    }
-
-    static electronSave(dump: string): void {
-        (window as any).saveFile?.(null, dump);
-        CommandManager.electronSaveCallback();
-    }
-
-    static electronOpenFileCallback(text: string, name: string): void {
-        const app = CirSim.theApp;
-        (window as any).LoadFile?.doLoadCallback(text, name);
-        app.allowSave(true);
-    }
-
-    static electronOpenFile(): void {
-        (window as any).openFile?.((text: string, name: string) => {
-            CommandManager.electronOpenFileCallback(text, name);
-        });
-    }
-
-    static toggleDevTools(): void {
-        (window as any).toggleDevTools?.();
     }
 }

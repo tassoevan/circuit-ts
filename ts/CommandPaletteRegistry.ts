@@ -125,12 +125,7 @@ export class CommandPaletteRegistry {
         CommandPaletteRegistry.add("file:newblankcircuit", "New Blank Circuit", "File", "new blank", "file", "newblankcircuit");
         CommandPaletteRegistry.add("file:importfromtext", "Import From Text...", "File", "import text", "file", "importfromtext");
         CommandPaletteRegistry.add("file:importfromdropbox", "Import From Dropbox...", "File", "import dropbox", "file", "importfromdropbox");
-        if (CirSim.isElectron()) {
-            CommandPaletteRegistry.add("file:save", "Save", "File", "save " + cm + "S", "file", "save");
-            CommandPaletteRegistry.add("file:saveas", "Save As...", "File", "save export", "file", "saveas");
-        } else {
-            CommandPaletteRegistry.add("file:exportaslocalfile", "Save As...", "File", "save export " + cm + "S", "file", "exportaslocalfile");
-        }
+        CommandPaletteRegistry.add("file:exportaslocalfile", "Save As...", "File", "save export " + cm + "S", "file", "exportaslocalfile");
         CommandPaletteRegistry.add("file:exportasurl", "Export As Link...", "File", "export url link share", "file", "exportasurl");
         CommandPaletteRegistry.add("file:exportastext", "Export As Text...", "File", "export text", "file", "exportastext");
         CommandPaletteRegistry.add("file:exportasimage", "Save As Image...", "File", "export image png", "file", "exportasimage");
@@ -242,8 +237,6 @@ export class CommandPaletteRegistry {
 
         CommandPaletteRegistry.add("options:shortcuts", "Shortcuts...", "Options", "keyboard shortcuts keys", "options", "shortcuts");
         CommandPaletteRegistry.add("options:other", "Other Options...", "Options", "options settings preferences", "options", "other");
-        if (CirSim.isElectron())
-            CommandPaletteRegistry.add("options:devtools", "Toggle Dev Tools", "Options", "developer tools debug", "options", "devtools");
     }
 
     // Called from Menus.processSetupList() for each circuit entry in setuplist.txt.

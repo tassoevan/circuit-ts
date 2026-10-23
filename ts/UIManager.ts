@@ -832,8 +832,7 @@ export class UIManager {
         this.registerKeyHandlers();
 
         window.addEventListener('beforeunload', (event) => {
-            // there is a bug in electron that makes it impossible to close the app if this warning is given
-            if (this.app.isModified() && !(CirSim as any).isElectron())
+            if (this.app.isModified())
                 event.returnValue = Locale.LS("Are you sure?  There are unsaved changes.");
         });
 
@@ -1728,17 +1727,7 @@ export class UIManager {
             if (code === KEY_D) { this.app.commands.menuPerformed("key", "duplicate");         e.preventDefault(); }
             if (code === KEY_A) { this.app.commands.menuPerformed("key", "selectAll");         e.preventDefault(); }
             if (code === KEY_P) { this.app.commands.menuPerformed("key", "print");             e.preventDefault(); }
-            if (code === KEY_N && (CirSim as any).isElectron()) {
-                this.app.commands.menuPerformed("key", "newwindow");
-                e.preventDefault();
-            }
-            if (code === KEY_S) {
-                let cmd = "exportaslocalfile";
-                if ((CirSim as any).isElectron())
-                    cmd = this.menus.saveFileItem.isEnabled() ? "save" : "saveas";
-                this.app.commands.menuPerformed("key", cmd);
-                e.preventDefault();
-            }
+            if (code === KEY_S) { this.app.commands.menuPerformed("key", "exportaslocalfile"); e.preventDefault(); }
             if (code === KEY_O) { this.app.commands.menuPerformed("key", "importfromlocalfile"); e.preventDefault(); }
         }
     }
@@ -1915,11 +1904,6 @@ export class UIManager {
             document.title = s + " - " + CirSim.baseTitle;
         else
             document.title = CirSim.baseTitle;
-    }
-
-    allowSave(b: boolean): void {
-        if (this.menus.saveFileItem != null)
-            this.menus.saveFileItem.setEnabled(b);
     }
 
     isSelection(): boolean {

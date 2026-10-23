@@ -43,16 +43,6 @@ export class ImageExporter {
     }
 
     doExportAsImage(): void {
-        if (CirSim.isElectron()) {
-            const dataURL = this.getCircuitAsCanvas(ImageExporter.CAC_IMAGE).toDataURL();
-            const base64 = dataURL.substring(dataURL.indexOf(',') + 1);
-            (window as any).showSaveDialog?.(ImageExporter.defaultFileName(".png")).then((file: any) => {
-                if (file.canceled)
-                    return;
-                (window as any).saveFile(file, base64, "base64");
-            });
-            return;
-        }
         CirSim.dialogShowing = new (window as any).ExportAsImageDialog(ImageExporter.CAC_IMAGE, this.sim);
         CirSim.dialogShowing.show();
     }
@@ -93,14 +83,6 @@ export class ImageExporter {
     }
 
     doExportAsSVG(): void {
-        if (CirSim.isElectron()) {
-            (window as any).showSaveDialog?.(ImageExporter.defaultFileName(".svg")).then((file: any) => {
-                if (file.canceled)
-                    return;
-                (window as any).saveFile(file, this.getCircuitAsSVG(), "utf8");
-            });
-            return;
-        }
         CirSim.dialogShowing = new (window as any).ExportAsImageDialog(ImageExporter.CAC_SVG, this.sim);
         CirSim.dialogShowing.show();
     }

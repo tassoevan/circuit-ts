@@ -18,7 +18,6 @@
 */
 
 import { Dialog } from "./Dialog";
-import { CirSim } from "./CirSim";
 import { Locale } from "./Locale";
 
 export class ExportAsUrlDialog extends Dialog {
@@ -28,8 +27,6 @@ export class ExportAsUrlDialog extends Dialog {
     textArea: HTMLTextAreaElement;
 
     shortIsSupported(): boolean {
-        if (CirSim.isElectron())
-            return false;
         return ExportAsUrlDialog.shortRelaySupported;
     }
 
@@ -52,8 +49,6 @@ export class ExportAsUrlDialog extends Dialog {
         this.closeOnEnter = false;
 
         const start = window.location.href.split("?");
-        if (CirSim.isElectron())
-            start[0] = "https://www.falstad.com/circuit/circuitjs.html";
         const compressed = (window as any).LZString.compressToEncodedURIComponent(dump);
         const query = "?ctz=" + compressed;
         const url = start[0] + query;

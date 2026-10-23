@@ -233,7 +233,6 @@ export class Menus {
     exportAsTextItem         = new MenuItem();
     printItem                = new MenuItem();
     recoverItem              = new MenuItem();
-    saveFileItem             = new MenuItem();
     importFromDropboxItem    = new MenuItem();
     undoItem                 = new MenuItem();
     redoItem                 = new MenuItem();
@@ -341,9 +340,6 @@ export class Menus {
 
         // ---- File menu ----
         const fileMenu = new Menu(this.app);
-        if (this.isElectron())
-            fileMenu.addCommand(shortcutHtml("window", "New Window...", Locale.LS(ck + "N")), "file", "newwindow");
-
         fileMenu.addCommand(iconHtml("doc-new", "New Blank Circuit"), "file", "newblankcircuit");
 
         fileMenu.addMenuItem(this.importFromLocalFileItem,
@@ -355,15 +351,9 @@ export class Menus {
         fileMenu.addMenuItem(this.importFromDropboxItem,
             iconHtml("dropbox", "Import From Dropbox..."), "file", "importfromdropbox");
 
-        if (this.isElectron()) {
-            fileMenu.addMenuItem(this.saveFileItem,
-                shortcutHtml("floppy", "Save", Locale.LS(ck + "S")), "file", "save");
-            fileMenu.addCommand(iconHtml("floppy", "Save As..."), "file", "saveas");
-        } else {
-            fileMenu.addMenuItem(this.exportAsLocalFileItem,
-                shortcutHtml("floppy", "Save As...", Locale.LS(ck + "S")), "file", "exportaslocalfile");
-            this.exportAsLocalFileItem.setEnabled("download" in document.createElement("a"));
-        }
+        fileMenu.addMenuItem(this.exportAsLocalFileItem,
+            shortcutHtml("floppy", "Save As...", Locale.LS(ck + "S")), "file", "exportaslocalfile");
+        this.exportAsLocalFileItem.setEnabled("download" in document.createElement("a"));
 
         fileMenu.addMenuItem(this.exportAsUrlItem,
             iconHtml("export", "Export As Link..."), "file", "exportasurl");
@@ -456,8 +446,6 @@ export class Menus {
             this.app.ui?.setOptionInStorage("mouseWheelEdit", this.mouseWheelEditCheckItem.getState()) });
         optMenu.addCommand(subheadHtml + Locale.LS("Shortcuts..."),    "options", "shortcuts");
         optMenu.addMenuItem(this.optionsItem, subheadHtml + Locale.LS("Other Options..."), "options", "other");
-        if (this.isElectron())
-            optMenu.addCommand(subheadHtml + Locale.LS("Toggle Dev Tools"), "options", "devtools");
 
         // ---- Tools menu ----
         const toolsMenu = new Menu(this.app);
@@ -710,7 +698,6 @@ export class Menus {
         return this.app.ui.getClassCheckItem(s, t);
     }
 
-    isElectron(): boolean { return (CirSim as any).isElectron?.() ?? false; }
 
     // Load the built-in circuits list from the server and build the Circuits menu.
     // Uses fetch() instead of GWT's RequestBuilder.
