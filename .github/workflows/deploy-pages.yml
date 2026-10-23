@@ -47,7 +47,7 @@ jobs:
       # Scoped to this workflow only — not added to ts/ or the other build
       # scripts, which don't need it (dist.sh/dist-offline.sh deployments are
       # placed under a path where the caller already knows to link straight
-      # to circuitjs.html, and the Electron app loads it directly by name).
+      # to circuitjs.html).
       - name: Add index.html redirect to circuitjs.html
         run: |
           cat > site/index.html <<'EOF'

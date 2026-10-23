@@ -55,7 +55,6 @@ Temporary Items
 # Other stuff
 /circuits
 /client
-/offline
 /spice
 /tmp
 *.tgz

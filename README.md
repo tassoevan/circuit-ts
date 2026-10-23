@@ -86,7 +86,7 @@ Copy everything under `site/` to your web server. Running `./dist.sh` again with
 * The optional file "shortrelay.php" (found in `war/`, not produced by the build) is a server-side script to act as a relay to a URL shortening service to avoid cross-origin problems with a purely client solution. Copy it alongside `circuitjsNUM.html` if you want the "Create short URL" feature; otherwise it's simply unused. You may want to customize it for your site.
 * If you wish to enable dropbox loading and saving, a dropbox API app-key is needed. This should be added as a script tag in `ts/circuitjs.html` before building. If this is not included the relevant features will be disabled.
 
-For a quick unversioned build (used for local testing and the Electron/offline app below), use `./dist-offline.sh` instead, which produces the same `site/` layout without the version-numbered rename — the entry point stays `site/circuitjs.html`.
+For a quick unversioned build (used for local testing), use `./dist-offline.sh` instead, which produces the same `site/` layout without the version-numbered rename — the entry point stays `site/circuitjs.html`.
 
 ## Embedding
 
@@ -118,26 +118,6 @@ You can add query parameters to link to change the applications startup behaviou
 .../circuitjs.html?hideInfoBox=<true|false>
 ```
 The simulator can also interface with your javascript code.  See [ts/jsinterface.html](http://www.falstad.com/circuit/jsinterface.html) for an example.
-
-## Building an Electron application
-
-The [Electron](https://electronjs.org/) project allows web applications to be distributed as local executables for a variety of platforms. This repository contains the additional files needed to build circuitJS1 as an Electron application.
-
-The general approach to building an Electron application for a particular platform is documented [here](https://electronjs.org/docs/tutorial/application-distribution). The following instructions apply this approach to circuit JS.
-
-To build the Electron application:
-* Build the application by running `./dist-offline.sh` from the repository root. This produces the compiled app in `site/`.
-* Download and unpack a [pre-built Electron binary directory](https://github.com/electron/electron/releases) version 9.3.2 for the target platform.
-* Copy the "app" directory from this repository to the location specified [here](https://electronjs.org/docs/tutorial/application-distribution) in the Electron binary directory structure.
-* Copy the "site" directory produced above, containing the compiled CircuitJS1 application, in to the "app" directory of the Electron binary directory structure, renaming it to "war" (`app/main.js` loads `war/circuitjs.html`).
-* Run the "Electron" executable file. It should automatically load CircuitJS1.
-
-`test-app-mac.sh` automates all of the above for the macOS arm64 `.app` bundle under `offline/mac-arm-dmg/`.
-
-Known limitations of the Electron application:
-* "Create short URL" on "Export as URL" doesn't work as it relies on server support.
-
-Thanks to @Immortalin for the initial work in applying Electron to CircuitJS1.
 
 ## License
 

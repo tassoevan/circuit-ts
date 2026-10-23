@@ -13,7 +13,7 @@ All commits from now on follow the [Conventional Commits](https://www.convention
 ```
 
 - **Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
-- **Scope:** the part of the monorepo touched, e.g. `ts`, `app`, `websocket`; omit it for repo-wide changes.
+- **Scope:** the part of the monorepo touched, e.g. `ts`, `websocket`; omit it for repo-wide changes.
 - **Description:** imperative mood, lowercase, no trailing period.
 - **Breaking changes:** add `!` after the type/scope and a `BREAKING CHANGE:` footer.
 - Reference issues in the footer (e.g. `Refs: #421`).
