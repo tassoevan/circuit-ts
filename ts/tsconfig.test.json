@@ -1,10 +1,10 @@
 {
-  // AutoTests.test.ts runs under Node (it reads and records fixtures/auto-tests/ circuits), so it's
-  // type-checked here with Node types instead of with the browser app in tsconfig.json.
+  // The circuit regression tests run under Node (they read and record the circuits in fixtures/),
+  // so they're type-checked here with Node types instead of with the browser app in tsconfig.json.
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "types": ["node", "vite/client"]
   },
-  "include": ["AutoTests.test.ts"],
+  "include": ["AutoTests.test.ts", "CircuitRegression.test.ts"],
   "exclude": ["old", "node_modules"]
 }

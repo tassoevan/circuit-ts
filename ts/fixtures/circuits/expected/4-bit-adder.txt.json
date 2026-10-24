@@ -1,0 +1,7 @@
+{
+  "elements": ["SubcircuitElm","LogicInputElm","TextElm","SevenSegDecoderElm","SevenSegElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","LogicInputElm","LogicInputElm","LogicInputElm","LogicInputElm","LogicInputElm","LogicInputElm","LogicInputElm","LogicInputElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","SevenSegElm","SevenSegDecoderElm","SevenSegDecoderElm","SevenSegElm","WireElm","WireElm","WireElm","WireElm","WireElm","SevenSegElm","SevenSegDecoderElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","LogicOutputElm","LogicOutputElm","LogicOutputElm","LogicOutputElm","TextElm","TextElm","TextElm","TextElm","TextElm","TextElm","TextElm","TextElm","TextElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm","WireElm"],
+  "stop": "Path to ground with no resistance!",
+  "samples": [
+
+  ]
+}

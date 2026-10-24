@@ -58,6 +58,13 @@ cd ts
 RECORD_AUTO_TESTS=1 npx vitest run AutoTests -t td4.txt
 ```
 
+It also loads every circuit in `ts/fixtures/circuits/` (elements the examples don't use, bug reproductions and loader edge cases) with the app's loader, runs it for 1000 timesteps and compares the result with `ts/fixtures/circuits/expected/<file>.json`: the elements that loaded, whether the simulation stopped, and every element's voltages and current at regular intervals (`ts/CircuitRegression.test.ts`). Loading must not log an exception. These circuits stay in whatever format they were saved in, so the old text format keeps being tested. To add a circuit, put it in that directory and record its expected results; re-record the same way after an intended change in simulator behavior:
+
+```bash
+cd ts
+RECORD_CIRCUITS=1 npx vitest run CircuitRegression -t sram.txt
+```
+
 ### Quick local test
 
 The included `test.sh` script builds the app and starts a local server in one step:
