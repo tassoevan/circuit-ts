@@ -276,11 +276,8 @@ export class CirSim {
 
         const { CircuitLoader } = await import('./CircuitLoader');
         this.loader = new CircuitLoader(this, this.sim, this.scopeManager, this.menus);
-        (window as any).TestManager?.init(this);
 
-        if ((window as any).TestManager?.loadingTestCircuit) {
-            this.startCircuitText = this.startCircuit = null;
-        } else if (this.startCircuitText != null) {
+        if (this.startCircuitText != null) {
             this.menus.getSetupList(false);
             this.loader.readCircuit(this.startCircuitText);
             this.unsavedChanges = false;

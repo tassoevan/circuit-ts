@@ -131,39 +131,6 @@ export class CircuitXMLDeserializer {
                 (window as any).Adjustable?.undumpXml(this, this.app);
                 continue;
             }
-            if (tagName === "test") {
-                const tm = (window as any).TestManager?.theManager;
-                if (tm != null) {
-                    this.currentXmlElement = elem;
-                    tm.saveTestTag(this.parseDoubleAttr("len", -1));
-                }
-                continue;
-            }
-            if (tagName === "switchevent") {
-                const tm = (window as any).TestManager?.theManager;
-                if (tm != null) {
-                    this.currentXmlElement = elem;
-                    tm.saveSwitchEvent(this.parseDoubleAttr("t", 0), this.parseIntAttr("en", -1));
-                }
-                continue;
-            }
-            if (tagName === "scopedata") {
-                const tm = (window as any).TestManager?.theManager;
-                if (tm != null) {
-                    this.currentXmlElement = elem;
-                    const si     = this.parseIntAttr("si", -1);
-                    const pi     = this.parseIntAttr("pi", -1);
-                    const en     = this.parseIntAttr("en", -1);
-                    const v      = this.parseIntAttr("v", 0);
-                    const u      = this.parseIntAttr("u", 0);
-                    const sp     = this.parseIntAttr("sp", 1);
-                    const ts     = this.parseDoubleAttr("ts", 0);
-                    const values = this.parseDoubleArray(this.parseContents());
-                    tm.saveScopeDataTag(si, pi, en, v, u, sp, ts, values);
-                }
-                continue;
-            }
-
             const x = elem.getAttribute("x");
             if (x == null)
                 continue;
@@ -231,12 +198,6 @@ export class CircuitXMLDeserializer {
         } catch (e) {
             return null;
         }
-    }
-
-    parseDoubleArray(text: string | null): number[] {
-        if (text == null || text.trim() === "")
-            return [];
-        return text.trim().split(",").map(s => parseFloat(s.trim()));
     }
 
     getChildElements(): Element[] {

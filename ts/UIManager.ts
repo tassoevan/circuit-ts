@@ -797,11 +797,6 @@ export class UIManager {
         verticalPanel.add(exportImportButton);
         */
 
-        if ((window as any).TestManager && (window as any).TestManager.enabled) {
-            const tm = new (window as any).TestManager(this.app);
-            tm.createUI(this.verticalPanel);
-        }
-
         l = document.createElement('div');
         l.textContent = Locale.LS("Current Circuit:");
         l.className = 'topSpace';

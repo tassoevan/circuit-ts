@@ -1429,7 +1429,6 @@ export class SimulationManager {
 		this.stampCircuit();
 		goodIterations = 0;
 	    }
-	    // TODO: TestManager integration
 
 	    let i: number, j: number, subiter: number;
 	    for (i = 0; i !== this.elmArr.length; i++)
@@ -1541,7 +1540,6 @@ export class SimulationManager {
 	    if (!delayWireProcessing)
 		this.calcWireCurrents();
 	    this.app.onTimeStep();
-	    // TODO: TestManager.theManager.checkTime()
 	    // save last node voltages so we can restart the next iteration if necessary
 	    for (let mi = 0; mi !== this.matrices!.length; mi++) {
 		const m = this.matrices![mi];
