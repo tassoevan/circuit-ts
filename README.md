@@ -51,6 +51,13 @@ npm run preview
 npm test
 ```
 
+Besides the unit tests, this replays every circuit in `auto-tests/` headless and compares its scope traces with the ones recorded in the file (`ts/AutoTests.test.ts`). To add a test, save a circuit with scopes and append a `<test len="..."/>` tag (the simulated time to run, in seconds) before `</cir>`, then record its expected traces. After an intended change in simulator behavior, re-record the affected circuits the same way:
+
+```bash
+cd ts
+RECORD_AUTO_TESTS=1 npx vitest run AutoTests -t td4.txt
+```
+
 ### Quick local test
 
 The included `test.sh` script builds the app and starts a local server in one step:

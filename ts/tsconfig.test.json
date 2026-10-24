@@ -1,0 +1,10 @@
+{
+  // AutoTests.test.ts runs under Node (it reads and records auto-tests/ circuits), so it's
+  // type-checked here with Node types instead of with the browser app in tsconfig.json.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "vite/client"]
+  },
+  "include": ["AutoTests.test.ts"],
+  "exclude": ["old", "node_modules"]
+}
