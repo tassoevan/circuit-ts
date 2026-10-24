@@ -1,4 +1,4 @@
-// Simulator regression tests: replays each recorded circuit in auto-tests/ headless and compares
+// Simulator regression tests: replays each recorded circuit in fixtures/auto-tests/ headless and compares
 // its scope traces against the ones saved in the file.  A recorded circuit is a normal saved
 // circuit with extra tags before </cir>:
 //   <test len="..."/>                   how long to run (simulated seconds)
@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { DOMParser, XMLSerializer, DOMImplementation } from "@xmldom/xmldom";
 
-const testDir = path.resolve(__dirname, "../auto-tests");
+const testDir = path.resolve(__dirname, "fixtures/auto-tests");
 const record = !!process.env.RECORD_AUTO_TESTS;
 
 // a sample matches if it's within 0.1% of its own value or of the trace's peak (full scale)
