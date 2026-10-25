@@ -31,7 +31,7 @@ beforeAll(() => {
 // Element and the test needs no DOM.
 function elmEntries(spec: [string, string, string | null, Record<string, string>?][]): Element[] {
     return spec.map(([tag, nn, rn, attrs]) => {
-        const map: Record<string, string> = { nn, ...(attrs ?? {}) };
+        const map: Record<string, string> = { nn, ...attrs };
         if (rn != null) map.rn = rn;
         return {
             tagName: tag,

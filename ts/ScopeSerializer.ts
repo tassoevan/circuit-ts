@@ -20,7 +20,7 @@
 import { Scope } from "./Scope";
 import { ScopePlot } from "./ScopePlot";
 import { ScopePlot2d } from "./ScopePlot2d";
-import { CircuitXMLSerializer as CircuitXMLSerializer } from "./CircuitXMLSerializer";
+import { CircuitXMLSerializer } from "./CircuitXMLSerializer";
 import { CircuitXMLDeserializer } from "./CircuitXMLDeserializer";
 import { StringTokenizer } from "./StringTokenizer";
 import { CustomLogicModel } from "./CustomLogicModel";

@@ -28,7 +28,7 @@ import { ElementFactory } from "./ElementFactory";
 import { StringTokenizer } from "./StringTokenizer";
 import { Rectangle } from "./Rectangle";
 import { Locale } from "./Locale";
-import { CircuitXMLSerializer as CircuitXMLSerializer } from "./CircuitXMLSerializer";
+import { CircuitXMLSerializer } from "./CircuitXMLSerializer";
 import { CustomLogicModel } from "./CustomLogicModel";
 import { DiodeModel } from "./DiodeModel";
 import { MosfetModel } from "./MosfetModel";

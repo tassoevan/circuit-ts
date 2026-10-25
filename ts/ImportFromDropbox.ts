@@ -32,7 +32,7 @@ export class ImportFromDropbox {
             // Bug in firefox prevents Dropbox dialog working properly in this application
             // even though Dropbox chooser supports firefox
             // See https://github.com/gwtproject/gwt/issues/7923
-            if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent))
+            if (/Firefox[/\s](\d+\.\d+)/.test(navigator.userAgent))
                 return false;
             return !!(window as any).Dropbox?.isBrowserSupported?.();
         }
