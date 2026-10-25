@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 120,
+  "overrides": [
+    {
+      "files": ["*.ts", "*.js", "*.mjs", "*.css"],
+      "options": { "tabWidth": 4 }
+    }
+  ],
+  "ignorePatterns": [
+    "lang/",
+    "war/",
+    "websocket/",
+    "ts/fixtures/",
+    "ts/public/",
+    "ts/canvas2svg.js",
+    "package-lock.json"
+  ]
+}

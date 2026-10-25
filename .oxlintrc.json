@@ -1,0 +1,40 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "import", "vitest"],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "builtin": true,
+    "browser": true
+  },
+  "ignorePatterns": ["lang/", "war/", "websocket/", "ts/fixtures/", "ts/public/", "ts/dist/", "ts/canvas2svg.js"],
+  "rules": {
+    // new Array(n) is the idiomatic port of Java's sized array allocation
+    "unicorn/no-new-array": "off",
+    // overridden methods keep the base class signature, and many catch blocks ignore the error
+    "no-unused-vars": ["warn", { "args": "none", "caughtErrors": "none" }],
+    // pre-existing findings, kept visible as warnings until they are triaged
+    "no-debugger": "warn",
+    "no-dupe-else-if": "warn",
+    "no-loss-of-precision": "warn",
+    "oxc/erasing-op": "warn",
+    "typescript/no-this-alias": "warn",
+    "vitest/valid-expect": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["ts/scripts/**", "ts/vite.config.ts", "ts/**/*.test.ts"],
+      "env": { "node": true }
+    },
+    {
+      // test suites are generated from fixture lists
+      "files": ["ts/**/*.test.ts"],
+      "rules": {
+        "vitest/valid-title": "off",
+        "vitest/no-conditional-tests": "off",
+        "vitest/no-disabled-tests": "off"
+      }
+    }
+  ]
+}
