@@ -20,7 +20,6 @@
   "devDependencies": {
     "@types/node": "^26.6.2",
     "@xmldom/xmldom": "^0.9.12",
-    "ts-morph": "^28.0.0",
     "tsx": "^4.22.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.7"
