@@ -5,6 +5,6 @@
   "compilerOptions": {
     "types": ["node", "vite/client"]
   },
-  "include": ["AutoTests.test.ts", "CircuitRegression.test.ts"],
-  "exclude": ["old", "node_modules"]
+  "include": ["src/AutoTests.test.ts", "src/CircuitRegression.test.ts"],
+  "exclude": []
 }

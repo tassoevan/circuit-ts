@@ -11,5 +11,10 @@
 // an asset reference to bundle, and mishandles it in dev mode when the
 // literal isn't a real file (it produced a mangled path with no separating
 // slash instead of a proper URL). Plain string slicing sidesteps that.
+//
+// In dev mode, modules are served unbundled from src/ while the resources are
+// served from ts/public/ at the server base, so resolve against that instead.
 const url = import.meta.url;
-export const moduleBaseURL = url.substring(0, url.lastIndexOf("/") + 1);
+export const moduleBaseURL = import.meta.env.DEV
+    ? new URL(import.meta.env.BASE_URL, url).href
+    : url.substring(0, url.lastIndexOf("/") + 1);

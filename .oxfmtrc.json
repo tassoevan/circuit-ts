@@ -7,11 +7,5 @@
       "options": { "tabWidth": 4 }
     }
   ],
-  "ignorePatterns": [
-    "war/",
-    "ts/fixtures/",
-    "ts/public/",
-    "ts/canvas2svg.js",
-    "package-lock.json"
-  ]
+  "ignorePatterns": ["war/", "ts/fixtures/", "ts/public/", "ts/src/canvas2svg.js", "package-lock.json"]
 }

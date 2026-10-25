@@ -8,7 +8,7 @@
     "builtin": true,
     "browser": true
   },
-  "ignorePatterns": ["war/", "ts/fixtures/", "ts/public/", "ts/dist/", "ts/canvas2svg.js"],
+  "ignorePatterns": ["war/", "ts/fixtures/", "ts/public/", "ts/dist/", "ts/src/canvas2svg.js"],
   "rules": {
     // new Array(n) is the idiomatic port of Java's sized array allocation
     "unicorn/no-new-array": "off",

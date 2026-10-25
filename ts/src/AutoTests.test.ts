@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { initHeadless, createApp, resetCircuit, step, M } from "./HeadlessSim";
 
-const testDir = path.resolve(__dirname, "fixtures/auto-tests");
+const testDir = path.resolve(__dirname, "../fixtures/auto-tests");
 const record = !!process.env.RECORD_AUTO_TESTS;
 
 // a sample matches if it's within 0.1% of its own value or of the trace's peak (full scale)

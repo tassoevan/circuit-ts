@@ -20,7 +20,7 @@ cp -r "$DIR/ts/dist/." site
   # those up to match the renamed directory. The app's own runtime data
   # fetches (setuplist.txt, circuits/, locale/) don't need this: they're
   # resolved from the actual running script's URL at runtime (see
-  # ts/ModuleBase.ts), so they find the renamed directory automatically.
+  # ts/src/ModuleBase.ts), so they find the renamed directory automatically.
   for f in *.html "circuitjs$num"/*.html; do
     [ -f "$f" ] || continue
     sed -i.bak "s#circuitjs/#circuitjs$num/#g" "$f"

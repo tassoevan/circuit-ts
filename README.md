@@ -51,14 +51,14 @@ npm run preview
 npm test
 ```
 
-Besides the unit tests, this replays every circuit in `ts/fixtures/auto-tests/` headless and compares its scope traces with the ones recorded in the file (`ts/AutoTests.test.ts`). To add a test, save a circuit with scopes and append a `<test len="..."/>` tag (the simulated time to run, in seconds) before `</cir>`, then record its expected traces. After an intended change in simulator behavior, re-record the affected circuits the same way:
+Besides the unit tests, this replays every circuit in `ts/fixtures/auto-tests/` headless and compares its scope traces with the ones recorded in the file (`ts/src/AutoTests.test.ts`). To add a test, save a circuit with scopes and append a `<test len="..."/>` tag (the simulated time to run, in seconds) before `</cir>`, then record its expected traces. After an intended change in simulator behavior, re-record the affected circuits the same way:
 
 ```bash
 cd ts
 RECORD_AUTO_TESTS=1 npx vitest run AutoTests -t td4.txt
 ```
 
-It also loads every circuit in `ts/fixtures/circuits/` (elements the examples don't use, bug reproductions and loader edge cases) with the app's loader, runs it for 1000 timesteps and compares the result with `ts/fixtures/circuits/expected/<file>.json`: the elements that loaded, whether the simulation stopped, and every element's voltages and current at regular intervals (`ts/CircuitRegression.test.ts`). Loading must not log an exception. These circuits stay in whatever format they were saved in, so the old text format keeps being tested. To add a circuit, put it in that directory and record its expected results; re-record the same way after an intended change in simulator behavior:
+It also loads every circuit in `ts/fixtures/circuits/` (elements the examples don't use, bug reproductions and loader edge cases) with the app's loader, runs it for 1000 timesteps and compares the result with `ts/fixtures/circuits/expected/<file>.json`: the elements that loaded, whether the simulation stopped, and every element's voltages and current at regular intervals (`ts/src/CircuitRegression.test.ts`). Loading must not log an exception. These circuits stay in whatever format they were saved in, so the old text format keeps being tested. To add a circuit, put it in that directory and record its expected results; re-record the same way after an intended change in simulator behavior:
 
 ```bash
 cd ts

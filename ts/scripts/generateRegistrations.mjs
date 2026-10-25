@@ -8,7 +8,7 @@ import { readdirSync, writeFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const root = join(dirname(fileURLToPath(import.meta.url)), "../src");
 const out = join(root, "registerElements.ts");
 
 const SKIP = new Set(["GateElm", "ChipElm", "CompositeElm", "SubcircuitChipElm", "JfetElm", "GraphicElm"]);

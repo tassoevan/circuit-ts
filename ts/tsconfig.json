@@ -43,5 +43,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "exclude": ["old", "node_modules", "vite.config.ts", "AutoTests.test.ts", "CircuitRegression.test.ts"]
+  "include": ["src"],
+  "exclude": ["src/AutoTests.test.ts", "src/CircuitRegression.test.ts"]
 }

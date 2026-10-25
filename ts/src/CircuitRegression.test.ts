@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { initHeadless, createApp, resetCircuit, step, M } from "./HeadlessSim";
 
-const circuitDir = path.resolve(__dirname, "fixtures/circuits");
+const circuitDir = path.resolve(__dirname, "../fixtures/circuits");
 const expectedDir = path.join(circuitDir, "expected");
 const record = !!process.env.RECORD_CIRCUITS;
 
