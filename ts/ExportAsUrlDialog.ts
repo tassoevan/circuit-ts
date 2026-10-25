@@ -34,14 +34,18 @@ export class ExportAsUrlDialog extends Dialog {
         const url = "shortrelay.php" + "?v=" + urlin;
         textArea.value = "Waiting for short URL for web service...";
         fetch(url)
-            .then(r => {
+            .then((r) => {
                 if (r.ok) return r.text();
                 const text = "Shortner error:" + r.statusText;
                 console.log(text);
                 return text;
             })
-            .then(text => { textArea.value = text; })
-            .catch((exception) => { console.log("File Error Response", exception); });
+            .then((text) => {
+                textArea.value = text;
+            })
+            .catch((exception) => {
+                console.log("File Error Response", exception);
+            });
     }
 
     constructor(dump: string) {
@@ -67,7 +71,9 @@ export class ExportAsUrlDialog extends Dialog {
 
         if (url.length > 2000) {
             const warning = document.createElement("div");
-            warning.textContent = Locale.LS("Warning: this URL is longer than 2000 characters and may not work in some browsers.");
+            warning.textContent = Locale.LS(
+                "Warning: this URL is longer than 2000 characters and may not work in some browsers.",
+            );
             warning.style.width = "300px";
             this.dialogEl.appendChild(warning);
         }

@@ -89,7 +89,7 @@ function getCircuitAsComposite(sim: SimulationManager): SubcircuitModel | null {
         for (let j = 0; j < lne.busWidth; j++) {
             extnodes[ce.getNode(j).index] = true;
             if (ce.getNode(j).index === 0) {
-                window.alert('Node "' + lne.text + '" can\'t be connected to ground');
+                window.alert('Node "' + lne.text + "\" can't be connected to ground");
                 return null;
             }
         }
@@ -118,8 +118,14 @@ function getCircuitAsComposite(sim: SimulationManager): SubcircuitModel | null {
     for (let i = 0; i !== sim.app.elmList.length; i++) {
         const ce = sim.app.elmList[i] as CircuitElm;
         if (sel && !ce.isSelected()) continue;
-        if (ce.isWireElm() || ce.isRoutedWireElm() || ce.isLabeledNodeElm() ||
-                ce.isScopeElm() || ce.isGraphicElm() || ce.isGroundElm()) {
+        if (
+            ce.isWireElm() ||
+            ce.isRoutedWireElm() ||
+            ce.isLabeledNodeElm() ||
+            ce.isScopeElm() ||
+            ce.isGraphicElm() ||
+            ce.isGroundElm()
+        ) {
             extraList.push(ce);
         } else {
             dumpList.push(ce);
@@ -130,9 +136,7 @@ function getCircuitAsComposite(sim: SimulationManager): SubcircuitModel | null {
     // which node ids the model actually contains, so we can tell whether an expression
     // reference points at something inside the selection
     const inModel: boolean[] = new Array(nodeCount).fill(false);
-    for (const ce of dumpList)
-        for (let j = 0; j !== ce.getPostCount(); j++)
-            inModel[ce.getNode(j).index] = true;
+    for (const ce of dumpList) for (let j = 0; j !== ce.getPostCount(); j++) inModel[ce.getNode(j).index] = true;
 
     // output all the elements as XML
     for (let i = 0; i !== dumpList.length; i++) {
@@ -152,8 +156,7 @@ function getCircuitAsComposite(sim: SimulationManager): SubcircuitModel | null {
         for (let j = 0; j !== ce.getRefNodeCount(); j++) {
             const n = ce.getNode(ce.getRefNodeBase() + j).index;
             if (n !== 0 && !inModel[n]) {
-                window.alert('Element "' + ce.getElmType() +
-                    '" refers to a node outside the selection');
+                window.alert('Element "' + ce.getElmType() + '" refers to a node outside the selection');
                 for (const se of closedSwitches) se.position = 0;
                 return null;
             }
@@ -163,15 +166,13 @@ function getCircuitAsComposite(sim: SimulationManager): SubcircuitModel | null {
         }
         const child = elmDoc.createElement(ce.getXmlDumpType());
         CircuitXMLSerializer.dumpAttr(child, "nn", nn);
-        if (rn.length > 0)
-            CircuitXMLSerializer.dumpAttr(child, "rn", rn);
+        if (rn.length > 0) CircuitXMLSerializer.dumpAttr(child, "rn", rn);
         ce.dumpXml(elmDoc, child);
         // remove child elements (state) since this is a model definition, not an instance
         let cn = child.firstChild;
         while (cn !== null) {
             const next = cn.nextSibling;
-            if (cn.nodeType === Node.ELEMENT_NODE)
-                child.removeChild(cn);
+            if (cn.nodeType === Node.ELEMENT_NODE) child.removeChild(cn);
             cn = next;
         }
         elmRoot.appendChild(child);

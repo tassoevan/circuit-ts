@@ -29,7 +29,7 @@ import { parseIntStrict } from "./NumberParse";
 export class CounterElm extends ChipElm {
     invertreset: boolean = false;
     modulus: number = 0;
-    static readonly FLAG_UP_DOWN       = 4;
+    static readonly FLAG_UP_DOWN = 4;
     static readonly FLAG_NEGATIVE_EDGE = 8;
 
     constructor(xx: number, yy: number);
@@ -61,12 +61,15 @@ export class CounterElm extends ChipElm {
         this.pins[1].bubble = this.invertreset;
     }
 
-    needsBits(): boolean { return true; }
-    allowBus(): boolean { return true; }
+    needsBits(): boolean {
+        return true;
+    }
+    allowBus(): boolean {
+        return true;
+    }
 
     getChipName(): string {
-        if (this.modulus === 0)
-            return "Counter";
+        if (this.modulus === 0) return "Counter";
         return Locale.LS("Counter") + Locale.LS(" (mod ") + this.modulus + ")";
     }
 
@@ -81,8 +84,7 @@ export class CounterElm extends ChipElm {
         this.pins[1] = new Pin(this, this.sizeY - 1, ChipElm.SIDE_W, "R");
         this.pins[1].bubble = this.invertreset;
         this.makeBitPins(this.bits, 0, ChipElm.SIDE_E, 2, "Q", true, true, true);
-        if (this.hasUpDown())
-            this.pins[this.bits + 2] = new Pin(this, this.sizeY - 2, ChipElm.SIDE_W, "U/D");
+        if (this.hasUpDown()) this.pins[this.bits + 2] = new Pin(this, this.sizeY - 2, ChipElm.SIDE_W, "U/D");
         this.allocNodes();
     }
 
@@ -90,10 +92,16 @@ export class CounterElm extends ChipElm {
         return this.hasUpDown() ? this.bits + 3 : this.bits + 2;
     }
 
-    getVoltageSourceCount(): number { return this.bits; }
+    getVoltageSourceCount(): number {
+        return this.bits;
+    }
 
-    hasUpDown(): boolean { return this.hasFlag(CounterElm.FLAG_UP_DOWN); }
-    negativeEdgeTriggered(): boolean { return this.hasFlag(CounterElm.FLAG_NEGATIVE_EDGE); }
+    hasUpDown(): boolean {
+        return this.hasFlag(CounterElm.FLAG_UP_DOWN);
+    }
+    negativeEdgeTriggered(): boolean {
+        return this.hasFlag(CounterElm.FLAG_NEGATIVE_EDGE);
+    }
 
     execute(): void {
         const neg = this.negativeEdgeTriggered();
@@ -102,42 +110,36 @@ export class CounterElm extends ChipElm {
 
             // get direction
             let dir = 1;
-            if (this.hasUpDown() && this.pins[this.bits + 2].value)
-                dir = -1;
+            if (this.hasUpDown() && this.pins[this.bits + 2].value) dir = -1;
 
             // get current value
             const lastBit = 2 + this.bits - 1;
-            for (let i = 0; i !== this.bits; i++)
-                if (this.pins[lastBit - i].value)
-                    value |= 1 << i;
+            for (let i = 0; i !== this.bits; i++) if (this.pins[lastBit - i].value) value |= 1 << i;
 
             // update value
             value += dir;
-            if (this.modulus !== 0)
-                value = ((value % this.modulus) + this.modulus) % this.modulus;
+            if (this.modulus !== 0) value = ((value % this.modulus) + this.modulus) % this.modulus;
 
             // convert value to binary
-            for (let i = 0; i !== this.bits; i++)
-                this.pins[lastBit - i].value = (value & (1 << i)) !== 0;
+            for (let i = 0; i !== this.bits; i++) this.pins[lastBit - i].value = (value & (1 << i)) !== 0;
         }
         if (!this.pins[1].value === this.invertreset) {
-            for (let i = 0; i !== this.bits; i++)
-                this.pins[i + 2].value = false;
+            for (let i = 0; i !== this.bits; i++) this.pins[i + 2].value = false;
         }
         this.lastClock = this.pins[0].value;
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Invert reset pin", this.invertreset);
             return ei;
         }
-        if (n === 1)
-            return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
-        if (n === 2)
-            return new EditInfo("Modulus", this.modulus, 1, 1).setDimensionless();
+        if (n === 1) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
+        if (n === 2) return new EditInfo("Modulus", this.modulus, 1, 1).setDimensionless();
         if (n === 3) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Up/Down Pin", this.hasUpDown());
@@ -162,11 +164,9 @@ export class CounterElm extends ChipElm {
                 this.bits = Math.trunc(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be >= 3");
+            } else ei.setError("must be >= 3");
         }
-        if (n === 2)
-            this.modulus = Math.trunc(ei.value);
+        if (n === 2) this.modulus = Math.trunc(ei.value);
         if (n === 3) {
             this.flags = ei.changeFlag(this.flags, CounterElm.FLAG_UP_DOWN);
             this.setupPins();
@@ -179,6 +179,10 @@ export class CounterElm extends ChipElm {
         }
     }
 
-    getDumpType(): number { return 164; }
-    getXmlDumpType(): string { return "ctr"; }
+    getDumpType(): number {
+        return 164;
+    }
+    getXmlDumpType(): string {
+        return "ctr";
+    }
 }

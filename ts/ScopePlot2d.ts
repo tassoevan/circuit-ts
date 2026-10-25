@@ -56,17 +56,16 @@ export class ScopePlot2d {
     constructor(scope: Scope) {
         this.scope = scope;
         this.scaleX = 5;
-        this.scaleY = .1;
+        this.scaleY = 0.1;
     }
 
     allocImage(): void {
-        if (!this.enabled)
-            return;
+        if (!this.enabled) return;
         if (this.imageCanvas === null) {
             this.imageCanvas = document.createElement("canvas");
             this.imageContext = this.imageCanvas.getContext("2d");
         }
-        this.imageCanvas.width  = this.scope.rect.width;
+        this.imageCanvas.width = this.scope.rect.width;
         this.imageCanvas.height = this.scope.rect.height;
         this.clearView();
     }
@@ -81,20 +80,18 @@ export class ScopePlot2d {
 
     calcGridPx(width: number, height: number): number {
         const m = Math.min(width, height);
-        return (m / 2) / (this.scope.manDivisions / 2 + 0.05);
+        return m / 2 / (this.scope.manDivisions / 2 + 0.05);
     }
 
     // Draw a segment from (ox,oy) to (x2,y2) with the given color and alpha.
     drawSegment(ox: number, oy: number, x2: number, y2: number, color: string, alpha: number): void {
-        if (alpha !== 1.0)
-            this.imageContext!.globalAlpha = alpha;
+        if (alpha !== 1.0) this.imageContext!.globalAlpha = alpha;
         this.imageContext!.strokeStyle = color;
         this.imageContext!.beginPath();
         this.imageContext!.moveTo(ox, oy);
         this.imageContext!.lineTo(x2, y2);
         this.imageContext!.stroke();
-        if (alpha !== 1.0)
-            this.imageContext!.globalAlpha = 1.0;
+        if (alpha !== 1.0) this.imageContext!.globalAlpha = 1.0;
     }
 
     drawTo(x2: number, y2: number, color?: string, alpha?: number): void {
@@ -113,7 +110,9 @@ export class ScopePlot2d {
     computeColor(): string {
         if (this.plotColorR < 0 && this.plotColorG < 0 && this.plotColorB < 0)
             return this.scope.app.isPrintable() ? "#000000" : "#ffffff";
-        let r = 0, g = 0, b = 0;
+        let r = 0,
+            g = 0,
+            b = 0;
         if (this.plotColorR >= 0 && this.plotColorR < this.scope.plots.length) {
             const rv = this.scope.plots[this.plotColorR].lastValue;
             while (rv > this.scaleR) this.scaleR *= 2;
@@ -134,8 +133,7 @@ export class ScopePlot2d {
 
     // Compute draw alpha from the brightness modulator plot (0 = off, 1 = full).
     computeAlpha(): number {
-        if (this.plotBrightness < 0 || this.plotBrightness >= this.scope.plots.length)
-            return 1.0;
+        if (this.plotBrightness < 0 || this.plotBrightness >= this.scope.plots.length) return 1.0;
         const bv = Math.abs(this.scope.plots[this.plotBrightness].lastValue);
         while (bv > this.scaleBrightness) this.scaleBrightness *= 2;
         return this.scaleBrightness > 0 ? bv / this.scaleBrightness : 0;
@@ -149,47 +147,58 @@ export class ScopePlot2d {
     }
 
     timeStep(): void {
-        if (this.imageContext === null || this.scope.plots.length < 1)
-            return;
+        if (this.imageContext === null || this.scope.plots.length < 1) return;
         const px = this.validPlotIndex(this.plotX, 0);
         const py = this.validPlotIndex(this.plotY, Math.min(1, this.scope.plots.length - 1));
-        const v    = this.scope.plots[px].lastValue;
+        const v = this.scope.plots[px].lastValue;
         const yval = this.scope.plots[py].lastValue;
         let x: number, y: number;
         if (!this.scope.isManualScale()) {
             let newscale = false;
-            while (v > this.scaleX || v < -this.scaleX)    { this.scaleX *= 2; newscale = true; }
-            while (yval > this.scaleY || yval < -this.scaleY) { this.scaleY *= 2; newscale = true; }
-            if (newscale)
-                this.clearView();
-            x = Math.trunc(this.scope.rect.width  * (1 + v    / this.scaleX) * .499);
-            y = Math.trunc(this.scope.rect.height * (1 - yval / this.scaleY) * .499);
+            while (v > this.scaleX || v < -this.scaleX) {
+                this.scaleX *= 2;
+                newscale = true;
+            }
+            while (yval > this.scaleY || yval < -this.scaleY) {
+                this.scaleY *= 2;
+                newscale = true;
+            }
+            if (newscale) this.clearView();
+            x = Math.trunc(this.scope.rect.width * (1 + v / this.scaleX) * 0.499);
+            y = Math.trunc(this.scope.rect.height * (1 - yval / this.scaleY) * 0.499);
         } else {
             const gridPx = this.calcGridPx(this.scope.rect.width, this.scope.rect.height);
-            x = Math.trunc(this.scope.rect.width  * .499 + (v    / this.scope.plots[px].manScale) * gridPx + gridPx * this.scope.manDivisions * this.scope.plots[px].manVPosition  / Scope.V_POSITION_STEPS);
-            y = Math.trunc(this.scope.rect.height * .499 - (yval / this.scope.plots[py].manScale) * gridPx - gridPx * this.scope.manDivisions * this.scope.plots[py].manVPosition / Scope.V_POSITION_STEPS);
+            x = Math.trunc(
+                this.scope.rect.width * 0.499 +
+                    (v / this.scope.plots[px].manScale) * gridPx +
+                    (gridPx * this.scope.manDivisions * this.scope.plots[px].manVPosition) / Scope.V_POSITION_STEPS,
+            );
+            y = Math.trunc(
+                this.scope.rect.height * 0.499 -
+                    (yval / this.scope.plots[py].manScale) * gridPx -
+                    (gridPx * this.scope.manDivisions * this.scope.plots[py].manVPosition) / Scope.V_POSITION_STEPS,
+            );
         }
         this.drawTo(x, y, this.computeColor(), this.computeAlpha());
     }
 
     maxScale(): void {
         const x = 1e-8;
-        this.scope.scale[Scope.UNITS_V]    *= x;
-        this.scope.scale[Scope.UNITS_A]    *= x;
+        this.scope.scale[Scope.UNITS_V] *= x;
+        this.scope.scale[Scope.UNITS_A] *= x;
         this.scope.scale[Scope.UNITS_OHMS] *= x;
-        this.scope.scale[Scope.UNITS_W]    *= x;
-        this.scope.scale[Scope.UNITS_C]    *= x;
-        this.scaleX            *= x;
-        this.scaleY            *= x;
-        this.scaleBrightness   *= x;
-        this.scaleR            *= x;
-        this.scaleG            *= x;
-        this.scaleB            *= x;
+        this.scope.scale[Scope.UNITS_W] *= x;
+        this.scope.scale[Scope.UNITS_C] *= x;
+        this.scaleX *= x;
+        this.scaleY *= x;
+        this.scaleBrightness *= x;
+        this.scaleR *= x;
+        this.scaleG *= x;
+        this.scaleB *= x;
     }
 
     draw(g: Graphics): void {
-        if (this.imageContext === null)
-            return;
+        if (this.imageContext === null) return;
         g.context.save();
         g.context.translate(this.scope.rect.x, this.scope.rect.y);
         g.clipRect(0, 0, this.scope.rect.width, this.scope.rect.height);
@@ -206,13 +215,11 @@ export class ScopePlot2d {
                 // alphas have no effect on an 8-bit canvas and the trail never fades at low speed.
                 if (this.lastTrailSimTime < 0 || this.scope.sim.t < this.lastTrailSimTime)
                     this.lastTrailSimTime = this.scope.sim.t;
-                const elapsed   = this.scope.sim.t - this.lastTrailSimTime;
+                const elapsed = this.scope.sim.t - this.lastTrailSimTime;
                 const timeConst = this.trailPersistence * this.scope.sim.maxTimeStep;
                 fadeAlpha = 1.0 - Math.exp(-elapsed / timeConst);
-                if (fadeAlpha >= 3.0 / 255)
-                    this.lastTrailSimTime = this.scope.sim.t;
-                else
-                    fadeAlpha = 0;
+                if (fadeAlpha >= 3.0 / 255) this.lastTrailSimTime = this.scope.sim.t;
+                else fadeAlpha = 0;
             }
             if (fadeAlpha > 0) {
                 this.imageContext.globalAlpha = fadeAlpha;
@@ -227,48 +234,78 @@ export class ScopePlot2d {
         g.fillOval(this.draw_ox - 2, this.draw_oy - 2, 5, 5);
         g.setColor(CircuitElm.positiveColor);
         g.drawLine(0, this.scope.rect.height / 2, this.scope.rect.width - 1, this.scope.rect.height / 2);
-        if (!this.plotXY)
-            g.setColor(Color.yellow);
+        if (!this.plotXY) g.setColor(Color.yellow);
         g.drawLine(this.scope.rect.width / 2, 0, this.scope.rect.width / 2, this.scope.rect.height - 1);
         if (this.scope.isManualScale()) {
             const gridPx = this.calcGridPx(this.scope.rect.width, this.scope.rect.height);
             g.setColor("#404040");
             for (let i = -this.scope.manDivisions; i <= this.scope.manDivisions; i++) {
                 if (i !== 0)
-                    g.drawLine(Math.trunc(gridPx * i) + this.scope.rect.width  / 2, 0,
-                               Math.trunc(gridPx * i) + this.scope.rect.width  / 2, this.scope.rect.height);
-                g.drawLine(0,                          Math.trunc(gridPx * i) + this.scope.rect.height / 2,
-                           this.scope.rect.width,      Math.trunc(gridPx * i) + this.scope.rect.height / 2);
+                    g.drawLine(
+                        Math.trunc(gridPx * i) + this.scope.rect.width / 2,
+                        0,
+                        Math.trunc(gridPx * i) + this.scope.rect.width / 2,
+                        this.scope.rect.height,
+                    );
+                g.drawLine(
+                    0,
+                    Math.trunc(gridPx * i) + this.scope.rect.height / 2,
+                    this.scope.rect.width,
+                    Math.trunc(gridPx * i) + this.scope.rect.height / 2,
+                );
             }
         }
         this.scope.overlays.textY = 10;
         g.setColor(CircuitElm.whiteColor);
-        if (this.scope.text != null)
-            this.scope.drawInfoText(g, this.scope.text);
+        if (this.scope.text != null) this.scope.drawInfoText(g, this.scope.text);
         const px = this.validPlotIndex(this.plotX, 0);
         const py = this.validPlotIndex(this.plotY, Math.min(1, this.scope.plots.length - 1));
-        if (this.scope.showScale && this.scope.plots.length >= 1 && this.scope.isManualScale() &&
-                px < this.scope.plots.length && py < this.scope.plots.length) {
+        if (
+            this.scope.showScale &&
+            this.scope.plots.length >= 1 &&
+            this.scope.isManualScale() &&
+            px < this.scope.plots.length &&
+            py < this.scope.plots.length
+        ) {
             const spx = this.scope.plots[px];
             const spy = this.scope.plots[py];
-            this.scope.drawInfoText(g, "X=" + spx.getUnitText(spx.manScale) + "/div, Y=" + spy.getUnitText(spy.manScale) + "/div");
+            this.scope.drawInfoText(
+                g,
+                "X=" + spx.getUnitText(spx.manScale) + "/div, Y=" + spy.getUnitText(spy.manScale) + "/div",
+            );
         }
         g.context.restore();
         this.scope.drawSettingsWheel(g);
-        if (!this.scope.app.modalDialogIsShowing() &&
-                this.scope.rect.contains(this.scope.app.mouse.mouseCursorX, this.scope.app.mouse.mouseCursorY) &&
-                this.scope.plots.length >= 1 && px < this.scope.plots.length && py < this.scope.plots.length) {
+        if (
+            !this.scope.app.modalDialogIsShowing() &&
+            this.scope.rect.contains(this.scope.app.mouse.mouseCursorX, this.scope.app.mouse.mouseCursorY) &&
+            this.scope.plots.length >= 1 &&
+            px < this.scope.plots.length &&
+            py < this.scope.plots.length
+        ) {
             const gridPx = this.calcGridPx(this.scope.rect.width, this.scope.rect.height);
             const info: string[] = new Array(2);
             const spx = this.scope.plots[px];
             const spy = this.scope.plots[py];
             let xValue: number, yValue: number;
             if (this.scope.isManualScale()) {
-                xValue =  spx.manScale * ((this.scope.app.mouse.mouseCursorX - this.scope.rect.x - this.scope.rect.width  / 2) / gridPx - this.scope.manDivisions * spx.manVPosition / Scope.V_POSITION_STEPS);
-                yValue =  spy.manScale * ((-this.scope.app.mouse.mouseCursorY + this.scope.rect.y + this.scope.rect.height / 2) / gridPx - this.scope.manDivisions * spy.manVPosition / Scope.V_POSITION_STEPS);
+                xValue =
+                    spx.manScale *
+                    ((this.scope.app.mouse.mouseCursorX - this.scope.rect.x - this.scope.rect.width / 2) / gridPx -
+                        (this.scope.manDivisions * spx.manVPosition) / Scope.V_POSITION_STEPS);
+                yValue =
+                    spy.manScale *
+                    ((-this.scope.app.mouse.mouseCursorY + this.scope.rect.y + this.scope.rect.height / 2) / gridPx -
+                        (this.scope.manDivisions * spy.manVPosition) / Scope.V_POSITION_STEPS);
             } else {
-                xValue =  ((this.scope.app.mouse.mouseCursorX - this.scope.rect.x) / (0.499 * this.scope.rect.width)  - 1.0) * this.scaleX;
-                yValue = -((this.scope.app.mouse.mouseCursorY - this.scope.rect.y) / (0.499 * this.scope.rect.height) - 1.0) * this.scaleY;
+                xValue =
+                    ((this.scope.app.mouse.mouseCursorX - this.scope.rect.x) / (0.499 * this.scope.rect.width) - 1.0) *
+                    this.scaleX;
+                yValue =
+                    -(
+                        (this.scope.app.mouse.mouseCursorY - this.scope.rect.y) / (0.499 * this.scope.rect.height) -
+                        1.0
+                    ) * this.scaleY;
             }
             info[0] = spx.getUnitText(xValue);
             info[1] = spy.getUnitText(yValue);

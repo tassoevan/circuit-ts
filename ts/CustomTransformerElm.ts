@@ -72,8 +72,7 @@ export class CustomTransformerElm extends CircuitElm {
             this.description = CustomLogicModel.unescape(st.nextToken());
             this.coilCount = parseIntStrict(st.nextToken());
             this.coilCurrents = new Array(this.coilCount).fill(0);
-            for (let i = 0; i !== this.coilCount; i++)
-                this.coilCurrents[i] = parseFloatStrict(st.nextToken());
+            for (let i = 0; i !== this.coilCount; i++) this.coilCurrents[i] = parseFloatStrict(st.nextToken());
             this.noDiagonal = true;
             this.parseDescription(this.description);
         } else {
@@ -89,13 +88,15 @@ export class CustomTransformerElm extends CircuitElm {
     drag(xx: number, yy: number): void {
         xx = this.snapGrid(xx);
         yy = this.snapGrid(yy);
-        if (xx === this.x)
-            yy = this.y;
-        this.x2 = xx; this.y2 = yy;
+        if (xx === this.x) yy = this.y;
+        this.x2 = xx;
+        this.y2 = yy;
         this.setPoints();
     }
 
-    getDumpType(): number { return 406; }
+    getDumpType(): number {
+        return 406;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -131,8 +132,7 @@ export class CustomTransformerElm extends CircuitElm {
     }
 
     parseDescription(desc?: string, ei?: EditInfo): boolean {
-        if (desc === undefined)
-            desc = this.description;
+        if (desc === undefined) desc = this.description;
         // a number indicates a coil (number = turns ratio to base inductance coil)
         // (negative number = reverse polarity)
         // : separates primary and secondary
@@ -143,17 +143,14 @@ export class CustomTransformerElm extends CircuitElm {
         // count coils/nodes
         this.coilCount = this.nodeCount = 0;
         for (const s of tokens) {
-            if (s === "+")
-                this.nodeCount--;
-            if (s === "," || s === "+" || s === ":")
-                continue;
+            if (s === "+") this.nodeCount--;
+            if (s === "," || s === "+" || s === ":") continue;
             this.nodeCount += 2;
             this.coilCount++;
         }
 
         if (this.coilCount === 0) {
-            if (ei !== undefined)
-                ei.setError("no coils defined");
+            if (ei !== undefined) ei.setError("no coils defined");
             return false;
         }
 
@@ -182,14 +179,12 @@ export class CustomTransformerElm extends CircuitElm {
             let n = 0;
             const parsed = parseFloatStrict(tok);
             if (isNaN(parsed)) {
-                if (ei !== undefined)
-                    ei.setError("expected number, got '" + tok + "'");
+                if (ei !== undefined) ei.setError("expected number, got '" + tok + "'");
                 return false;
             }
             n = parsed;
             if (n === 0) {
-                if (ei !== undefined)
-                    ei.setError("turns ratio cannot be zero");
+                if (ei !== undefined) ei.setError("turns ratio cannot be zero");
                 return false;
             }
             // create new coil
@@ -202,13 +197,10 @@ export class CustomTransformerElm extends CircuitElm {
             }
             nodeNum += 2;
             coilNum++;
-            if (!secondary)
-                this.primaryCoils = coilNum;
-            if (ti >= tokens.length)
-                break;
+            if (!secondary) this.primaryCoils = coilNum;
+            if (ti >= tokens.length) break;
             const sep = tokens[ti++];
-            if (sep === ",")
-                continue;
+            if (sep === ",") continue;
             if (sep === "+") {
                 nodeNum--;
                 continue;
@@ -216,15 +208,13 @@ export class CustomTransformerElm extends CircuitElm {
             if (sep === ":") {
                 // switch to secondary
                 if (secondary) {
-                    if (ei !== undefined)
-                        ei.setError("only one ':' separator allowed");
+                    if (ei !== undefined) ei.setError("only one ':' separator allowed");
                     return false;
                 }
                 secondary = true;
                 continue;
             }
-            if (ei !== undefined)
-                ei.setError("unexpected '" + sep + "'");
+            if (ei !== undefined) ei.setError("unexpected '" + sep + "'");
             return false;
         }
         this.allocNodes();
@@ -239,7 +229,10 @@ export class CustomTransformerElm extends CircuitElm {
         let cur = "";
         for (const ch of desc) {
             if (ch === "," || ch === ":" || ch === "+") {
-                if (cur.length > 0) { result.push(cur); cur = ""; }
+                if (cur.length > 0) {
+                    result.push(cur);
+                    cur = "";
+                }
                 result.push(ch);
             } else {
                 cur += ch;
@@ -249,7 +242,9 @@ export class CustomTransformerElm extends CircuitElm {
         return result;
     }
 
-    isTrapezoidal(): boolean { return (this.flags & Inductor.FLAG_BACK_EULER) === 0; }
+    isTrapezoidal(): boolean {
+        return (this.flags & Inductor.FLAG_BACK_EULER) === 0;
+    }
 
     draw(g: Graphics): void {
         // draw taps
@@ -262,9 +257,15 @@ export class CustomTransformerElm extends CircuitElm {
         for (let i = 0; i !== this.coilCount; i++) {
             const n = this.coilNodes[i];
             this.setVoltageColor(g, this.nodes[n].v);
-            this.setPowerColor(g, this.coilCurrents[i] * (this.nodes[n].v - this.nodes[n+1].v));
-            this.drawCoil(g, (i >= this.primaryCoils ? -6 * this.flip : 6 * this.flip),
-                this.nodeTaps[n], this.nodeTaps[n+1], this.nodes[n].v, this.nodes[n+1].v);
+            this.setPowerColor(g, this.coilCurrents[i] * (this.nodes[n].v - this.nodes[n + 1].v));
+            this.drawCoil(
+                g,
+                i >= this.primaryCoils ? -6 * this.flip : 6 * this.flip,
+                this.nodeTaps[n],
+                this.nodeTaps[n + 1],
+                this.nodes[n].v,
+                this.nodes[n + 1].v,
+            );
             if (this.dots !== null) {
                 g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.lightGrayColor);
                 g.fillOval(this.dots[i].x - 2, this.dots[i].y - 2, 5, 5);
@@ -274,14 +275,14 @@ export class CustomTransformerElm extends CircuitElm {
 
         // draw core
         for (let i = 0; i !== 2; i++) {
-            CircuitElm.drawThickLine(g, this.ptCore[i], this.ptCore[i+2]);
+            CircuitElm.drawThickLine(g, this.ptCore[i], this.ptCore[i + 2]);
         }
 
         // draw coil currents
         for (let i = 0; i !== this.coilCount; i++) {
             this.coilCurCounts[i] = this.updateDotCountImpl(this.coilCurrents[i], this.coilCurCounts[i]);
             const ni = this.coilNodes[i];
-            this.drawDots(g, this.nodeTaps[ni], this.nodeTaps[ni+1], this.coilCurCounts[i]);
+            this.drawDots(g, this.nodeTaps[ni], this.nodeTaps[ni + 1], this.coilCurCounts[i]);
         }
 
         // draw tap currents
@@ -291,7 +292,7 @@ export class CustomTransformerElm extends CircuitElm {
         }
 
         this.drawPosts(g);
-        this.setBbox(this.nodePoints[0], this.nodePoints[this.nodeCount-1], 0);
+        this.setBbox(this.nodePoints[0], this.nodePoints[this.nodeCount - 1], 0);
         this.adjustBbox(this.ptCore[0], this.ptCore[3]);
     }
 
@@ -299,7 +300,7 @@ export class CustomTransformerElm extends CircuitElm {
         super.setPoints();
         this.point2.y = this.point1.y;
         this.flip = this.hasFlag(CustomTransformerElm.FLAG_FLIP) ? -1 : 1;
-        const primaryNodes = (this.primaryCoils === this.coilCount) ? this.nodeCount : this.coilNodes[this.primaryCoils];
+        const primaryNodes = this.primaryCoils === this.coilCount ? this.nodeCount : this.coilNodes[this.primaryCoils];
         this.dn = Math.abs(this.point1.x - this.point2.x);
         const ce = 0.5 - 12 / this.dn;
         const cd = 0.5 - 2 / this.dn;
@@ -308,13 +309,23 @@ export class CustomTransformerElm extends CircuitElm {
             let c = 0;
             let offset = 0;
             for (let i = 0; i !== this.nodeCount; i++) {
-                if (i === primaryNodes)
-                    offset = 0;
+                if (i === primaryNodes) offset = 0;
                 if (step === 1) {
-                    if (i === primaryNodes - 1 || i === this.nodeCount - 1)
-                        offset = maxWidth;
-                    this.interpPoint(this.point1, this.point2, this.nodePoints[i], i < primaryNodes ? 0 : 1,     -offset * this.flip);
-                    this.interpPoint(this.point1, this.point2, this.nodeTaps[i],   i < primaryNodes ? ce : 1-ce, -offset * this.flip);
+                    if (i === primaryNodes - 1 || i === this.nodeCount - 1) offset = maxWidth;
+                    this.interpPoint(
+                        this.point1,
+                        this.point2,
+                        this.nodePoints[i],
+                        i < primaryNodes ? 0 : 1,
+                        -offset * this.flip,
+                    );
+                    this.interpPoint(
+                        this.point1,
+                        this.point2,
+                        this.nodeTaps[i],
+                        i < primaryNodes ? ce : 1 - ce,
+                        -offset * this.flip,
+                    );
                 }
                 maxWidth = Math.max(maxWidth, offset);
                 const nn = c < this.coilCount ? this.coilNodes[c] : -1;
@@ -330,9 +341,9 @@ export class CustomTransformerElm extends CircuitElm {
         }
         this.ptCore = this.newPointArray(4);
         for (let i = 0; i !== 4; i += 2) {
-            const h = (i === 2) ? -maxWidth * this.flip : 0;
-            this.interpPoint(this.point1, this.point2, this.ptCore[i],   cd,     h);
-            this.interpPoint(this.point1, this.point2, this.ptCore[i+1], 1 - cd, h);
+            const h = i === 2 ? -maxWidth * this.flip : 0;
+            this.interpPoint(this.point1, this.point2, this.ptCore[i], cd, h);
+            this.interpPoint(this.point1, this.point2, this.ptCore[i + 1], 1 - cd, h);
         }
 
         if (this.needDots) {
@@ -340,23 +351,29 @@ export class CustomTransformerElm extends CircuitElm {
             const dotp = Math.abs(7 / this.width);
             for (let i = 0; i !== this.coilCount; i++) {
                 const n = this.coilNodes[i];
-                this.dots[i] = this.interpPoint(this.nodeTaps[n], this.nodeTaps[n+1],
+                this.dots[i] = this.interpPoint(
+                    this.nodeTaps[n],
+                    this.nodeTaps[n + 1],
                     this.coilPolarities[i] > 0 ? dotp : 1 - dotp,
-                    i < this.primaryCoils ? -7 : 7);
+                    i < this.primaryCoils ? -7 : 7,
+                );
             }
         } else {
             this.dots = null;
         }
     }
 
-    getPost(n: number): Point { return this.nodePoints[n]; }
-    getPostCount(): number { return this.nodeCount; }
+    getPost(n: number): Point {
+        return this.nodePoints[n];
+    }
+    getPostCount(): number {
+        return this.nodeCount;
+    }
 
     reset(): void {
         for (let i = 0; i !== this.coilCount; i++)
             this.coilCurrents[i] = this.coilCurSourceValues[i] = this.coilCurCounts[i] = 0;
-        for (let i = 0; i !== this.nodeCount; i++)
-            this.nodes[i].v = this.nodeCurrents[i] = this.nodeCurCounts[i] = 0;
+        for (let i = 0; i !== this.nodeCount; i++) this.nodes[i].v = this.nodeCurrents[i] = this.nodeCurCounts[i] = 0;
     }
 
     xformMatrix: number[][] | null = null;
@@ -389,14 +406,15 @@ export class CustomTransformerElm extends CircuitElm {
             this.xformMatrix[i] = new Array(this.coilCount).fill(0);
         }
         // fill diagonal
-        for (let i = 0; i !== this.coilCount; i++)
-            this.xformMatrix[i][i] = this.coilInductances[i];
+        for (let i = 0; i !== this.coilCount; i++) this.xformMatrix[i][i] = this.coilInductances[i];
         // fill off-diagonal
         for (let i = 0; i !== this.coilCount; i++)
             for (let j = 0; j !== i; j++)
                 this.xformMatrix[i][j] = this.xformMatrix[j][i] =
-                    this.couplingCoef * Math.sqrt(this.coilInductances[i] * this.coilInductances[j]) *
-                    this.coilPolarities[i] * this.coilPolarities[j];
+                    this.couplingCoef *
+                    Math.sqrt(this.coilInductances[i] * this.coilInductances[j]) *
+                    this.coilPolarities[i] *
+                    this.coilPolarities[j];
 
         SimulationManager.invertMatrix(this.xformMatrix, this.coilCount);
 
@@ -408,12 +426,17 @@ export class CustomTransformerElm extends CircuitElm {
                 const ni = this.coilNodes[i];
                 const nj = this.coilNodes[j];
                 if (i === j)
-                    CircuitElm.sim.stampConductance(this.nodes[ni], this.nodes[ni+1], this.xformMatrix[i][i]);
+                    CircuitElm.sim.stampConductance(this.nodes[ni], this.nodes[ni + 1], this.xformMatrix[i][i]);
                 else
-                    CircuitElm.sim.stampVCCurrentSource(this.nodes[ni], this.nodes[ni+1], this.nodes[nj], this.nodes[nj+1], this.xformMatrix[i][j]);
+                    CircuitElm.sim.stampVCCurrentSource(
+                        this.nodes[ni],
+                        this.nodes[ni + 1],
+                        this.nodes[nj],
+                        this.nodes[nj + 1],
+                        this.xformMatrix[i][j],
+                    );
             }
-        for (let i = 0; i !== this.nodeCount; i++)
-            CircuitElm.sim.stampRightSide(this.nodes[i]);
+        for (let i = 0; i !== this.nodeCount; i++) CircuitElm.sim.stampRightSide(this.nodes[i]);
     }
 
     startIteration(): void {
@@ -422,7 +445,7 @@ export class CustomTransformerElm extends CircuitElm {
             if (this.isTrapezoidal()) {
                 for (let j = 0; j !== this.coilCount; j++) {
                     const n = this.coilNodes[j];
-                    const voltdiff = this.nodes[n].v - this.nodes[n+1].v;
+                    const voltdiff = this.nodes[n].v - this.nodes[n + 1].v;
                     val += voltdiff * this.xformMatrix![i][j];
                 }
             }
@@ -433,26 +456,25 @@ export class CustomTransformerElm extends CircuitElm {
     doStep(): void {
         for (let i = 0; i !== this.coilCount; i++) {
             const n = this.coilNodes[i];
-            CircuitElm.sim.stampCurrentSource(this.nodes[n], this.nodes[n+1], this.coilCurSourceValues[i]);
+            CircuitElm.sim.stampCurrentSource(this.nodes[n], this.nodes[n + 1], this.coilCurSourceValues[i]);
         }
     }
 
     calculateCurrent(): void {
-        for (let i = 0; i !== this.nodeCount; i++)
-            this.nodeCurrents[i] = 0;
+        for (let i = 0; i !== this.nodeCount; i++) this.nodeCurrents[i] = 0;
         for (let i = 0; i !== this.coilCount; i++) {
             let val = this.coilCurSourceValues[i];
             if (this.xformMatrix !== null) {
                 for (let j = 0; j !== this.coilCount; j++) {
                     const n = this.coilNodes[j];
-                    const voltdiff = this.nodes[n].v - this.nodes[n+1].v;
+                    const voltdiff = this.nodes[n].v - this.nodes[n + 1].v;
                     val += voltdiff * this.xformMatrix[i][j];
                 }
             }
             this.coilCurrents[i] = val;
             const ni = this.coilNodes[i];
             this.nodeCurrents[ni] += val;
-            this.nodeCurrents[ni+1] -= val;
+            this.nodeCurrents[ni + 1] -= val;
         }
     }
 
@@ -464,27 +486,27 @@ export class CustomTransformerElm extends CircuitElm {
         arr[0] = "transformer (custom)";
         arr[1] = "L = " + CircuitElm.getUnitText(this.inductance, "H");
         for (let i = 0; i !== this.coilCount; i++) {
-            if (2 + i * 2 >= arr.length)
-                break;
+            if (2 + i * 2 >= arr.length) break;
             const ni = this.coilNodes[i];
-            arr[2 + i*2] = "Vd" + (i+1) + " = " + CircuitElm.getVoltageText(this.nodes[ni].v - this.nodes[ni+1].v);
-            arr[3 + i*2] = "I" + (i+1) + " = " + CircuitElm.getCurrentText(this.coilCurrents[i]);
+            arr[2 + i * 2] =
+                "Vd" + (i + 1) + " = " + CircuitElm.getVoltageText(this.nodes[ni].v - this.nodes[ni + 1].v);
+            arr[3 + i * 2] = "I" + (i + 1) + " = " + CircuitElm.getCurrentText(this.coilCurrents[i]);
         }
     }
 
     getConnection(n1: number, n2: number): boolean {
         for (let i = 0; i !== this.coilCount; i++)
-            if (this.comparePair(n1, n2, this.coilNodes[i], this.coilNodes[i] + 1))
-                return true;
+            if (this.comparePair(n1, n2, this.coilNodes[i], this.coilNodes[i] + 1)) return true;
         return false;
     }
 
     // VCCS stamps couple all nodes, so they must all be in the same matrix
-    getMatrixConnection(n1: number, n2: number): boolean { return true; }
+    getMatrixConnection(n1: number, n2: number): boolean {
+        return true;
+    }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Base Inductance (H)", this.inductance, 0.01, 5).setPositive();
+        if (n === 0) return new EditInfo("Base Inductance (H)", this.inductance, 0.01, 5).setPositive();
         if (n === 1) {
             const ei = new EditInfo(EditInfo.makeLink("customtransformer.html", "Description"), 0, -1, -1);
             ei.setErrorFieldName("Description");
@@ -527,10 +549,8 @@ export class CustomTransformerElm extends CircuitElm {
             }
         }
         if (n === 3) {
-            if (ei.checkbox!.getState())
-                this.flags &= ~Inductor.FLAG_BACK_EULER;
-            else
-                this.flags |= Inductor.FLAG_BACK_EULER;
+            if (ei.checkbox!.getState()) this.flags &= ~Inductor.FLAG_BACK_EULER;
+            else this.flags |= Inductor.FLAG_BACK_EULER;
             this.parseDescription();
         }
     }
@@ -546,5 +566,7 @@ export class CustomTransformerElm extends CircuitElm {
     }
 
     // vertical not supported
-    canFlipXY(): boolean { return false; }
+    canFlipXY(): boolean {
+        return false;
+    }
 }

@@ -22,7 +22,6 @@ import { CheckItem, MenuItem } from "./Menus";
 import { Locale } from "./Locale";
 
 export class ScopePopupMenu {
-
     private ul: HTMLUListElement;
     private maxScaleItem: CheckItem;
     private stackItem: MenuItem;
@@ -32,17 +31,17 @@ export class ScopePopupMenu {
     private undockItem: MenuItem;
 
     constructor(app?: CirSim) {
-        this.ul = document.createElement('ul');
+        this.ul = document.createElement("ul");
 
         const addPlain = (label: string, cmdName: string): MenuItem => {
             const item = new MenuItem();
-            const li = document.createElement('li');
-            li.className = 'menuItem';
+            const li = document.createElement("li");
+            li.className = "menuItem";
             li.innerHTML = `<span class="checkMark" style="visibility:hidden">&#10003;</span> ${Locale.LS(label)}`;
-            li.addEventListener('click', e => {
-                if (li.classList.contains('menuItemDisabled')) return;
+            li.addEventListener("click", (e) => {
+                if (li.classList.contains("menuItemDisabled")) return;
                 e.stopPropagation();
-                if (app) app.commands.menuPerformed('scopepop', cmdName);
+                if (app) app.commands.menuPerformed("scopepop", cmdName);
             });
             item._li = li;
             this.ul.appendChild(li);
@@ -50,26 +49,26 @@ export class ScopePopupMenu {
         };
 
         addPlain("Remove Scope", "remove");
-        this.dockItem   = addPlain("Dock Scope",   "dock");
-        this.undockItem = addPlain("Undock Scope",  "undock");
+        this.dockItem = addPlain("Dock Scope", "dock");
+        this.undockItem = addPlain("Undock Scope", "undock");
 
         // maxScaleItem has a visible checkmark
         this.maxScaleItem = new CheckItem(false);
-        const maxLi = document.createElement('li');
-        maxLi.className = 'menuItem';
+        const maxLi = document.createElement("li");
+        maxLi.className = "menuItem";
         maxLi.innerHTML = `<span class="checkMark" style="visibility:hidden">&#10003;</span> ${Locale.LS("Max Scale")}`;
         this.maxScaleItem._li = maxLi;
-        maxLi.addEventListener('click', e => {
+        maxLi.addEventListener("click", (e) => {
             e.stopPropagation();
-            if (app) app.commands.menuPerformed('scopepop', 'maxscale');
+            if (app) app.commands.menuPerformed("scopepop", "maxscale");
         });
         this.ul.appendChild(maxLi);
 
-        this.stackItem   = addPlain("Stack",        "stack");
-        this.unstackItem = addPlain("Unstack",       "unstack");
-        this.combineItem = addPlain("Combine",       "combine");
-        addPlain("Remove Plot",   "removeplot");
-        addPlain("Reset",         "reset");
+        this.stackItem = addPlain("Stack", "stack");
+        this.unstackItem = addPlain("Unstack", "unstack");
+        this.combineItem = addPlain("Combine", "combine");
+        addPlain("Remove Plot", "removeplot");
+        addPlain("Reset", "reset");
         addPlain("Export CSV...", "exportcsv");
         addPlain("Export Image...", "exportimage");
         addPlain("Properties...", "properties");
@@ -77,19 +76,21 @@ export class ScopePopupMenu {
 
     doScopePopupChecks(floating: boolean, canstack: boolean, cancombine: boolean, canunstack: boolean, s: any): void {
         this.maxScaleItem.setState(s.maxScale);
-        setLiVisible(this.stackItem._li,   !floating);
+        setLiVisible(this.stackItem._li, !floating);
         this.stackItem.setEnabled(canstack);
-        setLiVisible(this.unstackItem._li,  !floating);
+        setLiVisible(this.unstackItem._li, !floating);
         this.unstackItem.setEnabled(canunstack);
-        setLiVisible(this.combineItem._li,  !floating);
+        setLiVisible(this.combineItem._li, !floating);
         this.combineItem.setEnabled(cancombine);
-        setLiVisible(this.dockItem._li,    floating);
-        setLiVisible(this.undockItem._li,  !floating);
+        setLiVisible(this.dockItem._li, floating);
+        setLiVisible(this.undockItem._li, !floating);
     }
 
-    getMenuBar(): HTMLElement { return this.ul; }
+    getMenuBar(): HTMLElement {
+        return this.ul;
+    }
 }
 
 function setLiVisible(li: HTMLLIElement | null, visible: boolean): void {
-    if (li) li.style.display = visible ? '' : 'none';
+    if (li) li.style.display = visible ? "" : "none";
 }

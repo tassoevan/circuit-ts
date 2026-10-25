@@ -39,8 +39,8 @@ export class SevenSegElm extends ChipElm {
     segmentCount: number = 0;
 
     extraSegment: number = 0;
-    static readonly ES_NONE  = 0;
-    static readonly ES_DP    = 1;
+    static readonly ES_NONE = 0;
+    static readonly ES_DP = 1;
     static readonly ES_COLON = 2;
 
     pinCount: number = 0;
@@ -61,8 +61,8 @@ export class SevenSegElm extends ChipElm {
             this.setDefaults();
             try {
                 this.baseSegmentCount = parseIntStrict(st!.nextToken());
-                this.extraSegment     = parseIntStrict(st!.nextToken());
-                this.diodeDirection   = parseIntStrict(st!.nextToken());
+                this.extraSegment = parseIntStrict(st!.nextToken());
+                this.diodeDirection = parseIntStrict(st!.nextToken());
             } catch (e) {}
             this.setPinCount();
         }
@@ -83,63 +83,68 @@ export class SevenSegElm extends ChipElm {
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.baseSegmentCount = xml.parseIntAttr("ba", this.baseSegmentCount);
-        this.extraSegment     = xml.parseIntAttr("ex", this.extraSegment);
-        this.diodeDirection   = xml.parseIntAttr("di", this.diodeDirection);
+        this.extraSegment = xml.parseIntAttr("ex", this.extraSegment);
+        this.diodeDirection = xml.parseIntAttr("di", this.diodeDirection);
         this.setPinCount();
     }
 
-    allowBus(): boolean { return this.diodeDirection === 0; }
-    getChipName(): string { return this.segmentCount + "-segment display"; }
+    allowBus(): boolean {
+        return this.diodeDirection === 0;
+    }
+    getChipName(): string {
+        return this.segmentCount + "-segment display";
+    }
     darkred: Color;
     lightgray: Color;
 
     setupPins(): void {
-        if (!this.pinCount)
-            return;
-        this.darkred   = new Color(30, 0, 0);
+        if (!this.pinCount) return;
+        this.darkred = new Color(30, 0, 0);
         this.lightgray = new Color(255 - 10, 255 - 10, 255 - 10);
         this.bits = this.segmentCount;
 
         if (this.useBus()) {
-            this.sizeX = (this.baseSegmentCount === 7) ? 4 : 5;
-            this.sizeY = (this.baseSegmentCount === 7) ? 4 : 6;
+            this.sizeX = this.baseSegmentCount === 7 ? 4 : 5;
+            this.sizeY = this.baseSegmentCount === 7 ? 4 : 6;
             this.pins = new Array(this.pinCount);
             this.makeBitPins(this.segmentCount, 0, ChipElm.SIDE_W, 0, "I", false, false, false);
             if (this.commonPin > 0)
-                this.pins[this.commonPin] = new Pin(this, 1, ChipElm.SIDE_W, (this.diodeDirection === 1) ? "gnd" : "Vcc");
+                this.pins[this.commonPin] = new Pin(this, 1, ChipElm.SIDE_W, this.diodeDirection === 1 ? "gnd" : "Vcc");
         } else {
             const segmentPinsOnLeftSide = Math.trunc((this.baseSegmentCount + 1) / 2);
             this.sizeY = segmentPinsOnLeftSide;
             if (this.baseSegmentCount === 7) {
                 this.sizeX = 4;
-                if (this.pinCount > 7)
-                    this.sizeX = 5;
-            } else
-                this.sizeX = 5;
+                if (this.pinCount > 7) this.sizeX = 5;
+            } else this.sizeX = 5;
 
             // make room for common/dp/colon pins
-            if (this.pinCount > this.sizeY * 2)
-                this.sizeY++;
+            if (this.pinCount > this.sizeY * 2) this.sizeY++;
 
             this.pins = new Array(this.pinCount);
             let i: number;
             for (i = 0; i !== segmentPinsOnLeftSide; i++)
-                this.pins[i] = new Pin(this, i, ChipElm.SIDE_W, String.fromCharCode('a'.charCodeAt(0) + i));
+                this.pins[i] = new Pin(this, i, ChipElm.SIDE_W, String.fromCharCode("a".charCodeAt(0) + i));
 
             // retain backward compatibility pin layout for old 7-segment setup, otherwise put pins on left and right side
-            const backwardCompatibility = (this.segmentCount === 7 && this.diodeDirection === 0 && this.extraSegment === SevenSegElm.ES_NONE);
+            const backwardCompatibility =
+                this.segmentCount === 7 && this.diodeDirection === 0 && this.extraSegment === SevenSegElm.ES_NONE;
             let s = backwardCompatibility ? 1 : 0;
             for (; i !== this.segmentCount; i++)
-                this.pins[i] = new Pin(this, s++, backwardCompatibility ? ChipElm.SIDE_S : ChipElm.SIDE_E, String.fromCharCode('a'.charCodeAt(0) + i));
-            if (this.extraSegment === SevenSegElm.ES_DP)
-                this.pins[this.segmentCount - 1].text = "dp";
+                this.pins[i] = new Pin(
+                    this,
+                    s++,
+                    backwardCompatibility ? ChipElm.SIDE_S : ChipElm.SIDE_E,
+                    String.fromCharCode("a".charCodeAt(0) + i),
+                );
+            if (this.extraSegment === SevenSegElm.ES_DP) this.pins[this.segmentCount - 1].text = "dp";
             if (this.commonPin > 0) {
                 let side = ChipElm.SIDE_E;
                 if (this.segmentCount !== 7) {
                     side = ChipElm.SIDE_W;
                     s = segmentPinsOnLeftSide;
                 }
-                this.pins[this.commonPin] = new Pin(this, s++, side, (this.diodeDirection === 1) ? "gnd" : "Vcc");
+                this.pins[this.commonPin] = new Pin(this, s++, side, this.diodeDirection === 1 ? "gnd" : "Vcc");
             }
         }
     }
@@ -176,47 +181,15 @@ export class SevenSegElm extends ChipElm {
 
     static readonly display7: number[] = [
         // x1, y1, x2, y2 for each segment
-        0, 0, 2, 0,
-        2, 0, 2, 1,
-        2, 1, 2, 2,
-        0, 2, 2, 2,
-        0, 1, 0, 2,
-        0, 0, 0, 1,
-        0, 1, 2, 1
+        0, 0, 2, 0, 2, 0, 2, 1, 2, 1, 2, 2, 0, 2, 2, 2, 0, 1, 0, 2, 0, 0, 0, 1, 0, 1, 2, 1,
     ];
     static readonly display16: number[] = [
-        0, 0, 1, 0,
-        1, 0, 2, 0,
-        2, 0, 2, 1,
-        2, 1, 2, 2,
-        2, 2, 1, 2,
-        1, 2, 0, 2,
-        0, 2, 0, 1,
-        0, 1, 0, 0,
-        0, 0, 1, 1,
-        1, 0, 1, 1,
-        2, 0, 1, 1,
-        1, 1, 2, 1,
-        1, 1, 2, 2,
-        1, 1, 1, 2,
-        1, 1, 0, 2,
-        0, 1, 1, 1
+        0, 0, 1, 0, 1, 0, 2, 0, 2, 0, 2, 1, 2, 1, 2, 2, 2, 2, 1, 2, 1, 2, 0, 2, 0, 2, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1,
+        0, 1, 1, 2, 0, 1, 1, 1, 1, 2, 1, 1, 1, 2, 2, 1, 1, 1, 2, 1, 1, 0, 2, 0, 1, 1, 1,
     ];
     static readonly display14: number[] = [
-        0, 0, 2, 0,
-        2, 0, 2, 1,
-        2, 1, 2, 2,
-        2, 2, 0, 2,
-        0, 2, 0, 1,
-        0, 1, 0, 0,
-        0, 0, 1, 1,
-        1, 0, 1, 1,
-        2, 0, 1, 1,
-        1, 1, 2, 1,
-        1, 1, 2, 2,
-        1, 1, 1, 2,
-        1, 1, 0, 2,
-        0, 1, 1, 1
+        0, 0, 2, 0, 2, 0, 2, 1, 2, 1, 2, 2, 2, 2, 0, 2, 0, 2, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 2, 0, 1, 1, 1,
+        1, 2, 1, 1, 1, 2, 2, 1, 1, 1, 2, 1, 1, 0, 2, 0, 1, 1, 1,
     ];
 
     diodes: Diode[];
@@ -224,31 +197,29 @@ export class SevenSegElm extends ChipElm {
     stamp(): void {
         super.stamp();
 
-        if (this.diodeDirection === 0)
-            return;
+        if (this.diodeDirection === 0) return;
         this.diodes = new Array(this.segmentCount);
         const model = DiodeModel.getModelWithName("default-led");
         for (let i = 0; i !== this.segmentCount; i++) {
             this.diodes[i] = new Diode(CircuitElm.sim);
             this.diodes[i].setup(model);
-            if (this.diodeDirection === 1)
-                this.diodes[i].stamp(this.nodes[i], this.nodes[this.commonPin]);
-            else
-                this.diodes[i].stamp(this.nodes[this.commonPin], this.nodes[i]);
+            if (this.diodeDirection === 1) this.diodes[i].stamp(this.nodes[i], this.nodes[this.commonPin]);
+            else this.diodes[i].stamp(this.nodes[this.commonPin], this.nodes[i]);
         }
     }
 
     doStep(): void {
         super.doStep();
 
-        if (this.diodeDirection === 0)
-            return;
+        if (this.diodeDirection === 0) return;
 
         for (let i = 0; i !== this.segmentCount; i++)
             this.diodes[i].doStep(this.diodeDirection * (this.nodes[i].v - this.nodes[this.commonPin].v));
     }
 
-    nonLinear(): boolean { return this.diodeDirection !== 0; }
+    nonLinear(): boolean {
+        return this.diodeDirection !== 0;
+    }
 
     draw(g: Graphics): void {
         this.drawChip(g);
@@ -256,32 +227,34 @@ export class SevenSegElm extends ChipElm {
         let spx = this.cspc * 2;
 
         // make room for dp/colon
-        if (this.extraSegment !== SevenSegElm.ES_NONE)
-            spx = Math.trunc(spx * .9);
+        if (this.extraSegment !== SevenSegElm.ES_NONE) spx = Math.trunc(spx * 0.9);
 
-        if (this.sizeY <= 4 || this.isFlippedXY())
-            spx = Math.trunc(spx / 2);
+        if (this.sizeY <= 4 || this.isFlippedXY()) spx = Math.trunc(spx / 2);
         const spy = spx * 2;
         const xl = this.x + this.cspc + this.flippedSizeX * this.cspc - spx;
         let yl = this.y - this.cspc + this.flippedSizeY * this.cspc - spy;
-        if (this.sizeY <= 4 && (this.flags & (ChipElm.FLAG_FLIP_Y | ChipElm.FLAG_FLIP_XY)) !== 0)
-            yl += 10;
-        const disp = (this.baseSegmentCount === 7) ? SevenSegElm.display7 :
-                     (this.baseSegmentCount === 14) ? SevenSegElm.display14 : SevenSegElm.display16;
-        const thick  = (this.sizeY <= 4) ? 5 : Math.trunc(spx / 6);
-        const dpsize = (this.sizeY <= 4) ? 7 : this.isFlippedXY() ? 3 : 7;
+        if (this.sizeY <= 4 && (this.flags & (ChipElm.FLAG_FLIP_Y | ChipElm.FLAG_FLIP_XY)) !== 0) yl += 10;
+        const disp =
+            this.baseSegmentCount === 7
+                ? SevenSegElm.display7
+                : this.baseSegmentCount === 14
+                  ? SevenSegElm.display14
+                  : SevenSegElm.display16;
+        const thick = this.sizeY <= 4 ? 5 : Math.trunc(spx / 6);
+        const dpsize = this.sizeY <= 4 ? 7 : this.isFlippedXY() ? 3 : 7;
         for (let step = 0; step !== 2; step++)
             for (let i = 0; i !== this.segmentCount; i++) {
                 const i4 = i * 4;
                 // draw diagonal lines in first pass, so the other lines overlap
-                const diag = (disp[i4] !== disp[i4 + 2] && disp[i4 + 1] !== disp[i4 + 3]);
-                if (diag !== (step === 0))
-                    continue;
+                const diag = disp[i4] !== disp[i4 + 2] && disp[i4 + 1] !== disp[i4 + 3];
+                if (diag !== (step === 0)) continue;
                 this.setColor(g, i);
-                this.drawSegment(g,
-                    new Point(xl + disp[i4] * spx,     yl + disp[i4 + 1] * spy),
+                this.drawSegment(
+                    g,
+                    new Point(xl + disp[i4] * spx, yl + disp[i4 + 1] * spy),
                     new Point(xl + disp[i4 + 2] * spx, yl + disp[i4 + 3] * spy),
-                    thick);
+                    thick,
+                );
             }
         if (this.extraSegment === SevenSegElm.ES_DP) {
             this.setColor(g, this.baseSegmentCount);
@@ -291,23 +264,24 @@ export class SevenSegElm extends ChipElm {
         if (this.extraSegment === SevenSegElm.ES_COLON) {
             this.setColor(g, this.baseSegmentCount);
             const dist = Math.max(spx * 1.5, spx + 14);
-            this.drawDecimal(g, xl + spx + dist, yl + spy * .5,   dpsize);
-            this.drawDecimal(g, xl + spx + dist, yl + spy * 1.5,  dpsize);
+            this.drawDecimal(g, xl + spx + dist, yl + spy * 0.5, dpsize);
+            this.drawDecimal(g, xl + spx + dist, yl + spy * 1.5, dpsize);
         }
     }
 
     calculateCurrent(): void {
         if (this.diodeDirection === 0 || this.diodes == null) {
             // no current
-            for (let i = 0; i !== this.pinCount; i++)
-                this.pins[i].current = 0;
+            for (let i = 0; i !== this.pinCount; i++) this.pins[i].current = 0;
             return;
         }
 
         // calculate diode currents
         this.pins[this.commonPin].current = 0;
         for (let i = 0; i !== this.segmentCount; i++) {
-            this.pins[i].current = -this.diodeDirection * this.diodes[i].calculateCurrent(this.diodeDirection * (this.nodes[i].v - this.nodes[this.commonPin].v));
+            this.pins[i].current =
+                -this.diodeDirection *
+                this.diodes[i].calculateCurrent(this.diodeDirection * (this.nodes[i].v - this.nodes[this.commonPin].v));
             this.pins[this.commonPin].current -= this.pins[i].current;
         }
     }
@@ -325,30 +299,36 @@ export class SevenSegElm extends ChipElm {
     setColor(g: Graphics, p: number): void {
         const whiteBkg = this.isPrintable();
         if (this.diodeDirection === 0) {
-            g.setColor(this.pins[p].value ? Color.red :
-                whiteBkg ? this.lightgray : this.darkred);
+            g.setColor(this.pins[p].value ? Color.red : whiteBkg ? this.lightgray : this.darkred);
             return;
         }
         // 10mA current = max brightness
-        let w = -this.diodeDirection * this.pins[p].current / .01;
-        if (w > 0)
-            w = 255 * (1 + .2 * Math.log(w));
-        if (w > 255)
-            w = 255;
+        let w = (-this.diodeDirection * this.pins[p].current) / 0.01;
+        if (w > 0) w = 255 * (1 + 0.2 * Math.log(w));
+        if (w > 255) w = 255;
         const minw = whiteBkg ? 5 : 30;
-        if (w < minw)
-            w = minw;
+        if (w < minw) w = minw;
         const wi = Math.trunc(w);
         const cc = whiteBkg ? new Color(255, 255 - wi, 255 - wi) : new Color(wi, 0, 0);
         g.setColor(cc);
     }
 
-    getPostCount(): number { return this.pinCount ?? 0; }
-    getVoltageSourceCount(): number { return 0; }
-    getDumpType(): number { return 157; }
-    getXmlDumpType(): string { return "ssd"; }
+    getPostCount(): number {
+        return this.pinCount ?? 0;
+    }
+    getVoltageSourceCount(): number {
+        return 0;
+    }
+    getDumpType(): number {
+        return 157;
+    }
+    getXmlDumpType(): string {
+        return "ssd";
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Segments", 0, -1, -1);
@@ -383,7 +363,7 @@ export class SevenSegElm extends ChipElm {
     setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             const ix = ei.choice!.getSelectedIndex();
-            this.baseSegmentCount = (ix === 0) ? 7 : (ix === 1) ? 14 : 16;
+            this.baseSegmentCount = ix === 0 ? 7 : ix === 1 ? 14 : 16;
             this.setPinCount();
             return;
         }
@@ -394,7 +374,7 @@ export class SevenSegElm extends ChipElm {
         }
         if (n === 2) {
             const ix = ei.choice!.getSelectedIndex();
-            this.diodeDirection = (ix === 0) ? 1 : (ix === 1) ? -1 : 0;
+            this.diodeDirection = ix === 0 ? 1 : ix === 1 ? -1 : 0;
             this.setPinCount();
             return;
         }
@@ -403,13 +383,12 @@ export class SevenSegElm extends ChipElm {
 
     setPinCount(): void {
         this.segmentCount = this.baseSegmentCount;
-        if (this.extraSegment > 0)
-            this.segmentCount++;
+        if (this.extraSegment > 0) this.segmentCount++;
         if (this.diodeDirection === 0) {
-            this.pinCount  = this.segmentCount;
+            this.pinCount = this.segmentCount;
             this.commonPin = -1;
         } else {
-            this.pinCount  = this.segmentCount + 1;
+            this.pinCount = this.segmentCount + 1;
             this.commonPin = this.pinCount - 1;
         }
         this.allocNodes();
@@ -417,5 +396,7 @@ export class SevenSegElm extends ChipElm {
         this.setPoints();
     }
 
-    isDigitalChip(): boolean { return false; }
+    isDigitalChip(): boolean {
+        return false;
+    }
 }

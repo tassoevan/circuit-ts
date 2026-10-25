@@ -55,7 +55,7 @@ export class DiodeElm extends CircuitElm {
             this.setup();
         } else {
             super(xa, ya, xb, yb!, f!);
-            const defaultdrop = .805904783;
+            const defaultdrop = 0.805904783;
             this.diode = new Diode(CircuitElm.sim);
             let fwdrop = defaultdrop;
             const zvoltage = 0;
@@ -69,40 +69,44 @@ export class DiodeElm extends CircuitElm {
                 }
                 this.model = DiodeModel.getModelWithParameters(fwdrop, zvoltage);
                 this.modelName = this.model.name;
-//	    CirSim.console("model name wparams = " + modelName);
+                //	    CirSim.console("model name wparams = " + modelName);
             }
             this.setup();
         }
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     setup(): void {
-//	CirSim.console("setting up for model " + modelName + " " + model);
+        //	CirSim.console("setting up for model " + modelName + " " + model);
         this.model = DiodeModel.getModelWithNameOrCopy(this.modelName, this.model ?? null);
-        this.modelName = this.model.name;   // in case we couldn't find that model
+        this.modelName = this.model.name; // in case we couldn't find that model
         this.diode.setup(this.model);
-        this.hasResistance = (this.model.seriesResistance > 0);
+        this.hasResistance = this.model.seriesResistance > 0;
         this.diodeEndNode = this.hasResistance ? 2 : 1;
         this.allocNodes();
     }
 
-    getInternalNodeCount(): number { return this.hasResistance ? 1 : 0; }
+    getInternalNodeCount(): number {
+        return this.hasResistance ? 1 : 0;
+    }
 
     updateModels(): void {
         this.setup();
     }
 
-    getDumpType(): number { return 'd'.charCodeAt(0); }
+    getDumpType(): number {
+        return "d".charCodeAt(0);
+    }
 
     dumpXmlModel(doc: Document): void {
-        if (!(this.model.builtIn || this.model.dumped))
-            this.model.dumpXml(doc);
+        if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
     }
 
     dumpXml(doc: Document, elem: Element): void {
-        if (!(this.model.builtIn || this.model.dumped))
-            this.model.dumpXml(doc);
+        if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modelName);
     }
@@ -127,7 +131,9 @@ export class DiodeElm extends CircuitElm {
         this.poly = this.createPolygon(pa[0], pa[1], this.lead2!);
     }
 
-    addRoutingObstacle(router: WireRouter): void { this.addRoutingObstacleWithLeads(router, this.hs); }
+    addRoutingObstacle(router: WireRouter): void {
+        this.addRoutingObstacleWithLeads(router, this.hs);
+    }
 
     draw(g: Graphics): void {
         this.drawDiode(g);
@@ -178,23 +184,24 @@ export class DiodeElm extends CircuitElm {
         this.current = this.diode.calculateCurrent(this.nodes[0].v - this.nodes[this.diodeEndNode].v);
     }
 
-    getElmType(): string { return "diode"; }
+    getElmType(): string {
+        return "diode";
+    }
 
     getInfo(arr: string[]): void {
-        if (this.model.oldStyle)
-            arr[0] = "diode";
-        else
-            arr[0] = Locale.LS("diode") + " (" + this.modelName + ")";
+        if (this.model.oldStyle) arr[0] = "diode";
+        else arr[0] = Locale.LS("diode") + " (" + this.modelName + ")";
         arr[1] = "I = " + CircuitElm.getCurrentText(this.getCurrent());
         arr[2] = "Vd = " + CircuitElm.getVoltageText(this.getVoltageDiff());
         arr[3] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
-        if (this.model.oldStyle)
-            arr[4] = "Vf = " + CircuitElm.getVoltageText(this.model.fwdrop);
+        if (this.model.oldStyle) arr[4] = "Vf = " + CircuitElm.getVoltageText(this.model.fwdrop);
     }
 
     models: DiodeModel[];
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Model", 0, -1, -1);
@@ -203,8 +210,7 @@ export class DiodeElm extends CircuitElm {
             for (let i = 0; i !== this.models.length; i++) {
                 const dm = this.models[i];
                 ei.choice.add(dm.getDescription());
-                if (dm === this.model)
-                    ei.choice.select(i);
+                if (dm === this.model) ei.choice.select(i);
             }
             return ei;
         }
@@ -219,8 +225,7 @@ export class DiodeElm extends CircuitElm {
             return ei;
         }
         if (n === 3) {
-            if (this.model.readOnly)
-                return null;
+            if (this.model.readOnly) return null;
             const ei = new EditInfo("", 0, -1, -1);
             ei.button = { label: Locale.LS("Edit Model") };
             return ei;
@@ -245,8 +250,7 @@ export class DiodeElm extends CircuitElm {
         if (n === 1 || n === 2) {
             const newModel = new DiodeModel(this.model);
             newModel.setSimple(n === 1);
-            if (newModel.isSimple())
-                newModel.setForwardVoltage();
+            if (newModel.isSimple()) newModel.setForwardVoltage();
             const editDialog = new EditDiodeModelDialog(newModel, CirSim.theApp, this);
             CirSim.diodeModelEditDialog = editDialog;
             editDialog.show();
@@ -255,11 +259,12 @@ export class DiodeElm extends CircuitElm {
         if (n === 3) {
             if (this.model.readOnly) {
                 // probably never reached
-                window.alert(Locale.LS("This model cannot be modified.  Change the model name to allow customization."));
+                window.alert(
+                    Locale.LS("This model cannot be modified.  Change the model name to allow customization."),
+                );
                 return;
             }
-            if (this.model.isSimple())
-                this.model.setForwardVoltage();
+            if (this.model.isSimple()) this.model.setForwardVoltage();
             const editDialog = new EditDiodeModelDialog(this.model, CirSim.theApp, null);
             CirSim.diodeModelEditDialog = editDialog;
             editDialog.show();
@@ -267,9 +272,13 @@ export class DiodeElm extends CircuitElm {
         }
     }
 
-    isZenerElm(): boolean { return false; }
+    isZenerElm(): boolean {
+        return false;
+    }
 
-    getShortcut(): number { return 'd'.charCodeAt(0); }
+    getShortcut(): number {
+        return "d".charCodeAt(0);
+    }
 
     setLastModelName(n: string): void {
         DiodeElm.lastModelName = n;
@@ -277,7 +286,6 @@ export class DiodeElm extends CircuitElm {
 
     stepFinished(): void {
         // stop for huge currents that make simulator act weird
-        if (Math.abs(this.current) > 1e12)
-            CircuitElm.sim.stop("max current exceeded", this);
+        if (Math.abs(this.current) > 1e12) CircuitElm.sim.stop("max current exceeded", this);
     }
 }

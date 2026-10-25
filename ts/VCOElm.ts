@@ -34,7 +34,9 @@ export class VCOElm extends ChipElm {
         }
     }
 
-    getChipName(): string { return "VCO"; }
+    getChipName(): string {
+        return "VCO";
+    }
 
     setupPins(): void {
         this.sizeX = 2;
@@ -51,7 +53,9 @@ export class VCOElm extends ChipElm {
         this.pins[5].output = true;
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     stamp(): void {
         // output pin
@@ -74,13 +78,13 @@ export class VCOElm extends ChipElm {
     doStep(): void {
         const vc = this.nodes[3].v - this.nodes[2].v;
         let vo = this.nodes[1].v;
-        let dir = (vo < 2.5) ? 1 : -1;
+        let dir = vo < 2.5 ? 1 : -1;
         // switch direction of current through cap as we oscillate
         if (vo < 2.5 && vc > 4.5) {
             vo = 5;
             dir = -1;
         }
-        if (vo > 2.5 && vc < .5) {
+        if (vo > 2.5 && vc < 0.5) {
             vo = 0;
             dir = 1;
         }
@@ -100,9 +104,9 @@ export class VCOElm extends ChipElm {
     // can't do this in calculateCurrent() because it's called before
     // we get pins[4].current and pins[5].current, which we need
     computeCurrent(): void {
-        if (this.cResistance === 0)
-            return;
-        const c = this.cDir * (this.pins[4].current + this.pins[5].current) +
+        if (this.cResistance === 0) return;
+        const c =
+            this.cDir * (this.pins[4].current + this.pins[5].current) +
             (this.nodes[3].v - this.nodes[2].v) / this.cResistance;
         this.pins[2].current = -c;
         this.pins[3].current = c;
@@ -114,10 +118,22 @@ export class VCOElm extends ChipElm {
         this.drawChip(g);
     }
 
-    getPostCount(): number { return 6; }
-    getVoltageSourceCount(): number { return 3; }
-    showPropertiesOnCreate(): boolean { return false; }
-    getDumpType(): number { return 158; }
-    getMatrixConnection(n1: number, n2: number): boolean { return true; }
-    isDigitalChip(): boolean { return false; }
+    getPostCount(): number {
+        return 6;
+    }
+    getVoltageSourceCount(): number {
+        return 3;
+    }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
+    getDumpType(): number {
+        return 158;
+    }
+    getMatrixConnection(n1: number, n2: number): boolean {
+        return true;
+    }
+    isDigitalChip(): boolean {
+        return false;
+    }
 }

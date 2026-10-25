@@ -31,8 +31,12 @@ export class OhmMeterElm extends CurrentElm {
         super(xa, ya, xb, yb, f, st);
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
-    getDumpType(): number { return 216; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
+    getDumpType(): number {
+        return 216;
+    }
 
     setPoints(): void {
         super.setPoints();
@@ -52,18 +56,17 @@ export class OhmMeterElm extends CurrentElm {
         this.doDots(g);
         if (this.showValues() && this.current !== 0) {
             const s = CircuitElm.getShortUnitText(this.getVoltageDiff() / this.current, Locale.ohmString);
-            if (this.dx === 0 || this.dy === 0)
-                this.drawValues(g, s, cr);
+            if (this.dx === 0 || this.dy === 0) this.drawValues(g, s, cr);
         }
         this.drawPosts(g);
     }
 
     getScopeValue(x: number): number {
-        return (x === VAL_R) ? this.getVoltageDiff() / this.current : super.getScopeValue(x);
+        return x === VAL_R ? this.getVoltageDiff() / this.current : super.getScopeValue(x);
     }
 
     getScopeUnits(x: number): number {
-        return (x === VAL_R) ? UNITS_OHMS : super.getScopeUnits(x);
+        return x === VAL_R ? UNITS_OHMS : super.getScopeUnits(x);
     }
 
     canShowValueInScope(x: number): boolean {
@@ -72,9 +75,7 @@ export class OhmMeterElm extends CurrentElm {
 
     getInfo(arr: string[]): void {
         arr[0] = "ohmmeter";
-        if (this.current === 0)
-            arr[1] = "R = ∞";
-        else
-            arr[1] = "R = " + CircuitElm.getUnitText(this.getVoltageDiff() / this.current, Locale.ohmString);
+        if (this.current === 0) arr[1] = "R = ∞";
+        else arr[1] = "R = " + CircuitElm.getUnitText(this.getVoltageDiff() / this.current, Locale.ohmString);
     }
 }

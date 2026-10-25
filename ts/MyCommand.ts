@@ -29,7 +29,13 @@ export class MyCommand {
     execute(): void {
         CirSim.theApp.commands.menuPerformed(this.menu, this.className);
     }
-    getMenuName(): string { return this.menu; }
-    getItemName(): string { return this.className; }
-    setItemName(name: string): void { this.className = name; }
+    getMenuName(): string {
+        return this.menu;
+    }
+    getItemName(): string {
+        return this.className;
+    }
+    setItemName(name: string): void {
+        this.className = name;
+    }
 }

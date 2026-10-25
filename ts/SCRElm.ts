@@ -77,7 +77,9 @@ export class SCRElm extends CircuitElm {
         this.aresistance = 1; // to avoid divide by zero
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     reset(): void {
         this.nodes[this.anode].v = this.nodes[this.cnode].v = this.nodes[this.gnode].v = 0;
@@ -85,7 +87,9 @@ export class SCRElm extends CircuitElm {
         this.lastvag = this.lastvac = this.curcount_a = this.curcount_c = this.curcount_g = 0;
     }
 
-    getDumpType(): number { return 177; }
+    getDumpType(): number {
+        return 177;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -119,7 +123,9 @@ export class SCRElm extends CircuitElm {
     cathode: Point[];
     gate: Point[];
 
-    applyGateFix(): boolean { return (this.flags & this.FLAG_GATE_FIX) !== 0; }
+    applyGateFix(): boolean {
+        return (this.flags & this.FLAG_GATE_FIX) !== 0;
+    }
 
     setPoints(): void {
         super.setPoints();
@@ -128,17 +134,14 @@ export class SCRElm extends CircuitElm {
             this.dir = -CircuitElm.sign(this.dx) * CircuitElm.sign(this.dy);
             // correct dn (length) or else calcLeads() may get confused, and also gate may be drawn weirdly.  Can't do this with old circuits or it may
             // break them
-            if (this.applyGateFix())
-                this.dn = Math.abs(this.dx);
+            if (this.applyGateFix()) this.dn = Math.abs(this.dx);
             this.point2.y = this.point1.y;
         } else {
             this.dir = CircuitElm.sign(this.dy) * CircuitElm.sign(this.dx);
-            if (this.applyGateFix())
-                this.dn = Math.abs(this.dy);
+            if (this.applyGateFix()) this.dn = Math.abs(this.dy);
             this.point2.x = this.point1.x;
         }
-        if (this.dir === 0)
-            this.dir = 1;
+        if (this.dir === 0) this.dir = 1;
         this.calcLeads(16);
         this.cathode = this.newPointArray(2);
         const pa = this.newPointArray(2);
@@ -151,11 +154,18 @@ export class SCRElm extends CircuitElm {
         let gatelen = CircuitElm.app.gridSize;
         gatelen += leadlen % CircuitElm.app.gridSize;
         if (leadlen < gatelen) {
-            this.x2 = this.x; this.y2 = this.y;
+            this.x2 = this.x;
+            this.y2 = this.y;
             return;
         }
         this.interpPoint(this.lead2!, this.point2, this.gate[0], gatelen / leadlen, gatelen * this.dir);
-        this.interpPoint(this.lead2!, this.point2, this.gate[1], gatelen / leadlen, CircuitElm.app.gridSize * 2 * this.dir);
+        this.interpPoint(
+            this.lead2!,
+            this.point2,
+            this.gate[1],
+            gatelen / leadlen,
+            CircuitElm.app.gridSize * 2 * this.dir,
+        );
         this.gate[1].x = this.snapGrid(this.gate[1].x);
         this.gate[1].y = this.snapGrid(this.gate[1].y);
     }
@@ -190,13 +200,22 @@ export class SCRElm extends CircuitElm {
             this.drawDots(g, this.point1, this.lead2!, this.curcount_a);
             this.drawDots(g, this.point2, this.lead2!, this.curcount_c);
             this.drawDots(g, this.gate[1], this.gate[0], this.curcount_g);
-            this.drawDots(g, this.gate[0], this.lead2!, this.curcount_g + CircuitElm.distance(this.gate[1], this.gate[0]));
+            this.drawDots(
+                g,
+                this.gate[0],
+                this.lead2!,
+                this.curcount_g + CircuitElm.distance(this.gate[1], this.gate[0]),
+            );
         }
 
-        if ((this.needsHighlight() || this.isCreating()) && this.point1.x === this.point2.x && this.point2.y > this.point1.y) {
+        if (
+            (this.needsHighlight() || this.isCreating()) &&
+            this.point1.x === this.point2.x &&
+            this.point2.y > this.point1.y
+        ) {
             g.setColor(CircuitElm.whiteColor);
             const ds = CircuitElm.sign(this.dx);
-            g.drawString("C", this.lead2!.x + ((ds < 0) ? 5 : -15), this.lead2!.y + 12);
+            g.drawString("C", this.lead2!.x + (ds < 0 ? 5 : -15), this.lead2!.y + 12);
             g.drawString("A", this.lead1!.x + 5, this.lead1!.y - 4);
             g.drawString("G", this.gate[0].x, this.gate[0].y + 12);
         }
@@ -205,23 +224,27 @@ export class SCRElm extends CircuitElm {
     }
 
     getCurrentIntoNode(n: number): number {
-        if (n === this.anode)
-            return -this.ia;
-        if (n === this.cnode)
-            return -this.ic;
+        if (n === this.anode) return -this.ia;
+        if (n === this.cnode) return -this.ic;
         return -this.ig;
     }
 
     getPost(n: number): Point {
-        return (n === 0) ? this.point1 : (n === 1) ? this.point2 : this.gate[1];
+        return n === 0 ? this.point1 : n === 1 ? this.point2 : this.gate[1];
     }
 
-    getPostCount(): number { return 3; }
-    getInternalNodeCount(): number { return 1; }
+    getPostCount(): number {
+        return 3;
+    }
+    getInternalNodeCount(): number {
+        return 1;
+    }
 
     getPower(): number {
-        return (this.nodes[this.anode].v - this.nodes[this.gnode].v) * this.ia +
-               (this.nodes[this.cnode].v - this.nodes[this.gnode].v) * this.ic;
+        return (
+            (this.nodes[this.anode].v - this.nodes[this.gnode].v) * this.ia +
+            (this.nodes[this.cnode].v - this.nodes[this.gnode].v) * this.ic
+        );
     }
 
     aresistance: number;
@@ -238,15 +261,14 @@ export class SCRElm extends CircuitElm {
     doStep(): void {
         const vac = this.nodes[this.anode].v - this.nodes[this.cnode].v; // typically negative
         const vag = this.nodes[this.anode].v - this.nodes[this.gnode].v; // typically positive
-        if (Math.abs(vac - this.lastvac) > 0.01 ||
-            Math.abs(vag - this.lastvag) > 0.01)
+        if (Math.abs(vac - this.lastvac) > 0.01 || Math.abs(vag - this.lastvag) > 0.01)
             CircuitElm.sim.converged = false;
         this.lastvac = vac;
         this.lastvag = vag;
         this.diode.doStep(this.nodes[this.inode].v - this.nodes[this.cnode].v);
         const icmult = 1 / this.triggerI;
         const iamult = 1 / this.holdingI - icmult;
-        this.aresistance = (-icmult * this.ic + this.ia * iamult > 1) ? 0.0105 : 10e5;
+        this.aresistance = -icmult * this.ic + this.ia * iamult > 1 ? 0.0105 : 10e5;
         CircuitElm.sim.stampResistor(this.nodes[this.anode], this.nodes[this.inode], this.aresistance);
     }
 
@@ -269,24 +291,20 @@ export class SCRElm extends CircuitElm {
         this.ic = -this.ig - this.ia;
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Trigger Current (A)", this.triggerI, 0, 0).setPositive();
-        if (n === 1)
-            return new EditInfo("Holding Current (A)", this.holdingI, 0, 0).setPositive();
-        if (n === 2)
-            return new EditInfo("Gate Resistance (ohms)", this.gresistance, 0, 0).setPositive();
+        if (n === 0) return new EditInfo("Trigger Current (A)", this.triggerI, 0, 0).setPositive();
+        if (n === 1) return new EditInfo("Holding Current (A)", this.holdingI, 0, 0).setPositive();
+        if (n === 2) return new EditInfo("Gate Resistance (ohms)", this.gresistance, 0, 0).setPositive();
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.triggerI = ei.value;
-        if (n === 1)
-            this.holdingI = ei.value;
-        if (n === 2)
-            this.gresistance = ei.value;
+        if (n === 0) this.triggerI = ei.value;
+        if (n === 1) this.holdingI = ei.value;
+        if (n === 2) this.gresistance = ei.value;
     }
 
     // if point1 and point2 are in line, then we don't know which way the gate
@@ -294,7 +312,8 @@ export class SCRElm extends CircuitElm {
     fixEnds(): void {
         const pt = new Point();
         this.interpPoint(this.point1, this.point2, pt, 1, CircuitElm.app.gridSize * this.dir);
-        this.x2 = pt.x; this.y2 = pt.y;
+        this.x2 = pt.x;
+        this.y2 = pt.y;
     }
 
     flipX(c2: number, count: number): void {

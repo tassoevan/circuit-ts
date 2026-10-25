@@ -21,16 +21,16 @@
 // This module has no imports, so it is safe to import from anywhere.
 
 export const HookRegistry = {
-    undumpSubcircuitModel:        null as ((xml: any) => void) | null,
+    undumpSubcircuitModel: null as ((xml: any) => void) | null,
     loadSubcircuitModelsFromStorage: null as (() => void) | null,
     clearSubcircuitModelDumpedFlags: null as (() => void) | null,
     dumpUnusedLocalSubcircuitModels: null as ((doc: Document) => void) | null,
     createScopePropertiesDialog: null as ((app: any, scope: any) => any) | null,
-    scopeNextHighestScale:       null as ((d: number) => number) | null,
-    getCircuitAsComposite:       null as ((sim: any) => any) | null,
-    createSubcircuitElm:    null as ((x: number, y: number, name: string) => any) | null,
-    createJSInterface:           null as ((app: any) => any) | null,
-    resetGroundNodeList:         null as (() => void) | null,
-    resetLabeledNodeList:        null as (() => void) | null,
-    getLabeledNode:              null as ((name: string) => any) | null,
+    scopeNextHighestScale: null as ((d: number) => number) | null,
+    getCircuitAsComposite: null as ((sim: any) => any) | null,
+    createSubcircuitElm: null as ((x: number, y: number, name: string) => any) | null,
+    createJSInterface: null as ((app: any) => any) | null,
+    resetGroundNodeList: null as (() => void) | null,
+    resetLabeledNodeList: null as (() => void) | null,
+    getLabeledNode: null as ((name: string) => any) | null,
 };

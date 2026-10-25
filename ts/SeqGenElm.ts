@@ -50,8 +50,7 @@ export class SeqGenElm extends ChipElm {
                     let oldData = parseIntStrict(st.nextToken());
                     let newData = 0;
                     for (let i = 0; i < 32; i++) {
-                        if (((~(0x7FFFFFFF - 1) >> i) !== 0) && (oldData & (1 << i)))
-                            newData |= (1 << i);
+                        if (~(0x7fffffff - 1) >> i !== 0 && oldData & (1 << i)) newData |= 1 << i;
                     }
                     this.bitCount = 8;
                     this.data = new Int32Array([newData]);
@@ -59,12 +58,10 @@ export class SeqGenElm extends ChipElm {
                     this.bitCount = parseIntStrict(st.nextToken());
                     const wordCount = Math.trunc(this.bitCount / 32) + (this.bitCount % 32 !== 0 ? 1 : 0);
                     this.data = new Int32Array(wordCount);
-                    for (let i = 0; i < wordCount; i++)
-                        this.data[i] = parseIntStrict(st.nextToken());
+                    for (let i = 0; i < wordCount; i++) this.data[i] = parseIntStrict(st.nextToken());
                 }
             } catch (e) {}
-            if (this.bitCount > this.data.length * 32)
-                this.bitCount = this.data.length * 32;
+            if (this.bitCount > this.data.length * 32) this.bitCount = this.data.length * 32;
         } else {
             this.bitCount = 8;
             this.data = new Int32Array([0]);
@@ -75,7 +72,9 @@ export class SeqGenElm extends ChipElm {
         }
     }
 
-    getChipName(): string { return "sequence generator"; }
+    getChipName(): string {
+        return "sequence generator";
+    }
 
     setupPins(): void {
         this.sizeX = 2;
@@ -86,15 +85,24 @@ export class SeqGenElm extends ChipElm {
         this.pins[0].clock = true;
         this.pins[1] = new Pin(this, 1, ChipElm.SIDE_E, "Q");
         this.pins[1].output = true;
-        if (this.hasReset())
-            this.pins[2] = new Pin(this, 1, ChipElm.SIDE_W, "R");
+        if (this.hasReset()) this.pins[2] = new Pin(this, 1, ChipElm.SIDE_W, "R");
     }
 
-    getVoltageDiff(): number { return this.nodes[1].v; }
-    getPostCount(): number { return this.hasReset() ? 3 : 2; }
-    getVoltageSourceCount(): number { return 1; }
-    hasPlayOnce(): boolean { return (this.flags & SeqGenElm.FLAG_PLAY_ONCE) !== 0; }
-    hasReset(): boolean { return (this.flags & SeqGenElm.FLAG_HAS_RESET) !== 0; }
+    getVoltageDiff(): number {
+        return this.nodes[1].v;
+    }
+    getPostCount(): number {
+        return this.hasReset() ? 3 : 2;
+    }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    hasPlayOnce(): boolean {
+        return (this.flags & SeqGenElm.FLAG_PLAY_ONCE) !== 0;
+    }
+    hasReset(): boolean {
+        return (this.flags & SeqGenElm.FLAG_HAS_RESET) !== 0;
+    }
 
     reset(): void {
         super.reset();
@@ -125,13 +133,14 @@ export class SeqGenElm extends ChipElm {
         } else {
             if (this.pins[0].value !== this.clockstate) {
                 this.clockstate = this.pins[0].value;
-                if (this.clockstate)
-                    this.nextBit();
+                if (this.clockstate) this.nextBit();
             }
         }
     }
 
-    getDumpType(): number { return 188; }
+    getDumpType(): number {
+        return 188;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -154,8 +163,7 @@ export class SeqGenElm extends ChipElm {
             while (st.hasMoreTokens()) words.push(parseIntStrict(st.nextToken()));
             this.data = new Int32Array(words);
         }
-        if (this.bitCount > this.data.length * 32)
-            this.bitCount = this.data.length * 32;
+        if (this.bitCount > this.data.length * 32) this.bitCount = this.data.length * 32;
     }
 
     getChipEditInfo(n: number): EditInfo | null {
@@ -168,7 +176,7 @@ export class SeqGenElm extends ChipElm {
             const ei = new EditInfo("Sequence", 0, -1, -1);
             let sb = "";
             for (let i = 0; i < this.bitCount; i++)
-                sb += (this.data[Math.trunc(i / 32)] & (1 << (i % 32))) !== 0 ? '1' : '0';
+                sb += (this.data[Math.trunc(i / 32)] & (1 << (i % 32))) !== 0 ? "1" : "0";
             // EditDialog makes the real textarea and puts it in ei.textArea.element
             ei.textArea = { value: sb };
             return ei;
@@ -185,17 +193,15 @@ export class SeqGenElm extends ChipElm {
             const s = ei.textArea.element ? ei.textArea.element.value : ei.textArea.value;
             // count bits
             this.bitCount = 0;
-            for (let i = 0; i < s.length; i++)
-                if (s[i] === '0' || s[i] === '1') this.bitCount++;
+            for (let i = 0; i < s.length; i++) if (s[i] === "0" || s[i] === "1") this.bitCount++;
             const wordCount = Math.max(1, Math.ceil(this.bitCount / 32));
             this.data = new Int32Array(wordCount);
             // fill bits
             this.bitCount = 0;
             for (let i = 0; i < s.length; i++) {
                 const c = s[i];
-                if (c === '0' || c === '1') {
-                    if (c === '1')
-                        this.data[Math.trunc(this.bitCount / 32)] |= (1 << (this.bitCount % 32));
+                if (c === "0" || c === "1") {
+                    if (c === "1") this.data[Math.trunc(this.bitCount / 32)] |= 1 << (this.bitCount % 32);
                     this.bitCount++;
                 }
             }

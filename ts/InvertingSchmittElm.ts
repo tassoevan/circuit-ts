@@ -44,7 +44,7 @@ export class InvertingSchmittElm extends CircuitElm {
         if (xb === undefined) {
             super(xxOrXa, yyOrYa);
             this.noDiagonal = true;
-            this.slewRate = .5;
+            this.slewRate = 0.5;
             this.state = false;
             this.lowerTrigger = 1.66;
             this.upperTrigger = 3.33;
@@ -53,7 +53,7 @@ export class InvertingSchmittElm extends CircuitElm {
         } else {
             super(xxOrXa, yyOrYa, xb, yb!, f!);
             this.noDiagonal = true;
-            this.slewRate = .5;
+            this.slewRate = 0.5;
             this.lowerTrigger = 1.66;
             this.upperTrigger = 3.33;
             this.logicOnLevel = 5;
@@ -64,8 +64,7 @@ export class InvertingSchmittElm extends CircuitElm {
                 this.upperTrigger = parseFloatStrict(st!.nextToken());
                 this.logicOnLevel = parseFloatStrict(st!.nextToken());
                 this.logicOffLevel = parseFloatStrict(st!.nextToken());
-            } catch (e) {
-            }
+            } catch (e) {}
         }
     }
 
@@ -86,7 +85,9 @@ export class InvertingSchmittElm extends CircuitElm {
         this.logicOffLevel = xml.parseDoubleAttr("loff", this.logicOffLevel);
     }
 
-    getDumpType(): number { return 183; }
+    getDumpType(): number {
+        return 183;
+    }
 
     draw(g: Graphics): void {
         this.drawPosts(g);
@@ -107,20 +108,21 @@ export class InvertingSchmittElm extends CircuitElm {
         super.setPoints();
         const hs = 16;
         let ww = 16;
-        if (ww > this.dn / 2)
-            ww = Math.floor(this.dn / 2);
-        this.lead1 = this.interpPoint(this.point1, this.point2, .5 - ww / this.dn);
-        this.lead2 = this.interpPoint(this.point1, this.point2, .5 + (ww + 2) / this.dn);
-        this.pcircle = this.interpPoint(this.point1, this.point2, .5 + (ww - 2) / this.dn);
+        if (ww > this.dn / 2) ww = Math.floor(this.dn / 2);
+        this.lead1 = this.interpPoint(this.point1, this.point2, 0.5 - ww / this.dn);
+        this.lead2 = this.interpPoint(this.point1, this.point2, 0.5 + (ww + 2) / this.dn);
+        this.pcircle = this.interpPoint(this.point1, this.point2, 0.5 + (ww - 2) / this.dn);
         const triPoints = this.newPointArray(3);
         this.interpPoint2(this.lead1, this.lead2, triPoints[0], triPoints[1], 0, hs);
-        triPoints[2] = this.interpPoint(this.point1, this.point2, .5 + (ww - 5) / this.dn);
+        triPoints[2] = this.interpPoint(this.point1, this.point2, 0.5 + (ww - 5) / this.dn);
 
         this.gatePoly = this.createPolygon(triPoints);
-        this.symbolPoly = this.getSchmittPolygon(1, .3);
+        this.symbolPoly = this.getSchmittPolygon(1, 0.3);
         this.setBbox(this.point1, this.point2, hs);
     }
-    getVoltageSourceCount(): number { return 1; }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
     stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[1], this.voltSource!);
     }
@@ -151,7 +153,9 @@ export class InvertingSchmittElm extends CircuitElm {
         out = Math.max(Math.min(v0 + maxStep, out), v0 - maxStep);
         CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[1], this.voltSource, out);
     }
-    getVoltageDiff(): number { return this.nodes[0].v; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "inverting Schmitt trigger";
@@ -160,7 +164,9 @@ export class InvertingSchmittElm extends CircuitElm {
     }
     dlt: number = 0;
     dut: number = 0;
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             this.dlt = this.lowerTrigger;
@@ -170,26 +176,18 @@ export class InvertingSchmittElm extends CircuitElm {
             this.dut = this.upperTrigger;
             return new EditInfo("Upper threshold (V)", this.upperTrigger, 0.01, 5);
         }
-        if (n === 2)
-            return new EditInfo("Slew Rate (V/ns)", this.slewRate, 0, 0);
-        if (n === 3)
-            return new EditInfo("High Logic Voltage", this.logicOnLevel, 0, 0).setUnitStep();
-        if (n === 4)
-            return new EditInfo("Low Voltage (V)", this.logicOffLevel, 0, 0).setUnitStep();
+        if (n === 2) return new EditInfo("Slew Rate (V/ns)", this.slewRate, 0, 0);
+        if (n === 3) return new EditInfo("High Logic Voltage", this.logicOnLevel, 0, 0).setUnitStep();
+        if (n === 4) return new EditInfo("Low Voltage (V)", this.logicOffLevel, 0, 0).setUnitStep();
 
         return null;
     }
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.dlt = ei.value;
-        if (n === 1)
-            this.dut = ei.value;
-        if (n === 2)
-            this.slewRate = ei.value;
-        if (n === 3)
-            this.logicOnLevel = ei.value;
-        if (n === 4)
-            this.logicOffLevel = ei.value;
+        if (n === 0) this.dlt = ei.value;
+        if (n === 1) this.dut = ei.value;
+        if (n === 2) this.slewRate = ei.value;
+        if (n === 3) this.logicOnLevel = ei.value;
+        if (n === 4) this.logicOffLevel = ei.value;
 
         if (this.dlt > this.dut) {
             this.upperTrigger = this.dlt;
@@ -201,14 +199,15 @@ export class InvertingSchmittElm extends CircuitElm {
     }
     // there is no current path through the InvertingSchmitt input, but there
     // is an indirect path through the output to ground.
-    getConnection(n1: number, n2: number): boolean { return false; }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
     hasGroundConnection(n1: number): boolean {
-        return (n1 === 1);
+        return n1 === 1;
     }
 
     getCurrentIntoNode(n: number): number {
-        if (n === 1)
-            return this.current;
+        if (n === 1) return this.current;
         return 0;
     }
 }

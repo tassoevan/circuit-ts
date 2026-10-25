@@ -59,16 +59,22 @@ export class DCMotorElm extends CircuitElm {
             this.angle = CircuitElm.pi / 2;
             this.inductance = parseFloatStrict(st.nextToken());
             this.resistance = parseFloatStrict(st.nextToken());
-            this.K  = parseFloatStrict(st.nextToken());
+            this.K = parseFloatStrict(st.nextToken());
             this.Kb = parseFloatStrict(st.nextToken());
-            this.J  = parseFloatStrict(st.nextToken());
-            this.b  = parseFloatStrict(st.nextToken());
+            this.J = parseFloatStrict(st.nextToken());
+            this.b = parseFloatStrict(st.nextToken());
             this.gearRatio = parseFloatStrict(st.nextToken());
             this.tau = parseFloatStrict(st.nextToken());
         } else {
-            this.inductance = 0.5; this.resistance = 1;
+            this.inductance = 0.5;
+            this.resistance = 1;
             this.angle = CircuitElm.pi / 2;
-            this.K = 0.15; this.b = 0.05; this.J = 0.02; this.Kb = 0.15; this.gearRatio = 1; this.tau = 0;
+            this.K = 0.15;
+            this.b = 0.05;
+            this.J = 0.02;
+            this.Kb = 0.15;
+            this.gearRatio = 1;
+            this.tau = 0;
         }
         this.ind = new Inductor(CircuitElm.sim);
         this.indInertia = new Inductor(CircuitElm.sim);
@@ -76,7 +82,9 @@ export class DCMotorElm extends CircuitElm {
         this.indInertia.setup(this.J, 0, Inductor.FLAG_BACK_EULER);
     }
 
-    getDumpType(): number { return 415; }
+    getDumpType(): number {
+        return 415;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -94,10 +102,10 @@ export class DCMotorElm extends CircuitElm {
         super.undumpXml(xml);
         this.inductance = xml.parseDoubleAttr("in", this.inductance);
         this.resistance = xml.parseDoubleAttr("rs", this.resistance);
-        this.K  = xml.parseDoubleAttr("k", this.K);
+        this.K = xml.parseDoubleAttr("k", this.K);
         this.Kb = xml.parseDoubleAttr("kb", this.Kb);
-        this.J  = xml.parseDoubleAttr("j", this.J);
-        this.b  = xml.parseDoubleAttr("b", this.b);
+        this.J = xml.parseDoubleAttr("j", this.J);
+        this.b = xml.parseDoubleAttr("b", this.b);
         this.gearRatio = xml.parseDoubleAttr("gr", this.gearRatio);
         this.tau = xml.parseDoubleAttr("ta", this.tau);
         this.ind = new Inductor(CircuitElm.sim);
@@ -106,7 +114,9 @@ export class DCMotorElm extends CircuitElm {
         this.indInertia.setup(this.J, 0, Inductor.FLAG_BACK_EULER);
     }
 
-    getAngle(): number { return this.angle; }
+    getAngle(): number {
+        return this.angle;
+    }
 
     setPoints(): void {
         super.setPoints();
@@ -115,9 +125,15 @@ export class DCMotorElm extends CircuitElm {
         this.allocNodes();
     }
 
-    getPostCount(): number { return 2; }
-    getInternalNodeCount(): number { return 4; }
-    getVoltageSourceCount(): number { return 2; }
+    getPostCount(): number {
+        return 2;
+    }
+    getInternalNodeCount(): number {
+        return 4;
+    }
+    getVoltageSourceCount(): number {
+        return 2;
+    }
 
     setVoltageSource(n: number, v: VoltageSource): void {
         this.voltSources[n] = v;
@@ -149,8 +165,18 @@ export class DCMotorElm extends CircuitElm {
     }
 
     doStep(): void {
-        CircuitElm.sim.updateVoltageSource(this.nodes[4], CircuitNode.ground, this.voltSources[1], this.coilCurrent * this.K);
-        CircuitElm.sim.updateVoltageSource(this.nodes[3], this.nodes[1], this.voltSources[0], this.inertiaCurrent * this.Kb);
+        CircuitElm.sim.updateVoltageSource(
+            this.nodes[4],
+            CircuitNode.ground,
+            this.voltSources[1],
+            this.coilCurrent * this.K,
+        );
+        CircuitElm.sim.updateVoltageSource(
+            this.nodes[3],
+            this.nodes[1],
+            this.voltSources[0],
+            this.inertiaCurrent * this.Kb,
+        );
         this.ind.doStep(this.nodes[0].v - this.nodes[2].v);
         this.indInertia.doStep(this.nodes[4].v - this.nodes[5].v);
     }
@@ -172,15 +198,25 @@ export class DCMotorElm extends CircuitElm {
         this.doDots(g);
         this.setPowerColor(g, true);
         g.setColor(new Color(165, 165, 165));
-        g.fillOval(this.motorCenter.x - cr, this.motorCenter.y - cr, cr*2, cr*2);
+        g.fillOval(this.motorCenter.x - cr, this.motorCenter.y - cr, cr * 2, cr * 2);
         g.setColor(new Color(10, 10, 10));
         const angleAux = Math.round(this.angle * 300.0) / 300.0;
-        g.fillOval(this.motorCenter.x - Math.trunc(cr/2.2), this.motorCenter.y - Math.trunc(cr/2.2),
-            Math.trunc(2*cr/2.2), Math.trunc(2*cr/2.2));
+        g.fillOval(
+            this.motorCenter.x - Math.trunc(cr / 2.2),
+            this.motorCenter.y - Math.trunc(cr / 2.2),
+            Math.trunc((2 * cr) / 2.2),
+            Math.trunc((2 * cr) / 2.2),
+        );
         for (let k = 0; k < 3; k++) {
-            const a = angleAux * this.gearRatio + k * CircuitElm.pi / 3;
-            this.interpPointFix(this.lead1!, this.lead2!, CircuitElm.ps1, 0.5 + 0.28*Math.cos(a), 0.28*Math.sin(a));
-            this.interpPointFix(this.lead1!, this.lead2!, CircuitElm.ps2, 0.5 - 0.28*Math.cos(a), -0.28*Math.sin(a));
+            const a = angleAux * this.gearRatio + (k * CircuitElm.pi) / 3;
+            this.interpPointFix(this.lead1!, this.lead2!, CircuitElm.ps1, 0.5 + 0.28 * Math.cos(a), 0.28 * Math.sin(a));
+            this.interpPointFix(
+                this.lead1!,
+                this.lead2!,
+                CircuitElm.ps2,
+                0.5 - 0.28 * Math.cos(a),
+                -0.28 * Math.sin(a),
+            );
             DCMotorElm.drawThickerLine(g, CircuitElm.ps1, CircuitElm.ps2);
         }
         this.drawPosts(g);
@@ -195,20 +231,25 @@ export class DCMotorElm extends CircuitElm {
     interpPointFix(a: Point, b: Point, c: Point, f: number, gg: number): void {
         const gx = b.y - a.y;
         const gy = a.x - b.x;
-        c.x = Math.round(a.x*(1-f) + b.x*f + gg*gx);
-        c.y = Math.round(a.y*(1-f) + b.y*f + gg*gy);
+        c.x = Math.round(a.x * (1 - f) + b.x * f + gg * gx);
+        c.y = Math.round(a.y * (1 - f) + b.y * f + gg * gy);
     }
 
     getInfo(arr: string[]): void {
         arr[0] = "DC Motor";
         this.getBasicInfo(arr);
-        arr[3] = Locale.LS("speed") + " = " + CircuitElm.getUnitText(60 * Math.abs(this.speed) / (2 * CircuitElm.pi), Locale.LS("RPM"));
+        arr[3] =
+            Locale.LS("speed") +
+            " = " +
+            CircuitElm.getUnitText((60 * Math.abs(this.speed)) / (2 * CircuitElm.pi), Locale.LS("RPM"));
         arr[4] = "L = " + CircuitElm.getUnitText(this.inductance, "H");
         arr[5] = "R = " + CircuitElm.getUnitText(this.resistance, Locale.ohmString);
         arr[6] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Armature inductance (H)", this.inductance, 0, 0).setPositive();
         if (n === 1) return new EditInfo("Armature Resistance (ohms)", this.resistance, 0, 0).setPositive();
@@ -220,10 +261,19 @@ export class DCMotorElm extends CircuitElm {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0 && ei.value > 0) { this.inductance = ei.value; this.ind.setup(this.inductance, this.current, Inductor.FLAG_BACK_EULER); }
+        if (n === 0 && ei.value > 0) {
+            this.inductance = ei.value;
+            this.ind.setup(this.inductance, this.current, Inductor.FLAG_BACK_EULER);
+        }
         if (n === 1 && ei.value > 0) this.resistance = ei.value;
-        if (n === 2 && ei.value > 0) { this.K = ei.value; this.Kb = this.K; }
-        if (n === 3 && ei.value > 0) { this.J = ei.value; this.indInertia.setup(this.J, this.inertiaCurrent, Inductor.FLAG_BACK_EULER); }
+        if (n === 2 && ei.value > 0) {
+            this.K = ei.value;
+            this.Kb = this.K;
+        }
+        if (n === 3 && ei.value > 0) {
+            this.J = ei.value;
+            this.indInertia.setup(this.J, this.inertiaCurrent, Inductor.FLAG_BACK_EULER);
+        }
         if (n === 4 && ei.value > 0) this.b = ei.value;
         if (n === 5 && ei.value > 0) this.gearRatio = ei.value;
     }

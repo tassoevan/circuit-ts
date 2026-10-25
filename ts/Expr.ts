@@ -25,7 +25,7 @@ import { parseFloatStrict } from "./NumberParse";
 // these; the element owning the expression resolves them when the circuit is analyzed.
 export class ExprNodeRef {
     name: string;
-    current: boolean;  // true for i(name), false for v(name)
+    current: boolean; // true for i(name), false for v(name)
 
     constructor(name: string, current: boolean) {
         this.name = name;
@@ -52,17 +52,13 @@ export class ExprState {
 
     updateLastValues(lastOut: number): void {
         this.lastOutput = lastOut;
-        for (let i = 0; i !== this.values.length; i++)
-            this.lastValues[i] = this.values[i];
-        for (let i = 0; i !== this.nodeValues.length; i++)
-            this.lastNodeValues[i] = this.nodeValues[i];
+        for (let i = 0; i !== this.values.length; i++) this.lastValues[i] = this.values[i];
+        for (let i = 0; i !== this.nodeValues.length; i++) this.lastNodeValues[i] = this.nodeValues[i];
     }
 
     reset(): void {
-        for (let i = 0; i !== this.values.length; i++)
-            this.lastValues[i] = 0;
-        for (let i = 0; i !== this.lastNodeValues.length; i++)
-            this.lastNodeValues[i] = 0;
+        for (let i = 0; i !== this.values.length; i++) this.lastValues[i] = 0;
+        for (let i = 0; i !== this.lastNodeValues.length; i++) this.lastNodeValues[i] = 0;
         this.lastOutput = 0;
     }
 }
@@ -146,8 +142,7 @@ export class Expr {
             // Expr(Expr e1, Expr|null e2, int v)
             this.type = v!;
             this.children = [e1OrV as Expr];
-            if (e2OrVv != null)
-                this.children.push(e2OrVv as Expr);
+            if (e2OrVv != null) this.children.push(e2OrVv as Expr);
         }
     }
 
@@ -156,106 +151,138 @@ export class Expr {
         let right: Expr | null = null;
         if (this.children != null && this.children.length > 0) {
             left = this.children[0];
-            if (this.children.length >= 2)
-                right = this.children[this.children.length - 1];
+            if (this.children.length >= 2) right = this.children[this.children.length - 1];
         }
         switch (this.type) {
-        case Expr.E_ADD: return left!.eval(es) + right!.eval(es);
-        case Expr.E_SUB: return left!.eval(es) - right!.eval(es);
-        case Expr.E_MUL: return left!.eval(es) * right!.eval(es);
-        case Expr.E_DIV: return left!.eval(es) / right!.eval(es);
-        case Expr.E_POW: return Math.pow(left!.eval(es), right!.eval(es));
-        case Expr.E_OR:  return (left!.eval(es) !== 0 || right!.eval(es) !== 0) ? 1 : 0;
-        case Expr.E_AND: return (left!.eval(es) !== 0 && right!.eval(es) !== 0) ? 1 : 0;
-        case Expr.E_EQUALS: return (left!.eval(es) === right!.eval(es)) ? 1 : 0;
-        case Expr.E_NEQ: return (left!.eval(es) !== right!.eval(es)) ? 1 : 0;
-        case Expr.E_LEQ: return (left!.eval(es) <= right!.eval(es)) ? 1 : 0;
-        case Expr.E_GEQ: return (left!.eval(es) >= right!.eval(es)) ? 1 : 0;
-        case Expr.E_LESS: return (left!.eval(es) < right!.eval(es)) ? 1 : 0;
-        case Expr.E_GREATER: return (left!.eval(es) > right!.eval(es)) ? 1 : 0;
-        case Expr.E_TERNARY: return this.children![left!.eval(es) !== 0 ? 1 : 2].eval(es);
-        case Expr.E_UMINUS: return -left!.eval(es);
-        case Expr.E_NOT: return left!.eval(es) === 0 ? 1 : 0;
-        case Expr.E_VAL: return this.value;
-        case Expr.E_T: return es.t;
-        case Expr.E_NODEV: return es.nodeValues[this.value];
-        case Expr.E_NODEDVDT:
-            return (es.nodeValues[this.value] - es.lastNodeValues[this.value]) /
-                SimulationManager.theSim.timeStep;
-        case Expr.E_SIN: return Math.sin(left!.eval(es));
-        case Expr.E_COS: return Math.cos(left!.eval(es));
-        case Expr.E_ABS: return Math.abs(left!.eval(es));
-        case Expr.E_EXP: return Math.exp(left!.eval(es));
-        case Expr.E_LOG: return Math.log(left!.eval(es));
-        case Expr.E_SQRT: return Math.sqrt(left!.eval(es));
-        case Expr.E_TAN: return Math.tan(left!.eval(es));
-        case Expr.E_ASIN: return Math.asin(left!.eval(es));
-        case Expr.E_ACOS: return Math.acos(left!.eval(es));
-        case Expr.E_ATAN: return Math.atan(left!.eval(es));
-        case Expr.E_SINH: return Math.sinh(left!.eval(es));
-        case Expr.E_COSH: return Math.cosh(left!.eval(es));
-        case Expr.E_TANH: return Math.tanh(left!.eval(es));
-        case Expr.E_BITAND: return (left!.eval(es) | 0) & (right!.eval(es) | 0);
-        case Expr.E_BITOR:  return (left!.eval(es) | 0) | (right!.eval(es) | 0);
-        case Expr.E_RSHIFT: return (left!.eval(es) | 0) >> (right!.eval(es) | 0);
-        case Expr.E_FLOOR: return Math.floor(left!.eval(es));
-        case Expr.E_CEIL: return Math.ceil(left!.eval(es));
-        case Expr.E_MIN: {
-            let x = left!.eval(es);
-            for (let i = 1; i < this.children!.length; i++)
-                x = Math.min(x, this.children![i].eval(es));
-            return x;
-        }
-        case Expr.E_MAX: {
-            let x = left!.eval(es);
-            for (let i = 1; i < this.children!.length; i++)
-                x = Math.max(x, this.children![i].eval(es));
-            return x;
-        }
-        case Expr.E_CLAMP:
-            return Math.min(Math.max(left!.eval(es), this.children![1].eval(es)), this.children![2].eval(es));
-        case Expr.E_STEP: {
-            const x = left!.eval(es);
-            if (right == null)
-                return (x < 0) ? 0 : 1;
-            return (x > right.eval(es)) ? 0 : (x < 0) ? 0 : 1;
-        }
-        case Expr.E_SELECT: {
-            const x = left!.eval(es);
-            return this.children![x > 0 ? 2 : 1].eval(es);
-        }
-        case Expr.E_TRIANGLE: {
-            const x = this.posmod(left!.eval(es), Math.PI * 2) / Math.PI;
-            return (x < 1) ? -1 + x * 2 : 3 - x * 2;
-        }
-        case Expr.E_SAWTOOTH: {
-            const x = this.posmod(left!.eval(es), Math.PI * 2) / Math.PI;
-            return x - 1;
-        }
-        case Expr.E_MOD:
-            return left!.eval(es) % right!.eval(es);
-        case Expr.E_PWL:
-            return this.pwl(es, this.children!);
-        case Expr.E_PWR:
-            return Math.pow(Math.abs(left!.eval(es)), right!.eval(es));
-        case Expr.E_PWRS: {
-            const x = left!.eval(es);
-            if (x < 0)
-                return -Math.pow(-x, right!.eval(es));
-            return Math.pow(x, right!.eval(es));
-        }
-        case Expr.E_LASTOUTPUT:
-            return es.lastOutput;
-        case Expr.E_TIMESTEP:
-            return SimulationManager.theSim.timeStep;
-        default:
-            if (this.type >= Expr.E_LASTA)
-                return es.lastValues[this.type - Expr.E_LASTA];
-            if (this.type >= Expr.E_DADT)
-                return (es.values[this.type - Expr.E_DADT] - es.lastValues[this.type - Expr.E_DADT]) / SimulationManager.theSim.timeStep;
-            if (this.type >= Expr.E_A)
-                return es.values[this.type - Expr.E_A];
-            console.error("unknown Expr type");
+            case Expr.E_ADD:
+                return left!.eval(es) + right!.eval(es);
+            case Expr.E_SUB:
+                return left!.eval(es) - right!.eval(es);
+            case Expr.E_MUL:
+                return left!.eval(es) * right!.eval(es);
+            case Expr.E_DIV:
+                return left!.eval(es) / right!.eval(es);
+            case Expr.E_POW:
+                return Math.pow(left!.eval(es), right!.eval(es));
+            case Expr.E_OR:
+                return left!.eval(es) !== 0 || right!.eval(es) !== 0 ? 1 : 0;
+            case Expr.E_AND:
+                return left!.eval(es) !== 0 && right!.eval(es) !== 0 ? 1 : 0;
+            case Expr.E_EQUALS:
+                return left!.eval(es) === right!.eval(es) ? 1 : 0;
+            case Expr.E_NEQ:
+                return left!.eval(es) !== right!.eval(es) ? 1 : 0;
+            case Expr.E_LEQ:
+                return left!.eval(es) <= right!.eval(es) ? 1 : 0;
+            case Expr.E_GEQ:
+                return left!.eval(es) >= right!.eval(es) ? 1 : 0;
+            case Expr.E_LESS:
+                return left!.eval(es) < right!.eval(es) ? 1 : 0;
+            case Expr.E_GREATER:
+                return left!.eval(es) > right!.eval(es) ? 1 : 0;
+            case Expr.E_TERNARY:
+                return this.children![left!.eval(es) !== 0 ? 1 : 2].eval(es);
+            case Expr.E_UMINUS:
+                return -left!.eval(es);
+            case Expr.E_NOT:
+                return left!.eval(es) === 0 ? 1 : 0;
+            case Expr.E_VAL:
+                return this.value;
+            case Expr.E_T:
+                return es.t;
+            case Expr.E_NODEV:
+                return es.nodeValues[this.value];
+            case Expr.E_NODEDVDT:
+                return (es.nodeValues[this.value] - es.lastNodeValues[this.value]) / SimulationManager.theSim.timeStep;
+            case Expr.E_SIN:
+                return Math.sin(left!.eval(es));
+            case Expr.E_COS:
+                return Math.cos(left!.eval(es));
+            case Expr.E_ABS:
+                return Math.abs(left!.eval(es));
+            case Expr.E_EXP:
+                return Math.exp(left!.eval(es));
+            case Expr.E_LOG:
+                return Math.log(left!.eval(es));
+            case Expr.E_SQRT:
+                return Math.sqrt(left!.eval(es));
+            case Expr.E_TAN:
+                return Math.tan(left!.eval(es));
+            case Expr.E_ASIN:
+                return Math.asin(left!.eval(es));
+            case Expr.E_ACOS:
+                return Math.acos(left!.eval(es));
+            case Expr.E_ATAN:
+                return Math.atan(left!.eval(es));
+            case Expr.E_SINH:
+                return Math.sinh(left!.eval(es));
+            case Expr.E_COSH:
+                return Math.cosh(left!.eval(es));
+            case Expr.E_TANH:
+                return Math.tanh(left!.eval(es));
+            case Expr.E_BITAND:
+                return (left!.eval(es) | 0) & (right!.eval(es) | 0);
+            case Expr.E_BITOR:
+                return left!.eval(es) | 0 | (right!.eval(es) | 0);
+            case Expr.E_RSHIFT:
+                return (left!.eval(es) | 0) >> (right!.eval(es) | 0);
+            case Expr.E_FLOOR:
+                return Math.floor(left!.eval(es));
+            case Expr.E_CEIL:
+                return Math.ceil(left!.eval(es));
+            case Expr.E_MIN: {
+                let x = left!.eval(es);
+                for (let i = 1; i < this.children!.length; i++) x = Math.min(x, this.children![i].eval(es));
+                return x;
+            }
+            case Expr.E_MAX: {
+                let x = left!.eval(es);
+                for (let i = 1; i < this.children!.length; i++) x = Math.max(x, this.children![i].eval(es));
+                return x;
+            }
+            case Expr.E_CLAMP:
+                return Math.min(Math.max(left!.eval(es), this.children![1].eval(es)), this.children![2].eval(es));
+            case Expr.E_STEP: {
+                const x = left!.eval(es);
+                if (right == null) return x < 0 ? 0 : 1;
+                return x > right.eval(es) ? 0 : x < 0 ? 0 : 1;
+            }
+            case Expr.E_SELECT: {
+                const x = left!.eval(es);
+                return this.children![x > 0 ? 2 : 1].eval(es);
+            }
+            case Expr.E_TRIANGLE: {
+                const x = this.posmod(left!.eval(es), Math.PI * 2) / Math.PI;
+                return x < 1 ? -1 + x * 2 : 3 - x * 2;
+            }
+            case Expr.E_SAWTOOTH: {
+                const x = this.posmod(left!.eval(es), Math.PI * 2) / Math.PI;
+                return x - 1;
+            }
+            case Expr.E_MOD:
+                return left!.eval(es) % right!.eval(es);
+            case Expr.E_PWL:
+                return this.pwl(es, this.children!);
+            case Expr.E_PWR:
+                return Math.pow(Math.abs(left!.eval(es)), right!.eval(es));
+            case Expr.E_PWRS: {
+                const x = left!.eval(es);
+                if (x < 0) return -Math.pow(-x, right!.eval(es));
+                return Math.pow(x, right!.eval(es));
+            }
+            case Expr.E_LASTOUTPUT:
+                return es.lastOutput;
+            case Expr.E_TIMESTEP:
+                return SimulationManager.theSim.timeStep;
+            default:
+                if (this.type >= Expr.E_LASTA) return es.lastValues[this.type - Expr.E_LASTA];
+                if (this.type >= Expr.E_DADT)
+                    return (
+                        (es.values[this.type - Expr.E_DADT] - es.lastValues[this.type - Expr.E_DADT]) /
+                        SimulationManager.theSim.timeStep
+                    );
+                if (this.type >= Expr.E_A) return es.values[this.type - Expr.E_A];
+                console.error("unknown Expr type");
         }
         return 0;
     }
@@ -264,16 +291,13 @@ export class Expr {
         const x = args[0].eval(es);
         let x0 = args[1].eval(es);
         let y0 = args[2].eval(es);
-        if (x < x0)
-            return y0;
+        if (x < x0) return y0;
         let x1 = args[3].eval(es);
         let y1 = args[4].eval(es);
         let i = 5;
         while (true) {
-            if (x < x1)
-                return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
-            if (i + 1 >= args.length)
-                break;
+            if (x < x1) return y0 + ((x - x0) * (y1 - y0)) / (x1 - x0);
+            if (i + 1 >= args.length) break;
             x0 = x1;
             y0 = y1;
             x1 = args[i].eval(es);
@@ -285,7 +309,7 @@ export class Expr {
 
     private posmod(x: number, y: number): number {
         x %= y;
-        return (x >= 0) ? x : x + y;
+        return x >= 0 ? x : x + y;
     }
 }
 
@@ -308,33 +332,33 @@ export class ExprParser {
     }
 
     // quantities referenced by v()/i() in this expression, in slot order
-    getNodeRefs(): ExprNodeRef[] { return this.nodeRefs; }
+    getNodeRefs(): ExprNodeRef[] {
+        return this.nodeRefs;
+    }
 
     private getToken(): void {
-        while (this.pos < this.tlen && this.text.charAt(this.pos) === ' ')
-            this.pos++;
+        while (this.pos < this.tlen && this.text.charAt(this.pos) === " ") this.pos++;
         if (this.pos === this.tlen) {
             this.token = "";
             return;
         }
         let i = this.pos;
         const c = this.text.charCodeAt(i);
-        if ((c >= 48 && c <= 57) || this.text.charAt(i) === '.') { // '0'-'9' or '.'
+        if ((c >= 48 && c <= 57) || this.text.charAt(i) === ".") {
+            // '0'-'9' or '.'
             for (i = this.pos; i !== this.tlen; i++) {
-                if (this.text.charAt(i) === 'e' || this.text.charAt(i) === 'E') {
+                if (this.text.charAt(i) === "e" || this.text.charAt(i) === "E") {
                     i++;
-                    if (i < this.tlen && (this.text.charAt(i) === '+' || this.text.charAt(i) === '-'))
-                        i++;
+                    if (i < this.tlen && (this.text.charAt(i) === "+" || this.text.charAt(i) === "-")) i++;
                 }
                 const ch = this.text.charCodeAt(i);
-                if (!((ch >= 48 && ch <= 57) || this.text.charAt(i) === '.'))
-                    break;
+                if (!((ch >= 48 && ch <= 57) || this.text.charAt(i) === ".")) break;
             }
-        } else if (c >= 97 && c <= 122) { // 'a'-'z'
+        } else if (c >= 97 && c <= 122) {
+            // 'a'-'z'
             for (i = this.pos; i !== this.tlen; i++) {
                 const ch = this.text.charCodeAt(i);
-                if (!(ch >= 97 && ch <= 122))
-                    break;
+                if (!(ch >= 97 && ch <= 122)) break;
             }
         } else {
             i++;
@@ -342,11 +366,9 @@ export class ExprParser {
                 const ch = this.text.charAt(i);
                 const cc = this.text.charAt(i - 1);
                 // ||, &&, <<, >>, ==
-                if (ch === cc && (cc === '|' || cc === '&' || cc === '<' || cc === '>' || cc === '='))
-                    i++;
+                if (ch === cc && (cc === "|" || cc === "&" || cc === "<" || cc === ">" || cc === "=")) i++;
                 // <=, >=, !=
-                else if ((cc === '<' || cc === '>' || cc === '!') && ch === '=')
-                    i++;
+                else if ((cc === "<" || cc === ">" || cc === "!") && ch === "=") i++;
             }
         }
         this.token = this.text.substring(this.pos, i);
@@ -354,28 +376,23 @@ export class ExprParser {
     }
 
     private skip(s: string): boolean {
-        if (this.token !== s)
-            return false;
+        if (this.token !== s) return false;
         this.getToken();
         return true;
     }
 
     private setError(s: string): void {
-        if (this.err == null)
-            this.err = s;
+        if (this.err == null) this.err = s;
     }
 
     private skipOrError(s: string): void {
-        if (!this.skip(s))
-            this.setError("expected " + s + ", got " + this.token);
+        if (!this.skip(s)) this.setError("expected " + s + ", got " + this.token);
     }
 
     parseExpression(): Expr {
-        if (this.token.length === 0)
-            return new Expr(Expr.E_VAL, 0);
+        if (this.token.length === 0) return new Expr(Expr.E_VAL, 0);
         const e = this.parse();
-        if (this.token.length > 0)
-            this.setError("unexpected token: " + this.token);
+        if (this.token.length > 0) this.setError("unexpected token: " + this.token);
         return e;
     }
 
@@ -394,36 +411,31 @@ export class ExprParser {
 
     private parseOr(): Expr {
         let e = this.parseAnd();
-        while (this.skip("||"))
-            e = new Expr(e, this.parseAnd(), Expr.E_OR);
+        while (this.skip("||")) e = new Expr(e, this.parseAnd(), Expr.E_OR);
         return e;
     }
 
     private parseAnd(): Expr {
         let e = this.parseBitOr();
-        while (this.skip("&&"))
-            e = new Expr(e, this.parseBitOr(), Expr.E_AND);
+        while (this.skip("&&")) e = new Expr(e, this.parseBitOr(), Expr.E_AND);
         return e;
     }
 
     private parseBitOr(): Expr {
         let e = this.parseBitAnd();
-        while (this.skip("|"))
-            e = new Expr(e, this.parseBitAnd(), Expr.E_BITOR);
+        while (this.skip("|")) e = new Expr(e, this.parseBitAnd(), Expr.E_BITOR);
         return e;
     }
 
     private parseBitAnd(): Expr {
         let e = this.parseEquals();
-        while (this.skip("&"))
-            e = new Expr(e, this.parseEquals(), Expr.E_BITAND);
+        while (this.skip("&")) e = new Expr(e, this.parseEquals(), Expr.E_BITAND);
         return e;
     }
 
     private parseEquals(): Expr {
         const e = this.parseCompare();
-        if (this.skip("=="))
-            return new Expr(e, this.parseCompare(), Expr.E_EQUALS);
+        if (this.skip("==")) return new Expr(e, this.parseCompare(), Expr.E_EQUALS);
         return e;
     }
 
@@ -432,27 +444,23 @@ export class ExprParser {
         if (this.skip("<=")) return new Expr(e, this.parseShift(), Expr.E_LEQ);
         if (this.skip(">=")) return new Expr(e, this.parseShift(), Expr.E_GEQ);
         if (this.skip("!=")) return new Expr(e, this.parseShift(), Expr.E_NEQ);
-        if (this.skip("<"))  return new Expr(e, this.parseShift(), Expr.E_LESS);
-        if (this.skip(">"))  return new Expr(e, this.parseShift(), Expr.E_GREATER);
+        if (this.skip("<")) return new Expr(e, this.parseShift(), Expr.E_LESS);
+        if (this.skip(">")) return new Expr(e, this.parseShift(), Expr.E_GREATER);
         return e;
     }
 
     private parseShift(): Expr {
         let e = this.parseAdd();
-        while (this.skip(">>"))
-            e = new Expr(e, this.parseAdd(), Expr.E_RSHIFT);
+        while (this.skip(">>")) e = new Expr(e, this.parseAdd(), Expr.E_RSHIFT);
         return e;
     }
 
     private parseAdd(): Expr {
         let e = this.parseMult();
         while (true) {
-            if (this.skip("+"))
-                e = new Expr(e, this.parseMult(), Expr.E_ADD);
-            else if (this.skip("-"))
-                e = new Expr(e, this.parseMult(), Expr.E_SUB);
-            else
-                break;
+            if (this.skip("+")) e = new Expr(e, this.parseMult(), Expr.E_ADD);
+            else if (this.skip("-")) e = new Expr(e, this.parseMult(), Expr.E_SUB);
+            else break;
         }
         return e;
     }
@@ -460,29 +468,23 @@ export class ExprParser {
     private parseMult(): Expr {
         let e = this.parseUminus();
         while (true) {
-            if (this.skip("*"))
-                e = new Expr(e, this.parseUminus(), Expr.E_MUL);
-            else if (this.skip("/"))
-                e = new Expr(e, this.parseUminus(), Expr.E_DIV);
-            else
-                break;
+            if (this.skip("*")) e = new Expr(e, this.parseUminus(), Expr.E_MUL);
+            else if (this.skip("/")) e = new Expr(e, this.parseUminus(), Expr.E_DIV);
+            else break;
         }
         return e;
     }
 
     private parseUminus(): Expr {
         this.skip("+");
-        if (this.skip("!"))
-            return new Expr(this.parseUminus(), null, Expr.E_NOT);
-        if (this.skip("-"))
-            return new Expr(this.parseUminus(), null, Expr.E_UMINUS);
+        if (this.skip("!")) return new Expr(this.parseUminus(), null, Expr.E_NOT);
+        if (this.skip("-")) return new Expr(this.parseUminus(), null, Expr.E_UMINUS);
         return this.parsePow();
     }
 
     private parsePow(): Expr {
         let e = this.parseTerm();
-        while (this.skip("^"))
-            e = new Expr(e, this.parseTerm(), Expr.E_POW);
+        while (this.skip("^")) e = new Expr(e, this.parseTerm(), Expr.E_POW);
         return e;
     }
 
@@ -503,8 +505,7 @@ export class ExprParser {
             args++;
         }
         this.skipOrError(")");
-        if (args < minArgs || args > maxArgs)
-            this.setError("bad number of function args: " + args);
+        if (args < minArgs || args > maxArgs) this.setError("bad number of function args: " + args);
         return e;
     }
 
@@ -512,9 +513,8 @@ export class ExprParser {
     // input letter "i" apart from the function "i(".
     private nextCharIsOpenParen(): boolean {
         let i = this.pos;
-        while (i < this.tlen && this.origText.charAt(i) === ' ')
-            i++;
-        return i < this.tlen && this.origText.charAt(i) === '(';
+        while (i < this.tlen && this.origText.charAt(i) === " ") i++;
+        return i < this.tlen && this.origText.charAt(i) === "(";
     }
 
     // parse v(name), v(name1,name2) or i(name).  called just after the function letter was
@@ -526,18 +526,14 @@ export class ExprParser {
             return new Expr(Expr.E_VAL, 0);
         }
         let e = this.makeNodeRef(this.scanNodeName(), current, deriv);
-        if (this.pos < this.tlen && this.origText.charAt(this.pos) === ',') {
+        if (this.pos < this.tlen && this.origText.charAt(this.pos) === ",") {
             this.pos++;
             const e2 = this.makeNodeRef(this.scanNodeName(), current, deriv);
-            if (current)
-                this.setError(fn + "() takes one name");
-            else
-                e = new Expr(e, e2, Expr.E_SUB);
+            if (current) this.setError(fn + "() takes one name");
+            else e = new Expr(e, e2, Expr.E_SUB);
         }
-        if (this.pos < this.tlen && this.origText.charAt(this.pos) === ')')
-            this.pos++;
-        else
-            this.setError("expected ) in " + fn + "()");
+        if (this.pos < this.tlen && this.origText.charAt(this.pos) === ")") this.pos++;
+        else this.setError("expected ) in " + fn + "()");
         this.getToken();
         return e;
     }
@@ -545,31 +541,25 @@ export class ExprParser {
     // scan a node name out of the raw text, stopping at ',' or ')'.  a double-quoted
     // name may contain those characters.
     private scanNodeName(): string {
-        while (this.pos < this.tlen && this.origText.charAt(this.pos) === ' ')
-            this.pos++;
+        while (this.pos < this.tlen && this.origText.charAt(this.pos) === " ") this.pos++;
         let s: string;
         if (this.pos < this.tlen && this.origText.charAt(this.pos) === '"') {
             this.pos++;
             const start = this.pos;
-            while (this.pos < this.tlen && this.origText.charAt(this.pos) !== '"')
-                this.pos++;
+            while (this.pos < this.tlen && this.origText.charAt(this.pos) !== '"') this.pos++;
             s = this.origText.substring(start, this.pos);
-            if (this.pos < this.tlen)
-                this.pos++; // skip closing quote
-            while (this.pos < this.tlen && this.origText.charAt(this.pos) === ' ')
-                this.pos++;
+            if (this.pos < this.tlen) this.pos++; // skip closing quote
+            while (this.pos < this.tlen && this.origText.charAt(this.pos) === " ") this.pos++;
         } else {
             const start = this.pos;
             while (this.pos < this.tlen) {
                 const c = this.origText.charAt(this.pos);
-                if (c === ',' || c === ')')
-                    break;
+                if (c === "," || c === ")") break;
                 this.pos++;
             }
             s = this.origText.substring(start, this.pos).trim();
         }
-        if (s.length === 0)
-            this.setError("missing name in a v()/i() reference");
+        if (s.length === 0) this.setError("missing name in a v()/i() reference");
         return s;
     }
 
@@ -580,8 +570,7 @@ export class ExprParser {
     private makeNodeRef(name: string, current: boolean, deriv: boolean): Expr {
         let ix = -1;
         for (let i = 0; i !== this.nodeRefs.length; i++)
-            if (this.nodeRefs[i].name === name && this.nodeRefs[i].current === current)
-                ix = i;
+            if (this.nodeRefs[i].name === name && this.nodeRefs[i].current === current) ix = i;
         if (ix < 0) {
             ix = this.nodeRefs.length;
             this.nodeRefs.push(new ExprNodeRef(name, current));
@@ -597,8 +586,7 @@ export class ExprParser {
             this.skipOrError(")");
             return e;
         }
-        if (this.skip("t"))
-            return new Expr(Expr.E_T);
+        if (this.skip("t")) return new Expr(Expr.E_T);
         // i(name) has to be checked before the a..i input letters below, since "i" is also
         // the 9th input.  only "i" immediately followed by "(" is a reference; "i" followed
         // by anything else keeps its old meaning, and "i(" was a syntax error before.
@@ -608,14 +596,16 @@ export class ExprParser {
         }
         if (this.token.length === 1) {
             const c = this.token.charCodeAt(0);
-            if (c >= 97 && c <= 105) { // 'a'-'i'
+            if (c >= 97 && c <= 105) {
+                // 'a'-'i'
                 this.getToken();
                 return new Expr(Expr.E_A + (c - 97));
             }
         }
         if (this.token.startsWith("last") && this.token.length === 5) {
             const c = this.token.charCodeAt(4);
-            if (c >= 97 && c <= 105) { // 'a'-'i'
+            if (c >= 97 && c <= 105) {
+                // 'a'-'i'
                 this.getToken();
                 return new Expr(Expr.E_LASTA + (c - 97));
             }
@@ -630,54 +620,55 @@ export class ExprParser {
         }
         if (this.token.endsWith("dt") && this.token.startsWith("d") && this.token.length === 4) {
             const c = this.token.charCodeAt(1);
-            if (c >= 97 && c <= 105) { // 'a'-'i'
+            if (c >= 97 && c <= 105) {
+                // 'a'-'i'
                 this.getToken();
                 return new Expr(Expr.E_DADT + (c - 97));
             }
         }
         if (this.skip("lastoutput")) return new Expr(Expr.E_LASTOUTPUT);
-        if (this.skip("timestep"))  return new Expr(Expr.E_TIMESTEP);
-        if (this.skip("pi"))        return new Expr(Expr.E_VAL, 3.14159265358979323846);
-        if (this.skip("v"))         return this.parseNodeRefFunc(false, false);
-        if (this.skip("sin"))   return this.parseFunc(Expr.E_SIN);
-        if (this.skip("cos"))   return this.parseFunc(Expr.E_COS);
-        if (this.skip("asin"))  return this.parseFunc(Expr.E_ASIN);
-        if (this.skip("acos"))  return this.parseFunc(Expr.E_ACOS);
-        if (this.skip("atan"))  return this.parseFunc(Expr.E_ATAN);
-        if (this.skip("sinh"))  return this.parseFunc(Expr.E_SINH);
-        if (this.skip("cosh"))  return this.parseFunc(Expr.E_COSH);
-        if (this.skip("tanh"))  return this.parseFunc(Expr.E_TANH);
-        if (this.skip("abs"))   return this.parseFunc(Expr.E_ABS);
-        if (this.skip("exp"))   return this.parseFunc(Expr.E_EXP);
-        if (this.skip("log"))   return this.parseFunc(Expr.E_LOG);
-        if (this.skip("sqrt"))  return this.parseFunc(Expr.E_SQRT);
-        if (this.skip("tan"))   return this.parseFunc(Expr.E_TAN);
-        if (this.skip("tri"))   return this.parseFunc(Expr.E_TRIANGLE);
-        if (this.skip("saw"))   return this.parseFunc(Expr.E_SAWTOOTH);
+        if (this.skip("timestep")) return new Expr(Expr.E_TIMESTEP);
+        if (this.skip("pi")) return new Expr(Expr.E_VAL, 3.14159265358979323846);
+        if (this.skip("v")) return this.parseNodeRefFunc(false, false);
+        if (this.skip("sin")) return this.parseFunc(Expr.E_SIN);
+        if (this.skip("cos")) return this.parseFunc(Expr.E_COS);
+        if (this.skip("asin")) return this.parseFunc(Expr.E_ASIN);
+        if (this.skip("acos")) return this.parseFunc(Expr.E_ACOS);
+        if (this.skip("atan")) return this.parseFunc(Expr.E_ATAN);
+        if (this.skip("sinh")) return this.parseFunc(Expr.E_SINH);
+        if (this.skip("cosh")) return this.parseFunc(Expr.E_COSH);
+        if (this.skip("tanh")) return this.parseFunc(Expr.E_TANH);
+        if (this.skip("abs")) return this.parseFunc(Expr.E_ABS);
+        if (this.skip("exp")) return this.parseFunc(Expr.E_EXP);
+        if (this.skip("log")) return this.parseFunc(Expr.E_LOG);
+        if (this.skip("sqrt")) return this.parseFunc(Expr.E_SQRT);
+        if (this.skip("tan")) return this.parseFunc(Expr.E_TAN);
+        if (this.skip("tri")) return this.parseFunc(Expr.E_TRIANGLE);
+        if (this.skip("saw")) return this.parseFunc(Expr.E_SAWTOOTH);
         if (this.skip("floor")) return this.parseFunc(Expr.E_FLOOR);
-        if (this.skip("ceil"))  return this.parseFunc(Expr.E_CEIL);
-        if (this.skip("min"))   return this.parseFuncMulti(Expr.E_MIN, 2, 1000);
-        if (this.skip("max"))   return this.parseFuncMulti(Expr.E_MAX, 2, 1000);
-        if (this.skip("pwl"))   return this.parseFuncMulti(Expr.E_PWL, 2, 1000);
-        if (this.skip("mod"))   return this.parseFuncMulti(Expr.E_MOD, 2, 2);
-        if (this.skip("step"))  return this.parseFuncMulti(Expr.E_STEP, 1, 2);
-        if (this.skip("select"))return this.parseFuncMulti(Expr.E_SELECT, 3, 3);
+        if (this.skip("ceil")) return this.parseFunc(Expr.E_CEIL);
+        if (this.skip("min")) return this.parseFuncMulti(Expr.E_MIN, 2, 1000);
+        if (this.skip("max")) return this.parseFuncMulti(Expr.E_MAX, 2, 1000);
+        if (this.skip("pwl")) return this.parseFuncMulti(Expr.E_PWL, 2, 1000);
+        if (this.skip("mod")) return this.parseFuncMulti(Expr.E_MOD, 2, 2);
+        if (this.skip("step")) return this.parseFuncMulti(Expr.E_STEP, 1, 2);
+        if (this.skip("select")) return this.parseFuncMulti(Expr.E_SELECT, 3, 3);
         if (this.skip("clamp")) return this.parseFuncMulti(Expr.E_CLAMP, 3, 3);
-        if (this.skip("pwr"))   return this.parseFuncMulti(Expr.E_PWR, 2, 2);
-        if (this.skip("pwrs"))  return this.parseFuncMulti(Expr.E_PWRS, 2, 2);
+        if (this.skip("pwr")) return this.parseFuncMulti(Expr.E_PWR, 2, 2);
+        if (this.skip("pwrs")) return this.parseFuncMulti(Expr.E_PWRS, 2, 2);
         try {
             const v = parseFloatStrict(this.token);
             if (isNaN(v)) throw new Error("NaN");
             this.getToken();
             return new Expr(Expr.E_VAL, v);
         } catch (_e) {
-            if (this.token.length === 0)
-                this.setError("unexpected end of input");
-            else
-                this.setError("unrecognized token: " + this.token);
+            if (this.token.length === 0) this.setError("unexpected end of input");
+            else this.setError("unrecognized token: " + this.token);
             return new Expr(Expr.E_VAL, 0);
         }
     }
 
-    gotError(): string | null { return this.err; }
+    gotError(): string | null {
+        return this.err;
+    }
 }

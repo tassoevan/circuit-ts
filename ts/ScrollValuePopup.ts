@@ -24,7 +24,6 @@ import { EditInfo } from "./EditInfo";
 // popup shown when the mouse wheel is scrolled over a resistor/capacitor/inductor: scrolling
 // steps the value through the E12 preferred-value series, previewing a few neighboring values
 export class ScrollValuePopup {
-
     static readonly e12: number[] = [1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2];
     static readonly labMax = 5;
     static readonly scale = 6;
@@ -51,10 +50,8 @@ export class ScrollValuePopup {
     };
     private readonly onMouseOut = () => this.close(true);
     private readonly onMouseDown = (e: MouseEvent) => {
-        if (e.button === 0 || e.button === 1)
-            this.close(true);
-        else
-            this.close(false);
+        if (e.button === 0 || e.button === 1) this.close(true);
+        else this.close(false);
     };
 
     constructor(x: number, y: number, dy: number, elm: CircuitElm, sim: CirSim) {
@@ -74,8 +71,8 @@ export class ScrollValuePopup {
         for (let i = 0; i < ScrollValuePopup.labMax; i++) {
             const label = document.createElement("div");
             label.textContent = "---";
-            label.className = "scrollValuePopup-label" +
-                (i === 2 ? " selected" : (i === 1 || i === 3) ? " off1" : " off2");
+            label.className =
+                "scrollValuePopup-label" + (i === 2 ? " selected" : i === 1 || i === 3 ? " off1" : " off2");
             this.panel.appendChild(label);
             this.labels.push(label);
         }
@@ -93,7 +90,7 @@ export class ScrollValuePopup {
         const w = this.panel.offsetWidth;
         const h = this.panel.offsetHeight;
         const left = Math.max(0, x - w / 4);
-        const top = Math.max(0, y - 7 * h / 12);
+        const top = Math.max(0, y - (7 * h) / 12);
         this.panel.style.left = left + "px";
         this.panel.style.top = top + "px";
         this.panel.style.visibility = "";
@@ -115,9 +112,8 @@ export class ScrollValuePopup {
         this.values = new Array(2 + (this.maxpow - this.minpow) * 12);
         let ptr = 0;
         for (let i = this.minpow; i <= this.maxpow; i++) {
-            const jmax = (i !== this.maxpow) ? 12 : 1;
-            for (let j = 0; j < jmax; j++, ptr++)
-                this.values[ptr] = Math.pow(10.0, i) * ScrollValuePopup.e12[j];
+            const jmax = i !== this.maxpow ? 12 : 1;
+            for (let j = 0; j < jmax; j++, ptr++) this.values[ptr] = Math.pow(10.0, i) * ScrollValuePopup.e12[j];
         }
         this.nvalues = ptr;
         this.values[this.nvalues] = 1e99;
@@ -133,8 +129,7 @@ export class ScrollValuePopup {
             if (currentvalue < this.values[i]) {
                 // overshot - need to insert value
                 this.currentidx = i;
-                for (let j = this.nvalues - 1; j >= i; j--)
-                    this.values[j + 1] = this.values[j];
+                for (let j = this.nvalues - 1; j >= i; j--) this.values[j + 1] = this.values[j];
                 this.values[i] = currentvalue;
                 this.nvalues++;
                 break;
@@ -150,24 +145,19 @@ export class ScrollValuePopup {
             const label = this.labels[i];
             label.classList.remove("current");
             const idx = thissel + i - 2;
-            if (idx < 0 || idx >= this.nvalues)
-                label.textContent = "---";
+            if (idx < 0 || idx >= this.nvalues) label.textContent = "---";
             else {
                 label.textContent = CircuitElm.getShortUnitText(this.values[idx], "");
-                if (idx === this.currentidx)
-                    label.classList.add("current");
+                if (idx === this.currentidx) label.classList.add("current");
             }
         }
     }
 
     close(keepChanges: boolean): void {
-        if (this.closed)
-            return;
+        if (this.closed) return;
         this.closed = true;
-        if (!keepChanges)
-            this.setElmValue(this.currentidx);
-        else
-            this.setElmValue();
+        if (!keepChanges) this.setElmValue(this.currentidx);
+        else this.setElmValue();
         this.panel.remove();
     }
 
@@ -179,7 +169,7 @@ export class ScrollValuePopup {
         // a single wheel event moves at most one step (times the sensitivity).  a mouse wheel
         // notch's pixel deltaY varies a lot by browser/platform (~100 in Chromium, more in
         // Firefox), which otherwise skipped values; small trackpad deltas still accumulate
-        dy /= (window.devicePixelRatio || 1);
+        dy /= window.devicePixelRatio || 1;
         this.deltaY += Math.max(-ScrollValuePopup.scale, Math.min(ScrollValuePopup.scale, dy));
         this.setElmValue();
         this.setupLabels();
@@ -204,11 +194,9 @@ export class ScrollValuePopup {
     }
 
     getSelIdx(): number {
-        let r = this.currentidx + Math.round(this.sim.mouse.wheelSensitivity * this.deltaY / ScrollValuePopup.scale);
-        if (r < 0)
-            r = 0;
-        if (r >= this.nvalues)
-            r = this.nvalues - 1;
+        let r = this.currentidx + Math.round((this.sim.mouse.wheelSensitivity * this.deltaY) / ScrollValuePopup.scale);
+        if (r < 0) r = 0;
+        if (r >= this.nvalues) r = this.nvalues - 1;
         return r;
     }
 }

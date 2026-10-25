@@ -29,15 +29,15 @@ import { parseIntStrict } from "./NumberParse";
 
 export class MultiplexerElm extends ChipElm {
     static readonly FLAG_INVERTED_OUTPUT = 1 << 1;
-    static readonly FLAG_STROBE         = 1 << 2;
-    static readonly FLAG_BUS_SELECT     = 1 << 3;
+    static readonly FLAG_STROBE = 1 << 2;
+    static readonly FLAG_BUS_SELECT = 1 << 3;
 
     // inputMode: 0 = individual inputs/single output (original)
     //            1 = bus input/single output (bit selector)
     //            2 = bus input/bus output
     static readonly INPUT_MODE_INDIVIDUAL = 0;
-    static readonly INPUT_MODE_BUS_BIT    = 1;
-    static readonly INPUT_MODE_BUS_BUS    = 2;
+    static readonly INPUT_MODE_BUS_BIT = 1;
+    static readonly INPUT_MODE_BUS_BUS = 2;
 
     selectBitCount: number;
     outputCount: number = 0;
@@ -47,8 +47,12 @@ export class MultiplexerElm extends ChipElm {
     outputPin: number = 0;
     selectPin: number = 0;
 
-    hasReset(): boolean { return false; }
-    busSelect(): boolean { return this.hasFlag(MultiplexerElm.FLAG_BUS_SELECT); }
+    hasReset(): boolean {
+        return false;
+    }
+    busSelect(): boolean {
+        return this.hasFlag(MultiplexerElm.FLAG_BUS_SELECT);
+    }
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
@@ -67,15 +71,15 @@ export class MultiplexerElm extends ChipElm {
         }
     }
 
-    getChipName(): string { return "Multiplexer"; }
+    getChipName(): string {
+        return "Multiplexer";
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "se", this.selectBitCount);
-        if (this.inputMode !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "im", this.inputMode);
-        if (this.dataBusWidth !== 4)
-            CircuitXMLSerializer.dumpAttr(elem, "dw", this.dataBusWidth);
+        if (this.inputMode !== 0) CircuitXMLSerializer.dumpAttr(elem, "im", this.inputMode);
+        if (this.dataBusWidth !== 4) CircuitXMLSerializer.dumpAttr(elem, "dw", this.dataBusWidth);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
@@ -87,17 +91,16 @@ export class MultiplexerElm extends ChipElm {
     }
 
     setupPins(): void {
-        if (!this.selectBitCount)
-	    this.selectBitCount = 2;
+        if (!this.selectBitCount) this.selectBitCount = 2;
         const M = MultiplexerElm;
         this.outputCount = 1 << this.selectBitCount;
         let i: number, n: number;
 
         if (this.inputMode === M.INPUT_MODE_BUS_BUS) {
-            const inputPinCount   = this.outputCount * this.dataBusWidth;
-            const outputPinCount  = this.dataBusWidth;
-            const invertedCount   = this.hasFlag(M.FLAG_INVERTED_OUTPUT) ? this.dataBusWidth : 0;
-            const strobeCount     = this.hasFlag(M.FLAG_STROBE) ? 1 : 0;
+            const inputPinCount = this.outputCount * this.dataBusWidth;
+            const outputPinCount = this.dataBusWidth;
+            const invertedCount = this.hasFlag(M.FLAG_INVERTED_OUTPUT) ? this.dataBusWidth : 0;
+            const strobeCount = this.hasFlag(M.FLAG_STROBE) ? 1 : 0;
 
             this.sizeX = this.selectBitCount + 1;
             this.sizeY = this.outputCount + 1;
@@ -143,7 +146,7 @@ export class MultiplexerElm extends ChipElm {
                     this.pins[n] = new Pin(this, 1, ChipElm.SIDE_E, "Q");
                     this.pins[n].lineOver = true;
                     this.pins[n].output = true;
-                    this.pins[n].bubble = (i === 0);
+                    this.pins[n].bubble = i === 0;
                     this.pins[n].busWidth = this.dataBusWidth;
                     this.pins[n].busZ = i;
                 }
@@ -154,13 +157,11 @@ export class MultiplexerElm extends ChipElm {
                 n = this.outputPin + this.dataBusWidth + invertedCount;
                 this.pins[n] = new Pin(this, 0, ChipElm.SIDE_S, "STR");
                 this.strobe = n;
-            } else
-                this.strobe = -1;
-
+            } else this.strobe = -1;
         } else if (this.inputMode === M.INPUT_MODE_BUS_BIT) {
             this.sizeX = this.selectBitCount + 1;
             this.sizeY = 3;
-            const strobeCount   = this.hasFlag(M.FLAG_STROBE) ? 1 : 0;
+            const strobeCount = this.hasFlag(M.FLAG_STROBE) ? 1 : 0;
             const invertedCount = this.hasFlag(M.FLAG_INVERTED_OUTPUT) ? 1 : 0;
             this.pins = new Array(this.outputCount + this.selectBitCount + 1 + invertedCount + strobeCount);
 
@@ -201,19 +202,16 @@ export class MultiplexerElm extends ChipElm {
                 n++;
                 this.pins[n] = new Pin(this, 0, ChipElm.SIDE_S, "STR");
                 this.strobe = n;
-            } else
-                this.strobe = -1;
-
+            } else this.strobe = -1;
         } else {
             // mode 0: individual inputs / single output
             this.sizeX = this.selectBitCount + 1;
             this.sizeY = this.outputCount + 1;
-            const strobeCount   = this.hasFlag(M.FLAG_STROBE) ? 1 : 0;
+            const strobeCount = this.hasFlag(M.FLAG_STROBE) ? 1 : 0;
             const invertedCount = this.hasFlag(M.FLAG_INVERTED_OUTPUT) ? 1 : 0;
             this.pins = new Array(this.outputCount + this.selectBitCount + 1 + invertedCount + strobeCount);
 
-            for (i = 0; i < this.outputCount; i++)
-                this.pins[i] = new Pin(this, i, ChipElm.SIDE_W, "I" + i);
+            for (i = 0; i < this.outputCount; i++) this.pins[i] = new Pin(this, i, ChipElm.SIDE_W, "I" + i);
 
             this.selectPin = this.outputCount;
             for (i = 0; i < this.selectBitCount; i++) {
@@ -242,8 +240,7 @@ export class MultiplexerElm extends ChipElm {
                 n++;
                 this.pins[n] = new Pin(this, 0, ChipElm.SIDE_S, "STR");
                 this.strobe = n;
-            } else
-                this.strobe = -1;
+            } else this.strobe = -1;
         }
 
         this.allocNodes();
@@ -253,11 +250,17 @@ export class MultiplexerElm extends ChipElm {
         const M = MultiplexerElm;
         if (this.inputMode === M.INPUT_MODE_BUS_BUS) {
             const invertedCount = this.hasFlag(M.FLAG_INVERTED_OUTPUT) ? this.dataBusWidth : 0;
-            const strobeCount   = this.hasFlag(M.FLAG_STROBE) ? 1 : 0;
-            return this.outputCount * this.dataBusWidth + this.selectBitCount + this.dataBusWidth + invertedCount + strobeCount;
+            const strobeCount = this.hasFlag(M.FLAG_STROBE) ? 1 : 0;
+            return (
+                this.outputCount * this.dataBusWidth +
+                this.selectBitCount +
+                this.dataBusWidth +
+                invertedCount +
+                strobeCount
+            );
         }
         const invertedCount = this.hasFlag(M.FLAG_INVERTED_OUTPUT) ? 1 : 0;
-        const strobeCount   = this.hasFlag(M.FLAG_STROBE) ? 1 : 0;
+        const strobeCount = this.hasFlag(M.FLAG_STROBE) ? 1 : 0;
         return this.outputCount + this.selectBitCount + 1 + invertedCount + strobeCount;
     }
 
@@ -265,8 +268,7 @@ export class MultiplexerElm extends ChipElm {
         const M = MultiplexerElm;
         if (this.inputMode === M.INPUT_MODE_BUS_BUS) {
             let count = this.dataBusWidth;
-            if (this.hasFlag(M.FLAG_INVERTED_OUTPUT))
-                count += this.dataBusWidth;
+            if (this.hasFlag(M.FLAG_INVERTED_OUTPUT)) count += this.dataBusWidth;
             return count;
         }
         return this.hasFlag(M.FLAG_INVERTED_OUTPUT) ? 2 : 1;
@@ -274,9 +276,7 @@ export class MultiplexerElm extends ChipElm {
 
     readSelectValue(): number {
         let sel = 0;
-        for (let i = 0; i < this.selectBitCount; i++)
-            if (this.pins[this.selectPin + i].value)
-                sel |= 1 << i;
+        for (let i = 0; i < this.selectBitCount; i++) if (this.pins[this.selectPin + i].value) sel |= 1 << i;
         return sel;
     }
 
@@ -285,7 +285,7 @@ export class MultiplexerElm extends ChipElm {
         const selectedValue = this.readSelectValue();
 
         if (this.inputMode === M.INPUT_MODE_BUS_BUS) {
-            const strobed = (this.strobe !== -1 && this.pins[this.strobe].value);
+            const strobed = this.strobe !== -1 && this.pins[this.strobe].value;
             for (let i = 0; i < this.dataBusWidth; i++) {
                 const val = strobed ? false : this.pins[selectedValue * this.dataBusWidth + i].value;
                 this.pins[this.outputPin + i].value = val;
@@ -296,25 +296,27 @@ export class MultiplexerElm extends ChipElm {
             }
         } else {
             let val = this.pins[selectedValue].value;
-            if (this.strobe !== -1 && this.pins[this.strobe].value)
-                val = false;
+            if (this.strobe !== -1 && this.pins[this.strobe].value) val = false;
             this.pins[this.outputPin].value = val;
-            if (this.hasFlag(M.FLAG_INVERTED_OUTPUT))
-                this.pins[this.outputPin + 1].value = !val;
+            if (this.hasFlag(M.FLAG_INVERTED_OUTPUT)) this.pins[this.outputPin + 1].value = !val;
         }
     }
 
-    getDumpType(): number { return 184; }
-    getXmlDumpType(): string { return "mux"; }
+    getDumpType(): number {
+        return 184;
+    }
+    getXmlDumpType(): string {
+        return "mux";
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Select Bits", this.selectBitCount, 1, 8).setDimensionless();
+        if (n === 0) return new EditInfo("# of Select Bits", this.selectBitCount, 1, 8).setDimensionless();
         if (n === 1)
             return EditInfo.createCheckbox("Inverted Output", this.hasFlag(MultiplexerElm.FLAG_INVERTED_OUTPUT));
-        if (n === 2)
-            return EditInfo.createCheckbox("Strobe Pin", this.hasFlag(MultiplexerElm.FLAG_STROBE));
+        if (n === 2) return EditInfo.createCheckbox("Strobe Pin", this.hasFlag(MultiplexerElm.FLAG_STROBE));
         if (n === 3) {
             const ei = new EditInfo("Input Mode", 0, -1, -1);
             ei.choice = new Choice();
@@ -324,8 +326,7 @@ export class MultiplexerElm extends ChipElm {
             ei.choice.select(this.inputMode);
             return ei;
         }
-        if (n === 4)
-            return EditInfo.createCheckbox("Bus Select", this.busSelect());
+        if (n === 4) return EditInfo.createCheckbox("Bus Select", this.busSelect());
         if (n === 5 && this.inputMode === MultiplexerElm.INPUT_MODE_BUS_BUS)
             return new EditInfo("Data Bus Width", this.dataBusWidth, 2, 32).setDimensionless();
         return null;
@@ -338,8 +339,7 @@ export class MultiplexerElm extends ChipElm {
                 this.selectBitCount = Math.trunc(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be between 1 and 6");
+            } else ei.setError("must be between 1 and 6");
             return;
         }
         if (n === 1) {
@@ -371,8 +371,7 @@ export class MultiplexerElm extends ChipElm {
                 this.dataBusWidth = Math.trunc(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be >= 2");
+            } else ei.setError("must be >= 2");
             return;
         }
     }

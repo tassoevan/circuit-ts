@@ -60,9 +60,15 @@ export class OutputElm extends CircuitElm {
         this.scale = xml.parseIntAttr("sc", this.scale);
     }
 
-    isOutputElm(): boolean { return true; }
-    getDumpType(): number { return 'O'.charCodeAt(0); }
-    getPostCount(): number { return 1; }
+    isOutputElm(): boolean {
+        return true;
+    }
+    getDumpType(): number {
+        return "O".charCodeAt(0);
+    }
+    getPostCount(): number {
+        return 1;
+    }
 
     setPoints(): void {
         super.setPoints();
@@ -75,17 +81,22 @@ export class OutputElm extends CircuitElm {
         const f = new Font("SansSerif", selected ? Font.BOLD : 0, 14);
         g.setFont(f);
         g.setColor(selected ? CircuitElm.selectColor : CircuitElm.lightGrayColor);
-        let s = this.showVoltage() ? CircuitElm.getUnitTextWithScale(this.nodes[0].v, "V", this.scale, this.isFixed()) : Locale.LS("out");
-//      FontMetrics fm = g.getFontMetrics();
+        let s = this.showVoltage()
+            ? CircuitElm.getUnitTextWithScale(this.nodes[0].v, "V", this.scale, this.isFixed())
+            : Locale.LS("out");
+        //      FontMetrics fm = g.getFontMetrics();
         const role = CircuitElm.app.mouse.scopePlotRoles.get(this);
-        if (role != null && role !== "")
-            s = role;
-        this.interpPoint(this.point1, this.point2, this.lead1!, 1 - (Math.trunc(g.context.measureText(s).width / 2) + 8) / this.dn);
+        if (role != null && role !== "") s = role;
+        this.interpPoint(
+            this.point1,
+            this.point2,
+            this.lead1!,
+            1 - (Math.trunc(g.context.measureText(s).width / 2) + 8) / this.dn,
+        );
         this.setBbox(this.point1, this.lead1!, 0);
         this.drawCenteredText(g, s, this.x2, this.y2, true);
         this.setVoltageColor(g, this.nodes[0].v);
-        if (selected)
-            g.setColor(CircuitElm.selectColor);
+        if (selected) g.setColor(CircuitElm.selectColor);
         CircuitElm.drawThickLine(g, this.point1, this.lead1!);
         this.drawPosts(g);
         g.restore();
@@ -96,19 +107,21 @@ export class OutputElm extends CircuitElm {
         router.addObstacle(this.x2 - 10, this.y2 - 10, this.x2 + 10, this.y2 + 10);
     }
 
-    getVoltageDiff(): number { return this.nodes[0].v; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "output";
         arr[1] = "V = " + CircuitElm.getVoltageText(this.nodes[0].v);
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return EditInfo.createCheckbox("Show Voltage", this.showVoltage());
-        if (!this.showVoltage())
-            return null;
+        if (n === 0) return EditInfo.createCheckbox("Show Voltage", this.showVoltage());
+        if (!this.showVoltage()) return null;
         if (n === 1) {
             const ei = new EditInfo("Scale", 0);
             ei.choice = new Choice();
@@ -119,15 +132,17 @@ export class OutputElm extends CircuitElm {
             ei.choice.select(this.scale);
             return ei;
         }
-        if (this.scale === CircuitElm.SCALE_AUTO)
-            return null;
-        if (n === 2)
-            return EditInfo.createCheckbox("Fixed Precision", this.isFixed());
+        if (this.scale === CircuitElm.SCALE_AUTO) return null;
+        if (n === 2) return EditInfo.createCheckbox("Fixed Precision", this.isFixed());
         return null;
     }
 
-    isFixed(): boolean { return (this.flags & OutputElm.FLAG_FIXED) !== 0; }
-    showVoltage(): boolean { return (this.flags & OutputElm.FLAG_VALUE) !== 0; }
+    isFixed(): boolean {
+        return (this.flags & OutputElm.FLAG_FIXED) !== 0;
+    }
+    showVoltage(): boolean {
+        return (this.flags & OutputElm.FLAG_VALUE) !== 0;
+    }
 
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
@@ -138,12 +153,11 @@ export class OutputElm extends CircuitElm {
             this.scale = ei.choice!.getSelectedIndex();
             ei.newDialog = true;
         }
-        if (n === 2)
-            this.flags = ei.changeFlag(this.flags, OutputElm.FLAG_FIXED);
+        if (n === 2) this.flags = ei.changeFlag(this.flags, OutputElm.FLAG_FIXED);
     }
 
-//  void drawHandles(Graphics g, Color c) {
-//      g.setColor(c);
-//      g.fillRect(x-3, y-3, 7, 7);
-//  }
+    //  void drawHandles(Graphics g, Color c) {
+    //      g.setColor(c);
+    //      g.fillRect(x-3, y-3, 7, 7);
+    //  }
 }

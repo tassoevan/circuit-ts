@@ -5,7 +5,8 @@ import { UNITS_V } from "./ScopeConstants";
 
 // 16-column buffer, 6-pixel-wide screen, so the write pointer laps the displayed window after
 // only a dozen or so columns of nothing happening.
-const SPC = 16, W = 6;
+const SPC = 16,
+    W = 6;
 
 function setup(mode = ScopeTrigger.TRIGGER_NORMAL) {
     const plot = new ScopePlot(null, UNITS_V);
@@ -24,7 +25,9 @@ function setup(mode = ScopeTrigger.TRIGGER_NORMAL) {
         sim.t++;
         trigger.check([plot], false, sim, SPC, W);
     };
-    const columns = (v: number, n: number) => { for (let i = 0; i < n; i++) column(v); };
+    const columns = (v: number, n: number) => {
+        for (let i = 0; i < n; i++) column(v);
+    };
     // the displayed screen, one max value per pixel column (only the valid ones)
     const screen = () => {
         const ipa = trigger.displayStartIndex(plot, W, SPC);

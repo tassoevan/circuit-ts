@@ -12,4 +12,4 @@
 // literal isn't a real file (it produced a mangled path with no separating
 // slash instead of a proper URL). Plain string slicing sidesteps that.
 const url = import.meta.url;
-export const moduleBaseURL = url.substring(0, url.lastIndexOf('/') + 1);
+export const moduleBaseURL = url.substring(0, url.lastIndexOf("/") + 1);

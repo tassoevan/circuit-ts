@@ -27,7 +27,6 @@ import { Locale } from "./Locale";
 // and Escape are handled in UIManager's keydown handler so they work even when the
 // filter box has focus.
 export class CommandPalette {
-
     static readonly WIDTH = 520;
     static readonly MAX_RESULTS = 50;
 
@@ -49,8 +48,7 @@ export class CommandPalette {
         this.overlay = document.createElement("div");
         this.overlay.className = "command-palette-overlay";
         this.overlay.addEventListener("mousedown", (e) => {
-            if (e.target === this.overlay)
-                this.close();
+            if (e.target === this.overlay) this.close();
         });
 
         this.panel = document.createElement("div");
@@ -70,8 +68,7 @@ export class CommandPalette {
         this.filterBox.addEventListener("keyup", (e) => {
             // arrow/enter/escape are handled globally in UIManager so selection isn't
             // disturbed by refreshList(); don't let them also trigger a filter refresh.
-            if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "Enter" || e.key === "Escape")
-                return;
+            if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "Enter" || e.key === "Escape") return;
             this.onFilterTextChanged();
         });
     }
@@ -101,8 +98,7 @@ export class CommandPalette {
 
     private onFilterTextChanged(): void {
         const query = this.filterBox.value;
-        if (query === this.lastQuery)
-            return;
+        if (query === this.lastQuery) return;
         this.lastQuery = query;
         this.refreshList();
     }
@@ -117,13 +113,11 @@ export class CommandPalette {
             const recent = CommandPaletteRegistry.recentCommands();
             if (recent.length > 0) {
                 this.addSectionLabel(Locale.LS("Recent"));
-                for (const cmd of recent)
-                    this.addCommandRow(cmd, query);
+                for (const cmd of recent) this.addCommandRow(cmd, query);
             }
         } else {
             const results = CommandPaletteRegistry.search(query, CommandPalette.MAX_RESULTS);
-            for (const cmd of results)
-                this.addCommandRow(cmd, query);
+            for (const cmd of results) this.addCommandRow(cmd, query);
         }
         this.updateSelectionHighlight();
     }
@@ -164,13 +158,10 @@ export class CommandPalette {
     }
 
     moveSelection(delta: number): void {
-        if (this.visibleCommands.length === 0)
-            return;
+        if (this.visibleCommands.length === 0) return;
         this.selectedIndex += delta;
-        if (this.selectedIndex < 0)
-            this.selectedIndex = this.visibleCommands.length - 1;
-        if (this.selectedIndex >= this.visibleCommands.length)
-            this.selectedIndex = 0;
+        if (this.selectedIndex < 0) this.selectedIndex = this.visibleCommands.length - 1;
+        if (this.selectedIndex >= this.visibleCommands.length) this.selectedIndex = 0;
         this.updateSelectionHighlight();
         this.scrollSelectedIntoView();
     }
@@ -178,8 +169,7 @@ export class CommandPalette {
     private updateSelectionHighlight(): void {
         for (const row of Array.from(this.listPanel.children)) {
             const idxStr = row.getAttribute("data-index");
-            if (idxStr == null || idxStr.length === 0)
-                continue;
+            if (idxStr == null || idxStr.length === 0) continue;
             const idx = parseInt(idxStr, 10);
             row.classList.toggle("command-palette-item-selected", idx === this.selectedIndex);
         }
@@ -196,7 +186,11 @@ export class CommandPalette {
     }
 
     executeSelected(): void {
-        if (this.visibleCommands.length === 0 || this.selectedIndex < 0 || this.selectedIndex >= this.visibleCommands.length)
+        if (
+            this.visibleCommands.length === 0 ||
+            this.selectedIndex < 0 ||
+            this.selectedIndex >= this.visibleCommands.length
+        )
             return;
         const cmd = this.visibleCommands[this.selectedIndex];
         // Close before running the command so the modal overlay doesn't block native
@@ -207,20 +201,16 @@ export class CommandPalette {
 
     static execute(cmd: PaletteCommand): void {
         const app = CirSim.theApp;
-        if (cmd.custom != null)
-            cmd.custom.execute();
-        else
-            app.commands.menuPerformed(cmd.menu!, cmd.item!);
+        if (cmd.custom != null) cmd.custom.execute();
+        else app.commands.menuPerformed(cmd.menu!, cmd.item!);
         CommandPaletteHistory.record(cmd.id);
     }
 
     close(): void {
-        if (this.closed)
-            return;
+        if (this.closed) return;
         this.closed = true;
         this.overlay.remove();
         this.panel.remove();
-        if (CirSim.commandPalette === this)
-            CirSim.commandPalette = null;
+        if (CirSim.commandPalette === this) CirSim.commandPalette = null;
     }
 }

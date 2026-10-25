@@ -32,8 +32,12 @@ export class BusSplitterElm extends ChipElm {
             super(xxOrXa, yyOrYa, xb, yb!, f!, st!);
         }
     }
-    getChipName(): string { return "Bus Splitter"; }
-    needsBits(): boolean { return true; }
+    getChipName(): string {
+        return "Bus Splitter";
+    }
+    needsBits(): boolean {
+        return true;
+    }
 
     setupPins(): void {
         this.sizeX = 2;
@@ -56,18 +60,30 @@ export class BusSplitterElm extends ChipElm {
 
     currents: number[] = [];
 
-    getPostCount(): number { return this.bits * 2; }
-    getBusWidth(): number { return this.bits; }
-    getVoltageSourceCount(): number { return 0; }
+    getPostCount(): number {
+        return this.bits * 2;
+    }
+    getBusWidth(): number {
+        return this.bits;
+    }
+    getVoltageSourceCount(): number {
+        return 0;
+    }
 
     getConnection(n1: number, n2: number): boolean {
         // bus pin i connects to individual pin i+bits
         return Math.abs(n1 - n2) === this.bits;
     }
 
-    isBusSplitterElm(): boolean { return true; }
-    isWireEquivalent(): boolean { return true; }
-    isRemovableWire(): boolean { return true; }
+    isBusSplitterElm(): boolean {
+        return true;
+    }
+    isWireEquivalent(): boolean {
+        return true;
+    }
+    isRemovableWire(): boolean {
+        return true;
+    }
 
     getConnectedPost(n?: number): Point {
         // bus bit n connects to individual pin n+bits
@@ -75,8 +91,7 @@ export class BusSplitterElm extends ChipElm {
     }
 
     getCurrentIntoNode(n: number): number {
-        if (n < this.bits)
-            return -this.currents[n];
+        if (n < this.bits) return -this.currents[n];
         return this.currents[n - this.bits];
     }
 
@@ -85,17 +100,19 @@ export class BusSplitterElm extends ChipElm {
         this.pins[bit + this.bits].current = c;
         // update total bus current on pin 0 (the only bus-side pin that gets drawn)
         let total = 0;
-        for (let i = 0; i < this.bits; i++)
-            total += this.currents[i];
+        for (let i = 0; i < this.bits; i++) total += this.currents[i];
         this.pins[0].current = -total;
     }
 
-    getDumpType(): number { return 433; }
-    getXmlDumpType(): string { return "bs"; }
+    getDumpType(): number {
+        return 433;
+    }
+    getXmlDumpType(): string {
+        return "bs";
+    }
 
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
+        if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         return null;
     }
     setChipEditValue(n: number, ei: EditInfo): void {
@@ -104,8 +121,7 @@ export class BusSplitterElm extends ChipElm {
                 this.bits = Math.floor(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be >= 2");
+            } else ei.setError("must be >= 2");
         }
     }
 }

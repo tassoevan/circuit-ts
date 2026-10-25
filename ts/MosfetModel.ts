@@ -28,7 +28,6 @@ import { Locale } from "./Locale";
 import { parseIntStrict, parseFloatStrict } from "./NumberParse";
 
 export class MosfetModel implements Editable, Comparable<MosfetModel> {
-
     static modelMap: Map<string, MosfetModel>;
 
     static readonly FLAG_JFET = 1;
@@ -36,21 +35,21 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     flags: number = 0;
     name: string;
     description: string | null;
-    threshold: number;              // Vt: threshold voltage (V)
-    beta: number;                   // transconductance parameter (A/V^2)
-    lambda: number = 0;             // channel-length modulation (1/V), 0=ideal
-    capGS: number = 0;              // Cgs: gate-source capacitance (F), 0=disabled
-    capGD: number = 0;              // Cgd: gate-drain capacitance (F), 0=disabled
+    threshold: number; // Vt: threshold voltage (V)
+    beta: number; // transconductance parameter (A/V^2)
+    lambda: number = 0; // channel-length modulation (1/V), 0=ideal
+    capGS: number = 0; // Cgs: gate-source capacitance (F), 0=disabled
+    capGD: number = 0; // Cgd: gate-drain capacitance (F), 0=disabled
 
     // these describe how parts using this model are drawn/simulated; they were formerly
     // per-element (or, worse, circuit-wide) flags, but they really describe the physical
     // part, e.g. whether it exposes a 4th body terminal or has a body diode, so they belong
     // on the model.  Not used for JFETs (isJfet() true), which never show the bulk/body.
     showBulk: boolean = false;
-    digitalSymbol: boolean = false;          // draw as a simple digital-logic symbol (only if !showBulk)
-    bodyDiode: boolean = false;              // simulate the parasitic body diode (only if showBulk)
-    bodyTerminal: boolean = false;           // expose the body as a 4th terminal (only if bodyDiode)
-    showBodyDiodeSymbol: boolean = false;    // draw the body diode symbol (only if bodyDiode)
+    digitalSymbol: boolean = false; // draw as a simple digital-logic symbol (only if !showBulk)
+    bodyDiode: boolean = false; // simulate the parasitic body diode (only if showBulk)
+    bodyTerminal: boolean = false; // expose the body as a 4th terminal (only if bodyDiode)
+    showBodyDiodeSymbol: boolean = false; // draw the body diode symbol (only if bodyDiode)
 
     dumped: boolean = false;
     readOnly: boolean = false;
@@ -66,7 +65,7 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     constructor(dOrCopy?: string | MosfetModel, vt?: number, b?: number) {
         if (dOrCopy === undefined) {
             this.threshold = 1.5;
-            this.beta = .02;
+            this.beta = 0.02;
             this.showBulk = true;
             this.bodyDiode = true;
         } else if (dOrCopy instanceof MosfetModel) {
@@ -94,7 +93,9 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     // is this a model meant for use by JfetElm (vs. MosfetElm)?  JFETs and MOSFETs share this
     // one model class since the only real difference between them is which default parameter
     // values make sense; this flag is just used to filter the model-picker dropdown per element type.
-    isJfet(): boolean { return (this.flags & MosfetModel.FLAG_JFET) !== 0; }
+    isJfet(): boolean {
+        return (this.flags & MosfetModel.FLAG_JFET) !== 0;
+    }
 
     setJfet(): MosfetModel {
         this.flags |= MosfetModel.FLAG_JFET;
@@ -104,8 +105,7 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     static getModelWithName(name: string): MosfetModel {
         MosfetModel.createModelMap();
         let lm = MosfetModel.modelMap.get(name);
-        if (lm != null)
-            return lm;
+        if (lm != null) return lm;
         lm = new MosfetModel();
         lm.name = name;
         MosfetModel.modelMap.set(name, lm);
@@ -115,8 +115,7 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     static getModelWithNameOrCopy(name: string, oldmodel: MosfetModel | null, jfet: boolean): MosfetModel {
         MosfetModel.createModelMap();
         const lm = MosfetModel.modelMap.get(name);
-        if (lm != null)
-            return lm;
+        if (lm != null) return lm;
         if (oldmodel == null) {
             CirSim.console("model not found: " + name);
             return MosfetModel.getDefaultModel(jfet);
@@ -128,28 +127,27 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     }
 
     static createModelMap(): void {
-        if (MosfetModel.modelMap != null)
-            return;
+        if (MosfetModel.modelMap != null) return;
         MosfetModel.modelMap = new Map<string, MosfetModel>();
 
-        MosfetModel.addDefaultModel("default", new MosfetModel("default", 1.5, .02));
+        MosfetModel.addDefaultModel("default", new MosfetModel("default", 1.5, 0.02));
 
-        const noDiodeDefault = new MosfetModel("default-nodiode", 1.5, .02);
+        const noDiodeDefault = new MosfetModel("default-nodiode", 1.5, 0.02);
         noDiodeDefault.bodyDiode = false;
         MosfetModel.addDefaultModel("default-nodiode", noDiodeDefault);
 
-        const bodyTerminalDefault = new MosfetModel("default-body", 1.5, .02);
+        const bodyTerminalDefault = new MosfetModel("default-body", 1.5, 0.02);
         bodyTerminalDefault.bodyTerminal = true;
         MosfetModel.addDefaultModel("default-body", bodyTerminalDefault);
 
-        const digitalDefault = new MosfetModel("default-digital", 1.5, .02);
+        const digitalDefault = new MosfetModel("default-digital", 1.5, 0.02);
         digitalDefault.showBulk = false;
         digitalDefault.digitalSymbol = true;
         digitalDefault.bodyDiode = false;
         MosfetModel.addDefaultModel("default-digital", digitalDefault);
 
         // values taken from Hayes+Horowitz p155.  JFETs never show a bulk/body terminal.
-        const jfetDefault = new MosfetModel("default-jfet", -4, .00125).setJfet();
+        const jfetDefault = new MosfetModel("default-jfet", -4, 0.00125).setJfet();
         jfetDefault.showBulk = jfetDefault.bodyDiode = false;
         MosfetModel.addDefaultModel("default-jfet", jfetDefault);
     }
@@ -167,22 +165,38 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     // Find (or create) a model matching the given legacy per-element vt/beta and drawing/behavior
     // flags, for backward compatibility with old circuit files that stored these inline per
     // element instead of by model name.
-    static getModelWithParameters(vt: number, beta: number, jfet: boolean,
-            showBulk: boolean, bodyDiode: boolean, bodyTerminal: boolean, digitalSymbol: boolean,
-            showBodyDiodeSymbol: boolean): MosfetModel {
+    static getModelWithParameters(
+        vt: number,
+        beta: number,
+        jfet: boolean,
+        showBulk: boolean,
+        bodyDiode: boolean,
+        bodyTerminal: boolean,
+        digitalSymbol: boolean,
+        showBodyDiodeSymbol: boolean,
+    ): MosfetModel {
         MosfetModel.createModelMap();
         for (const [, mm] of MosfetModel.modelMap) {
-            if (mm.isJfet() === jfet && Math.abs(mm.threshold - vt) < 1e-15 && Math.abs(mm.beta - beta) < 1e-15 &&
-                mm.lambda === 0 && mm.capGS === 0 && mm.capGD === 0 &&
-                mm.showBulk === showBulk && mm.bodyDiode === bodyDiode && mm.bodyTerminal === bodyTerminal &&
-                mm.digitalSymbol === digitalSymbol && mm.showBodyDiodeSymbol === showBodyDiodeSymbol)
+            if (
+                mm.isJfet() === jfet &&
+                Math.abs(mm.threshold - vt) < 1e-15 &&
+                Math.abs(mm.beta - beta) < 1e-15 &&
+                mm.lambda === 0 &&
+                mm.capGS === 0 &&
+                mm.capGD === 0 &&
+                mm.showBulk === showBulk &&
+                mm.bodyDiode === bodyDiode &&
+                mm.bodyTerminal === bodyTerminal &&
+                mm.digitalSymbol === digitalSymbol &&
+                mm.showBodyDiodeSymbol === showBodyDiodeSymbol
+            )
                 return mm;
         }
         const baseName = "old-" + (jfet ? "jfet" : "mosfet");
         let name = baseName;
         if (MosfetModel.modelMap.get(name) != null) {
             let num = 2;
-            for (;; num++) {
+            for (; ; num++) {
                 const n = baseName + "-" + num;
                 if (MosfetModel.modelMap.get(n) == null) {
                     name = n;
@@ -198,8 +212,7 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
         mm.bodyTerminal = bodyTerminal;
         mm.digitalSymbol = digitalSymbol;
         mm.showBodyDiodeSymbol = showBodyDiodeSymbol;
-        if (jfet)
-            mm.setJfet();
+        if (jfet) mm.setJfet();
         // unlike DiodeModel's oldStyle models (whose auto-generated name embeds the value, e.g.
         // "fwdrop=0.7", so editing the value in place would make the name misleading), this
         // name ("old-mosfet-2" etc.) doesn't encode the values, so there's no harm in letting the
@@ -209,10 +222,8 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     }
 
     static clearDumpedFlags(): void {
-        if (MosfetModel.modelMap == null)
-            return;
-        for (const [, mm] of MosfetModel.modelMap)
-            mm.dumped = false;
+        if (MosfetModel.modelMap == null) return;
+        for (const [, mm] of MosfetModel.modelMap) mm.dumped = false;
     }
 
     // jfet selects whether to return models meant for JfetElm or for MosfetElm
@@ -220,10 +231,8 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
         MosfetModel.createModelMap();
         const vector: MosfetModel[] = [];
         for (const [, mm] of MosfetModel.modelMap) {
-            if (mm.internal || mm.isJfet() !== jfet)
-                continue;
-            if (!vector.includes(mm))
-                vector.push(mm);
+            if (mm.internal || mm.isJfet() !== jfet) continue;
+            if (!vector.includes(mm)) vector.push(mm);
         }
         vector.sort((a, b) => a.compareTo(b));
         return vector;
@@ -234,8 +243,7 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     }
 
     getDescription(): string {
-        if (this.description == null || this.description === this.name)
-            return this.name;
+        if (this.description == null || this.description === this.name) return this.name;
         return this.name + " (" + Locale.LS(this.description) + ")";
     }
 
@@ -273,12 +281,9 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
         CircuitXMLSerializer.dumpAttr(elem, "f", this.flags);
         CircuitXMLSerializer.dumpAttr(elem, "vt", this.threshold);
         CircuitXMLSerializer.dumpAttr(elem, "be", this.beta);
-        if (this.lambda !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "la", this.lambda);
-        if (this.capGS !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "cgs", this.capGS);
-        if (this.capGD !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "cgd", this.capGD);
+        if (this.lambda !== 0) CircuitXMLSerializer.dumpAttr(elem, "la", this.lambda);
+        if (this.capGS !== 0) CircuitXMLSerializer.dumpAttr(elem, "cgs", this.capGS);
+        if (this.capGD !== 0) CircuitXMLSerializer.dumpAttr(elem, "cgd", this.capGD);
         // dumped unconditionally (not just when true) since these default to true for MOSFETs;
         // an omitted attribute would otherwise be misread as true again on reload
         CircuitXMLSerializer.dumpAttr(elem, "sb", this.showBulk ? 1 : 0);
@@ -310,9 +315,13 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
         this.showBodyDiodeSymbol = xml.parseIntAttr("sbd", this.showBodyDiodeSymbol ? 1 : 0) !== 0;
     }
 
-    getDialogTitle(): string { return "Edit " + (this.isJfet() ? "JFET" : "MOSFET") + " Model"; }
+    getDialogTitle(): string {
+        return "Edit " + (this.isJfet() ? "JFET" : "MOSFET") + " Model";
+    }
 
-    getEditTitle(): string { return "Edit MOSFET Model"; }
+    getEditTitle(): string {
+        return "Edit MOSFET Model";
+    }
 
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
@@ -325,18 +334,14 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
         let idx = 3;
         // JFETs never show the bulk/body, so these options don't apply to jfet models
         if (!this.isJfet()) {
-            if (n === idx++)
-                return EditInfo.createCheckbox("Show Bulk", this.showBulk);
+            if (n === idx++) return EditInfo.createCheckbox("Show Bulk", this.showBulk);
             if (n === idx++) {
-                if (!this.showBulk)
-                    return EditInfo.createCheckbox("Digital Symbol", this.digitalSymbol);
+                if (!this.showBulk) return EditInfo.createCheckbox("Digital Symbol", this.digitalSymbol);
                 return EditInfo.createCheckbox("Simulate Body Diode", this.bodyDiode);
             }
             if (this.showBulk && this.bodyDiode) {
-                if (n === idx++)
-                    return EditInfo.createCheckbox("Body Terminal", this.bodyTerminal);
-                if (n === idx++)
-                    return EditInfo.createCheckbox("Show Body Diode", this.showBodyDiodeSymbol);
+                if (n === idx++) return EditInfo.createCheckbox("Body Terminal", this.bodyTerminal);
+                if (n === idx++) return EditInfo.createCheckbox("Show Body Diode", this.showBodyDiodeSymbol);
             }
         }
         if (n === idx++) return new EditInfo("Lambda", this.lambda).setDimensionless().newColumnMethod();
@@ -348,8 +353,7 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.name = ei.textf.value;
-            if (this.name.length > 0)
-                MosfetModel.modelMap.set(this.name, this);
+            if (this.name.length > 0) MosfetModel.modelMap.set(this.name, this);
         }
         if (n === 1) this.threshold = ei.value;
         if (n === 2 && ei.value > 0) this.beta = ei.value;
@@ -357,18 +361,15 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
         if (!this.isJfet()) {
             if (n === idx++) {
                 const newVal = ei.checkbox!.getState();
-                if (newVal !== this.showBulk)
-                    ei.newDialog = true;
+                if (newVal !== this.showBulk) ei.newDialog = true;
                 this.showBulk = newVal;
             } else if (n === idx++) {
                 const newVal = ei.checkbox!.getState();
                 if (!this.showBulk) {
-                    if (newVal !== this.digitalSymbol)
-                        ei.newDialog = true;
+                    if (newVal !== this.digitalSymbol) ei.newDialog = true;
                     this.digitalSymbol = newVal;
                 } else {
-                    if (newVal !== this.bodyDiode)
-                        ei.newDialog = true;
+                    if (newVal !== this.bodyDiode) ei.newDialog = true;
                     this.bodyDiode = newVal;
                 }
             } else if (this.showBulk && this.bodyDiode && n === idx++) {
@@ -377,9 +378,9 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
                 this.showBodyDiodeSymbol = ei.checkbox!.getState();
             }
         }
-        if (n === idx) this.lambda = (ei.value >= 0) ? ei.value : this.lambda;
-        else if (n === idx + 1) this.capGS = (ei.value >= 0) ? ei.value : this.capGS;
-        else if (n === idx + 2) this.capGD = (ei.value >= 0) ? ei.value : this.capGD;
+        if (n === idx) this.lambda = ei.value >= 0 ? ei.value : this.lambda;
+        else if (n === idx + 1) this.capGS = ei.value >= 0 ? ei.value : this.capGS;
+        else if (n === idx + 2) this.capGD = ei.value >= 0 ? ei.value : this.capGD;
         CirSim.theApp.updateModels();
     }
 
@@ -387,7 +388,7 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
         this.name = this.isJfet() ? "jfetmodel" : "mosfetmodel";
         if (MosfetModel.modelMap.get(this.name) != null) {
             let num = 2;
-            for (;; num++) {
+            for (; ; num++) {
                 const n = this.name + "-" + num;
                 if (MosfetModel.modelMap.get(n) == null) {
                     this.name = n;

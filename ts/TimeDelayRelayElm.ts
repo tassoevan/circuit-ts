@@ -76,7 +76,9 @@ export class TimeDelayRelayElm extends ChipElm {
         this.resistance = this.offResistance;
     }
 
-    getChipName(): string { return "time delay relay"; }
+    getChipName(): string {
+        return "time delay relay";
+    }
 
     setupPins(): void {
         this.sizeX = 2;
@@ -88,7 +90,9 @@ export class TimeDelayRelayElm extends ChipElm {
         this.pins[3] = new Pin(this, 0, ChipElm.SIDE_E, "out");
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     stamp(): void {
         this.resistance = this.onState ? this.onResistance : this.offResistance;
@@ -105,9 +109,8 @@ export class TimeDelayRelayElm extends ChipElm {
     stepFinished(): void {
         // power applied, then delay, then in and out are connected
         const oldState = this.poweredState;
-        this.poweredState = (this.nodes[0].v - this.nodes[1].v > 2.5);
-        if (oldState !== this.poweredState)
-            this.lastTransition = CircuitElm.sim.t;
+        this.poweredState = this.nodes[0].v - this.nodes[1].v > 2.5;
+        if (oldState !== this.poweredState) this.lastTransition = CircuitElm.sim.t;
         if (CircuitElm.sim.t > this.lastTransition + (this.poweredState ? this.onDelay : this.offDelay))
             this.onState = this.poweredState;
     }
@@ -120,31 +123,31 @@ export class TimeDelayRelayElm extends ChipElm {
         this.drawChip(g);
     }
 
-    isDigitalChip(): boolean { return false; }
-    getPostCount(): number { return 4; }
-    getVoltageSourceCount(): number { return 0; }
-    getDumpType(): number { return 414; }
+    isDigitalChip(): boolean {
+        return false;
+    }
+    getPostCount(): number {
+        return 4;
+    }
+    getVoltageSourceCount(): number {
+        return 0;
+    }
+    getDumpType(): number {
+        return 414;
+    }
 
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("On Delay (s)", this.onDelay, 0, 0);
-        if (n === 1)
-            return new EditInfo("Off Delay (s)", this.offDelay, 0, 0);
-        if (n === 2)
-            return new EditInfo("On Resistance (ohms)", this.onResistance, 0, 0).setPositive();
-        if (n === 3)
-            return new EditInfo("Off Resistance (ohms)", this.offResistance, 0, 0).setPositive();
+        if (n === 0) return new EditInfo("On Delay (s)", this.onDelay, 0, 0);
+        if (n === 1) return new EditInfo("Off Delay (s)", this.offDelay, 0, 0);
+        if (n === 2) return new EditInfo("On Resistance (ohms)", this.onResistance, 0, 0).setPositive();
+        if (n === 3) return new EditInfo("Off Resistance (ohms)", this.offResistance, 0, 0).setPositive();
         return null;
     }
 
     setChipEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.onDelay = ei.value;
-        if (n === 1)
-            this.offDelay = ei.value;
-        if (n === 2)
-            this.onResistance = ei.value;
-        if (n === 3)
-            this.offResistance = ei.value;
+        if (n === 0) this.onDelay = ei.value;
+        if (n === 1) this.offDelay = ei.value;
+        if (n === 2) this.onResistance = ei.value;
+        if (n === 3) this.offResistance = ei.value;
     }
 }

@@ -35,10 +35,8 @@ export class EditMosfetModelDialog extends EditDialog {
 
     apply(): boolean {
         const ok = super.apply();
-        if (this.model.name === null || this.model.name.length === 0)
-            this.model.pickName();
-        if (this.mosfetElm !== null)
-            this.mosfetElm.newModelCreated(this.model);
+        if (this.model.name === null || this.model.name.length === 0) this.model.pickName();
+        if (this.mosfetElm !== null) this.mosfetElm.newModelCreated(this.model);
         return ok;
     }
 
@@ -46,8 +44,7 @@ export class EditMosfetModelDialog extends EditDialog {
         super.closeDialog();
         const edlg = CirSim.editDialog;
         CirSim.console("resetting dialog " + edlg);
-        if (edlg !== null)
-            edlg.resetDialog();
+        if (edlg !== null) edlg.resetDialog();
         CirSim.mosfetModelEditDialog = null;
     }
 }

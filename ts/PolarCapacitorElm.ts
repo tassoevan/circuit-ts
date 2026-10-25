@@ -41,8 +41,12 @@ export class PolarCapacitorElm extends CapacitorElm {
         }
     }
 
-    getDumpType(): number { return 209; }
-    getXmlDumpType(): string { return "pc"; }
+    getDumpType(): number {
+        return 209;
+    }
+    getXmlDumpType(): string {
+        return "pc";
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -63,14 +67,17 @@ export class PolarCapacitorElm extends CapacitorElm {
         const maxI = this.platePoints.length - 1;
         const midI = maxI / 2;
         for (let i = 0; i <= maxI; i++) {
-            const q = (i - midI) * 0.9 / midI;
-            this.platePoints[i] = this.interpPoint(this.plate2[0], this.plate2[1], i / maxI, 5 * (1 - Math.sqrt(1 - q * q)));
+            const q = ((i - midI) * 0.9) / midI;
+            this.platePoints[i] = this.interpPoint(
+                this.plate2[0],
+                this.plate2[1],
+                i / maxI,
+                5 * (1 - Math.sqrt(1 - q * q)),
+            );
         }
         this.plusPoint = this.interpPoint(this.point1, this.point2, f - 8 / this.dn, -10 * this.dsign);
-        if (this.y2 > this.y)
-            this.plusPoint.y += 4;
-        if (this.y > this.y2)
-            this.plusPoint.y += 3;
+        if (this.y2 > this.y) this.plusPoint.y += 4;
+        if (this.y > this.y2) this.plusPoint.y += 3;
     }
 
     draw(g: Graphics): void {
@@ -87,17 +94,14 @@ export class PolarCapacitorElm extends CapacitorElm {
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 4)
-            return new EditInfo("Max Reverse Voltage", this.maxNegativeVoltage, 0, 0);
+        if (n === 4) return new EditInfo("Max Reverse Voltage", this.maxNegativeVoltage, 0, 0);
         return super.getEditInfo(n);
     }
 
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 4) {
-            if (ei.value >= 0)
-                this.maxNegativeVoltage = ei.value;
-            else
-                ei.setError("must be >= 0");
+            if (ei.value >= 0) this.maxNegativeVoltage = ei.value;
+            else ei.setError("must be >= 0");
         }
         super.setEditValue(n, ei);
     }
@@ -108,5 +112,7 @@ export class PolarCapacitorElm extends CapacitorElm {
         super.stepFinished();
     }
 
-    getShortcut(): number { return 'C'.charCodeAt(0); }
+    getShortcut(): number {
+        return "C".charCodeAt(0);
+    }
 }

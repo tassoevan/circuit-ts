@@ -48,9 +48,8 @@ export class UndoManager {
     // the dump without the sidebar slider settings (simulation speed, current speed, power
     // brightness), which are saved in the root element
     static withoutSliders(dump: string): string {
-        const end = dump.indexOf('>');
-        if (end < 0)
-            return dump;
+        const end = dump.indexOf(">");
+        if (end < 0) return dump;
         return dump.substring(0, end).replace(/ (ic|cb|pb)="[^"]*"/g, "") + dump.substring(end);
     }
 
@@ -58,8 +57,10 @@ export class UndoManager {
         this.redoStack.length = 0;
         const s = this.sim.dumpCircuit();
         // (moving a sidebar slider isn't an undoable change, and shouldn't mark the circuit changed)
-        if (this.undoStack.length > 0 &&
-                UndoManager.withoutSliders(s) === UndoManager.withoutSliders(this.undoStack[this.undoStack.length - 1].dump))
+        if (
+            this.undoStack.length > 0 &&
+            UndoManager.withoutSliders(s) === UndoManager.withoutSliders(this.undoStack[this.undoStack.length - 1].dump)
+        )
             return;
         this.undoStack.push(new UndoItem(this.sim, s));
         this.enableUndoRedo();
@@ -68,8 +69,7 @@ export class UndoManager {
     }
 
     doUndo(): void {
-        if (this.undoStack.length === 0)
-            return;
+        if (this.undoStack.length === 0) return;
         this.redoStack.push(new UndoItem(this.sim, this.sim.dumpCircuit()));
         const ui = this.undoStack.pop()!;
         this.loadUndoItem(ui);
@@ -77,8 +77,7 @@ export class UndoManager {
     }
 
     doRedo(): void {
-        if (this.redoStack.length === 0)
-            return;
+        if (this.redoStack.length === 0) return;
         this.undoStack.push(new UndoItem(this.sim, this.sim.dumpCircuit()));
         const ui = this.redoStack.pop()!;
         this.loadUndoItem(ui);
@@ -107,16 +106,14 @@ export class UndoManager {
     writeRecoveryToStorage(): void {
         CirSim.console("write recovery");
         const stor = window.localStorage;
-        if (stor == null)
-            return;
+        if (stor == null) return;
         const s = this.sim.dumpCircuit();
         stor.setItem("circuitRecovery", s);
     }
 
     readRecovery(): void {
         const stor = window.localStorage;
-        if (stor == null)
-            return;
+        if (stor == null) return;
         this.sim.recovery = stor.getItem("circuitRecovery");
     }
 }

@@ -49,7 +49,14 @@ export class SubcircuitElm extends CompositeElm {
     constructor(xx: number, yy: number);
     constructor(xx: number, yy: number, name: string);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
-    constructor(xxOrXa: number, yyOrYa: number, nameOrXb?: string | number, yb?: number, f?: number, st?: StringTokenizer) {
+    constructor(
+        xxOrXa: number,
+        yyOrYa: number,
+        nameOrXb?: string | number,
+        yb?: number,
+        f?: number,
+        st?: StringTokenizer,
+    ) {
         if (typeof nameOrXb === "number") {
             // text-dump constructor
             super(xxOrXa, yyOrYa, nameOrXb, yb!, f!);
@@ -62,7 +69,7 @@ export class SubcircuitElm extends CompositeElm {
             } else {
                 // use last model as default when creating new element in UI;
                 // use "default" otherwise, to avoid infinite recursion with nested subcircuits
-                this.modelName = (xxOrXa === 0 && yyOrYa === 0) ? "default" : SubcircuitElm.lastModelName;
+                this.modelName = xxOrXa === 0 && yyOrYa === 0 ? "default" : SubcircuitElm.lastModelName;
             }
             this.flags |= CompositeElm.FLAG_ESCAPE;
             if (this.useSmallGrid()) this.flags |= SubcircuitElm.FLAG_SMALL;
@@ -77,21 +84,19 @@ export class SubcircuitElm extends CompositeElm {
         }
         // model may be missing (e.g. wasn't available under its scope in this circuit); modelName
         // is still dumped by dumpXml() so the reference is preserved for a future retry
-        if (this.model != null && !(this.model.builtin || this.model.dumped))
-            this.model.dumpXml(doc);
+        if (this.model != null && !(this.model.builtin || this.model.dumped)) this.model.dumpXml(doc);
     }
 
     dumpXml(doc: Document, elem: Element): void {
         this.dumpXmlModel(doc);
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modelName);
-        if (this.highVoltage !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "hv", this.highVoltage);
+        if (this.highVoltage !== 0) CircuitXMLSerializer.dumpAttr(elem, "hv", this.highVoltage);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
-        this.modelName    = xml.parseStringAttr("mo", this.modelName)!;
-        this.highVoltage  = xml.parseDoubleAttr("hv", 0);
+        this.modelName = xml.parseStringAttr("mo", this.modelName)!;
+        this.highVoltage = xml.parseDoubleAttr("hv", 0);
         this.updateModels();
         super.undumpXml(xml);
     }
@@ -113,7 +118,7 @@ export class SubcircuitElm extends CompositeElm {
         this.chip = new SubcircuitChipElm(this.x, this.y);
         this.chip.x2 = this.x2;
         this.chip.y2 = this.y2;
-        this.chip.flags = (this.flags & (ChipElm.FLAG_FLIP_X | ChipElm.FLAG_FLIP_Y | ChipElm.FLAG_FLIP_XY));
+        this.chip.flags = this.flags & (ChipElm.FLAG_FLIP_X | ChipElm.FLAG_FLIP_Y | ChipElm.FLAG_FLIP_XY);
 
         if (this.model == null) {
             // model couldn't be resolved (missing/not in scope); draw as a labeled placeholder
@@ -127,8 +132,7 @@ export class SubcircuitElm extends CompositeElm {
             return;
         }
 
-        if (this.x2 - this.x > this.model.sizeX * 16 && this.isCreating())
-            this.flags &= ~SubcircuitElm.FLAG_SMALL;
+        if (this.x2 - this.x > this.model.sizeX * 16 && this.isCreating()) this.flags &= ~SubcircuitElm.FLAG_SMALL;
         this.chip.setSize((this.flags & SubcircuitElm.FLAG_SMALL) !== 0 ? 1 : 2);
         this.chip.setLabel((this.model.flags & SubcircuitModel.FLAG_SHOW_LABEL) !== 0 ? this.model.name : null);
 
@@ -144,8 +148,7 @@ export class SubcircuitElm extends CompositeElm {
 
         this.chip.setPoints();
         this.boundingBox = this.chip.boundingBox;
-        for (let i = 0; i < this.getPostCount(); i++)
-            this.setPost(i, this.chip.getPost(i));
+        for (let i = 0; i < this.getPostCount(); i++) this.setPost(i, this.chip.getPost(i));
     }
 
     updateModels(): void;
@@ -177,8 +180,7 @@ export class SubcircuitElm extends CompositeElm {
         }
         this.postCount = this.model.extList.length;
         const externalNodes = new Array(this.postCount);
-        for (let i = 0; i < this.postCount; i++)
-            externalNodes[i] = this.model.extList[i].node;
+        for (let i = 0; i < this.postCount; i++) externalNodes[i] = this.model.extList[i].node;
         if (st !== null) {
             this.loadComposite(st, this.model.getNodeList(), externalNodes);
         } else {
@@ -193,21 +195,26 @@ export class SubcircuitElm extends CompositeElm {
         if (this.highVoltage === 0) return;
         for (const ce of this.compElmList) {
             ce.setHighVoltage(this.highVoltage);
-            if (ce instanceof SubcircuitElm)
-                (ce as SubcircuitElm).propagateHighVoltage();
+            if (ce instanceof SubcircuitElm) (ce as SubcircuitElm).propagateHighVoltage();
         }
     }
 
-    setHighVoltage(hv: number): void { this.highVoltage = hv; }
+    setHighVoltage(hv: number): void {
+        this.highVoltage = hv;
+    }
 
-    getPostCount(): number { return this.postCount; }
-    getPostWidth(n: number): number { return this.chip ? this.chip.getPostWidth(n) : 1; }
+    getPostCount(): number {
+        return this.postCount;
+    }
+    getPostWidth(n: number): number {
+        return this.chip ? this.chip.getPostWidth(n) : 1;
+    }
 
     flipX(center2: number, count: number): void {
         this.flags ^= ChipElm.FLAG_FLIP_X;
         if (count !== 1) {
             const xs = (this.chip.flippedSizeX + 1) * this.chip.cspc2;
-            this.x  = center2 - this.x - xs;
+            this.x = center2 - this.x - xs;
             this.x2 = center2 - this.x2;
         }
         this.setPoints();
@@ -217,20 +224,23 @@ export class SubcircuitElm extends CompositeElm {
         this.flags ^= ChipElm.FLAG_FLIP_Y;
         if (count !== 1) {
             const xs = (this.chip.flippedSizeY - 1) * this.chip.cspc2;
-            this.y  = center2 - this.y - xs;
+            this.y = center2 - this.y - xs;
             this.y2 = center2 - this.y2;
         }
         this.setPoints();
     }
 
-    isFlippedX(): boolean { return (this.flags & ChipElm.FLAG_FLIP_X) !== 0; }
-    isFlippedY(): boolean { return (this.flags & ChipElm.FLAG_FLIP_Y) !== 0; }
+    isFlippedX(): boolean {
+        return (this.flags & ChipElm.FLAG_FLIP_X) !== 0;
+    }
+    isFlippedY(): boolean {
+        return (this.flags & ChipElm.FLAG_FLIP_Y) !== 0;
+    }
 
     flipXY(xmy: number, count: number): void {
         this.flags ^= ChipElm.FLAG_FLIP_XY;
         // FLAG_FLIP_XY is applied first, so need to swap X and Y
-        if (this.isFlippedX() !== this.isFlippedY())
-            this.flags ^= ChipElm.FLAG_FLIP_X | ChipElm.FLAG_FLIP_Y;
+        if (this.isFlippedX() !== this.isFlippedY()) this.flags ^= ChipElm.FLAG_FLIP_X | ChipElm.FLAG_FLIP_Y;
         if (count !== 1) {
             this.x += this.chip.cspc2;
             super.flipXY(xmy, count);
@@ -250,10 +260,14 @@ export class SubcircuitElm extends CompositeElm {
             const className = CirSim.xmlDumpTypeMap.get(tagName);
             if (!className) continue;
             let ce: CircuitElm;
-            if (className === "WireElm" || className === "RoutedWireElm" ||
-                className === "LabeledNodeElm" || className === "ScopeElm" ||
+            if (
+                className === "WireElm" ||
+                className === "RoutedWireElm" ||
+                className === "LabeledNodeElm" ||
+                className === "ScopeElm" ||
                 className === "GraphicElm" ||
-                (className === "GroundElm" && childElem.getAttribute("x") !== null)) {
+                (className === "GroundElm" && childElem.getAttribute("x") !== null)
+            ) {
                 ce = CirSim.constructElement(className, 0, 0);
                 xml.parseChildElement(childElem);
                 ce.undumpXml(xml);
@@ -267,8 +281,7 @@ export class SubcircuitElm extends CompositeElm {
     }
 
     canViewComponents(): boolean {
-        if (this.model == null)
-            return false;
+        if (this.model == null) return false;
         const elmEntries = this.model.getElmEntries();
         for (const childElem of elmEntries) {
             if (childElem.getAttribute("x") !== null) return true;
@@ -276,25 +289,33 @@ export class SubcircuitElm extends CompositeElm {
         return false;
     }
 
-    isSubcircuitElm(): boolean { return true; }
+    isSubcircuitElm(): boolean {
+        return true;
+    }
 
     onDoubleClick(): void {
         if (this.canViewComponents()) {
             // the first click of the double-click brought up our properties; hide them
             CirSim.editDialog?.closeDialog();
             CircuitElm.app.ui.pushSubcircuit(this, this.buildDisplayElmList());
-        }
-        else if (!CircuitElm.app.ui.isReadOnly())
-            CircuitElm.app.commands.doEdit(this);
+        } else if (!CircuitElm.app.ui.isReadOnly()) CircuitElm.app.commands.doEdit(this);
     }
 
     // don't bring up the properties when placing a subcircuit
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
 
-    getDumpType(): number { return 410; }
-    getXmlDumpType(): string { return "cc"; }
+    getDumpType(): number {
+        return 410;
+    }
+    getXmlDumpType(): string {
+        return "cc";
+    }
 
-    getElmType(): string { return "subcircuit"; }
+    getElmType(): string {
+        return "subcircuit";
+    }
 
     getInfo(arr: string[]): void {
         super.getInfo(arr);
@@ -302,10 +323,8 @@ export class SubcircuitElm extends CompositeElm {
             arr[0] = Locale.LS("subcircuit") + " (" + Locale.LS("missing: ") + this.modelName + ")";
             return;
         }
-        if (this.model.builtin && this.model.name.startsWith("~"))
-            arr[0] = this.model.name.substring(1);
-        else
-            arr[0] = "subcircuit (" + this.model.name + ")";
+        if (this.model.builtin && this.model.name.startsWith("~")) arr[0] = this.model.name.substring(1);
+        else arr[0] = "subcircuit (" + this.model.name + ")";
         let a = 1;
         for (let i = 0; i < this.postCount; i++) {
             if (a >= arr.length) break;
@@ -314,8 +333,7 @@ export class SubcircuitElm extends CompositeElm {
             if (ent.busWidth > 1) {
                 let value = 0;
                 for (let j = 0; j < ent.busWidth; j++)
-                    if (this.nodes[i + j].v > this.chip.getThreshold())
-                        value |= 1 << j;
+                    if (this.nodes[i + j].v > this.chip.getThreshold()) value |= 1 << j;
                 arr[a] = ent.name + " = " + value + " / 0x" + value.toString(16).toUpperCase();
             } else {
                 arr[a] = ent.name + " = " + CircuitElm.getVoltageText(this.nodes[i].v);
@@ -331,9 +349,10 @@ export class SubcircuitElm extends CompositeElm {
         if (this.model != null && this.model.internal) n += 2;
 
         if (n === 0) {
-            const label = (this.model == null) ?
-                Locale.LS("Model not found: ") + this.modelName :
-                EditInfo.makeLink("subcircuits.html", "Model Name");
+            const label =
+                this.model == null
+                    ? Locale.LS("Model not found: ") + this.modelName
+                    : EditInfo.makeLink("subcircuits.html", "Model Name");
             const ei = new EditInfo(label, 0, -1, -1);
             this.models = SubcircuitModel.getModelList();
             ei.choice = new Choice();
@@ -345,8 +364,7 @@ export class SubcircuitElm extends CompositeElm {
             return ei;
         }
         // remaining fields all depend on having a resolved model
-        if (this.model == null)
-            return null;
+        if (this.model == null) return null;
         if (n === 1) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.button = { label: Locale.LS("Edit Pin Layout") };
@@ -358,8 +376,7 @@ export class SubcircuitElm extends CompositeElm {
             return ei;
         }
         const hvIdx = this.canViewComponents() ? 3 : 2;
-        if (n === hvIdx)
-            return new EditInfo("High Logic Voltage (0=default)", this.highVoltage, 0, 10).setUnitStep();
+        if (n === hvIdx) return new EditInfo("High Logic Voltage (0=default)", this.highVoltage, 0, 10).setUnitStep();
         if (n === hvIdx + 1 && this.model.canLoadModelCircuit()) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.button = { label: Locale.LS("Edit Model") };
@@ -377,8 +394,7 @@ export class SubcircuitElm extends CompositeElm {
             this.setPoints();
             return;
         }
-        if (this.model == null)
-            return;
+        if (this.model == null) return;
         if (n === 1) {
             if (this.model.name === "default") {
                 window.alert(Locale.LS("Can't edit this model."));
@@ -402,8 +418,7 @@ export class SubcircuitElm extends CompositeElm {
         }
         if (n === hvIdx + 1) {
             CircuitElm.app.pushContext(this.model.name);
-            if (this.model.modelCircuit !== null)
-                CircuitElm.app.readCircuit(this.model.modelCircuit);
+            if (this.model.modelCircuit !== null) CircuitElm.app.readCircuit(this.model.modelCircuit);
             else if (this.model.elmDoc) {
                 const xmlDes = new CircuitXMLDeserializer(CircuitElm.app);
                 xmlDes.readCircuitFromDoc(this.model.elmDoc);
@@ -412,7 +427,9 @@ export class SubcircuitElm extends CompositeElm {
         }
     }
 
-    getNumHandles(): number { return 0; }
+    getNumHandles(): number {
+        return 0;
+    }
 }
 
 HookRegistry.createSubcircuitElm = (x, y, name) => new SubcircuitElm(x, y, name);

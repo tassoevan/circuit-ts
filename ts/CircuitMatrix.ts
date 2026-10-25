@@ -28,7 +28,7 @@ export class CircuitMatrix {
     origMatrix: number[][] = [];
     permute: number[] = [];
     size: number = 0;
-    nodeCount: number = 0;   // number of node rows (vs rows come after)
+    nodeCount: number = 0; // number of node rows (vs rows come after)
     nonLinear: boolean = false;
     nodeVoltages: number[] = [];
     lastNodeVoltages: number[] | null = null;
@@ -45,8 +45,8 @@ export class CircuitMatrix {
 
     clear(): void {
         const sz = this.size;
-        this.matrix = Array.from({length: sz}, () => new Array(sz).fill(0));
-        this.origMatrix = Array.from({length: sz}, () => new Array(sz).fill(0));
+        this.matrix = Array.from({ length: sz }, () => new Array(sz).fill(0));
+        this.origMatrix = Array.from({ length: sz }, () => new Array(sz).fill(0));
         this.stampedFlags = new Uint8Array(sz * sz);
         this.stamped = [];
         this.stampedSorted = true;

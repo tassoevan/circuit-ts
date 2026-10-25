@@ -20,7 +20,13 @@
 import { VoltageElm } from "./VoltageElm";
 
 export class DCVoltageElm extends VoltageElm {
-    constructor(xx: number, yy: number) { super(xx, yy, VoltageElm.WF_DC); }
-    getDumpClass() { return VoltageElm; }
-    getShortcut(): number { return 'v'.charCodeAt(0); }
+    constructor(xx: number, yy: number) {
+        super(xx, yy, VoltageElm.WF_DC);
+    }
+    getDumpClass() {
+        return VoltageElm;
+    }
+    getShortcut(): number {
+        return "v".charCodeAt(0);
+    }
 }

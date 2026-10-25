@@ -41,8 +41,7 @@ export class ScopeFFT {
 
     show(b: boolean): void {
         this.enabled = b;
-        if (!this.enabled)
-            this.fft = null;
+        if (!this.enabled) this.fft = null;
     }
 
     drawVerticalGridLines(g: Graphics): void {
@@ -50,7 +49,7 @@ export class ScopeFFT {
         const divs = 20;
         const maxFrequency = 1 / (this.scope.sim.maxTimeStep * this.scope.speed * divs * 2);
         for (let i = 0; i < divs; i++) {
-            const x = Math.floor(this.scope.rect.width * i / divs);
+            const x = Math.floor((this.scope.rect.width * i) / divs);
             if (x < prevEnd) continue;
             const s = "" + Math.round(i * maxFrequency) + "Hz";
             const sWidth = Math.ceil(g.context.measureText(s).width);
@@ -69,9 +68,7 @@ export class ScopeFFT {
             this.fft = new FFT(this.scope.scopePointCount);
         const real = new Array<number>(this.scope.scopePointCount).fill(0);
         const imag = new Array<number>(this.scope.scopePointCount).fill(0);
-        const plot: ScopePlot = (this.scope.visiblePlots.length === 0)
-            ? this.scope.plots[0]
-            : this.scope.visiblePlots[0];
+        const plot: ScopePlot = this.scope.visiblePlots.length === 0 ? this.scope.plots[0] : this.scope.visiblePlots[0];
         const maxV = plot.maxValues;
         const minV = plot.minValues;
         const ptr = plot.ptr;
@@ -85,8 +82,7 @@ export class ScopeFFT {
         let maxM = 1e-8;
         for (let i = 0; i < this.scope.scopePointCount / 2; i++) {
             const m = this.fft.magnitude(real[i], imag[i]);
-            if (m > maxM)
-                maxM = m;
+            if (m > maxM) maxM = m;
         }
         this.fftMaxMagnitude = maxM;
         this.fftReal = real;
@@ -95,13 +91,12 @@ export class ScopeFFT {
         g.setColor("#FF0000");
         if (!this.logSpectrum) {
             let prevHeight = 0;
-            const y = (this.scope.rect.height - 1) - 12;
+            const y = this.scope.rect.height - 1 - 12;
             for (let i = 0; i < this.scope.scopePointCount / 2; i++) {
-                const x = Math.floor(2 * i * this.scope.rect.width / this.scope.scopePointCount);
+                const x = Math.floor((2 * i * this.scope.rect.width) / this.scope.scopePointCount);
                 const magnitude = this.fft.magnitude(real[i], imag[i]);
                 const height = Math.floor((magnitude * y) / maxM);
-                if (x !== prevX)
-                    g.drawLine(prevX, y - prevHeight, x, y - height);
+                if (x !== prevX) g.drawLine(prevX, y - prevHeight, x, y - height);
                 prevHeight = height;
                 prevX = x;
             }
@@ -114,8 +109,7 @@ export class ScopeFFT {
             let prevY = 0;
             for (let db = -20; db >= -80; db -= 20) {
                 const y = topMargin + Math.floor(-db * pixelsPerDb);
-                if (y < 0 || y >= this.scope.rect.height)
-                    continue;
+                if (y < 0 || y >= this.scope.rect.height) continue;
                 g.setColor("#880000");
                 g.drawLine(0, y, this.scope.rect.width, y);
                 g.setColor("#FF0000");
@@ -123,14 +117,12 @@ export class ScopeFFT {
             }
             g.setColor("#FF0000");
             for (let i = 0; i < this.scope.scopePointCount / 2; i++) {
-                const x = Math.floor(2 * i * this.scope.rect.width / this.scope.scopePointCount);
+                const x = Math.floor((2 * i * this.scope.rect.width) / this.scope.scopePointCount);
                 const magnitude = this.fft.magnitude(real[i], imag[i]);
-                let db = 20 * Math.log(magnitude / maxM) / Math.log(10);
-                if (db < -dbRange)
-                    db = -dbRange;
+                let db = (20 * Math.log(magnitude / maxM)) / Math.log(10);
+                if (db < -dbRange) db = -dbRange;
                 const y = topMargin + Math.floor(-db * pixelsPerDb);
-                if (x !== prevX)
-                    g.drawLine(prevX, prevY, x, y);
+                if (x !== prevX) g.drawLine(prevX, prevY, x, y);
                 prevY = y;
                 prevX = x;
             }
@@ -147,11 +139,9 @@ export class ScopeFFT {
             } else if (p.units === UNITS_A) {
                 if (iPlot !== null) return;
                 iPlot = p;
-            } else
-                return;
+            } else return;
         }
-        if (vPlot === null || iPlot === null)
-            return;
+        if (vPlot === null || iPlot === null) return;
         if (this.fft === null || this.fft.getSize() !== this.scope.scopePointCount)
             this.fft = new FFT(this.scope.scopePointCount);
         const vReal = new Array<number>(this.scope.scopePointCount).fill(0);
@@ -171,13 +161,15 @@ export class ScopeFFT {
         let maxM = 0;
         for (let i = 1; i < this.scope.scopePointCount / 2; i++) {
             const m = this.fft.magnitude(vReal[i], vImag[i]);
-            if (m > maxM) { maxM = m; fund = i; }
+            if (m > maxM) {
+                maxM = m;
+                fund = i;
+            }
         }
-        if (maxM < 1e-8)
-            return;
+        if (maxM < 1e-8) return;
         const angleV = Math.atan2(vImag[fund], vReal[fund]);
         const angleI = Math.atan2(iImag[fund], iReal[fund]);
-        let angle = (angleV - angleI) * 180 / Math.PI;
+        let angle = ((angleV - angleI) * 180) / Math.PI;
         while (angle > 180) angle -= 360;
         while (angle < -180) angle += 360;
         this.scope.drawInfoText(g, Locale.LS("Phase angle: ") + CircuitElm.showFormat.format(angle) + "°");
@@ -185,12 +177,17 @@ export class ScopeFFT {
 
     addCursorInfo(info: string[], ct: number, mouseCursorX: number): number {
         const maxFrequency = 1 / (this.scope.sim.maxTimeStep * this.scope.speed * 2);
-        info[ct++] = CircuitElm.getUnitText(maxFrequency * (mouseCursorX - this.scope.rect.x) / this.scope.rect.width, "Hz");
+        info[ct++] = CircuitElm.getUnitText(
+            (maxFrequency * (mouseCursorX - this.scope.rect.x)) / this.scope.rect.width,
+            "Hz",
+        );
         if (this.fft !== null && this.fftReal !== null && this.fftMaxMagnitude > 0) {
-            const fftIndex = Math.floor((mouseCursorX - this.scope.rect.x) * this.scope.scopePointCount / (2 * this.scope.rect.width));
+            const fftIndex = Math.floor(
+                ((mouseCursorX - this.scope.rect.x) * this.scope.scopePointCount) / (2 * this.scope.rect.width),
+            );
             if (fftIndex >= 0 && fftIndex < this.scope.scopePointCount / 2) {
                 const mag = this.fft.magnitude(this.fftReal[fftIndex], this.fftImag![fftIndex]);
-                const db = 20 * Math.log(mag / this.fftMaxMagnitude) / Math.log(10);
+                const db = (20 * Math.log(mag / this.fftMaxMagnitude)) / Math.log(10);
                 info[ct++] = Math.round(db) + " dB";
             }
         }

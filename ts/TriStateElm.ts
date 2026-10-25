@@ -41,7 +41,7 @@ export class TriStateElm extends CircuitElm {
     busWidth: number = 1;
     voltageSources: VoltageSource[];
 
-    readonly FLAG_FLIP   = 1;
+    readonly FLAG_FLIP = 1;
     readonly FLAG_FLIP_X = 2;
     readonly FLAG_FLIP_Y = 4;
 
@@ -57,7 +57,10 @@ export class TriStateElm extends CircuitElm {
     constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
         super(xa, ya, xb, yb, f);
         if (st !== undefined) {
-            this.r_on = 0.1; this.r_off = 1e10; this.r_off_ground = 0; this.highVoltage = 5;
+            this.r_on = 0.1;
+            this.r_off = 1e10;
+            this.r_off_ground = 0;
+            this.highVoltage = 5;
             try {
                 this.r_on = parseFloatStrict(st.nextToken());
                 this.r_off = parseFloatStrict(st.nextToken());
@@ -65,7 +68,9 @@ export class TriStateElm extends CircuitElm {
                 this.highVoltage = parseFloatStrict(st.nextToken());
             } catch (e) {}
         } else {
-            this.r_on = 0.1; this.r_off = 1e10; this.r_off_ground = 1e8;
+            this.r_on = 0.1;
+            this.r_off = 1e10;
+            this.r_off_ground = 1e8;
             this.highVoltage = GateElm.lastHighVoltage;
         }
         this.noDiagonal = true;
@@ -78,8 +83,7 @@ export class TriStateElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "roff", this.r_off);
         CircuitXMLSerializer.dumpAttr(elem, "rog", this.r_off_ground);
         CircuitXMLSerializer.dumpAttr(elem, "hi", this.highVoltage);
-        if (this.busWidth !== 1)
-            CircuitXMLSerializer.dumpAttr(elem, "bw", this.busWidth);
+        if (this.busWidth !== 1) CircuitXMLSerializer.dumpAttr(elem, "bw", this.busWidth);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
@@ -92,9 +96,15 @@ export class TriStateElm extends CircuitElm {
         this.allocNodes();
     }
 
-    getDumpType(): number { return 180; }
-    getXmlDumpType(): string { return "ts"; }
-    setHighVoltage(hv: number): void { this.highVoltage = hv; }
+    getDumpType(): number {
+        return 180;
+    }
+    getXmlDumpType(): string {
+        return "ts";
+    }
+    setHighVoltage(hv: number): void {
+        this.highVoltage = hv;
+    }
 
     setPoints(): void {
         super.setPoints();
@@ -112,7 +122,7 @@ export class TriStateElm extends CircuitElm {
         this.busLead1 = this.interpPoint(this.point1, this.lead1!, 1 - 2 / this.dn);
         const sign = (this.flags & this.FLAG_FLIP) === 0 ? -1 : 1;
         this.point3 = this.interpPoint(this.lead1!, this.lead2!, 0.5, sign * hs);
-        this.lead3  = this.interpPoint(this.lead1!, this.lead2!, 0.5, sign * (hs/2 + 2));
+        this.lead3 = this.interpPoint(this.lead1!, this.lead2!, 0.5, sign * (hs / 2 + 2));
     }
 
     draw(g: Graphics): void {
@@ -135,8 +145,12 @@ export class TriStateElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    controlNode(): number { return 2 * this.busWidth; }
-    internalNode(bit: number): number { return 2 * this.busWidth + 1 + bit; }
+    controlNode(): number {
+        return 2 * this.busWidth;
+    }
+    internalNode(bit: number): number {
+        return 2 * this.busWidth + 1 + bit;
+    }
 
     calculateCurrent(): void {
         this.current = 0;
@@ -154,11 +168,17 @@ export class TriStateElm extends CircuitElm {
         return 0;
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     stamp(): void {
         for (let i = 0; i < this.busWidth; i++) {
-            CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[this.internalNode(i)], this.voltageSources[i]);
+            CircuitElm.sim.stampVoltageSource(
+                CircuitNode.ground,
+                this.nodes[this.internalNode(i)],
+                this.voltageSources[i],
+            );
             CircuitElm.sim.stampNonLinear(this.nodes[this.internalNode(i)]);
             CircuitElm.sim.stampNonLinear(this.nodes[this.busWidth + i]);
         }
@@ -173,23 +193,37 @@ export class TriStateElm extends CircuitElm {
             CircuitElm.sim.stampResistor(this.nodes[intNode], this.nodes[outNode], this.resistance);
             if (this.r_off_ground > 0)
                 CircuitElm.sim.stampResistor(this.nodes[outNode], CircuitNode.ground, this.r_off_ground);
-            CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[intNode], this.voltageSources[i],
-                this.nodes[i].v > this.highVoltage * 0.5 ? this.highVoltage : 0);
+            CircuitElm.sim.updateVoltageSource(
+                CircuitNode.ground,
+                this.nodes[intNode],
+                this.voltageSources[i],
+                this.nodes[i].v > this.highVoltage * 0.5 ? this.highVoltage : 0,
+            );
         }
     }
 
     drag(xx: number, yy: number): void {
-        let flip = (xx < this.x) === (yy < this.y);
-        xx = this.snapGrid(xx); yy = this.snapGrid(yy);
+        let flip = xx < this.x === yy < this.y;
+        xx = this.snapGrid(xx);
+        yy = this.snapGrid(yy);
         if (Math.abs(this.x - xx) < Math.abs(this.y - yy)) xx = this.x;
-        else { flip = !flip; yy = this.y; }
-        this.flags = flip ? (this.flags | this.FLAG_FLIP) : (this.flags & ~this.FLAG_FLIP);
+        else {
+            flip = !flip;
+            yy = this.y;
+        }
+        this.flags = flip ? this.flags | this.FLAG_FLIP : this.flags & ~this.FLAG_FLIP;
         super.drag(xx, yy);
     }
 
-    getPostCount(): number { return 2 * this.busWidth + 1; }
-    getInternalNodeCount(): number { return this.busWidth; }
-    getVoltageSourceCount(): number { return this.busWidth; }
+    getPostCount(): number {
+        return 2 * this.busWidth + 1;
+    }
+    getInternalNodeCount(): number {
+        return this.busWidth;
+    }
+    getVoltageSourceCount(): number {
+        return this.busWidth;
+    }
 
     setVoltageSource(n: number, v: VoltageSource): void {
         if (!this.voltageSources || this.voltageSources.length !== this.busWidth)
@@ -205,14 +239,15 @@ export class TriStateElm extends CircuitElm {
     }
 
     getPost(n: number): Point {
-        if (n < this.busWidth)
-            return this.busWidth > 1 ? new Point(this.point1.x, this.point1.y, n) : this.point1;
+        if (n < this.busWidth) return this.busWidth > 1 ? new Point(this.point1.x, this.point1.y, n) : this.point1;
         if (n < 2 * this.busWidth)
             return this.busWidth > 1 ? new Point(this.point2.x, this.point2.y, n - this.busWidth) : this.point2;
         return this.point3;
     }
 
-    getPostWidth(n: number): number { return n < 2 * this.busWidth ? this.busWidth : 1; }
+    getPostWidth(n: number): number {
+        return n < 2 * this.busWidth ? this.busWidth : 1;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "tri-state buffer";
@@ -223,10 +258,16 @@ export class TriStateElm extends CircuitElm {
         arr[4] = "Vc = " + CircuitElm.getVoltageText(this.nodes[this.controlNode()].v);
     }
 
-    getConnection(n1: number, n2: number): boolean { return false; }
-    hasGroundConnection(n1: number): boolean { return n1 >= this.busWidth && n1 < 2 * this.busWidth; }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
+    hasGroundConnection(n1: number): boolean {
+        return n1 >= this.busWidth && n1 < 2 * this.busWidth;
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("On Resistance (ohms)", this.r_on, 0, 0).setPositive();
         if (n === 1) return new EditInfo("Off Resistance (ohms)", this.r_off, 0, 0).setPositive();
@@ -242,12 +283,23 @@ export class TriStateElm extends CircuitElm {
         if (n === 2 && ei.value > 0) this.r_off_ground = ei.value;
         if (n === 3) this.highVoltage = GateElm.lastHighVoltage = ei.value;
         if (n === 4) {
-            if (ei.value >= 1) { this.busWidth = Math.trunc(ei.value); this.allocNodes(); }
-            else ei.setError("must be >= 1");
+            if (ei.value >= 1) {
+                this.busWidth = Math.trunc(ei.value);
+                this.allocNodes();
+            } else ei.setError("must be >= 1");
         }
     }
 
-    flipX(c2: number, count: number): void { this.flags ^= this.FLAG_FLIP | this.FLAG_FLIP_X; super.flipX(c2, count); }
-    flipY(c2: number, count: number): void { this.flags ^= this.FLAG_FLIP | this.FLAG_FLIP_Y; super.flipY(c2, count); }
-    flipXY(c2: number, count: number): void { this.flags ^= this.FLAG_FLIP; super.flipXY(c2, count); }
+    flipX(c2: number, count: number): void {
+        this.flags ^= this.FLAG_FLIP | this.FLAG_FLIP_X;
+        super.flipX(c2, count);
+    }
+    flipY(c2: number, count: number): void {
+        this.flags ^= this.FLAG_FLIP | this.FLAG_FLIP_Y;
+        super.flipY(c2, count);
+    }
+    flipXY(c2: number, count: number): void {
+        this.flags ^= this.FLAG_FLIP;
+        super.flipXY(c2, count);
+    }
 }

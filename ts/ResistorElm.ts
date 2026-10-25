@@ -43,8 +43,12 @@ export class ResistorElm extends CircuitElm {
         }
     }
 
-    isResistorElm(): boolean { return true; }
-    getDumpType(): number { return 'r'.charCodeAt(0); }
+    isResistorElm(): boolean {
+        return true;
+    }
+    getDumpType(): number {
+        return "r".charCodeAt(0);
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -81,40 +85,45 @@ export class ResistorElm extends CircuitElm {
         const len = CircuitElm.distance(this.lead1!, this.lead2!);
         g.context.save();
         g.context.lineWidth = 3.0;
-        g.context.transform(((this.lead2!.x - this.lead1!.x))/len, ((this.lead2!.y - this.lead1!.y))/len,
-                -((this.lead2!.y - this.lead1!.y))/len, ((this.lead2!.x - this.lead1!.x))/len, this.lead1!.x, this.lead1!.y);
+        g.context.transform(
+            (this.lead2!.x - this.lead1!.x) / len,
+            (this.lead2!.y - this.lead1!.y) / len,
+            -(this.lead2!.y - this.lead1!.y) / len,
+            (this.lead2!.x - this.lead1!.x) / len,
+            this.lead1!.x,
+            this.lead1!.y,
+        );
         if (CircuitElm.app.menus.voltsCheckItem.getState()) {
             const grad = g.context.createLinearGradient(0, 0, len, 0);
             grad.addColorStop(0, this.getVoltageColor(g, v1).getHexValue());
             grad.addColorStop(1.0, this.getVoltageColor(g, v2).getHexValue());
             g.context.strokeStyle = grad;
-        } else
-            this.setPowerColor(g, true);
-        if (this.dn < 30)
-            hs = 2;
+        } else this.setPowerColor(g, true);
+        if (this.dn < 30) hs = 2;
         if (!this.showEuroResistors()) {
             g.context.beginPath();
             g.context.moveTo(0, 0);
             for (i = 0; i < 4; i++) {
-                g.context.lineTo((1+4*i)*len/16, hs);
-                g.context.lineTo((3+4*i)*len/16, -hs);
+                g.context.lineTo(((1 + 4 * i) * len) / 16, hs);
+                g.context.lineTo(((3 + 4 * i) * len) / 16, -hs);
             }
             g.context.lineTo(len, 0);
             g.context.stroke();
-
         } else {
-            g.context.strokeRect(0, -hs, len, 2.0*hs);
+            g.context.strokeRect(0, -hs, len, 2.0 * hs);
         }
         g.context.restore();
         if (this.showValues()) {
             const s = CircuitElm.getShortUnitText(this.resistance, this.showOhmSymbol() ? Locale.ohmString : "");
-            this.drawValues(g, s, hs+2);
+            this.drawValues(g, s, hs + 2);
         }
         this.doDots(g);
         this.drawPosts(g);
     }
 
-    addRoutingObstacle(wr: WireRouter): void { this.addRoutingObstacleWithLeads(wr, 6); }
+    addRoutingObstacle(wr: WireRouter): void {
+        this.addRoutingObstacleWithLeads(wr, 6);
+    }
 
     calculateCurrent(): void {
         this.current = (this.nodes[0].v - this.nodes[1].v) / this.resistance;
@@ -138,16 +147,21 @@ export class ResistorElm extends CircuitElm {
 
     getEditInfo(n: number): EditInfo | null {
         // ohmString doesn't work here on linux
-        if (n === 0)
-            return new EditInfo("Resistance (ohms)", this.resistance, 0, 0);
+        if (n === 0) return new EditInfo("Resistance (ohms)", this.resistance, 0, 0);
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        this.resistance = (ei.value <= 0) ? 1e-9 : ei.value;
+        this.resistance = ei.value <= 0 ? 1e-9 : ei.value;
     }
 
-    getShortcut(): number { return 'r'.charCodeAt(0); }
-    getResistance(): number { return this.resistance; }
-    setResistance(r: number): void { this.resistance = r; }
+    getShortcut(): number {
+        return "r".charCodeAt(0);
+    }
+    getResistance(): number {
+        return this.resistance;
+    }
+    setResistance(r: number): void {
+        this.resistance = r;
+    }
 }

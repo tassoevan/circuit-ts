@@ -20,6 +20,10 @@
 import { CC2Elm } from "./CC2Elm";
 
 export class CC2NegElm extends CC2Elm {
-    constructor(xx: number, yy: number) { super(xx, yy, -1); }
-    getDumpClass(): Function { return CC2Elm; }
+    constructor(xx: number, yy: number) {
+        super(xx, yy, -1);
+    }
+    getDumpClass(): Function {
+        return CC2Elm;
+    }
 }

@@ -12,8 +12,11 @@ const off = { getState: () => false };
 beforeAll(() => {
     (CircuitElm as any).app = (CircuitElm as any).app ?? {
         menus: {
-            showValuesCheckItem: off, powerCheckItem: off, euroResistorCheckItem: off,
-            showOhmCheckItem: off, smallGridCheckItem: off,
+            showValuesCheckItem: off,
+            powerCheckItem: off,
+            euroResistorCheckItem: off,
+            showOhmCheckItem: off,
+            smallGridCheckItem: off,
         },
     };
     // registerElements() needs the whole app, so register just what this test loads
@@ -51,7 +54,8 @@ describe("expression references inside a subcircuit", () => {
                 ["ci", "1 2", "3 0", { ex: "v(vmid)" }],
                 ["r", "3 2", null, { r: "2000" }],
             ]),
-            [1, 2]);
+            [1, 2],
+        );
         return c;
     }
 
@@ -77,7 +81,7 @@ describe("expression references inside a subcircuit", () => {
         assignNodes(c, 10);
 
         const ccs: any = c.compElmList[1];
-        const other: any = c.compElmList[2];   // the resistor on internal node 3
+        const other: any = c.compElmList[2]; // the resistor on internal node 3
         const base = ccs.getRefNodeBase();
 
         // positive reference node is the same CircuitNode object as internal node 3
@@ -106,7 +110,7 @@ describe("expression references inside a subcircuit", () => {
         const c: any = buildModel();
         assignNodes(c, 10);
         const ccs: any = c.compElmList[1];
-        const res3: any = c.compElmList[2];   // the resistor on internal node 3
+        const res3: any = c.compElmList[2]; // the resistor on internal node 3
         ccs.current = 3;
         res3.current = 0.5;
         // both children ended up on the same node, so index 2 really is the one the
@@ -114,8 +118,7 @@ describe("expression references inside a subcircuit", () => {
         expect(ccs.nodes[ccs.getRefNodeBase()]).toBe(res3.nodes[0]);
         // the composite's current for that node is the resistor's alone
         expect(c.getCurrentIntoNode(2)).toBeCloseTo(res3.getCurrentIntoNode(0), 12);
-        expect(c.getCurrentIntoNode(2)).not.toBeCloseTo(
-            res3.getCurrentIntoNode(0) + ccs.current, 12);
+        expect(c.getCurrentIntoNode(2)).not.toBeCloseTo(res3.getCurrentIntoNode(0) + ccs.current, 12);
     });
 
     it("leaves references at ground for a model with no rn attribute", () => {
@@ -125,7 +128,8 @@ describe("expression references inside a subcircuit", () => {
                 ["r", "1 2", null, { r: "1000" }],
                 ["ci", "1 2", null, { ex: "v(vmid)" }],
             ]),
-            [1, 2]);
+            [1, 2],
+        );
         assignNodes(c, 10);
         const ccs: any = c.compElmList[1];
         const base = ccs.getRefNodeBase();

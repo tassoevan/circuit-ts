@@ -33,14 +33,15 @@ export class CircuitXMLDeserializer {
     currentXmlElement: Element;
     currentElm: CircuitElm | null = null;
 
-    constructor(app: CirSim) { this.app = app; }
+    constructor(app: CirSim) {
+        this.app = app;
+    }
 
     readCircuit(text: string, readFlags: number): void {
         const doc = new DOMParser().parseFromString(text, "text/xml");
         const root = doc.documentElement;
 
-        if ((readFlags & CircuitLoader.RC_RETAIN) === 0)
-            this.app.clearCircuit();
+        if ((readFlags & CircuitLoader.RC_RETAIN) === 0) this.app.clearCircuit();
         this.currentXmlElement = root;
 
         if ((readFlags & CircuitLoader.RC_RETAIN) === 0) {
@@ -48,15 +49,15 @@ export class CircuitXMLDeserializer {
             this.app.loader.readCircuitFlags(flags);
             const sim = this.app.sim;
             sim.maxTimeStep = sim.timeStep = this.parseDoubleAttr("ts", sim.maxTimeStep);
-            const sp  = this.parseDoubleAttr("ic", this.app.getIterCount());
+            const sp = this.parseDoubleAttr("ic", this.app.getIterCount());
             const sp2 = Math.trunc(Math.log(10 * sp) * 24 + 61.5);
-            const ui  = this.app.ui;
+            const ui = this.app.ui;
             ui.speedBar.setValue(sp2);
             ui.currentBar.setValue(this.parseIntAttr("cb", ui.currentBar.getValue()));
             CircuitElm.voltageRange = this.parseDoubleAttr("vr", CircuitElm.voltageRange);
             ui.powerBar.setValue(this.parseIntAttr("pb", ui.powerBar.getValue()));
             sim.minTimeStep = this.parseDoubleAttr("mts", sim.minTimeStep);
-            sim.solverType  = this.parseIntAttr("st", sim.solverType);
+            sim.solverType = this.parseIntAttr("st", sim.solverType);
             this.app.setGrid();
         }
 
@@ -76,10 +77,9 @@ export class CircuitXMLDeserializer {
 
         for (let i = 0; i < children.length; i++) {
             const node = children[i];
-            if (node.nodeType !== Node.ELEMENT_NODE)
-                continue;
+            if (node.nodeType !== Node.ELEMENT_NODE) continue;
 
-            const elem    = node as Element;
+            const elem = node as Element;
             const tagName = elem.tagName;
 
             if (tagName === "o") {
@@ -121,7 +121,7 @@ export class CircuitXMLDeserializer {
             }
             if (tagName === "h") {
                 this.currentXmlElement = elem;
-                this.app.hintType  = this.parseIntAttr("t", -1);
+                this.app.hintType = this.parseIntAttr("t", -1);
                 this.app.hintItem1 = this.parseIntAttr("i1", 0);
                 this.app.hintItem2 = this.parseIntAttr("i2", 0);
                 continue;
@@ -132,8 +132,7 @@ export class CircuitXMLDeserializer {
                 continue;
             }
             const x = elem.getAttribute("x");
-            if (x == null)
-                continue;
+            if (x == null) continue;
             const className = CirSim.xmlDumpTypeMap.get(tagName);
             if (className == null) {
                 console.log("unrecognized xml element: " + tagName);
@@ -150,8 +149,7 @@ export class CircuitXMLDeserializer {
 
     parseDoubleAttr(attr: string, def: number): number {
         const v = this.currentXmlElement.getAttribute(attr);
-        if (v == null)
-            return def;
+        if (v == null) return def;
         const n = parseFloat(v);
         if (isNaN(n)) {
             console.log("invalid value for attribute " + attr + ": " + JSON.stringify(v));
@@ -162,8 +160,7 @@ export class CircuitXMLDeserializer {
 
     parseIntAttr(attr: string, def: number): number {
         const v = this.currentXmlElement.getAttribute(attr);
-        if (v == null)
-            return def;
+        if (v == null) return def;
         const n = parseInt(v);
         if (isNaN(n)) {
             console.log("invalid value for attribute " + attr + ": " + JSON.stringify(v));
@@ -174,20 +171,19 @@ export class CircuitXMLDeserializer {
 
     parseBooleanAttr(attr: string, def: boolean): boolean {
         const v = this.currentXmlElement.getAttribute(attr);
-        if (v == null)
-            return def;
+        if (v == null) return def;
         return v === "true";
     }
 
     parseStringAttr(attr: string, def: string | null): string | null {
         let s = this.currentXmlElement.getAttribute(attr);
-        if (s == null)
-            return def;
-        s = s.replace(/&quot;/g, '"')
-             .replace(/&apos;/g, "'")
-             .replace(/&lt;/g, "<")
-             .replace(/&gt;/g, ">")
-             .replace(/&amp;/g, "&");
+        if (s == null) return def;
+        s = s
+            .replace(/&quot;/g, '"')
+            .replace(/&apos;/g, "'")
+            .replace(/&lt;/g, "<")
+            .replace(/&gt;/g, ">")
+            .replace(/&amp;/g, "&");
         return s;
     }
 
@@ -205,11 +201,12 @@ export class CircuitXMLDeserializer {
         const children = this.currentXmlElement.childNodes;
         for (let i = 0; i < children.length; i++) {
             const node = children[i];
-            if (node.nodeType === Node.ELEMENT_NODE)
-                elements.push(node as Element);
+            if (node.nodeType === Node.ELEMENT_NODE) elements.push(node as Element);
         }
         return elements;
     }
 
-    parseChildElement(elem: Element): void { this.currentXmlElement = elem; }
+    parseChildElement(elem: Element): void {
+        this.currentXmlElement = elem;
+    }
 }

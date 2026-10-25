@@ -42,8 +42,12 @@ export abstract class ControlledSourceElm extends CircuitElm {
 
     engine: ExprEngine = new ExprEngine(this);
 
-    get expr(): Expr | null { return this.engine.expr; }
-    get exprString(): string { return this.engine.exprString; }
+    get expr(): Expr | null {
+        return this.engine.expr;
+    }
+    get exprString(): string {
+        return this.engine.exprString;
+    }
 
     center!: Point;
     private side1!: Point;
@@ -66,12 +70,20 @@ export abstract class ControlledSourceElm extends CircuitElm {
     // the label shown in the edit dialog and in getInfo()
     protected abstract getExprLabel(): string;
 
-    getPostCount(): number { return 2; }
-    nonLinear(): boolean { return true; }
+    getPostCount(): number {
+        return 2;
+    }
+    nonLinear(): boolean {
+        return true;
+    }
 
-    getRefNodeCount(): number { return this.engine ? this.engine.getRefNodeCount() : 0; }
+    getRefNodeCount(): number {
+        return this.engine ? this.engine.getRefNodeCount() : 0;
+    }
 
-    resolveExprRefs(elmList: CircuitElm[]): void { this.engine.resolveRefs(elmList); }
+    resolveExprRefs(elmList: CircuitElm[]): void {
+        this.engine.resolveRefs(elmList);
+    }
 
     setParentList(elmList: CircuitElm[]): void {
         super.setParentList(elmList);
@@ -93,8 +105,7 @@ export abstract class ControlledSourceElm extends CircuitElm {
         this.allocNodes();
         if (err != null && ei != null) {
             ei.setErrorFieldName(this.getExprLabel());
-            ei.setError(Locale.LS("Parse error in expression") + ": " +
-                this.engine.exprString + ": " + err);
+            ei.setError(Locale.LS("Parse error in expression") + ": " + this.engine.exprString + ": " + err);
         }
     }
 
@@ -115,21 +126,21 @@ export abstract class ControlledSourceElm extends CircuitElm {
         const d = ControlledSourceElm.diamondSize;
         this.calcLeads(d * 2);
         this.center = this.interpPoint(this.point1, this.point2, 0.5) as Point;
-        this.side1  = this.interpPoint(this.point1, this.point2, 0.5,  d) as Point;
-        this.side2  = this.interpPoint(this.point1, this.point2, 0.5, -d) as Point;
+        this.side1 = this.interpPoint(this.point1, this.point2, 0.5, d) as Point;
+        this.side2 = this.interpPoint(this.point1, this.point2, 0.5, -d) as Point;
     }
 
     protected drawDiamond(g: Graphics): void {
         CircuitElm.drawThickLine(g, this.lead1!, this.side1);
-        CircuitElm.drawThickLine(g, this.side1,  this.lead2!);
+        CircuitElm.drawThickLine(g, this.side1, this.lead2!);
         CircuitElm.drawThickLine(g, this.lead2!, this.side2);
-        CircuitElm.drawThickLine(g, this.side2,  this.lead1!);
+        CircuitElm.drawThickLine(g, this.side2, this.lead1!);
     }
 
     // same widening schedule VCCSElm uses, so a hard-to-converge expression still settles
     protected getConvergeLimit(): number {
         const sim = SimulationManager.theSim;
-        if (sim.subIterations < 10)  return 0.001;
+        if (sim.subIterations < 10) return 0.001;
         if (sim.subIterations < 200) return 0.01;
         return 0.1;
     }
@@ -172,8 +183,12 @@ export abstract class ControlledSourceElm extends CircuitElm {
         this.engine.addUnresolvedInfo(arr, 4);
     }
 
-    getVoltageDiff(): number { return this.nodes[1].v - this.nodes[0].v; }
-    getPower(): number { return -this.getVoltageDiff() * this.current; }
+    getVoltageDiff(): number {
+        return this.nodes[1].v - this.nodes[0].v;
+    }
+    getPower(): number {
+        return -this.getVoltageDiff() * this.current;
+    }
 
     // ExprStampTarget: subclasses stamp into whatever their output is
     abstract stampInputDerivative(pos: CircuitNode, neg: CircuitNode, dx: number): void;

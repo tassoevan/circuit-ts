@@ -63,17 +63,19 @@ export class InductorElm extends CircuitElm {
             this.allocNodes();
         }
     }
-    getDumpType(): number { return 'l'.charCodeAt(0); }
-    isInductorElm(): boolean { return true; }
+    getDumpType(): number {
+        return "l".charCodeAt(0);
+    }
+    isInductorElm(): boolean {
+        return true;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "l", this.inductance);
         CircuitXMLSerializer.dumpAttr(elem, "ic", this.initialCurrent);
-        if (this.saturationCurrent !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "isat", this.saturationCurrent);
-        if (this.seriesResistance !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "sr", this.seriesResistance);
+        if (this.saturationCurrent !== 0) CircuitXMLSerializer.dumpAttr(elem, "isat", this.saturationCurrent);
+        if (this.seriesResistance !== 0) CircuitXMLSerializer.dumpAttr(elem, "sr", this.seriesResistance);
     }
 
     dumpXmlState(doc: Document, elem: Element): void {
@@ -126,27 +128,33 @@ export class InductorElm extends CircuitElm {
     // from seriesResistance rather than cached at stamp() time, because
     // calculateCurrent() can run (from setNodeVoltage()) after the resistance
     // is edited but before the circuit is re-stamped.
-    getIndNode2(): number { return (this.seriesResistance > 0) ? 2 : 1; }
+    getIndNode2(): number {
+        return this.seriesResistance > 0 ? 2 : 1;
+    }
     stamp(): void {
         this.ind.stamp(this.nodes[0], this.nodes[this.getIndNode2()]);
         if (this.seriesResistance > 0)
             CircuitElm.sim.stampResistor(this.nodes[1], this.nodes[2], this.seriesResistance);
     }
     startIteration(): void {
-        this.ind.startIteration(this.nodes[0].v-this.nodes[this.getIndNode2()].v);
+        this.ind.startIteration(this.nodes[0].v - this.nodes[this.getIndNode2()].v);
     }
-    nonLinear(): boolean { return this.ind.nonLinear(); }
+    nonLinear(): boolean {
+        return this.ind.nonLinear();
+    }
     calculateCurrent(): void {
-        const voltdiff = this.nodes[0].v-this.nodes[this.getIndNode2()].v;
+        const voltdiff = this.nodes[0].v - this.nodes[this.getIndNode2()].v;
         this.current = this.ind.calculateCurrent(voltdiff);
     }
     doStep(): void {
-        const voltdiff = this.nodes[0].v-this.nodes[this.getIndNode2()].v;
+        const voltdiff = this.nodes[0].v - this.nodes[this.getIndNode2()].v;
         this.ind.doStep(voltdiff);
     }
-    getInternalNodeCount(): number { return (this.seriesResistance > 0) ? 1 : 0; }
+    getInternalNodeCount(): number {
+        return this.seriesResistance > 0 ? 1 : 0;
+    }
     getInfo(arr: string[]): void {
-        arr[0] = (this.saturationCurrent > 0) ? "inductor (sat)" : "inductor";
+        arr[0] = this.saturationCurrent > 0 ? "inductor (sat)" : "inductor";
         this.getBasicInfo(arr);
         arr[3] = "L = " + CircuitElm.getUnitText(this.inductance, "H");
         arr[4] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
@@ -162,52 +170,44 @@ export class InductorElm extends CircuitElm {
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Inductance (H)", this.inductance, 1e-2, 10).setPositive();
+        if (n === 0) return new EditInfo("Inductance (H)", this.inductance, 1e-2, 10).setPositive();
         if (n === 1) {
             const ei = new EditInfo("", 0, -1, -1);
-            ei.checkbox = new Checkbox("Trapezoidal Approximation",
-                                       this.ind.isTrapezoidal());
+            ei.checkbox = new Checkbox("Trapezoidal Approximation", this.ind.isTrapezoidal());
             return ei;
         }
-        if (n === 2)
-            return new EditInfo("Initial Current (on Reset) (A)", this.initialCurrent);
-        if (n === 3)
-            return new EditInfo("Saturation Current (A) (0=none)", this.saturationCurrent);
-        if (n === 4)
-            return new EditInfo("Series Resistance", this.seriesResistance);
+        if (n === 2) return new EditInfo("Initial Current (on Reset) (A)", this.initialCurrent);
+        if (n === 3) return new EditInfo("Saturation Current (A) (0=none)", this.saturationCurrent);
+        if (n === 4) return new EditInfo("Series Resistance", this.seriesResistance);
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.inductance = ei.value;
+        if (n === 0) this.inductance = ei.value;
         if (n === 1) {
-            if (ei.checkbox!.getState())
-                this.flags &= ~Inductor.FLAG_BACK_EULER;
-            else
-                this.flags |= Inductor.FLAG_BACK_EULER;
+            if (ei.checkbox!.getState()) this.flags &= ~Inductor.FLAG_BACK_EULER;
+            else this.flags |= Inductor.FLAG_BACK_EULER;
         }
-        if (n === 2)
-            this.initialCurrent = ei.value;
+        if (n === 2) this.initialCurrent = ei.value;
         if (n === 3) {
-            if (ei.value >= 0)
-                this.saturationCurrent = ei.value;
-            else
-                ei.setError("must be >= 0");
+            if (ei.value >= 0) this.saturationCurrent = ei.value;
+            else ei.setError("must be >= 0");
         }
         if (n === 4) {
             if (ei.value >= 0) {
                 this.seriesResistance = ei.value;
                 this.allocNodes();
-            } else
-                ei.setError("must be >= 0");
+            } else ei.setError("must be >= 0");
         }
         this.ind.setup(this.inductance, this.current, this.flags, this.saturationCurrent);
     }
 
-    getShortcut(): number { return 'L'.charCodeAt(0); }
-    getInductance(): number { return this.inductance; }
+    getShortcut(): number {
+        return "L".charCodeAt(0);
+    }
+    getInductance(): number {
+        return this.inductance;
+    }
     setInductance(l: number): void {
         this.inductance = l;
         this.ind.setup(this.inductance, this.current, this.flags, this.saturationCurrent);
@@ -216,17 +216,22 @@ export class InductorElm extends CircuitElm {
         this.saturationCurrent = isat;
         this.ind.setup(this.inductance, this.current, this.flags, this.saturationCurrent);
     }
-    getSaturationCurrent(): number { return this.saturationCurrent; }
-    getSeriesResistance(): number { return this.seriesResistance; }
+    getSaturationCurrent(): number {
+        return this.saturationCurrent;
+    }
+    getSeriesResistance(): number {
+        return this.seriesResistance;
+    }
     setSeriesResistance(r: number): void {
         this.seriesResistance = r;
         this.allocNodes();
     }
-    isIdealInductor(): boolean { return this.seriesResistance === 0; }
+    isIdealInductor(): boolean {
+        return this.seriesResistance === 0;
+    }
     validate(): boolean {
         const fpi = new FindPathInfo(FindPathInfo.INDUCT, this, this.getNode(1), CircuitElm.sim);
-        if (!fpi.findPath(this.getNode(0)))
-            this.reset();
+        if (!fpi.findPath(this.getNode(0))) this.reset();
         return true;
     }
 }

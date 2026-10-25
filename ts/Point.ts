@@ -52,8 +52,7 @@ export class Point {
     }
 
     equals(other: unknown): boolean {
-        if (other instanceof Point)
-            return this.x === other.x && this.y === other.y && this.z === other.z;
+        if (other instanceof Point) return this.x === other.x && this.y === other.y && this.z === other.z;
         return false;
     }
 
@@ -62,8 +61,7 @@ export class Point {
     }
 
     toString(): string {
-        if (this.z !== 0)
-            return `Point(${this.x},${this.y},${this.z})`;
+        if (this.z !== 0) return `Point(${this.x},${this.y},${this.z})`;
         return `Point(${this.x},${this.y})`;
     }
 }

@@ -21,16 +21,20 @@ describe("controlled source construction", () => {
         const off = { getState: () => false };
         (CircuitElm as any).app = (CircuitElm as any).app ?? {
             menus: {
-                showValuesCheckItem: off, powerCheckItem: off,
-                euroResistorCheckItem: off, showOhmCheckItem: off,
+                showValuesCheckItem: off,
+                powerCheckItem: off,
+                euroResistorCheckItem: off,
+                showOhmCheckItem: off,
                 smallGridCheckItem: off,
             },
         };
     });
 
     const classes = [
-        ["VCCSElm", VCCSElm], ["VCVSElm", VCVSElm],
-        ["CCCSElm", CCCSElm], ["CCVSElm", CCVSElm],
+        ["VCCSElm", VCCSElm],
+        ["VCVSElm", VCVSElm],
+        ["CCCSElm", CCCSElm],
+        ["CCVSElm", CCVSElm],
         ["ControlledVoltageElm", ControlledVoltageElm],
         ["ControlledCurrentElm", ControlledCurrentElm],
     ] as const;
@@ -41,8 +45,7 @@ describe("controlled source construction", () => {
             expect(e.engine).toBeTruthy();
             expect(e.engine.expr).toBeTruthy();
             // nodes[] must be big enough for the posts plus two nodes per v()/i() reference
-            expect(e.nodes.length).toBe(
-                e.getPostCount() + e.getInternalNodeCount() + e.getRefNodeCount());
+            expect(e.nodes.length).toBe(e.getPostCount() + e.getInternalNodeCount() + e.getRefNodeCount());
             expect(e.engine.lastInputs.length).toBe(e.engine.getInputCount());
             expect(e.engine.state.nodeValues.length).toBe(e.engine.getRefCount());
         });
@@ -85,8 +88,7 @@ describe("current into a reference node", () => {
             e.current = 1.25;
             expect(e.getRefNodeCount()).toBeGreaterThan(0);
             for (let j = 0; j !== e.getRefNodeCount(); j++)
-                expect(e.getCurrentIntoNode(e.getRefNodeBase() + j),
-                    name + " ref node " + j).toBe(0);
+                expect(e.getCurrentIntoNode(e.getRefNodeBase() + j), name + " ref node " + j).toBe(0);
         });
     }
 
@@ -104,13 +106,20 @@ describe("current into a reference node", () => {
 describe("ControlledVoltageElm diamond layout", () => {
     // is p inside the rhombus with centre c, tip t (half-diagonal along the axis) and
     // half-width b?  |along|/A + |across|/B <= 1
-    function insideDiamond(p: {x: number, y: number}, c: {x: number, y: number},
-                           t: {x: number, y: number}, b: number): boolean {
-        const ax = t.x - c.x, ay = t.y - c.y;
+    function insideDiamond(
+        p: { x: number; y: number },
+        c: { x: number; y: number },
+        t: { x: number; y: number },
+        b: number,
+    ): boolean {
+        const ax = t.x - c.x,
+            ay = t.y - c.y;
         const A = Math.hypot(ax, ay);
-        const ux = ax / A, uy = ay / A;
-        const dx = p.x - c.x, dy = p.y - c.y;
-        const along  = Math.abs(dx * ux + dy * uy);
+        const ux = ax / A,
+            uy = ay / A;
+        const dx = p.x - c.x,
+            dy = p.y - c.y;
+        const along = Math.abs(dx * ux + dy * uy);
         const across = Math.abs(-dx * uy + dy * ux);
         return along / A + across / b <= 1;
     }
@@ -118,7 +127,10 @@ describe("ControlledVoltageElm diamond layout", () => {
     for (const len of [48, 64, 128, 256]) {
         it("keeps + and - inside the diamond at length " + len, () => {
             const e: any = new ControlledVoltageElm(0, 0);
-            e.x = 0; e.y = 0; e.x2 = len; e.y2 = 0;
+            e.x = 0;
+            e.y = 0;
+            e.x2 = len;
+            e.y2 = 0;
             e.setPoints();
 
             const c = e.center;
@@ -129,9 +141,16 @@ describe("ControlledVoltageElm diamond layout", () => {
             // allow for the glyph's own extent at the 12px font used in draw()
             const pad = 4;
             for (const p of [pm, pp]) {
-                for (const [ox, oy] of [[-pad, -pad], [pad, -pad], [-pad, pad], [pad, pad]]) {
-                    expect(insideDiamond({x: p.x + ox, y: p.y + oy}, c, e.lead2, half),
-                        "corner of glyph at " + p.x + "," + p.y + " escapes the diamond").toBe(true);
+                for (const [ox, oy] of [
+                    [-pad, -pad],
+                    [pad, -pad],
+                    [-pad, pad],
+                    [pad, pad],
+                ]) {
+                    expect(
+                        insideDiamond({ x: p.x + ox, y: p.y + oy }, c, e.lead2, half),
+                        "corner of glyph at " + p.x + "," + p.y + " escapes the diamond",
+                    ).toBe(true);
                 }
             }
         });

@@ -29,7 +29,6 @@ import { Locale } from "./Locale";
 import { parseIntStrict, parseFloatStrict } from "./NumberParse";
 
 export class TransistorModel implements Editable, Comparable<TransistorModel> {
-
     static modelMap: Map<string, TransistorModel>;
 
     flags: number = 0;
@@ -71,12 +70,12 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
     //                                   CJC=3.638pF VJC=0.75 MJC=0.3085
     //   2N3906  (small-signal PNP):     CJE=4.49pF  VJE=0.632 MJE=0.267
     //                                   CJC=4.43pF  VJC=0.632 MJC=0.33
-    junctionCapBE: number = 0;                   // CJE: zero-bias BE depletion capacitance (F), 0=disabled
-    junctionCapBC: number = 0;                   // CJC: zero-bias BC depletion capacitance (F), 0=disabled
-    junctionPotBE: number = 0.75;                // VJE: BE built-in potential (V)
-    junctionPotBC: number = 0.75;                // VJC: BC built-in potential (V)
-    junctionExpBE: number = 0.33;                // MJE: BE junction grading coefficient
-    junctionExpBC: number = 0.33;                // MJC: BC junction grading coefficient
+    junctionCapBE: number = 0; // CJE: zero-bias BE depletion capacitance (F), 0=disabled
+    junctionCapBC: number = 0; // CJC: zero-bias BC depletion capacitance (F), 0=disabled
+    junctionPotBE: number = 0.75; // VJE: BE built-in potential (V)
+    junctionPotBC: number = 0.75; // VJC: BC built-in potential (V)
+    junctionExpBE: number = 0.33; // MJE: BE junction grading coefficient
+    junctionExpBC: number = 0.33; // MJC: BC junction grading coefficient
 
     // Transit time parameters (SPICE Gummel-Poon diffusion charge storage)
     // These model the minority carrier charge stored in the base region during
@@ -88,8 +87,8 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
     //   2N2222A:  TF=0.411ns  TR=46.91ns
     //   2N3904:   TF=0.301ns  TR=239ns
     //   2N3906:   TF=0.579ns  TR=94.36ns
-    transitTimeF: number = 0;                    // TF: forward transit time (s), 0=disabled
-    transitTimeR: number = 0;                    // TR: reverse transit time (s), 0=disabled
+    transitTimeF: number = 0; // TF: forward transit time (s), 0=disabled
+    transitTimeR: number = 0; // TR: reverse transit time (s), 0=disabled
 
     dumped: boolean = false;
     readOnly: boolean = false;
@@ -151,8 +150,7 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
     static getModelWithName(name: string): TransistorModel {
         TransistorModel.createModelMap();
         let lm = TransistorModel.modelMap.get(name);
-        if (lm != null)
-            return lm;
+        if (lm != null) return lm;
         lm = new TransistorModel();
         lm.name = name;
         TransistorModel.modelMap.set(name, lm);
@@ -162,8 +160,7 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
     static getModelWithNameOrCopy(name: string, oldmodel: TransistorModel | null): TransistorModel {
         TransistorModel.createModelMap();
         const lm = TransistorModel.modelMap.get(name);
-        if (lm != null)
-            return lm;
+        if (lm != null) return lm;
         if (oldmodel == null) {
             CirSim.console("model not found: " + name);
             return TransistorModel.getDefaultModel();
@@ -175,23 +172,30 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
     }
 
     static createModelMap(): void {
-        if (TransistorModel.modelMap != null)
-            return;
+        if (TransistorModel.modelMap != null) return;
         TransistorModel.modelMap = new Map<string, TransistorModel>();
-        TransistorModel.addDefaultModel("default",       new TransistorModel("default",        1e-13));
-        TransistorModel.addDefaultModel("spice-default", new TransistorModel("spice-default",  1e-16));
+        TransistorModel.addDefaultModel("default", new TransistorModel("default", 1e-13));
+        TransistorModel.addDefaultModel("spice-default", new TransistorModel("spice-default", 1e-16));
 
         // for LM324v2 OpAmpRealElm
-        TransistorModel.loadInternalModel("xlm324v2-qpi 0 1.01e-16 333.3333333333333 0 1.5 0 0 2 1 1 0.0034482758620689655 0 1");
-        TransistorModel.loadInternalModel("xlm324v2-qpi 0 1.01e-16 333.3333333333333 0 1.5 0 0 2 1 1 0.0034482758620689655 0 1");
-        TransistorModel.loadInternalModel("xlm324v2-qpa 0 1.01e-16 333.3333333333333 0 1.5 0 0 2 1 1 0.004081632653061225 0 1");
+        TransistorModel.loadInternalModel(
+            "xlm324v2-qpi 0 1.01e-16 333.3333333333333 0 1.5 0 0 2 1 1 0.0034482758620689655 0 1",
+        );
+        TransistorModel.loadInternalModel(
+            "xlm324v2-qpi 0 1.01e-16 333.3333333333333 0 1.5 0 0 2 1 1 0.0034482758620689655 0 1",
+        );
+        TransistorModel.loadInternalModel(
+            "xlm324v2-qpa 0 1.01e-16 333.3333333333333 0 1.5 0 0 2 1 1 0.004081632653061225 0 1",
+        );
         TransistorModel.loadInternalModel("xlm324v2-qnq 0 1e-16 200 0 1.5 0 0 2 1 1 0 0 1");
         TransistorModel.loadInternalModel("xlm324v2-qpq 0 1e-16 333.3333333333333 0 1.5 0 0 2 1 1 0 0 1");
 
         // for TL431
         TransistorModel.loadInternalModel("~tl431ed-qn_ed 0 1e-16 0 0 1.5 0 0 2 1 1 0.0125 0.02 1");
         TransistorModel.loadInternalModel("~tl431ed-qn_ed-A1.2 0 1.2e-16 0 0 1.5 0 0 2 1 1 0.0125 0.02 1");
-        TransistorModel.loadInternalModel("~tl431ed-qn_ed-A2.2 0 2.2000000000000002e-16 0 0 1.5 0 0 2 1 1 0.0125 0.02 1");
+        TransistorModel.loadInternalModel(
+            "~tl431ed-qn_ed-A2.2 0 2.2000000000000002e-16 0 0 1.5 0 0 2 1 1 0.0125 0.02 1",
+        );
         TransistorModel.loadInternalModel("~tl431ed-qn_ed-A0.5 0 5e-17 0 0 1.5 0 0 2 1 1 0.0125 0.02 1");
         TransistorModel.loadInternalModel("~tl431ed-qp_ed 0 1e-16 0 0 1.5 0 0 2 1 1 0.014285714285714285 0.025 1");
         TransistorModel.loadInternalModel("~tl431ed-qn_ed-A5 0 5e-16 0 0 1.5 0 0 2 1 1 0.0125 0.02 1");
@@ -217,19 +221,15 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
     }
 
     static clearDumpedFlags(): void {
-        if (TransistorModel.modelMap == null)
-            return;
-        for (const [, tm] of TransistorModel.modelMap)
-            tm.dumped = false;
+        if (TransistorModel.modelMap == null) return;
+        for (const [, tm] of TransistorModel.modelMap) tm.dumped = false;
     }
 
     static getModelList(): TransistorModel[] {
         const vector: TransistorModel[] = [];
         for (const [, tm] of TransistorModel.modelMap) {
-            if (tm.internal)
-                continue;
-            if (!vector.includes(tm))
-                vector.push(tm);
+            if (tm.internal) continue;
+            if (!vector.includes(tm)) vector.push(tm);
         }
         vector.sort((a, b) => a.compareTo(b));
         return vector;
@@ -240,8 +240,7 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
     }
 
     getDescription(): string {
-        if (this.description == null || this.description === this.name)
-            return this.name;
+        if (this.description == null || this.description === this.name) return this.name;
         return this.name + " (" + Locale.LS(this.description) + ")";
     }
 
@@ -290,7 +289,9 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
         this.updateModel();
     }
 
-    getEditTitle(): string { return "Edit Transistor Model"; }
+    getEditTitle(): string {
+        return "Edit Transistor Model";
+    }
 
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
@@ -300,10 +301,10 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
         }
         if (n === 1) return new EditInfo("Transport Saturation Current (IS)", this.satCur);
         if (n === 2) return new EditInfo("Reverse Beta (BR)", this.betaR);
-        if (n === 3) return new EditInfo("Forward Early Voltage (VAF)", 1/this.invEarlyVoltF);
-        if (n === 4) return new EditInfo("Reverse Early Voltage (VAR)", 1/this.invEarlyVoltR);
-        if (n === 5) return new EditInfo("Corner For Forward Beta High Current Roll-Off (IKF)", 1/this.invRollOffF);
-        if (n === 6) return new EditInfo("Corner For Reverse Beta High Current Roll-Off (IKR)", 1/this.invRollOffR);
+        if (n === 3) return new EditInfo("Forward Early Voltage (VAF)", 1 / this.invEarlyVoltF);
+        if (n === 4) return new EditInfo("Reverse Early Voltage (VAR)", 1 / this.invEarlyVoltR);
+        if (n === 5) return new EditInfo("Corner For Forward Beta High Current Roll-Off (IKF)", 1 / this.invRollOffF);
+        if (n === 6) return new EditInfo("Corner For Reverse Beta High Current Roll-Off (IKR)", 1 / this.invRollOffR);
         if (n === 7) return new EditInfo("Forward Current Emission Coefficient (NF)", this.emissionCoeffF);
         if (n === 8) return new EditInfo("Reverse Current Emission Coefficient (NR)", this.emissionCoeffR);
         if (n === 9) return new EditInfo("B-E Leakage Saturation Current (ISE)", this.BEleakCur);
@@ -324,15 +325,14 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.name = ei.textf.value;
-            if (this.name.length > 0)
-                TransistorModel.modelMap.set(this.name, this);
+            if (this.name.length > 0) TransistorModel.modelMap.set(this.name, this);
         }
         if (n === 1) this.satCur = ei.value;
         if (n === 2) this.betaR = ei.value;
-        if (n === 3) this.invEarlyVoltF = 1/ei.value;
-        if (n === 4) this.invEarlyVoltR = 1/ei.value;
-        if (n === 5) this.invRollOffF = 1/ei.value;
-        if (n === 6) this.invRollOffR = 1/ei.value;
+        if (n === 3) this.invEarlyVoltF = 1 / ei.value;
+        if (n === 4) this.invEarlyVoltR = 1 / ei.value;
+        if (n === 5) this.invRollOffF = 1 / ei.value;
+        if (n === 6) this.invRollOffR = 1 / ei.value;
         if (n === 7) this.emissionCoeffF = ei.value;
         if (n === 8) this.emissionCoeffR = ei.value;
         if (n === 9) this.BEleakCur = ei.value;
@@ -357,14 +357,13 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
         CircuitElm.app.updateModels();
     }
 
-    updateModel(): void {
-    }
+    updateModel(): void {}
 
     pickName(): void {
         this.name = "transistormodel";
         if (TransistorModel.modelMap.get(this.name) != null) {
             let num = 2;
-            for (;; num++) {
+            for (; ; num++) {
                 const n = this.name + "-" + num;
                 if (TransistorModel.modelMap.get(n) == null) {
                     this.name = n;
@@ -402,10 +401,8 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
             CircuitXMLSerializer.dumpAttr(elem, "vjc", this.junctionPotBC);
             CircuitXMLSerializer.dumpAttr(elem, "mjc", this.junctionExpBC);
         }
-        if (this.transitTimeF !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "tf", this.transitTimeF);
-        if (this.transitTimeR !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "tr", this.transitTimeR);
+        if (this.transitTimeF !== 0) CircuitXMLSerializer.dumpAttr(elem, "tf", this.transitTimeF);
+        if (this.transitTimeR !== 0) CircuitXMLSerializer.dumpAttr(elem, "tr", this.transitTimeR);
         doc.documentElement.appendChild(elem);
     }
 

@@ -42,29 +42,41 @@ export class ControlledCurrentElm extends ControlledSourceElm {
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
-        if (xb === undefined)
-            super(xa, ya);
-        else
-            super(xa, ya, xb, yb!, f!, st!);
+        if (xb === undefined) super(xa, ya);
+        else super(xa, ya, xb, yb!, f!, st!);
     }
 
-    protected getDefaultExpr(): string { return ".001*v(in)"; }
-    protected getOutputValue(): number { return this.current; }
-    protected getExprLabel(): string { return "Output Current"; }
+    protected getDefaultExpr(): string {
+        return ".001*v(in)";
+    }
+    protected getOutputValue(): number {
+        return this.current;
+    }
+    protected getExprLabel(): string {
+        return "Output Current";
+    }
 
     // integer dump types are for the obsolete text format; this element is XML only
-    getDumpType(): number { return 0; }
-    getXmlDumpType(): string { return "ci"; }
-    getElmType(): string { return "Controlled Current Source"; }
+    getDumpType(): number {
+        return 0;
+    }
+    getXmlDumpType(): string {
+        return "ci";
+    }
+    getElmType(): string {
+        return "Controlled Current Source";
+    }
 
-    getVoltageSourceCount(): number { return 0; }
+    getVoltageSourceCount(): number {
+        return 0;
+    }
 
     setPoints(): void {
         super.setPoints();
         // arrow along the diamond's long axis, pointing from post 1 to post 2
         this.ashaft1 = this.interpPoint(this.lead1!, this.lead2!, 0.3) as Point;
-        this.ashaft2 = this.interpPoint(this.lead1!, this.lead2!, 0.7-.1) as Point;
-        const tip = this.interpPoint(this.lead1!, this.lead2!, 0.85-.1) as Point;
+        this.ashaft2 = this.interpPoint(this.lead1!, this.lead2!, 0.7 - 0.1) as Point;
+        const tip = this.interpPoint(this.lead1!, this.lead2!, 0.85 - 0.1) as Point;
         this.arrow = this.calcArrow(this.center, tip, 7, 6);
     }
 
@@ -86,8 +98,7 @@ export class ControlledCurrentElm extends ControlledSourceElm {
             return;
         }
 
-        if (!this.engine.checkConvergence(this.getConvergeLimit()))
-            sim.converged = false;
+        if (!this.engine.checkConvergence(this.getConvergeLimit())) sim.converged = false;
 
         const rs = this.engine.evalAndStamp(false);
         sim.stampCurrentSource(this.nodes[0], this.nodes[1], rs);

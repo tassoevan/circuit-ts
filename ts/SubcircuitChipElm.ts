@@ -30,9 +30,13 @@ export class SubcircuitChipElm extends ChipElm {
         this.setSize(2);
     }
 
-    needsBits(): boolean { return false; }
+    needsBits(): boolean {
+        return false;
+    }
     setupPins(): void {}
-    getVoltageSourceCount(): number { return 0; }
+    getVoltageSourceCount(): number {
+        return 0;
+    }
 
     setPins(p: Pin[]): void {
         this.pins = p;
@@ -60,5 +64,7 @@ export class SubcircuitChipElm extends ChipElm {
         g.restore();
     }
 
-    getPostCount(): number { return this.pins == null ? 1 : this.pins.length; }
+    getPostCount(): number {
+        return this.pins == null ? 1 : this.pins.length;
+    }
 }

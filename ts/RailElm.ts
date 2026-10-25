@@ -37,19 +37,25 @@ export class RailElm extends VoltageElm {
         }
     }
 
-    isRailElm(): boolean { return true; }
+    isRailElm(): boolean {
+        return true;
+    }
     // unlike other VoltageElm subclasses, RailElm can be placed either horizontally or
     // vertically via toolbar drag-and-drop, so this undoes VoltageElm's forced-vertical override
     getDragVertical(requestedVertical: boolean): boolean {
         return requestedVertical;
     }
     readonly FLAG_CLOCK = 1;
-    getDumpType(): number { return 'R'.charCodeAt(0); }
-    getPostCount(): number { return 1; }
+    getDumpType(): number {
+        return "R".charCodeAt(0);
+    }
+    getPostCount(): number {
+        return 1;
+    }
 
     setPoints(): void {
         super.setPoints();
-        this.lead1 = this.interpPoint(this.point1, this.point2, 1-this.circleSize/this.dn);
+        this.lead1 = this.interpPoint(this.point1, this.point2, 1 - this.circleSize / this.dn);
     }
 
     getRailText(): string | null {
@@ -58,34 +64,28 @@ export class RailElm extends VoltageElm {
 
     draw(g: Graphics): void {
         const rt = this.getRailText();
-        let w = rt == null ? this.circleSize : g.context.measureText(rt).width/2;
-        if (w > this.dn*.8)
-            w = this.dn*.8;
-        this.lead1 = this.interpPoint(this.point1, this.point2, 1-w/this.dn);
+        let w = rt == null ? this.circleSize : g.context.measureText(rt).width / 2;
+        if (w > this.dn * 0.8) w = this.dn * 0.8;
+        this.lead1 = this.interpPoint(this.point1, this.point2, 1 - w / this.dn);
         this.setBbox(this.point1, this.point2, this.circleSize);
         this.setVoltageColor(g, this.nodes[0].v);
         CircuitElm.drawThickLine(g, this.point1, this.lead1!);
         this.drawRail(g);
         this.drawPosts(g);
         this.curcount = this.updateDotCountImpl(-this.current, this.curcount);
-        if (!this.isCreating())
-            this.drawDots(g, this.point1, this.lead1!, this.curcount);
+        if (!this.isCreating()) this.drawDots(g, this.point1, this.lead1!, this.curcount);
     }
 
     drawRail(g: Graphics): void {
-        if (this.waveform == VoltageElm.WF_SQUARE && (this.flags & this.FLAG_CLOCK) != 0)
-            this.drawRailText(g, "CLK");
+        if (this.waveform == VoltageElm.WF_SQUARE && (this.flags & this.FLAG_CLOCK) != 0) this.drawRailText(g, "CLK");
         else if (this.waveform == VoltageElm.WF_DC || this.waveform == VoltageElm.WF_VAR) {
             g.setColor(this.needsHighlight() ? RailElm.selectColor : RailElm.whiteColor);
             this.setPowerColor(g, false);
             const v = this.getVoltage();
             let s: string;
-            if (Math.abs(v) < 1)
-                s = CircuitElm.showFormat.format(v)+" V";
-            else
-                s = CircuitElm.getShortUnitText(v, "V");
-            if (this.getVoltage() > 0)
-                s = "+" + s;
+            if (Math.abs(v) < 1) s = CircuitElm.showFormat.format(v) + " V";
+            else s = CircuitElm.getShortUnitText(v, "V");
+            if (this.getVoltage() > 0) s = "+" + s;
             this.drawLabeledNode(g, s, this.point1, this.lead1!);
         } else {
             this.drawWaveform(g, this.point2);
@@ -98,20 +98,19 @@ export class RailElm extends VoltageElm {
         this.drawLabeledNode(g, s, this.point1, this.lead1!);
     }
 
-    getVoltageDiff(): number { return this.nodes[0].v; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
     setVoltageSource(n: number, v: any): void {
         super.setVoltageSource(n, v);
-        if (this.internalResistance > 0)
-            v.setNodes(CircuitNode.ground, this.nodes[1]);
-        else
-            v.setNodes(CircuitNode.ground, this.nodes[0]);
+        if (this.internalResistance > 0) v.setNodes(CircuitNode.ground, this.nodes[1]);
+        else v.setNodes(CircuitNode.ground, this.nodes[0]);
     }
     stamp(): void {
         const vsNode = this.internalResistance > 0 ? this.nodes[1] : this.nodes[0];
         if (this.waveform == VoltageElm.WF_DC)
             CircuitElm.sim.stampVoltageSource(CircuitNode.ground, vsNode, this.voltSource, this.getVoltage());
-        else
-            CircuitElm.sim.stampVoltageSource(CircuitNode.ground, vsNode, this.voltSource);
+        else CircuitElm.sim.stampVoltageSource(CircuitNode.ground, vsNode, this.voltSource);
         if (this.internalResistance > 0)
             CircuitElm.sim.stampResistor(this.nodes[1], this.nodes[0], this.internalResistance);
     }
@@ -120,27 +119,37 @@ export class RailElm extends VoltageElm {
         if (this.waveform != VoltageElm.WF_DC)
             CircuitElm.sim.updateVoltageSource(CircuitNode.ground, vsNode, this.voltSource, this.getVoltage());
     }
-    hasGroundConnection(n1: number): boolean { return true; }
+    hasGroundConnection(n1: number): boolean {
+        return true;
+    }
     addRoutingObstacle(router: WireRouter): void {
         router.addWire(this.point1.x, this.point1.y, this.point2.x, this.point2.y);
-        router.addObstacle(this.point2.x - this.circleSize, this.point2.y - this.circleSize,
-                           this.point2.x + this.circleSize, this.point2.y + this.circleSize);
+        router.addObstacle(
+            this.point2.x - this.circleSize,
+            this.point2.y - this.circleSize,
+            this.point2.x + this.circleSize,
+            this.point2.y + this.circleSize,
+        );
     }
 
-    getShortcut(): number { return 'V'.charCodeAt(0); }
+    getShortcut(): number {
+        return "V".charCodeAt(0);
+    }
     validateRailNode(n: number): boolean {
         const fpi = new FindPathInfo(FindPathInfo.VOLTAGE, this, this.getNode(n), CircuitElm.sim);
         if (fpi.findPath(CircuitNode.ground)) {
             //CircuitElm.sim.stop("Path to ground with no resistance!", this);
-            this.internalResistance = .001;
+            this.internalResistance = 0.001;
             return false;
         }
         return true;
     }
-    validate(): boolean { return this.internalResistance > 0 || this.validateRailNode(0); }
+    validate(): boolean {
+        return this.internalResistance > 0 || this.validateRailNode(0);
+    }
 
-//    void drawHandles(Graphics g, Color c) {
-//    	g.setColor(c);
-//		g.fillRect(x-3, y-3, 7, 7);
-//    }
+    //    void drawHandles(Graphics g, Color c) {
+    //    	g.setColor(c);
+    //		g.fillRect(x-3, y-3, 7, 7);
+    //    }
 }

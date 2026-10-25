@@ -89,19 +89,27 @@ export class TransistorElm extends CircuitElm {
 
     setup(): void {
         this.model = TransistorModel.getModelWithNameOrCopy(this.modelName, this.model ?? null);
-        this.modelName = this.model.name;   // in case we couldn't find that model
+        this.modelName = this.model.name; // in case we couldn't find that model
         this.vcrit = TransistorElm.vt * Math.log(TransistorElm.vt / (Math.sqrt(2) * this.model.satCur));
         this.noDiagonal = true;
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     onMouseWheel(e: WheelEvent): void {
         if (CirSim.typeScrollPopup != null && CirSim.typeScrollPopup.isShowing()) {
             CirSim.typeScrollPopup.doDeltaY(ScrollValuePopup.normalizeWheelDelta(e));
             return;
         }
-        CirSim.typeScrollPopup = new TypeScrollPopup(e.clientX, e.clientY, ScrollValuePopup.normalizeWheelDelta(e), this, CircuitElm.app);
+        CirSim.typeScrollPopup = new TypeScrollPopup(
+            e.clientX,
+            e.clientY,
+            ScrollValuePopup.normalizeWheelDelta(e),
+            this,
+            CircuitElm.app,
+        );
     }
 
     reset(): void {
@@ -112,11 +120,12 @@ export class TransistorElm extends CircuitElm {
         this.localSubIters = 0;
     }
 
-    getDumpType(): number { return 't'.charCodeAt(0); }
+    getDumpType(): number {
+        return "t".charCodeAt(0);
+    }
 
     dumpXml(doc: Document, elem: Element): void {
-        if (!(this.model.builtIn || this.model.dumped))
-            this.model.dumpXml(doc);
+        if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "pn", this.pnp);
         CircuitXMLSerializer.dumpAttr(elem, "be", this.beta);
@@ -154,8 +163,7 @@ export class TransistorElm extends CircuitElm {
     }
 
     dumpXmlModel(doc: Document): void {
-        if (!(this.model.builtIn || this.model.dumped))
-            this.model.dumpXml(doc);
+        if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
     }
 
     ic: number = 0;
@@ -166,25 +174,26 @@ export class TransistorElm extends CircuitElm {
     curcount_b: number = 0;
 
     // Junction capacitance state (trapezoidal companion model)
-    capVoltBE: number = 0;   // junction voltages from end of previous time step
+    capVoltBE: number = 0; // junction voltages from end of previous time step
     capVoltBC: number = 0;
-    capCurBE: number = 0;    // junction cap currents from end of previous time step
+    capCurBE: number = 0; // junction cap currents from end of previous time step
     capCurBC: number = 0;
-    geqBE: number = 0;       // companion conductances (computed in startIteration)
+    geqBE: number = 0; // companion conductances (computed in startIteration)
     geqBC: number = 0;
-    ceqBE: number = 0;       // companion current sources (computed in startIteration)
+    ceqBE: number = 0; // companion current sources (computed in startIteration)
     ceqBC: number = 0;
 
     rectPoly: Polygon;
     arrowPoly: Polygon;
     circleCenter: Point;
 
-    hasCircle(): boolean { return (TransistorElm.globalFlags & TransistorElm.FLAG_CIRCLE) !== 0; }
+    hasCircle(): boolean {
+        return (TransistorElm.globalFlags & TransistorElm.FLAG_CIRCLE) !== 0;
+    }
 
     draw(g: Graphics): void {
         // pick up global flags changes
-        if ((this.flags & TransistorElm.FLAGS_GLOBAL) !== TransistorElm.globalFlags)
-            this.setPoints();
+        if ((this.flags & TransistorElm.FLAGS_GLOBAL) !== TransistorElm.globalFlags) this.setPoints();
 
         this.setBbox(this.point1, this.point2, 16);
         if (this.hasCircle()) {
@@ -202,8 +211,7 @@ export class TransistorElm extends CircuitElm {
         g.fillPolygon(this.arrowPoly);
         // draw base
         this.setVoltageColor(g, this.nodes[0].v);
-        if (this.showPower())
-            g.setColor(Color.gray);
+        if (this.showPower()) g.setColor(Color.gray);
         CircuitElm.drawThickLine(g, this.point1, this.base);
         // draw dots
         this.curcount_b = this.updateDotCountImpl(-this.ib, this.curcount_b);
@@ -219,8 +227,8 @@ export class TransistorElm extends CircuitElm {
 
         if (this.needsHighlight() || this.isCreating()) {
             g.setColor(CircuitElm.whiteColor);
-// IES
-//		g.setFont(unitsFont);
+            // IES
+            //		g.setFont(unitsFont);
             if (this.dy === 0) {
                 g.drawString("B", this.base.x - (this.dx < 0 ? -2 : 10), this.base.y - 4);
                 g.drawString("C", this.coll[0].x - (this.dx < 0 ? 13 : -6), this.coll[0].y + 4);
@@ -235,10 +243,12 @@ export class TransistorElm extends CircuitElm {
     }
 
     getPost(n: number): Point | null {
-        return (n === 0) ? this.point1 : (n === 1) ? this.coll[0] : this.emit[0];
+        return n === 0 ? this.point1 : n === 1 ? this.coll[0] : this.emit[0];
     }
 
-    getPostCount(): number { return 3; }
+    getPostCount(): number {
+        return 3;
+    }
 
     getPower(): number {
         return (this.nodes[0].v - this.nodes[2].v) * this.ib + (this.nodes[1].v - this.nodes[2].v) * this.ic;
@@ -256,8 +266,7 @@ export class TransistorElm extends CircuitElm {
 
         super.setPoints();
         const hs = 16;
-        if ((this.flags & TransistorElm.FLAG_FLIP) !== 0)
-            this.dsign = -this.dsign;
+        if ((this.flags & TransistorElm.FLAG_FLIP) !== 0) this.dsign = -this.dsign;
         const hs2 = hs * this.dsign * this.pnp;
         // calc collector, emitter posts
         this.coll = this.newPointArray(2);
@@ -265,19 +274,28 @@ export class TransistorElm extends CircuitElm {
         this.interpPoint2(this.point1, this.point2, this.coll[0], this.emit[0], 1, hs2);
         // calc rectangle edges
         this.rect = this.newPointArray(4);
-        this.interpPoint2(this.point1, this.point2, this.rect[0], this.rect[1], 1 - 16/this.dn, hs);
-        this.interpPoint2(this.point1, this.point2, this.rect[2], this.rect[3], 1 - 13/this.dn, hs);
+        this.interpPoint2(this.point1, this.point2, this.rect[0], this.rect[1], 1 - 16 / this.dn, hs);
+        this.interpPoint2(this.point1, this.point2, this.rect[2], this.rect[3], 1 - 13 / this.dn, hs);
         // calc points where collector/emitter leads contact rectangle
-        this.interpPoint2(this.point1, this.point2, this.coll[1], this.emit[1], 1 - 13/this.dn, 6*this.dsign*this.pnp);
+        this.interpPoint2(
+            this.point1,
+            this.point2,
+            this.coll[1],
+            this.emit[1],
+            1 - 13 / this.dn,
+            6 * this.dsign * this.pnp,
+        );
         // calc point where base lead contacts rectangle
-        this.base = this.interpPoint(this.point1, this.point2, 1 - 16/this.dn) as Point;
+        this.base = this.interpPoint(this.point1, this.point2, 1 - 16 / this.dn) as Point;
         // rectangle
         this.rectPoly = this.createPolygon(this.rect[0], this.rect[2], this.rect[3], this.rect[1]);
 
         // arrow
-        if (this.pnp === 1) // npn
+        if (this.pnp === 1)
+            // npn
             this.arrowPoly = this.calcArrow(this.emit[1], this.emit[0], 8, 4);
-        else                // pnp
+        else
+            // pnp
             this.arrowPoly = this.calcArrow(this.emit[0], this.emit[1], 8, 4);
 
         this.circleCenter = this.interpPoint(this.base, this.point2, 0.5) as Point;
@@ -299,7 +317,7 @@ export class TransistorElm extends CircuitElm {
     limitStep(vnew: number, vold: number): number {
         let arg: number;
 
-        if (vnew > this.vcrit && Math.abs(vnew - vold) > (TransistorElm.vt + TransistorElm.vt)) {
+        if (vnew > this.vcrit && Math.abs(vnew - vold) > TransistorElm.vt + TransistorElm.vt) {
             if (vold > 0) {
                 arg = 1 + (vnew - vold) / TransistorElm.vt;
                 if (arg > 0) {
@@ -324,16 +342,15 @@ export class TransistorElm extends CircuitElm {
     //   vj0 = built-in junction potential (typically 0.6-0.8V for silicon)
     //   mj  = grading coefficient (0.33 for linearly graded, 0.5 for abrupt)
     static calcJunctionCap(vj: number, cj0: number, vj0: number, mj: number): number {
-        if (cj0 <= 0)
-            return 0;
+        if (cj0 <= 0) return 0;
         const fc = 0.5;
         if (vj < fc * vj0) {
             // Normal depletion region: C increases as reverse bias decreases
-            return cj0 / Math.pow(1 - vj/vj0, mj);
+            return cj0 / Math.pow(1 - vj / vj0, mj);
         } else {
             // Forward bias beyond fc*Vj: linear extrapolation to avoid
             // the singularity at V=Vj where capacitance would go to infinity
-            return cj0 / Math.pow(1 - fc, 1 + mj) * (1 - fc*(1+mj) + mj*vj/vj0);
+            return (cj0 / Math.pow(1 - fc, 1 + mj)) * (1 - fc * (1 + mj) + (mj * vj) / vj0);
         }
     }
 
@@ -345,27 +362,43 @@ export class TransistorElm extends CircuitElm {
         const hasBCcap = this.model.junctionCapBC > 0 || this.model.transitTimeR > 0;
 
         if (hasBEcap && CircuitElm.sim.timeStep > 0) {
-            const vjBE = this.pnp * this.capVoltBE;  // physical junction voltage
-            let cje = TransistorElm.calcJunctionCap(vjBE, this.model.junctionCapBE, this.model.junctionPotBE, this.model.junctionExpBE);
+            const vjBE = this.pnp * this.capVoltBE; // physical junction voltage
+            let cje = TransistorElm.calcJunctionCap(
+                vjBE,
+                this.model.junctionCapBE,
+                this.model.junctionPotBE,
+                this.model.junctionExpBE,
+            );
             // Add diffusion capacitance only in forward bias (like SPICE)
             if (this.model.transitTimeF > 0 && vjBE > 0) {
                 const vtn = TransistorElm.vt * this.model.emissionCoeffF;
-                cje += this.model.transitTimeF * this.model.satCur * Math.exp(vjBE / vtn) / vtn;
+                cje += (this.model.transitTimeF * this.model.satCur * Math.exp(vjBE / vtn)) / vtn;
             }
-            this.geqBE = 2 * cje / CircuitElm.sim.timeStep;
-            if (this.geqBE < 1e-20) { this.geqBE = this.ceqBE = this.capCurBE = 0; }
-            else this.ceqBE = -this.geqBE * this.capVoltBE - this.capCurBE;
+            this.geqBE = (2 * cje) / CircuitElm.sim.timeStep;
+            if (this.geqBE < 1e-20) {
+                this.geqBE = this.ceqBE = this.capCurBE = 0;
+            } else this.ceqBE = -this.geqBE * this.capVoltBE - this.capCurBE;
         }
         if (hasBCcap && CircuitElm.sim.timeStep > 0) {
-            const vjBC = this.pnp * this.capVoltBC;  // physical junction voltage
-            let cjc = TransistorElm.calcJunctionCap(vjBC, this.model.junctionCapBC, this.model.junctionPotBC, this.model.junctionExpBC);
+            const vjBC = this.pnp * this.capVoltBC; // physical junction voltage
+            let cjc = TransistorElm.calcJunctionCap(
+                vjBC,
+                this.model.junctionCapBC,
+                this.model.junctionPotBC,
+                this.model.junctionExpBC,
+            );
             // Add diffusion capacitance only in forward bias (like SPICE)
             if (this.model.transitTimeR > 0 && vjBC > 0) {
-                cjc += this.model.transitTimeR * this.model.satCur * Math.exp(vjBC / (TransistorElm.vt * this.model.emissionCoeffR)) / (TransistorElm.vt * this.model.emissionCoeffR);
+                cjc +=
+                    (this.model.transitTimeR *
+                        this.model.satCur *
+                        Math.exp(vjBC / (TransistorElm.vt * this.model.emissionCoeffR))) /
+                    (TransistorElm.vt * this.model.emissionCoeffR);
             }
-            this.geqBC = 2 * cjc / CircuitElm.sim.timeStep;
-            if (this.geqBC < 1e-20) { this.geqBC = this.ceqBC = this.capCurBC = 0; }
-            else this.ceqBC = -this.geqBC * this.capVoltBC - this.capCurBC;
+            this.geqBC = (2 * cjc) / CircuitElm.sim.timeStep;
+            if (this.geqBC < 1e-20) {
+                this.geqBC = this.ceqBC = this.capCurBC = 0;
+            } else this.ceqBC = -this.geqBC * this.capVoltBC - this.capCurBC;
         }
     }
 
@@ -379,20 +412,16 @@ export class TransistorElm extends CircuitElm {
         let vbc = this.justLoaded ? this.pnp * this.lastvbc : this.pnp * (this.nodes[0].v - this.nodes[1].v); // typically negative
         let vbe = this.justLoaded ? this.pnp * this.lastvbe : this.pnp * (this.nodes[0].v - this.nodes[2].v); // typically positive
         this.justLoaded = false;
-        const notConverged = Math.abs(vbc - this.lastvbc) > .01 ||
-            Math.abs(vbe - this.lastvbe) > .01;
-        if (notConverged)
-            CircuitElm.sim.converged = false;
+        const notConverged = Math.abs(vbc - this.lastvbc) > 0.01 || Math.abs(vbe - this.lastvbe) > 0.01;
+        if (notConverged) CircuitElm.sim.converged = false;
 
         // track per-transistor convergence difficulty
-        if (notConverged)
-            this.localSubIters++;
-        else
-            this.localSubIters = 0;
+        if (notConverged) this.localSubIters++;
+        else this.localSubIters = 0;
 
         // To prevent a possible singular matrix, put a tiny conductance in parallel
         // with each P-N junction.
-//	    gmin = leakage * 0.01;
+        //	    gmin = leakage * 0.01;
         this.gmin = 1e-12;
 
         if (this.localSubIters > 100 && this.badIters < 5) {
@@ -400,9 +429,8 @@ export class TransistorElm extends CircuitElm {
             // parallel with all P-N junctions.  Use per-transistor iteration
             // count to avoid contaminating unrelated transistors elsewhere
             // in the circuit.
-            this.gmin = Math.exp(-9*Math.log(10)*(1 - this.localSubIters/300.));
-            if (this.gmin > .1)
-                this.gmin = .1;
+            this.gmin = Math.exp(-9 * Math.log(10) * (1 - this.localSubIters / 300));
+            if (this.gmin > 0.1) this.gmin = 0.1;
         }
 
         vbc = this.limitStep(vbc, this.lastvbc);
@@ -421,66 +449,77 @@ export class TransistorElm extends CircuitElm {
         const c4 = this.model.BCleakCur;
         const vtc = this.model.leakBCemissionCoeff * TransistorElm.vt;
 
-//          double rbpr=model.minBaseResist;
-//          double rbpi=model.baseResist-rbpr;
-//          double xjrb=model.baseCurrentHalfResist;
+        //          double rbpr=model.minBaseResist;
+        //          double rbpi=model.baseResist-rbpr;
+        //          double xjrb=model.baseCurrentHalfResist;
 
         let vtn = TransistorElm.vt * this.model.emissionCoeffF;
-        let evbe: number, cbe: number, gbe: number, cben: number, gben: number, evben: number, evbc: number, cbc: number, gbc: number, cbcn: number, gbcn: number, evbcn: number;
+        let evbe: number,
+            cbe: number,
+            gbe: number,
+            cben: number,
+            gben: number,
+            evben: number,
+            evbc: number,
+            cbc: number,
+            gbc: number,
+            cbcn: number,
+            gbcn: number,
+            evbcn: number;
         let qb: number, dqbdve: number, dqbdvc: number, q2: number, sqarg: number, arg: number;
-        if (vbe > -5*vtn) {
-            evbe = Math.exp(vbe/vtn);
-            cbe = csat*(evbe-1) + this.gmin*vbe;
-            gbe = csat*evbe/vtn + this.gmin;
+        if (vbe > -5 * vtn) {
+            evbe = Math.exp(vbe / vtn);
+            cbe = csat * (evbe - 1) + this.gmin * vbe;
+            gbe = (csat * evbe) / vtn + this.gmin;
             if (c2 === 0) {
                 cben = 0;
                 gben = 0;
             } else {
-                evben = Math.exp(vbe/vte);
-                cben = c2*(evben-1);
-                gben = c2*evben/vte;
+                evben = Math.exp(vbe / vte);
+                cben = c2 * (evben - 1);
+                gben = (c2 * evben) / vte;
             }
         } else {
-            gbe = -csat/vbe + this.gmin;
-            cbe = gbe*vbe;
-            gben = -c2/vbe;
-            cben = gben*vbe;
+            gbe = -csat / vbe + this.gmin;
+            cbe = gbe * vbe;
+            gben = -c2 / vbe;
+            cben = gben * vbe;
         }
         vtn = TransistorElm.vt * this.model.emissionCoeffR;
-        if (vbc > -5*vtn) {
-            evbc = Math.exp(vbc/vtn);
-            cbc = csat*(evbc-1) + this.gmin*vbc;
-            gbc = csat*evbc/vtn + this.gmin;
+        if (vbc > -5 * vtn) {
+            evbc = Math.exp(vbc / vtn);
+            cbc = csat * (evbc - 1) + this.gmin * vbc;
+            gbc = (csat * evbc) / vtn + this.gmin;
             if (c4 === 0) {
                 cbcn = 0;
                 gbcn = 0;
             } else {
-                evbcn = Math.exp(vbc/vtc);
-                cbcn = c4*(evbcn-1);
-                gbcn = c4*evbcn/vtc;
+                evbcn = Math.exp(vbc / vtc);
+                cbcn = c4 * (evbcn - 1);
+                gbcn = (c4 * evbcn) / vtc;
             }
         } else {
-            gbc = -csat/vbc + this.gmin;
-            cbc = gbc*vbc;
-            gbcn = -c4/vbc;
-            cbcn = gbcn*vbc;
+            gbc = -csat / vbc + this.gmin;
+            cbc = gbc * vbc;
+            gbcn = -c4 / vbc;
+            cbcn = gbcn * vbc;
         }
         /*
          *   determine base charge terms
          */
-        const q1 = 1/(1 - this.model.invEarlyVoltF*vbc - this.model.invEarlyVoltR*vbe);
+        const q1 = 1 / (1 - this.model.invEarlyVoltF * vbc - this.model.invEarlyVoltR * vbe);
         if (oik === 0 && oikr === 0) {
             qb = q1;
-            dqbdve = q1*qb*this.model.invEarlyVoltR;
-            dqbdvc = q1*qb*this.model.invEarlyVoltF;
+            dqbdve = q1 * qb * this.model.invEarlyVoltR;
+            dqbdvc = q1 * qb * this.model.invEarlyVoltF;
         } else {
-            q2 = oik*cbe + oikr*cbc;
-            arg = Math.max(0, 1 + 4*q2);
+            q2 = oik * cbe + oikr * cbc;
+            arg = Math.max(0, 1 + 4 * q2);
             sqarg = 1;
             if (arg !== 0) sqarg = Math.sqrt(arg);
-            qb = q1*(1 + sqarg)/2;
-            dqbdve = q1*(qb*this.model.invEarlyVoltR + oik*gbe/sqarg);
-            dqbdvc = q1*(qb*this.model.invEarlyVoltF + oikr*gbc/sqarg);
+            qb = (q1 * (1 + sqarg)) / 2;
+            dqbdve = q1 * (qb * this.model.invEarlyVoltR + (oik * gbe) / sqarg);
+            dqbdvc = q1 * (qb * this.model.invEarlyVoltF + (oikr * gbc) / sqarg);
         }
 
         let cc = 0;
@@ -489,15 +528,15 @@ export class TransistorElm extends CircuitElm {
         /*
          *   determine dc incremental conductances
          */
-        cc = cc + (cex - cbc)/qb - cbc/this.model.betaR - cbcn;
-        const cb = cbe/this.beta + cben + cbc/this.model.betaR + cbcn;
+        cc = cc + (cex - cbc) / qb - cbc / this.model.betaR - cbcn;
+        const cb = cbe / this.beta + cben + cbc / this.model.betaR + cbcn;
 
         // get currents
         this.ic = this.pnp * cc;
         this.ib = this.pnp * cb;
         this.ie = this.pnp * (-cc - cb);
 
-/*            double gx=rbpr+rbpi/qb;   // base resistance commented out for now
+        /*            double gx=rbpr+rbpi/qb;   // base resistance commented out for now
             if(xjrb != 0) {
                 double arg1=Math.max(cb/xjrb,1e-9);
                 double arg2=(-1+Math.sqrt(1+14.59025*arg1))/2.4317/Math.sqrt(arg1);
@@ -505,28 +544,27 @@ export class TransistorElm extends CircuitElm {
                 gx=rbpr+3*rbpi*(arg1-arg2)/arg2/arg1/arg1;
             }
             if(gx != 0) gx=1/gx;*/
-        const gpi = gbe/this.beta + gben;
-        const gmu = gbc/this.model.betaR + gbcn;
-        const go = (gbc + (cex - cbc)*dqbdvc/qb)/qb;
-        const gm = (gex - (cex - cbc)*dqbdve/qb)/qb - go;
+        const gpi = gbe / this.beta + gben;
+        const gmu = gbc / this.model.betaR + gbcn;
+        const go = (gbc + ((cex - cbc) * dqbdvc) / qb) / qb;
+        const gm = (gex - ((cex - cbc) * dqbdve) / qb) / qb - go;
 
-        const ceqbe = this.pnp * (cc + cb - vbe*(gm + go + gpi) + vbc*go);
-        const ceqbc = this.pnp * (-cc + vbe*(gm + go) - vbc*(gmu + go));
+        const ceqbe = this.pnp * (cc + cb - vbe * (gm + go + gpi) + vbc * go);
+        const ceqbc = this.pnp * (-cc + vbe * (gm + go) - vbc * (gmu + go));
 
-        if (!isFinite(this.ib) || isNaN(this.ic))
-            CircuitElm.sim.stop("infinite transistor current", this);
+        if (!isFinite(this.ib) || isNaN(this.ic)) CircuitElm.sim.stop("infinite transistor current", this);
 
         // stamp matrix.
         // Node 0 is the base, node 1 the collector, node 2 the emitter.
-        CircuitElm.sim.stampMatrix(this.nodes[1], this.nodes[1], gmu+go);
-        CircuitElm.sim.stampMatrix(this.nodes[1], this.nodes[0], -gmu+gm);
-        CircuitElm.sim.stampMatrix(this.nodes[1], this.nodes[2], -gm-go);
-        CircuitElm.sim.stampMatrix(this.nodes[0], this.nodes[0], gpi+gmu);
+        CircuitElm.sim.stampMatrix(this.nodes[1], this.nodes[1], gmu + go);
+        CircuitElm.sim.stampMatrix(this.nodes[1], this.nodes[0], -gmu + gm);
+        CircuitElm.sim.stampMatrix(this.nodes[1], this.nodes[2], -gm - go);
+        CircuitElm.sim.stampMatrix(this.nodes[0], this.nodes[0], gpi + gmu);
         CircuitElm.sim.stampMatrix(this.nodes[0], this.nodes[2], -gpi);
         CircuitElm.sim.stampMatrix(this.nodes[0], this.nodes[1], -gmu);
-        CircuitElm.sim.stampMatrix(this.nodes[2], this.nodes[0], -gpi-gm);
+        CircuitElm.sim.stampMatrix(this.nodes[2], this.nodes[0], -gpi - gm);
         CircuitElm.sim.stampMatrix(this.nodes[2], this.nodes[1], -go);
-        CircuitElm.sim.stampMatrix(this.nodes[2], this.nodes[2], gpi+gm+go);
+        CircuitElm.sim.stampMatrix(this.nodes[2], this.nodes[2], gpi + gm + go);
 
         /*
          *  load current excitation vector (right side)
@@ -542,43 +580,61 @@ export class TransistorElm extends CircuitElm {
         // the transistor and with voltage-dependent capacitance.
         if (this.geqBE > 0) {
             // BE junction cap: conductance between base (node 0) and emitter (node 2)
-            CircuitElm.sim.stampMatrix(this.nodes[0], this.nodes[0],  this.geqBE);
-            CircuitElm.sim.stampMatrix(this.nodes[2], this.nodes[2],  this.geqBE);
+            CircuitElm.sim.stampMatrix(this.nodes[0], this.nodes[0], this.geqBE);
+            CircuitElm.sim.stampMatrix(this.nodes[2], this.nodes[2], this.geqBE);
             CircuitElm.sim.stampMatrix(this.nodes[0], this.nodes[2], -this.geqBE);
             CircuitElm.sim.stampMatrix(this.nodes[2], this.nodes[0], -this.geqBE);
             // Current source (positive = base to emitter)
             CircuitElm.sim.stampRightSide(this.nodes[0], -this.ceqBE);
-            CircuitElm.sim.stampRightSide(this.nodes[2],  this.ceqBE);
+            CircuitElm.sim.stampRightSide(this.nodes[2], this.ceqBE);
         }
         if (this.geqBC > 0) {
             // BC junction cap: conductance between base (node 0) and collector (node 1)
-            CircuitElm.sim.stampMatrix(this.nodes[0], this.nodes[0],  this.geqBC);
-            CircuitElm.sim.stampMatrix(this.nodes[1], this.nodes[1],  this.geqBC);
+            CircuitElm.sim.stampMatrix(this.nodes[0], this.nodes[0], this.geqBC);
+            CircuitElm.sim.stampMatrix(this.nodes[1], this.nodes[1], this.geqBC);
             CircuitElm.sim.stampMatrix(this.nodes[0], this.nodes[1], -this.geqBC);
             CircuitElm.sim.stampMatrix(this.nodes[1], this.nodes[0], -this.geqBC);
             // Current source (positive = base to collector)
             CircuitElm.sim.stampRightSide(this.nodes[0], -this.ceqBC);
-            CircuitElm.sim.stampRightSide(this.nodes[1],  this.ceqBC);
+            CircuitElm.sim.stampRightSide(this.nodes[1], this.ceqBC);
         }
     }
 
-    isTransistorElm(): boolean { return true; }
+    isTransistorElm(): boolean {
+        return true;
+    }
 
     getScopeText(x: number): string {
         let t = "";
         switch (x) {
-        case Scope.VAL_IB: t = "Ib"; break;
-        case Scope.VAL_IC: t = "Ic"; break;
-        case Scope.VAL_IE: t = "Ie"; break;
-        case Scope.VAL_VBE: t = "Vbe"; break;
-        case Scope.VAL_VBC: t = "Vbc"; break;
-        case Scope.VAL_VCE: t = "Vce"; break;
-        case Scope.VAL_POWER: t = "P"; break;
+            case Scope.VAL_IB:
+                t = "Ib";
+                break;
+            case Scope.VAL_IC:
+                t = "Ic";
+                break;
+            case Scope.VAL_IE:
+                t = "Ie";
+                break;
+            case Scope.VAL_VBE:
+                t = "Vbe";
+                break;
+            case Scope.VAL_VBC:
+                t = "Vbc";
+                break;
+            case Scope.VAL_VCE:
+                t = "Vce";
+                break;
+            case Scope.VAL_POWER:
+                t = "P";
+                break;
         }
         return Locale.LS("transistor") + ", " + t;
     }
 
-    getElmType(): string { return "transistor"; }
+    getElmType(): string {
+        return "transistor";
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = Locale.LS("transistor") + (this.pnp === -1 ? " (PNP)" : " (NPN)");
@@ -586,10 +642,8 @@ export class TransistorElm extends CircuitElm {
         const vbc = this.nodes[0].v - this.nodes[1].v;
         const vbe = this.nodes[0].v - this.nodes[2].v;
         const vce = this.nodes[1].v - this.nodes[2].v;
-        if (vbc*this.pnp > .2)
-            arr[2] = vbe*this.pnp > .2 ? "saturation" : "reverse active";
-        else
-            arr[2] = vbe*this.pnp > .2 ? "fwd active" : "cutoff";
+        if (vbc * this.pnp > 0.2) arr[2] = vbe * this.pnp > 0.2 ? "saturation" : "reverse active";
+        else arr[2] = vbe * this.pnp > 0.2 ? "fwd active" : "cutoff";
         arr[2] = Locale.LS(arr[2]);
         arr[3] = "Ic = " + CircuitElm.getCurrentText(this.ic);
         arr[4] = "Ib = " + CircuitElm.getCurrentText(this.ib);
@@ -625,40 +679,51 @@ export class TransistorElm extends CircuitElm {
 
     getScopeValue(x: number): number {
         switch (x) {
-        case Scope.VAL_IB: return this.ib;
-        case Scope.VAL_IC: return this.ic;
-        case Scope.VAL_IE: return this.ie;
-        case Scope.VAL_VBE: return this.nodes[0].v - this.nodes[2].v;
-        case Scope.VAL_VBC: return this.nodes[0].v - this.nodes[1].v;
-        case Scope.VAL_VCE: return this.nodes[1].v - this.nodes[2].v;
-        case Scope.VAL_POWER: return this.getPower();
+            case Scope.VAL_IB:
+                return this.ib;
+            case Scope.VAL_IC:
+                return this.ic;
+            case Scope.VAL_IE:
+                return this.ie;
+            case Scope.VAL_VBE:
+                return this.nodes[0].v - this.nodes[2].v;
+            case Scope.VAL_VBC:
+                return this.nodes[0].v - this.nodes[1].v;
+            case Scope.VAL_VCE:
+                return this.nodes[1].v - this.nodes[2].v;
+            case Scope.VAL_POWER:
+                return this.getPower();
         }
         return 0;
     }
 
     getScopeUnits(x: number): number {
         switch (x) {
-        case Scope.VAL_IB: case Scope.VAL_IC:
-        case Scope.VAL_IE: return Scope.UNITS_A;
-        case Scope.VAL_POWER: return Scope.UNITS_W;
-        default: return Scope.UNITS_V;
+            case Scope.VAL_IB:
+            case Scope.VAL_IC:
+            case Scope.VAL_IE:
+                return Scope.UNITS_A;
+            case Scope.VAL_POWER:
+                return Scope.UNITS_W;
+            default:
+                return Scope.UNITS_V;
         }
     }
 
     models: TransistorModel[];
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Beta/hFE", this.beta, 10, 1000).setDimensionless();
+        if (n === 0) return new EditInfo("Beta/hFE", this.beta, 10, 1000).setDimensionless();
         if (n === 1) {
             const ei = new EditInfo("", 0, -1, -1);
             const state = (this.flags & TransistorElm.FLAG_FLIP) !== 0;
             ei.checkbox = new Checkbox("Swap E/C", state);
             return ei;
         }
-        if (n === 2)
-            return EditInfo.createCheckbox("Draw Circle", this.hasCircle());
+        if (n === 2) return EditInfo.createCheckbox("Draw Circle", this.hasCircle());
         if (n === 3) {
             const ei = new EditInfo("Model", 0, -1, -1);
             this.models = TransistorModel.getModelList();
@@ -666,8 +731,7 @@ export class TransistorElm extends CircuitElm {
             for (let i = 0; i !== this.models.length; i++) {
                 const dm = this.models[i];
                 ei.choice.add(dm.getDescription());
-                if (dm === this.model)
-                    ei.choice.select(i);
+                if (dm === this.model) ei.choice.select(i);
             }
             return ei;
         }
@@ -677,8 +741,7 @@ export class TransistorElm extends CircuitElm {
             return ei;
         }
         if (n === 5) {
-            if (this.model.readOnly)
-                return null;
+            if (this.model.readOnly) return null;
             const ei = new EditInfo("", 0, -1, -1);
             ei.button = { label: Locale.LS("Edit Model") };
             return ei;
@@ -698,10 +761,8 @@ export class TransistorElm extends CircuitElm {
             this.setup();
         }
         if (n === 1) {
-            if (ei.checkbox.getState())
-                this.flags |= TransistorElm.FLAG_FLIP;
-            else
-                this.flags &= ~TransistorElm.FLAG_FLIP;
+            if (ei.checkbox.getState()) this.flags |= TransistorElm.FLAG_FLIP;
+            else this.flags &= ~TransistorElm.FLAG_FLIP;
             this.setPoints();
         }
         if (n === 2) {
@@ -725,7 +786,9 @@ export class TransistorElm extends CircuitElm {
         if (n === 5) {
             if (this.model.readOnly) {
                 // probably never reached
-                window.alert(Locale.LS("This model cannot be modified.  Change the model name to allow customization."));
+                window.alert(
+                    Locale.LS("This model cannot be modified.  Change the model name to allow customization."),
+                );
                 return;
             }
             const editDialog = new EditTransistorModelDialog(this.model, CirSim.theApp, null);
@@ -742,15 +805,12 @@ export class TransistorElm extends CircuitElm {
 
     stepFinished(): void {
         // stop for huge currents that make simulator act weird
-        if (Math.abs(this.ic) > 1e12 || Math.abs(this.ib) > 1e12)
-            CircuitElm.sim.stop("max current exceeded", this);
+        if (Math.abs(this.ic) > 1e12 || Math.abs(this.ib) > 1e12) CircuitElm.sim.stop("max current exceeded", this);
 
         // if this transistor needed gmin ramping, it was a bad iteration.
         // If we have 5 of those in a row, give up on gmin for this transistor.
-        if (this.localSubIters > 100)
-            this.badIters++;
-        else
-            this.badIters = 0;
+        if (this.localSubIters > 100) this.badIters++;
+        else this.badIters = 0;
 
         // Save junction cap state for next time step's companion model.
         // capVoltXX = node voltage difference across junction (circuit reference, not pnp-adjusted).
@@ -781,14 +841,12 @@ export class TransistorElm extends CircuitElm {
     }
 
     flipX(c2: number, count: number): void {
-        if (this.x === this.x2)
-            this.flags ^= TransistorElm.FLAG_FLIP;
+        if (this.x === this.x2) this.flags ^= TransistorElm.FLAG_FLIP;
         super.flipX(c2, count);
     }
 
     flipY(c2: number, count: number): void {
-        if (this.y === this.y2)
-            this.flags ^= TransistorElm.FLAG_FLIP;
+        if (this.y === this.y2) this.flags ^= TransistorElm.FLAG_FLIP;
         super.flipY(c2, count);
     }
 
@@ -798,11 +856,12 @@ export class TransistorElm extends CircuitElm {
     }
 
     setFlipped(flip: boolean): void {
-        if (((this.flags & TransistorElm.FLAG_FLIP) !== 0) !== flip)
-            this.flags ^= TransistorElm.FLAG_FLIP;
+        if (((this.flags & TransistorElm.FLAG_FLIP) !== 0) !== flip) this.flags ^= TransistorElm.FLAG_FLIP;
     }
 
-    canViewInScope(): boolean { return true; }
+    canViewInScope(): boolean {
+        return true;
+    }
 
     getCurrentIntoNode(n: number): number {
         if (n === 0) return -this.ib;
@@ -812,13 +871,25 @@ export class TransistorElm extends CircuitElm {
 }
 
 export class NTransistorElm extends TransistorElm {
-    constructor(xx: number, yy: number) { super(xx, yy, false); }
-    getDumpClass(): typeof TransistorElm { return TransistorElm; }
-    getShortcut(): number { return 'n'.charCodeAt(0); }
+    constructor(xx: number, yy: number) {
+        super(xx, yy, false);
+    }
+    getDumpClass(): typeof TransistorElm {
+        return TransistorElm;
+    }
+    getShortcut(): number {
+        return "n".charCodeAt(0);
+    }
 }
 
 export class PTransistorElm extends TransistorElm {
-    constructor(xx: number, yy: number) { super(xx, yy, true); }
-    getDumpClass(): typeof TransistorElm { return TransistorElm; }
-    getShortcut(): number { return 'p'.charCodeAt(0); }
+    constructor(xx: number, yy: number) {
+        super(xx, yy, true);
+    }
+    getDumpClass(): typeof TransistorElm {
+        return TransistorElm;
+    }
+    getShortcut(): number {
+        return "p".charCodeAt(0);
+    }
 }

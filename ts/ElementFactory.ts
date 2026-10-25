@@ -21,8 +21,8 @@ import { StringTokenizer } from "./StringTokenizer";
 
 // Constructor signatures for the two creation patterns used throughout the codebase
 type ElmCtor = {
-    new(x: number, y: number): any;
-    new(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer): any;
+    new (x: number, y: number): any;
+    new (xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer): any;
 };
 
 export class ElementFactory {
@@ -37,11 +37,18 @@ export class ElementFactory {
     static create(name: string, x1: number, y1: number): any;
     // Create element from saved/loaded dump — used when loading a circuit file
     static create(name: string, x1: number, y1: number, x2: number, y2: number, f: number, st: StringTokenizer): any;
-    static create(name: string, x1: number, y1: number, x2?: number, y2?: number, f?: number, st?: StringTokenizer): any {
+    static create(
+        name: string,
+        x1: number,
+        y1: number,
+        x2?: number,
+        y2?: number,
+        f?: number,
+        st?: StringTokenizer,
+    ): any {
         const ctor = ElementFactory.classMap.get(name);
         if (ctor == null) return null;
-        if (x2 === undefined)
-            return new ctor(x1, y1);
+        if (x2 === undefined) return new ctor(x1, y1);
         return new ctor(x1, y1, x2, y2!, f!, st!);
     }
 

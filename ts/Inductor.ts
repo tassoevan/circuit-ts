@@ -41,11 +41,14 @@ export class Inductor {
         this.inductance = ic;
         this.current = cr;
         this.flags = f;
-        if (isat !== undefined)
-            this.saturationCurrent = isat;
+        if (isat !== undefined) this.saturationCurrent = isat;
     }
-    isTrapezoidal(): boolean { return (this.flags & Inductor.FLAG_BACK_EULER) === 0; }
-    reset(): void { this.resetTo(0); }
+    isTrapezoidal(): boolean {
+        return (this.flags & Inductor.FLAG_BACK_EULER) === 0;
+    }
+    reset(): void {
+        this.resetTo(0);
+    }
     resetTo(c: number): void {
         // need to set curSourceValue here in case one of inductor nodes is node 0.  In that case
         // calculateCurrent() may get called (from setNodeVoltage()) when analyzing circuit, before
@@ -75,29 +78,29 @@ export class Inductor {
             this.sim.stampNonLinear(this.nodes[1]);
         } else {
             // linear: fixed companion conductance
-            if (this.isTrapezoidal())
-                this.compResistance = 2*this.inductance/this.sim.timeStep;
-            else // backward euler
-                this.compResistance = this.inductance/this.sim.timeStep;
+            if (this.isTrapezoidal()) this.compResistance = (2 * this.inductance) / this.sim.timeStep;
+            else
+                // backward euler
+                this.compResistance = this.inductance / this.sim.timeStep;
             this.sim.stampResistor(this.nodes[0], this.nodes[1], this.compResistance);
         }
         //this.sim.stampRightSide(this.nodes[0]);
         //this.sim.stampRightSide(this.nodes[1]);
     }
-    nonLinear(): boolean { return this.saturationCurrent > 0; }
+    nonLinear(): boolean {
+        return this.saturationCurrent > 0;
+    }
 
     startIteration(voltdiff: number): void {
         if (this.saturationCurrent > 0) {
             // recompute companion resistance from current-dependent inductance
             const lEff = this.calcEffectiveInductance(this.current);
-            if (this.isTrapezoidal())
-                this.compResistance = 2*lEff/this.sim.timeStep;
-            else
-                this.compResistance = lEff/this.sim.timeStep;
+            if (this.isTrapezoidal()) this.compResistance = (2 * lEff) / this.sim.timeStep;
+            else this.compResistance = lEff / this.sim.timeStep;
         }
-        if (this.isTrapezoidal())
-            this.curSourceValue = voltdiff/this.compResistance+this.current;
-        else // backward euler
+        if (this.isTrapezoidal()) this.curSourceValue = voltdiff / this.compResistance + this.current;
+        else
+            // backward euler
             this.curSourceValue = this.current;
     }
 
@@ -105,14 +108,13 @@ export class Inductor {
         // we check compResistance because this might get called
         // before stamp(), which sets compResistance, causing
         // infinite current
-        if (this.compResistance > 0)
-            this.current = voltdiff/this.compResistance + this.curSourceValue;
+        if (this.compResistance > 0) this.current = voltdiff / this.compResistance + this.curSourceValue;
         return this.current;
     }
     doStep(voltdiff: number): void {
         if (this.saturationCurrent > 0) {
             // stamp companion conductance (matrix was restored to origMatrix)
-            this.sim.stampConductance(this.nodes[0], this.nodes[1], 1.0/this.compResistance);
+            this.sim.stampConductance(this.nodes[0], this.nodes[1], 1.0 / this.compResistance);
         }
         this.sim.stampCurrentSource(this.nodes[0], this.nodes[1], this.curSourceValue);
     }

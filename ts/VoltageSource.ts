@@ -22,10 +22,10 @@ import { CircuitMatrix } from "./CircuitMatrix";
 
 export class VoltageSource {
     index: number = 0;
-    elm: any = null;  // CircuitElm — typed as any to avoid circular import
+    elm: any = null; // CircuitElm — typed as any to avoid circular import
     matrix: CircuitMatrix | null = null;
-    row: number = 0;  // row in matrix (nodeCount + 1-based offset)
-    n1: CircuitNode | null = null;  // nodes this VS is stamped between
+    row: number = 0; // row in matrix (nodeCount + 1-based offset)
+    n1: CircuitNode | null = null; // nodes this VS is stamped between
     n2: CircuitNode | null = null;
 
     // save the nodes this voltage source is stamped between.
@@ -37,15 +37,23 @@ export class VoltageSource {
 
     // assign matrix from saved nodes (use non-ground node's matrix)
     assignMatrix(): void {
-        if (this.n1 != null && this.n1 !== CircuitNode.ground && this.n1.matrix != null)
-            this.matrix = this.n1.matrix;
+        if (this.n1 != null && this.n1 !== CircuitNode.ground && this.n1.matrix != null) this.matrix = this.n1.matrix;
         else if (this.n2 != null && this.n2 !== CircuitNode.ground && this.n2.matrix != null)
             this.matrix = this.n2.matrix;
         else
             // fallback: use element's last node
-            this.matrix = this.elm.getNode(this.elm.getPostCount()-1).matrix;
+            this.matrix = this.elm.getNode(this.elm.getPostCount() - 1).matrix;
         if (this.matrix == null) {
-            console.log("null matrix! " + this.elm + " n1=" + (this.n1 == null ? "null" : this.n1.index + " m=" + this.n1.matrix) + " n2=" + (this.n2 == null ? "null" : this.n2.index + " m=" + this.n2.matrix) + " fallback=" + this.elm.getNode(this.elm.getPostCount()-1).index);
+            console.log(
+                "null matrix! " +
+                    this.elm +
+                    " n1=" +
+                    (this.n1 == null ? "null" : this.n1.index + " m=" + this.n1.matrix) +
+                    " n2=" +
+                    (this.n2 == null ? "null" : this.n2.index + " m=" + this.n2.matrix) +
+                    " fallback=" +
+                    this.elm.getNode(this.elm.getPostCount() - 1).index,
+            );
         }
     }
 }

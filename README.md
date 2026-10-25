@@ -12,9 +12,9 @@ CircuitJS1 is an electronic circuit simulator that runs in the browser. It was o
 
 For a hosted version of the application see:
 
-* Paul's Page: [http://www.falstad.com/circuit/](http://www.falstad.com/circuit/)
-* Iain's Page: [http://lushprojects.com/circuitjs/](http://lushprojects.com/circuitjs/)
-* Development Branch Version: [https://pfalstad.github.io/circuitjs1/circuitjs.html](https://pfalstad.github.io/circuitjs1/circuitjs.html)
+- Paul's Page: [http://www.falstad.com/circuit/](http://www.falstad.com/circuit/)
+- Iain's Page: [http://lushprojects.com/circuitjs/](http://lushprojects.com/circuitjs/)
+- Development Branch Version: [https://pfalstad.github.io/circuitjs1/circuitjs.html](https://pfalstad.github.io/circuitjs1/circuitjs.html)
 
 Thanks to: Edward Calver for 15 new components and other improvements; Rodrigo Hausen for file import/export and many other UI improvements; J. Mike Rollins for the Zener diode code; Julius Schmidt for the spark gap code and some examples; Dustin Soodak for help with the user interface improvements; Jacob Calvert for the T Flip Flop; Ben Hayden for scope spectrum; Thomas Reitinger, Krystian Sławiński, Usevalad Khatkevich, Lucio Sciamanna, Mauro Hemerly Gazzani, J. Miguel Silva, and Franck Viard for translations; Andre Adrian for improved emitter coupled oscillator; Felthry for many examples; Colin Howell for code improvements. LZString (c) 2013 pieroxy.
 
@@ -96,9 +96,9 @@ site/
 
 Copy everything under `site/` to your web server. Running `./dist.sh` again with a different version number produces an independent deployment with its own file names and cache, so old versions keep working at their own `circuitjsNUM.html` URL alongside a newly deployed one.
 
-* Customize the "iframe.html" file to include any branding you want in the right hand panel of the application.
-* The optional file "shortrelay.php" (found in `war/`, not produced by the build) is a server-side script to act as a relay to a URL shortening service to avoid cross-origin problems with a purely client solution. Copy it alongside `circuitjsNUM.html` if you want the "Create short URL" feature; otherwise it's simply unused. You may want to customize it for your site.
-* If you wish to enable dropbox loading and saving, a dropbox API app-key is needed. This should be added as a script tag in `ts/circuitjs.html` before building. If this is not included the relevant features will be disabled.
+- Customize the "iframe.html" file to include any branding you want in the right hand panel of the application.
+- The optional file "shortrelay.php" (found in `war/`, not produced by the build) is a server-side script to act as a relay to a URL shortening service to avoid cross-origin problems with a purely client solution. Copy it alongside `circuitjsNUM.html` if you want the "Create short URL" feature; otherwise it's simply unused. You may want to customize it for your site.
+- If you wish to enable dropbox loading and saving, a dropbox API app-key is needed. This should be added as a script tag in `ts/circuitjs.html` before building. If this is not included the relevant features will be disabled.
 
 For a quick unversioned build (used for local testing), use `./dist-offline.sh` instead, which produces the same `site/` layout without the version-numbered rename — the entry point stays `site/circuitjs.html`.
 
@@ -109,6 +109,7 @@ You can link to the full page version of the application using the link shown ab
 If you want to embed the application in another page then use an iframe with the src being the full-page version.
 
 You can add query parameters to link to change the applications startup behaviour. The following are supported:
+
 ```
 .../circuitjs.html?cct=<string> // Load the circuit from the URL (like the # in the Java version)
 .../circuitjs.html?ctz=<string> // Load the circuit from compressed data in the URL
@@ -131,7 +132,8 @@ You can add query parameters to link to change the applications startup behaviou
 .../circuitjs.html?mouseMode=<item> // set the initial mouse mode.  can also initially perform other UI actions, such as opening the 'about' menu, running 'importfromlocalfile', etc.
 .../circuitjs.html?hideInfoBox=<true|false>
 ```
-The simulator can also interface with your javascript code.  See [ts/jsinterface.html](http://www.falstad.com/circuit/jsinterface.html) for an example.
+
+The simulator can also interface with your javascript code. See [ts/jsinterface.html](http://www.falstad.com/circuit/jsinterface.html) for an example.
 
 ## License
 
@@ -142,9 +144,9 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.

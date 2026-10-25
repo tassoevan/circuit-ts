@@ -19,5 +19,5 @@
 
 export class CircuitNodeLink {
     num: number = 0;
-    elm: any = null;  // CircuitElm — typed as any to avoid circular import
+    elm: any = null; // CircuitElm — typed as any to avoid circular import
 }

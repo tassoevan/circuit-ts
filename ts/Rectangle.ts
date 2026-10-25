@@ -33,13 +33,25 @@ export class Rectangle {
     constructor(r: Rectangle);
     constructor(arg0?: number | Point | Rectangle, arg1?: number, arg2?: number, arg3?: number) {
         if (arg0 === undefined) {
-            this.x = 0; this.y = 0; this.width = 0; this.height = 0;
+            this.x = 0;
+            this.y = 0;
+            this.width = 0;
+            this.height = 0;
         } else if (arg0 instanceof Point) {
-            this.x = arg0.x; this.y = arg0.y; this.width = 0; this.height = 0;
+            this.x = arg0.x;
+            this.y = arg0.y;
+            this.width = 0;
+            this.height = 0;
         } else if (arg0 instanceof Rectangle) {
-            this.x = arg0.x; this.y = arg0.y; this.width = arg0.width; this.height = arg0.height;
+            this.x = arg0.x;
+            this.y = arg0.y;
+            this.width = arg0.width;
+            this.height = arg0.height;
         } else {
-            this.x = arg0; this.y = arg1 as number; this.width = arg2 as number; this.height = arg3 as number;
+            this.x = arg0;
+            this.y = arg1 as number;
+            this.width = arg2 as number;
+            this.height = arg3 as number;
         }
     }
 
@@ -60,7 +72,8 @@ export class Rectangle {
     contains(arg0: number | Rectangle, arg1?: number): boolean {
         if (arg0 instanceof Rectangle)
             return this.contains(arg0.x, arg0.y) && this.contains(arg0.x + arg0.width, arg0.y + arg0.height);
-        const X = arg0, Y = arg1 as number;
+        const X = arg0,
+            Y = arg1 as number;
         const w = this.width;
         const h = this.height;
         if ((w | h) < 0) {
@@ -76,8 +89,7 @@ export class Rectangle {
         const w2 = w + x;
         const h2 = h + y;
         //    overflow || intersect
-        return ((w2 < x || w2 > X) &&
-                (h2 < y || h2 > Y));
+        return (w2 < x || w2 > X) && (h2 < y || h2 > Y);
     }
 
     /*
@@ -104,10 +116,7 @@ export class Rectangle {
         tw += tx;
         th += ty;
         //      overflow || intersect
-        return ((rw < rx || rw > tx) &&
-                (rh < ry || rh > ty) &&
-                (tw < tx || tw > rx) &&
-                (th < ty || th > ry));
+        return (rw < rx || rw > tx) && (rh < ry || rh > ty) && (tw < tx || tw > rx) && (th < ty || th > ry);
     }
 
     union(r: Rectangle): Rectangle {
@@ -152,13 +161,12 @@ export class Rectangle {
     equals(other: unknown): boolean {
         if (other instanceof Rectangle) {
             const r = other;
-            return ((this.x === r.x) &&
-                    (this.y === r.y) &&
-                    (this.width === r.width) &&
-                    (this.height === r.height));
+            return this.x === r.x && this.y === r.y && this.width === r.width && this.height === r.height;
         }
         return false;
     }
 
-    toString(): string { return "Rect(" + this.x + "," + this.y + "," + this.width + "," + this.height + ")"; }
+    toString(): string {
+        return "Rect(" + this.x + "," + this.y + "," + this.width + "," + this.height + ")";
+    }
 }

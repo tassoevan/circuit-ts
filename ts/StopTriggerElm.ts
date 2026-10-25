@@ -69,8 +69,7 @@ export class StopTriggerElm extends CircuitElm {
         this.type = xml.parseIntAttr("tp", this.type);
         this.delay = xml.parseDoubleAttr("dl", this.delay);
         this.count = xml.parseIntAttr("ct", 1);
-        if (this.count < 1)
-            this.count = 1;
+        if (this.count < 1) this.count = 1;
         this.requiredDuration = xml.parseDoubleAttr("rd", 0);
     }
 
@@ -80,8 +79,12 @@ export class StopTriggerElm extends CircuitElm {
         this.durationMet = false;
         this.triggerCount = 0;
     }
-    getDumpType(): number { return 408; }
-    getPostCount(): number { return 1; }
+    getDumpType(): number {
+        return 408;
+    }
+    getPostCount(): number {
+        return 1;
+    }
 
     setPoints(): void {
         super.setPoints();
@@ -104,15 +107,20 @@ export class StopTriggerElm extends CircuitElm {
 
     stepFinished(): void {
         this.stopped = false;
-        const condition = (this.type === 0 && this.nodes[0].v >= this.triggerVoltage) ||
+        const condition =
+            (this.type === 0 && this.nodes[0].v >= this.triggerVoltage) ||
             (this.type === 1 && this.nodes[0].v <= this.triggerVoltage);
         if (!this.conditionActive && condition) {
             this.conditionActive = true;
             this.conditionStartTime = CircuitElm.sim.t;
             this.durationMet = false;
         }
-        if (this.conditionActive && condition && !this.durationMet &&
-                CircuitElm.sim.t - this.conditionStartTime >= this.requiredDuration) {
+        if (
+            this.conditionActive &&
+            condition &&
+            !this.durationMet &&
+            CircuitElm.sim.t - this.conditionStartTime >= this.requiredDuration
+        ) {
             this.durationMet = true;
             this.triggerCount++;
             if (!this.triggered && this.triggerCount >= this.count) {
@@ -120,8 +128,7 @@ export class StopTriggerElm extends CircuitElm {
                 this.triggerTime = CircuitElm.sim.t;
             }
         }
-        if (this.conditionActive && !condition)
-            this.conditionActive = false;
+        if (this.conditionActive && !condition) this.conditionActive = false;
         if (this.triggered && CircuitElm.sim.t >= this.triggerTime + this.delay) {
             this.triggered = false;
             this.triggerCount = 0;
@@ -130,7 +137,9 @@ export class StopTriggerElm extends CircuitElm {
         }
     }
 
-    getVoltageDiff(): number { return this.nodes[0].v; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "stop trigger";
@@ -138,10 +147,8 @@ export class StopTriggerElm extends CircuitElm {
         arr[2] = "Vtrigger = " + CircuitElm.getVoltageText(this.triggerVoltage);
         if (this.triggered)
             arr[3] = "stopping in " + CircuitElm.getUnitText(this.triggerTime + this.delay - CircuitElm.sim.t, "s");
-        else if (this.stopped)
-            arr[3] = "stopped";
-        else
-            arr[3] = "waiting";
+        else if (this.stopped) arr[3] = "stopped";
+        else arr[3] = "waiting";
         if (!this.stopped && this.count > 1)
             arr[3] += " (" + Math.min(this.triggerCount, this.count) + "/" + this.count + ")";
     }
@@ -171,13 +178,11 @@ export class StopTriggerElm extends CircuitElm {
         if (n === 2) this.delay = ei.value;
         if (n === 3) {
             this.requiredDuration = ei.value;
-            if (this.requiredDuration < 0)
-                this.requiredDuration = 0;
+            if (this.requiredDuration < 0) this.requiredDuration = 0;
         }
         if (n === 4) {
             this.count = Math.trunc(ei.value);
-            if (this.count < 1)
-                this.count = 1;
+            if (this.count < 1) this.count = 1;
         }
     }
 }

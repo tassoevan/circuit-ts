@@ -52,15 +52,18 @@ export class CurrentElm extends CircuitElm {
             super(xa, ya, xb, yb!, f!);
             try {
                 this.currentValue = parseFloatStrict(st!.nextToken());
-                this.maxVoltage   = parseFloatStrict(st!.nextToken());
+                this.maxVoltage = parseFloatStrict(st!.nextToken());
             } catch (_e) {}
-            if (this.currentValue === 0)
-                this.currentValue = 0.01;
+            if (this.currentValue === 0) this.currentValue = 0.01;
         }
     }
 
-    isVoltageLimited(): boolean { return this.maxVoltage > 0; }
-    nonLinear(): boolean { return this.isVoltageLimited(); }
+    isVoltageLimited(): boolean {
+        return this.maxVoltage > 0;
+    }
+    nonLinear(): boolean {
+        return this.isVoltageLimited();
+    }
 
     reset(): void {
         super.reset();
@@ -70,25 +73,28 @@ export class CurrentElm extends CircuitElm {
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "cu", this.currentValue);
-        if (this.maxVoltage > 0)
-            CircuitXMLSerializer.dumpAttr(elem, "mv", this.maxVoltage);
+        if (this.maxVoltage > 0) CircuitXMLSerializer.dumpAttr(elem, "mv", this.maxVoltage);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.currentValue = xml.parseDoubleAttr("cu", this.currentValue);
-        this.maxVoltage   = xml.parseDoubleAttr("mv", 0);
+        this.maxVoltage = xml.parseDoubleAttr("mv", 0);
     }
 
-    getDumpType(): number { return 'i'.charCodeAt(0); }
-    isCurrentElm(): boolean { return true; }
+    getDumpType(): number {
+        return "i".charCodeAt(0);
+    }
+    isCurrentElm(): boolean {
+        return true;
+    }
 
     setPoints(): void {
         super.setPoints();
         this.calcLeads(26);
         this.ashaft1 = this.interpPoint(this.lead1!, this.lead2!, 0.25);
         this.ashaft2 = this.interpPoint(this.lead1!, this.lead2!, 0.6);
-        this.center  = this.interpPoint(this.lead1!, this.lead2!, 0.5);
+        this.center = this.interpPoint(this.lead1!, this.lead2!, 0.5);
         const p2 = this.interpPoint(this.lead1!, this.lead2!, 0.75);
         this.arrow = this.calcArrow(this.center, p2, 4, 4);
     }
@@ -107,8 +113,7 @@ export class CurrentElm extends CircuitElm {
         this.doDots(g);
         if (this.showValues() && this.current !== 0) {
             const s = CircuitElm.getShortUnitText(this.current, "A");
-            if (this.dx === 0 || this.dy === 0)
-                this.drawValues(g, s, cr);
+            if (this.dx === 0 || this.dy === 0) this.drawValues(g, s, cr);
         }
         this.drawPosts(g);
     }
@@ -142,16 +147,15 @@ export class CurrentElm extends CircuitElm {
     //   vd > Vmax       ->  i ~= 0              (tanh arg ~= +2.5)
     // tanh is centered at 0.975*Vmax with scale vt = vWidth/5.
     doStep(): void {
-        if (this.broken || !this.isVoltageLimited())
-            return;
+        if (this.broken || !this.isVoltageLimited()) return;
 
         const sim = SimulationManager.theSim;
         let vd = this.nodes[1].v - this.nodes[0].v;
 
         const vStart = 0.95 * this.maxVoltage;
         const vWidth = this.maxVoltage - vStart;
-        const vMid   = (vStart + this.maxVoltage) / 2.0;
-        const vt     = Math.max(vWidth / 5.0, 1e-3);
+        const vMid = (vStart + this.maxVoltage) / 2.0;
+        const vt = Math.max(vWidth / 5.0, 1e-3);
 
         // Step-size limit: prevent crossing the transition region in one Newton step.
         if (this.lastVoltDiff < vStart && vd > vStart) {
@@ -172,12 +176,12 @@ export class CurrentElm extends CircuitElm {
         }
         this.lastVoltDiff = vd;
 
-        const arg     = (vd - vMid) / vt;
+        const arg = (vd - vMid) / vt;
         const tanhArg = Math.tanh(arg);
 
-        const i     = this.currentValue * 0.5 * (1.0 - tanhArg);
+        const i = this.currentValue * 0.5 * (1.0 - tanhArg);
         const sech2 = 1.0 - tanhArg * tanhArg;
-        const g     = -this.currentValue * 0.5 * sech2 / vt * vd;
+        const g = ((-this.currentValue * 0.5 * sech2) / vt) * vd;
 
         // Norton companion: parallel resistor (1/|g|) + adjusted current source.
         // Gmin floor keeps the Norton resistance finite when sech^2 is
@@ -190,33 +194,30 @@ export class CurrentElm extends CircuitElm {
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Current (A)", this.currentValue, 0, 0.1);
-        if (n === 1)
-            return new EditInfo("Max Voltage (V, 0=unlimited)", this.maxVoltage, 0, 0).setUnitStep();
+        if (n === 0) return new EditInfo("Current (A)", this.currentValue, 0, 0.1);
+        if (n === 1) return new EditInfo("Max Voltage (V, 0=unlimited)", this.maxVoltage, 0, 0).setUnitStep();
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.currentValue = ei.value;
-        if (n === 1 && ei.value >= 0)
-            this.maxVoltage = ei.value;
+        if (n === 0) this.currentValue = ei.value;
+        if (n === 1 && ei.value >= 0) this.maxVoltage = ei.value;
     }
 
     getInfo(arr: string[]): void {
         arr[0] = "current source";
         let i = this.getBasicInfo(arr);
         arr[i++] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
-        if (this.isVoltageLimited())
-            arr[i++] = "Vmax = " + CircuitElm.getVoltageText(this.maxVoltage);
+        if (this.isVoltageLimited()) arr[i++] = "Vmax = " + CircuitElm.getVoltageText(this.maxVoltage);
     }
 
     getVoltageDiff(): number {
         return this.nodes[1].v - this.nodes[0].v;
     }
 
-    getPower(): number { return -this.getVoltageDiff() * this.current; }
+    getPower(): number {
+        return -this.getVoltageDiff() * this.current;
+    }
 
     validate(): boolean {
         const fpi = new FindPathInfo(FindPathInfo.INDUCT, this, this.getNode(1), SimulationManager.theSim);

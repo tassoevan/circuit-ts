@@ -31,7 +31,7 @@ import { CircuitXMLDeserializer } from "./CircuitXMLDeserializer";
 import { parseFloatStrict } from "./NumberParse";
 
 export class InverterElm extends CircuitElm {
-    static readonly FLAG_DEMORGAN = 1<<3;
+    static readonly FLAG_DEMORGAN = 1 << 3;
     slewRate: number; // V/ns
     highVoltage: number;
     gatePoly: Polygon;
@@ -44,12 +44,12 @@ export class InverterElm extends CircuitElm {
         if (xb === undefined) {
             super(xa, ya);
             this.noDiagonal = true;
-            this.slewRate = .5;
+            this.slewRate = 0.5;
             this.highVoltage = GateElm.lastHighVoltage;
         } else {
             super(xa, ya, xb, yb!, f!);
             this.noDiagonal = true;
-            this.slewRate = .5;
+            this.slewRate = 0.5;
             this.highVoltage = 5;
             try {
                 this.slewRate = parseFloatStrict(st!.nextToken());
@@ -70,15 +70,16 @@ export class InverterElm extends CircuitElm {
         this.highVoltage = xml.parseDoubleAttr("hi", this.highVoltage);
     }
 
-    getDumpType(): number { return 'I'.charCodeAt(0); }
+    getDumpType(): number {
+        return "I".charCodeAt(0);
+    }
 
     draw(g: Graphics): void {
         this.drawPosts(g);
         this.draw2Leads(g);
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.lightGrayColor);
         CircuitElm.drawThickPolygon(g, this.gatePoly);
-        if (GateElm.useEuroGates())
-            this.drawCenteredText(g, "1", this.center.x, this.center.y - 6, true);
+        if (GateElm.useEuroGates()) this.drawCenteredText(g, "1", this.center.x, this.center.y - 6, true);
         CircuitElm.drawThickCircle(g, this.pcircle.x, this.pcircle.y, 3);
         this.curcount = this.updateDotCountImpl(this.current, this.curcount);
         this.drawDots(g, this.lead2!, this.point2, this.curcount);
@@ -92,30 +93,29 @@ export class InverterElm extends CircuitElm {
         super.setPoints();
         const hs = 16;
         let ww = 16;
-        if (ww > this.dn / 2)
-            ww = Math.floor(this.dn / 2);
-        this.lead1 = this.interpPoint(this.point1, this.point2, .5 - ww / this.dn);
-        this.lead2 = this.interpPoint(this.point1, this.point2, .5 + (ww + 2) / this.dn);
+        if (ww > this.dn / 2) ww = Math.floor(this.dn / 2);
+        this.lead1 = this.interpPoint(this.point1, this.point2, 0.5 - ww / this.dn);
+        this.lead2 = this.interpPoint(this.point1, this.point2, 0.5 + (ww + 2) / this.dn);
 
         let start: Point;
         let end: number;
         if (this.hasFlag(InverterElm.FLAG_DEMORGAN)) {
-            this.pcircle = this.interpPoint(this.point1, this.point2, .5 - (ww - 4) / this.dn);   // Move circle to front
-            start = this.interpPoint(this.point1, this.point2, .5 - (ww - 8) / this.dn);          // Shift triangle so overall
-            end = .5 + (ww + 2) / this.dn;                                                        // symbol takes up same space
+            this.pcircle = this.interpPoint(this.point1, this.point2, 0.5 - (ww - 4) / this.dn); // Move circle to front
+            start = this.interpPoint(this.point1, this.point2, 0.5 - (ww - 8) / this.dn); // Shift triangle so overall
+            end = 0.5 + (ww + 2) / this.dn; // symbol takes up same space
         } else {
-            this.pcircle = this.interpPoint(this.point1, this.point2, .5 + (ww - 1) / this.dn);   // Normal symbol circle
+            this.pcircle = this.interpPoint(this.point1, this.point2, 0.5 + (ww - 1) / this.dn); // Normal symbol circle
             start = this.lead1!;
-            end = .5 + (ww - 5) / this.dn;
+            end = 0.5 + (ww - 5) / this.dn;
         }
 
         if (GateElm.useEuroGates()) {
             const pts = this.newPointArray(4);
-            const l2 = this.interpPoint(this.point1, this.point2, .5 + (ww - 5) / this.dn);
+            const l2 = this.interpPoint(this.point1, this.point2, 0.5 + (ww - 5) / this.dn);
             this.interpPoint2(this.lead1!, l2, pts[0], pts[1], 0, hs);
             this.interpPoint2(this.lead1!, l2, pts[3], pts[2], 1, hs);
             this.gatePoly = this.createPolygon(pts);
-            this.center = this.interpPoint(this.lead1!, l2, .5);
+            this.center = this.interpPoint(this.lead1!, l2, 0.5);
         } else {
             const triPoints = this.newPointArray(3);
             this.interpPoint2(start, this.lead2!, triPoints[0], triPoints[1], 0, hs);
@@ -125,8 +125,12 @@ export class InverterElm extends CircuitElm {
         this.setBbox(this.point1, this.point2, hs);
     }
 
-    getVoltageSourceCount(): number { return 1; }
-    setHighVoltage(hv: number): void { this.highVoltage = hv; }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    setHighVoltage(hv: number): void {
+        this.highVoltage = hv;
+    }
 
     stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[1], this.voltSource);
@@ -139,13 +143,15 @@ export class InverterElm extends CircuitElm {
     }
 
     doStep(): void {
-        let out = this.nodes[0].v > this.highVoltage * .5 ? 0 : this.highVoltage;
+        let out = this.nodes[0].v > this.highVoltage * 0.5 ? 0 : this.highVoltage;
         const maxStep = this.slewRate * CircuitElm.sim.timeStep * 1e9;
         out = Math.max(Math.min(this.lastOutputVoltage + maxStep, out), this.lastOutputVoltage - maxStep);
         CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[1], this.voltSource, out);
     }
 
-    getVoltageDiff(): number { return this.nodes[0].v; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "inverter";
@@ -153,40 +159,42 @@ export class InverterElm extends CircuitElm {
         arr[2] = "Vo = " + CircuitElm.getVoltageText(this.nodes[1].v);
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Slew Rate (V/ns)", this.slewRate, 0, 0);
-        if (n === 1)
-            return new EditInfo("High Logic Voltage", this.highVoltage, 1, 10).setUnitStep();
-        if (n === 2)
-            return EditInfo.createCheckbox("DeMorgan's Symbol", this.hasFlag(InverterElm.FLAG_DEMORGAN));
+        if (n === 0) return new EditInfo("Slew Rate (V/ns)", this.slewRate, 0, 0);
+        if (n === 1) return new EditInfo("High Logic Voltage", this.highVoltage, 1, 10).setUnitStep();
+        if (n === 2) return EditInfo.createCheckbox("DeMorgan's Symbol", this.hasFlag(InverterElm.FLAG_DEMORGAN));
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.slewRate = ei.value;
-        if (n === 1)
-            this.highVoltage = GateElm.lastHighVoltage = ei.value;
+        if (n === 0) this.slewRate = ei.value;
+        if (n === 1) this.highVoltage = GateElm.lastHighVoltage = ei.value;
         if (n === 2) {
-            if (ei.checkbox!.getState())
-                this.flags |= InverterElm.FLAG_DEMORGAN;
-            else
-                this.flags &= ~InverterElm.FLAG_DEMORGAN;
+            if (ei.checkbox!.getState()) this.flags |= InverterElm.FLAG_DEMORGAN;
+            else this.flags &= ~InverterElm.FLAG_DEMORGAN;
             this.setPoints();
         }
     }
 
     // no current path through inverter input, but indirect path through output to ground
-    validate(): boolean { return this.validateRailNode(1); }
-    getConnection(n1: number, n2: number): boolean { return false; }
-    hasGroundConnection(n1: number): boolean { return n1 === 1; }
-    getShortcut(): number { return '1'.charCodeAt(0); }
+    validate(): boolean {
+        return this.validateRailNode(1);
+    }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
+    hasGroundConnection(n1: number): boolean {
+        return n1 === 1;
+    }
+    getShortcut(): number {
+        return "1".charCodeAt(0);
+    }
 
     getCurrentIntoNode(n: number): number {
-        if (n === 1)
-            return this.current;
+        if (n === 1) return this.current;
         return 0;
     }
 }

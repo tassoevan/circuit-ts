@@ -34,45 +34,62 @@ export class DACElm extends ChipElm {
         }
     }
 
-    getChipName(): string { return "DAC"; }
-    needsBits(): boolean { return true; }
-    allowBus(): boolean { return true; }
+    getChipName(): string {
+        return "DAC";
+    }
+    needsBits(): boolean {
+        return true;
+    }
+    allowBus(): boolean {
+        return true;
+    }
 
     setupPins(): void {
-        if (!this.bits)
-            return;
+        if (!this.bits) return;
         this.sizeX = 2;
-        const bitsY = this.useBus() ? 1 : (this.bits > 2 ? this.bits : 2);
+        const bitsY = this.useBus() ? 1 : this.bits > 2 ? this.bits : 2;
         this.sizeY = bitsY > 2 ? bitsY : 2;
         this.pins = new Array(this.getPostCount());
         this.makeBitPins(this.bits, 0, ChipElm.SIDE_W, 0, "D", false, false, false);
-        this.pins[this.bits]        = new Pin(this, 0, ChipElm.SIDE_E, "O");
+        this.pins[this.bits] = new Pin(this, 0, ChipElm.SIDE_E, "O");
         this.pins[this.bits].output = true;
-        this.pins[this.bits + 1]    = new Pin(this, this.sizeY - 1, ChipElm.SIDE_E, "V+");
+        this.pins[this.bits + 1] = new Pin(this, this.sizeY - 1, ChipElm.SIDE_E, "V+");
         this.allocNodes();
     }
 
     doStep(): void {
         let ival = 0;
-        for (let i = 0; i !== this.bits; i++)
-            if (this.nodes[i].v > this.getThreshold())
-                ival |= 1 << i;
+        for (let i = 0; i !== this.bits; i++) if (this.nodes[i].v > this.getThreshold()) ival |= 1 << i;
         const ivalmax = (1 << this.bits) - 1;
-        const v = ival * this.nodes[this.bits + 1].v / ivalmax;
-        CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[this.bits], this.pins[this.bits].voltSource, v);
+        const v = (ival * this.nodes[this.bits + 1].v) / ivalmax;
+        CircuitElm.sim.updateVoltageSource(
+            CircuitNode.ground,
+            this.nodes[this.bits],
+            this.pins[this.bits].voltSource,
+            v,
+        );
     }
 
-    getVoltageSourceCount(): number { return 1; }
-    getPostCount(): number { return this.bits + 2; }
-    getDumpType(): number { return 166; }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    getPostCount(): number {
+        return this.bits + 2;
+    }
+    getDumpType(): number {
+        return 166;
+    }
 
     // there's already a V+ pin, how does that relate to high logic voltage?  figure out later
-    isDigitalChip(): boolean { return false; }
+    isDigitalChip(): boolean {
+        return false;
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
+        if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         return null;
     }
 
@@ -82,8 +99,7 @@ export class DACElm extends ChipElm {
                 this.bits = Math.trunc(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be >= 2");
+            } else ei.setError("must be >= 2");
         }
     }
 }

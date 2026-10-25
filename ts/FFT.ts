@@ -29,7 +29,7 @@ export class FFT {
         this.bits = Math.floor(Math.log(this.size) / Math.log(2));
         this.cosTable = new Array(this.size / 2);
         this.sinTable = new Array(this.size / 2);
-        const dtheta = -2 * Math.PI / this.size;
+        const dtheta = (-2 * Math.PI) / this.size;
         for (let i = 0; i < this.cosTable.length; i++) {
             this.cosTable[i] = Math.cos(dtheta * i);
             this.sinTable[i] = Math.sin(dtheta * i);
@@ -40,7 +40,7 @@ export class FFT {
 
         this.winTable = new Array(this.size);
         for (let i = 0; i < this.winTable.length; i++) {
-            const weight = Math.sin(i * Math.PI / this.winTable.length);
+            const weight = Math.sin((i * Math.PI) / this.winTable.length);
             this.winTable[i] = weight * gainCompensation;
         }
     }
@@ -102,7 +102,9 @@ export class FFT {
         }
     }
 
-    getSize(): number { return this.size; }
+    getSize(): number {
+        return this.size;
+    }
 
     magnitude(real: number, imag: number): number {
         return Math.sqrt(real * real + imag * imag) / this.size;

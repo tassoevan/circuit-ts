@@ -72,7 +72,9 @@ export class LEDArrayElm extends ChipElm {
         this.setPoints();
     }
 
-    getChipName(): string { return "LED array"; }
+    getChipName(): string {
+        return "LED array";
+    }
 
     setupPins(): void {
         if (this.sizeX === 0 || this.sizeY === 0) {
@@ -80,10 +82,8 @@ export class LEDArrayElm extends ChipElm {
             this.allocNodes();
         }
         this.pins = new Array(this.sizeX + this.sizeY);
-        for (let i = 0; i !== this.sizeX; i++)
-            this.pins[i] = new Pin(this, i, ChipElm.SIDE_S, "");
-        for (let i = 0; i !== this.sizeY; i++)
-            this.pins[i + this.sizeX] = new Pin(this, i, ChipElm.SIDE_W, "");
+        for (let i = 0; i !== this.sizeX; i++) this.pins[i] = new Pin(this, i, ChipElm.SIDE_S, "");
+        for (let i = 0; i !== this.sizeY; i++) this.pins[i + this.sizeX] = new Pin(this, i, ChipElm.SIDE_W, "");
         this.brightness = new Array(this.sizeX * this.sizeY).fill(0);
     }
 
@@ -111,37 +111,45 @@ export class LEDArrayElm extends ChipElm {
                 this.diodes![i].doStep(this.nodes[this.sizeX + iy].v - this.nodes[ix].v);
     }
 
-    nonLinear(): boolean { return true; }
-    isDigitalChip(): boolean { return false; }
+    nonLinear(): boolean {
+        return true;
+    }
+    isDigitalChip(): boolean {
+        return false;
+    }
 
     draw(g: Graphics): void {
         const elapsed = CircuitElm.sim.t - this.lastDrawTime;
         this.lastDrawTime = CircuitElm.sim.t;
-        this.decayMultiplier = (elapsed > 0) ? Math.exp(-elapsed / LEDArrayElm.brightnessTau) : 1;
+        this.decayMultiplier = elapsed > 0 ? Math.exp(-elapsed / LEDArrayElm.brightnessTau) : 1;
         this.drawChip(g);
         for (let ix = 0; ix !== this.sizeX; ix++) {
             for (let iy = 0; iy !== this.sizeY; iy++) {
                 const i = ix + iy * this.sizeX;
                 this.setLEDColor(g, i);
                 if (this.isFlippedXY())
-                    g.fillOval(this.pins[iy + this.sizeX].post.x - this.cspc / 2,
-                               this.pins[ix].post.y - this.cspc / 2,
-                               this.cspc, this.cspc);
+                    g.fillOval(
+                        this.pins[iy + this.sizeX].post.x - this.cspc / 2,
+                        this.pins[ix].post.y - this.cspc / 2,
+                        this.cspc,
+                        this.cspc,
+                    );
                 else
-                    g.fillOval(this.pins[ix].post.x - this.cspc / 2,
-                               this.pins[iy + this.sizeX].post.y - this.cspc / 2,
-                               this.cspc, this.cspc);
+                    g.fillOval(
+                        this.pins[ix].post.x - this.cspc / 2,
+                        this.pins[iy + this.sizeX].post.y - this.cspc / 2,
+                        this.cspc,
+                        this.cspc,
+                    );
             }
         }
     }
 
     calculateCurrent(): void {
-        for (let ix = 0; ix !== this.sizeX; ix++)
-            this.pins[ix].current = 0;
+        for (let ix = 0; ix !== this.sizeX; ix++) this.pins[ix].current = 0;
 
         // avoid exception if called before stamp()
-        if (this.diodes == null)
-            return;
+        if (this.diodes == null) return;
 
         let i = 0;
         for (let iy = 0; iy !== this.sizeY; iy++) {
@@ -157,8 +165,7 @@ export class LEDArrayElm extends ChipElm {
 
     stepFinished(): void {
         for (let i = 0; i !== this.currents.length; i++)
-            if (Math.abs(this.currents[i]) > 1e12)
-                CircuitElm.sim.stop("max current exceeded", this);
+            if (Math.abs(this.currents[i]) > 1e12) CircuitElm.sim.stop("max current exceeded", this);
     }
 
     private setLEDColor(g: Graphics, p: number): void {
@@ -168,12 +175,9 @@ export class LEDArrayElm extends ChipElm {
             return;
         }
         let w = this.currents[p] / 0.01;
-        if (w > 0)
-            w = 255 * (1 + 0.2 * Math.log(w));
-        if (w > 255)
-            w = 255;
-        if (w < 20)
-            w = 20;
+        if (w > 0) w = 255 * (1 + 0.2 * Math.log(w));
+        if (w > 255) w = 255;
+        if (w < 20) w = 20;
 
         // when diode turns off, fade gradually to simulate persistence of vision
         w = Math.max(w, this.brightness[p]);
@@ -182,16 +186,22 @@ export class LEDArrayElm extends ChipElm {
         g.setColor(new Color(Math.trunc(w), 0, 0));
     }
 
-    getPostCount(): number { return this.sizeX + this.sizeY; }
-    getVoltageSourceCount(): number { return 0; }
-    getMatrixConnection(n1: number, n2: number): boolean { return true; }
-    getDumpType(): number { return 405; }
+    getPostCount(): number {
+        return this.sizeX + this.sizeY;
+    }
+    getVoltageSourceCount(): number {
+        return 0;
+    }
+    getMatrixConnection(n1: number, n2: number): boolean {
+        return true;
+    }
+    getDumpType(): number {
+        return 405;
+    }
 
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Grid Width", this.sizeX).setDimensionless();
-        if (n === 1)
-            return new EditInfo("Grid Height", this.sizeY).setDimensionless();
+        if (n === 0) return new EditInfo("Grid Width", this.sizeX).setDimensionless();
+        if (n === 1) return new EditInfo("Grid Height", this.sizeY).setDimensionless();
         return null;
     }
 
@@ -202,8 +212,7 @@ export class LEDArrayElm extends ChipElm {
                 this.allocNodes();
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be between 2 and 16");
+            } else ei.setError("must be between 2 and 16");
             return;
         }
         if (n === 1) {
@@ -212,8 +221,7 @@ export class LEDArrayElm extends ChipElm {
                 this.allocNodes();
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be between 2 and 16");
+            } else ei.setError("must be between 2 and 16");
             return;
         }
     }

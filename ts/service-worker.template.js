@@ -3,14 +3,9 @@
 // version gets its own cache name and file list (old versions' caches are
 // cleaned up in the 'activate' handler below).
 
-const CACHE_NAME = 'circuitjs-cache-VERSION_PLACEHOLDER';
+const CACHE_NAME = "circuitjs-cache-VERSION_PLACEHOLDER";
 
-const urlsToCache = [
-  'circuitjs.html',
-  'iframe.html',
-  'jsinterface.html',
-FILE_LIST_GOES_HERE
-];
+const urlsToCache = ["circuitjs.html", "iframe.html", "jsinterface.html", FILE_LIST_GOES_HERE];
 
 // Cache each file individually rather than with cache.addAll(): addAll is
 // all-or-nothing, so a single file the server refuses (e.g. a stray .py the
@@ -18,35 +13,40 @@ FILE_LIST_GOES_HERE
 // version's worker in control and serving its stale cache indefinitely.
 // skipWaiting() activates the new version right away instead of waiting
 // for every open tab of the site to close.
-self.addEventListener('install', event => {
-  self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache =>
-      Promise.all(urlsToCache.map(url =>
-        cache.add(url).catch(err => console.warn('Service worker: failed to cache', url, err))
-      ))
-    )
-  );
+self.addEventListener("install", (event) => {
+    self.skipWaiting();
+    event.waitUntil(
+        caches
+            .open(CACHE_NAME)
+            .then((cache) =>
+                Promise.all(
+                    urlsToCache.map((url) =>
+                        cache.add(url).catch((err) => console.warn("Service worker: failed to cache", url, err)),
+                    ),
+                ),
+            ),
+    );
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
     // Normalize the request URL by stripping the ?startCircuit parameter
     let req = event.request;
     const url = new URL(req.url);
 
-    if (url.searchParams.has('startCircuit')) {
+    if (url.searchParams.has("startCircuit")) {
         // Remove the 'startCircuit' query parameter
-        url.searchParams.delete('startCircuit');
+        url.searchParams.delete("startCircuit");
         const request = event.request;
         req = new Request(url, {
-                    method: request.method,
-                    headers: request.headers,
-                    mode: request.mode === 'navigate' ? 'same-origin' : request.mode,
-                    credentials: request.credentials,
-                    redirect: request.redirect,
-                    referrer: request.referrer,
-                    integrity: request.integrity,
-                    cache: request.caches });
+            method: request.method,
+            headers: request.headers,
+            mode: request.mode === "navigate" ? "same-origin" : request.mode,
+            credentials: request.credentials,
+            redirect: request.redirect,
+            referrer: request.referrer,
+            integrity: request.integrity,
+            cache: request.caches,
+        });
     }
 
     event.respondWith(
@@ -58,10 +58,7 @@ self.addEventListener('fetch', (event) => {
 
             // Otherwise, fetch it from the network and add it to the cache
             return fetch(req).then((networkResponse) => {
-                if (
-                    event.request.method === 'GET' &&
-                    networkResponse.status === 200
-                ) {
+                if (event.request.method === "GET" && networkResponse.status === 200) {
                     const responseClone = networkResponse.clone();
                     caches.open(CACHE_NAME).then((cache) => {
                         cache.put(req, responseClone);
@@ -70,23 +67,26 @@ self.addEventListener('fetch', (event) => {
 
                 return networkResponse;
             });
-        })
+        }),
     );
 });
 
 // Activate event: cleans up old caches
-self.addEventListener('activate', (event) => {
-    const cacheWhitelist = [CACHE_NAME];  // List of cache versions you want to keep
+self.addEventListener("activate", (event) => {
+    const cacheWhitelist = [CACHE_NAME]; // List of cache versions you want to keep
 
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (!cacheWhitelist.includes(cacheName)) {
-                        return caches.delete(cacheName);  // Delete old caches that aren't in whitelist
-                    }
-                })
-            );
-        }).then(() => self.clients.claim())
+        caches
+            .keys()
+            .then((cacheNames) => {
+                return Promise.all(
+                    cacheNames.map((cacheName) => {
+                        if (!cacheWhitelist.includes(cacheName)) {
+                            return caches.delete(cacheName); // Delete old caches that aren't in whitelist
+                        }
+                    }),
+                );
+            })
+            .then(() => self.clients.claim()),
     );
 });

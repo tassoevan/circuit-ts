@@ -50,19 +50,18 @@ export class CCVSElm extends VCCSElm {
     }
 
     setupPins(): void {
-        if (!this.inputCount)
-	    this.inputCount = 0;
+        if (!this.inputCount) this.inputCount = 0;
         this.sizeX = 2;
         this.sizeY = this.inputCount > 2 ? this.inputCount : 2;
         this.inputPairCount = Math.floor(this.inputCount / 2);
         this.pins = new Array(this.inputCount + 2);
         for (let i = 0; i !== this.inputPairCount; i++) {
-            this.pins[i * 2]     = new Pin(this, i * 2,     ChipElm.SIDE_W, String.fromCharCode(65 + i) + "+");
+            this.pins[i * 2] = new Pin(this, i * 2, ChipElm.SIDE_W, String.fromCharCode(65 + i) + "+");
             this.pins[i * 2 + 1] = new Pin(this, i * 2 + 1, ChipElm.SIDE_W, String.fromCharCode(65 + i) + "-");
             this.pins[i * 2 + 1].output = true;
         }
         const i = this.inputPairCount;
-        this.pins[i * 2]     = new Pin(this, 0, ChipElm.SIDE_E, "V+");
+        this.pins[i * 2] = new Pin(this, 0, ChipElm.SIDE_E, "V+");
         this.pins[i * 2].output = true;
         this.pins[i * 2 + 1] = new Pin(this, 1, ChipElm.SIDE_E, "V-");
         this.lastCurrents = new Array(this.inputPairCount).fill(0);
@@ -72,9 +71,13 @@ export class CCVSElm extends VCCSElm {
 
     // our pin inputs are currents, handled by their own loop below, so the generic
     // expression-input machinery only covers the v()/i() references
-    protected getPinExprInputCount(): number { return 0; }
+    protected getPinExprInputCount(): number {
+        return 0;
+    }
 
-    getChipName(): string { return "CCVS"; }
+    getChipName(): string {
+        return "CCVS";
+    }
 
     stamp(): void {
         const sim = SimulationManager.theSim;
@@ -106,23 +109,23 @@ export class CCVSElm extends VCCSElm {
         const convergeLimitCurrent = this.getConvergeLimit() * 0.1;
         for (let i = 0; i !== this.inputPairCount; i++) {
             const cur = this.pins[i * 2 + 1].current;
-            if (Math.abs(cur - this.lastCurrents[i]) > convergeLimitCurrent)
-                sim.converged = false;
+            if (Math.abs(cur - this.lastCurrents[i]) > convergeLimitCurrent) sim.converged = false;
         }
 
         // check convergence on output voltage
         const convergeLimitVoltage = this.getConvergeLimit();
-        if (Math.abs((this.nodes[this.inputCount].v - this.nodes[this.inputCount + 1].v) - this.lastOutput) > convergeLimitVoltage)
+        if (
+            Math.abs(this.nodes[this.inputCount].v - this.nodes[this.inputCount + 1].v - this.lastOutput) >
+            convergeLimitVoltage
+        )
             sim.converged = false;
 
         // check convergence on the v()/i() references
-        if (!this.engine.checkConvergence(this.getConvergeLimit()))
-            sim.converged = false;
+        if (!this.engine.checkConvergence(this.getConvergeLimit())) sim.converged = false;
 
         const vno = this.outputVS!;
         if (this.expr != null) {
-            for (let i = 0; i !== this.inputPairCount; i++)
-                this.setCurrentExprValue(i, this.pins[i * 2 + 1].current);
+            for (let i = 0; i !== this.inputPairCount; i++) this.setCurrentExprValue(i, this.pins[i * 2 + 1].current);
             this.exprState.t = sim.t;
             const v0 = this.expr.eval(this.exprState);
             let rs = v0;
@@ -137,8 +140,7 @@ export class CCVSElm extends VCCSElm {
                 this.setCurrentExprValue(i, cur - dv);
                 const v2 = this.expr.eval(this.exprState);
                 let dx = (v - v2) / dv;
-                if (Math.abs(dx) < 1e-6)
-                    dx = this.sign(dx, 1e-6);
+                if (Math.abs(dx) < 1e-6) dx = this.sign(dx, 1e-6);
                 sim.stampMatrixVV(vno, vni, -dx);
                 rs -= dx * cur;
                 this.setCurrentExprValue(i, cur);
@@ -146,15 +148,13 @@ export class CCVSElm extends VCCSElm {
             // partial derivatives for the v()/i() references.  the pin currents were
             // already differentiated above, so this pass only picks up the references;
             // it re-derives the same v0, so subtracting it leaves just their residual.
-            if (this.engine.getRefCount() > 0)
-                rs += this.engine.evalAndStamp(false) - v0;
+            if (this.engine.getRefCount() > 0) rs += this.engine.evalAndStamp(false) - v0;
 
             sim.stampRightSideVS(vno, rs);
         }
 
         this.engine.saveInputs();
-        for (let i = 0; i !== this.inputPairCount; i++)
-            this.lastCurrents[i] = this.pins[i * 2 + 1].current;
+        for (let i = 0; i !== this.inputPairCount; i++) this.lastCurrents[i] = this.pins[i * 2 + 1].current;
         this.lastOutput = this.nodes[this.inputCount].v - this.nodes[this.inputCount + 1].v;
     }
 
@@ -171,27 +171,35 @@ export class CCVSElm extends VCCSElm {
 
     stepFinished(): void {
         this.exprState.updateLastValues(this.nodes[this.inputCount].v - this.nodes[this.inputCount + 1].v);
-        for (let i = 0; i !== this.inputPairCount; i++)
-            this.exprState.lastValues[i] = this.pins[i * 2 + 1].current;
+        for (let i = 0; i !== this.inputPairCount; i++) this.exprState.lastValues[i] = this.pins[i * 2 + 1].current;
     }
 
     private setCurrentExprValue(n: number, cur: number): void {
         // set index 8 to current for backward compatibility when single input
-        if (n === 0 && this.inputPairCount < 9)
-            this.exprState.values[8] = cur;
+        if (n === 0 && this.inputPairCount < 9) this.exprState.values[8] = cur;
         this.exprState.values[n] = cur;
     }
 
-    getPostCount(): number { return this.inputCount + 2; }
-    getVoltageSourceCount(): number { return this.isSpiceStyle() ? 1 : 1 + this.inputPairCount; }
-    getDumpType(): number { return 214; }
+    getPostCount(): number {
+        return this.inputCount + 2;
+    }
+    getVoltageSourceCount(): number {
+        return this.isSpiceStyle() ? 1 : 1 + this.inputPairCount;
+    }
+    getDumpType(): number {
+        return 214;
+    }
 
     getConnection(n1: number, n2: number): boolean {
         return Math.floor(n1 / 2) === Math.floor(n2 / 2);
     }
 
-    hasCurrentOutput(): boolean { return false; }
-    isSpiceStyle(): boolean { return (this.flags & CCVSElm.FLAG_SPICE) !== 0; }
+    hasCurrentOutput(): boolean {
+        return false;
+    }
+    isSpiceStyle(): boolean {
+        return (this.flags & CCVSElm.FLAG_SPICE) !== 0;
+    }
 
     setCurrent(vs: VoltageSource, c: number): void {
         let i = 0;
@@ -215,8 +223,7 @@ export class CCVSElm extends VCCSElm {
     setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 1) {
             // input count must be even
-            if (ei.value < 0 || ei.value > 8 || (ei.value % 2) === 1)
-                return;
+            if (ei.value < 0 || ei.value > 8 || ei.value % 2 === 1) return;
             this.inputCount = Math.round(ei.value);
             this.setupPins();
             this.allocNodes();
@@ -227,15 +234,13 @@ export class CCVSElm extends VCCSElm {
     }
 
     setParentList(elmList: CircuitElm[]): void {
-        super.setParentList(elmList);   // resolves our v()/i() references
-        if (!this.isSpiceStyle())
-            return;
+        super.setParentList(elmList); // resolves our v()/i() references
+        if (!this.isSpiceStyle()) return;
         this.voltageSources = new Array(this.inputPairCount).fill(null);
         for (let i = 0; i !== this.inputCount; i += 2) {
             for (let j = 0; j !== elmList.length; j++) {
                 const ce = elmList[j];
-                if (!ce.isVoltageElm())
-                    continue;
+                if (!ce.isVoltageElm()) continue;
                 if (ce.getNode(0) === this.nodes[i] && ce.getNode(1) === this.nodes[i + 1])
                     this.voltageSources[i / 2] = ce as VoltageElm;
             }
@@ -248,10 +253,8 @@ export class CCVSElm extends VCCSElm {
             vs.setNodes(this.nodes[this.inputCount + 1], this.nodes[this.inputCount]);
         } else {
             super.setVoltageSource(j, vs);
-            if (j < this.inputPairCount)
-                vs.setNodes(this.nodes[j * 2], this.nodes[j * 2 + 1]);
-            else
-                vs.setNodes(this.nodes[this.inputCount + 1], this.nodes[this.inputCount]);
+            if (j < this.inputPairCount) vs.setNodes(this.nodes[j * 2], this.nodes[j * 2 + 1]);
+            else vs.setNodes(this.nodes[this.inputCount + 1], this.nodes[this.inputCount]);
         }
     }
 
@@ -261,8 +264,14 @@ export class CCVSElm extends VCCSElm {
         let j = 0;
         for (j = 0; j !== this.inputCount; j += 2)
             arr[i++] = this.pins[j].text + " = " + CCVSElm.getCurrentText(-this.pins[j].current);
-        arr[i++] = this.pins[j].text + " = " + CCVSElm.getVoltageText(this.nodes[j].v) + "; " +
-                   this.pins[j + 1].text + " = " + CCVSElm.getVoltageText(this.nodes[j + 1].v);
+        arr[i++] =
+            this.pins[j].text +
+            " = " +
+            CCVSElm.getVoltageText(this.nodes[j].v) +
+            "; " +
+            this.pins[j + 1].text +
+            " = " +
+            CCVSElm.getVoltageText(this.nodes[j + 1].v);
         arr[i++] = "I = " + CCVSElm.getCurrentText(this.pins[j].current);
         arr[i] = null!;
     }

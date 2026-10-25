@@ -26,10 +26,12 @@ export class CircuitNode {
     internal: boolean = false;
     index: number = 0;
     matrix: CircuitMatrix | null = null;
-    row: number = 0;  // row in matrix (0 = ground/excluded)
+    row: number = 0; // row in matrix (0 = ground/excluded)
     v: number = 0;
 
-    toString(): string { return "node " + this.index; }
+    toString(): string {
+        return "node " + this.index;
+    }
 }
 
 // Initialize static ground node after class definition

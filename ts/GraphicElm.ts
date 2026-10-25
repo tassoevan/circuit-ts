@@ -21,7 +21,9 @@ import { CircuitElm } from "./CircuitElm";
 import { StringTokenizer } from "./StringTokenizer";
 
 export class GraphicElm extends CircuitElm {
-    isGraphicElm(): boolean { return true; }
+    isGraphicElm(): boolean {
+        return true;
+    }
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, flags: number);
     constructor(xa: number, ya: number, xb?: number, yb?: number, flags?: number) {
@@ -32,5 +34,7 @@ export class GraphicElm extends CircuitElm {
         }
     }
 
-    getPostCount(): number { return 0; }
+    getPostCount(): number {
+        return 0;
+    }
 }

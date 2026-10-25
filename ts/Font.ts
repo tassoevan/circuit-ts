@@ -24,8 +24,7 @@ export class Font {
     size: number;
 
     constructor(name: string, style: number, size: number) {
-        if (name === "SansSerif")
-            name = "sans-serif";
+        if (name === "SansSerif") name = "sans-serif";
         const styleStr = (style & Font.BOLD) !== 0 ? "bold " : "normal ";
         this.fontname = styleStr + size + "px " + name;
         this.size = size;

@@ -70,8 +70,7 @@ export class AudioInputElm extends RailElm {
         // add a file number to the dump so we can preserve the audio file data when doing cut and paste, or undo/redo.
         // we don't save the entire file in the dump because it would be huge.
         if (this.data !== null) {
-            if (this.fileNum === 0)
-                this.fileNum = AudioInputElm.fileNumCounter++;
+            if (this.fileNum === 0) this.fileNum = AudioInputElm.fileNumCounter++;
             const ent = new AudioFileEntry();
             ent.fileName = this.fileName!;
             ent.data = this.data;
@@ -121,17 +120,14 @@ export class AudioInputElm extends RailElm {
     }
 
     getVoltage(): number {
-        if (this.data === null)
-            return 0;
-        if (this.timeOffset < this.startPosition)
-            this.timeOffset = this.startPosition;
+        if (this.data === null) return 0;
+        if (this.timeOffset < this.startPosition) this.timeOffset = this.startPosition;
         const dptr = this.timeOffset * this.samplingRate;
         const iptr = Math.trunc(dptr);
         const frac = dptr - iptr;
-        if (iptr >= this.data.length)
-            return 0;
+        if (iptr >= this.data.length) return 0;
         const value1 = this.data[iptr];
-        const value2 = (iptr + 1 < this.data.length) ? this.data[iptr + 1] : 0;
+        const value2 = iptr + 1 < this.data.length ? this.data[iptr + 1] : 0;
         return (value1 * (1 - frac) + value2 * frac) * this.maxVoltage;
     }
 
@@ -139,9 +135,15 @@ export class AudioInputElm extends RailElm {
         this.timeOffset += CircuitElm.sim.timeStep;
     }
 
-    getDumpType(): number { return 411; }
-    getXmlDumpType(): string { return "ain"; }
-    getShortcut(): number { return 0; }
+    getDumpType(): number {
+        return 411;
+    }
+    getXmlDumpType(): string {
+        return "ain";
+    }
+    getShortcut(): number {
+        return 0;
+    }
 
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
@@ -159,18 +161,14 @@ export class AudioInputElm extends RailElm {
             ei.widget = input;
             return ei;
         }
-        if (n === 1)
-            return new EditInfo("Max Voltage", this.maxVoltage).setUnitStep();
-        if (n === 2)
-            return new EditInfo("Start Position (s)", this.startPosition);
+        if (n === 1) return new EditInfo("Max Voltage", this.maxVoltage).setUnitStep();
+        if (n === 2) return new EditInfo("Start Position (s)", this.startPosition);
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 1)
-            this.maxVoltage = ei.value;
-        if (n === 2)
-            this.startPosition = ei.value;
+        if (n === 1) this.maxVoltage = ei.value;
+        if (n === 2) this.startPosition = ei.value;
     }
 
     // fetch audio data for a selected file
@@ -179,11 +177,14 @@ export class AudioInputElm extends RailElm {
         elm.setSamplingRate(context.sampleRate);
         const reader = new FileReader();
         reader.onload = (e) => {
-            context.decodeAudioData(e.target!.result as ArrayBuffer,
+            context.decodeAudioData(
+                e.target!.result as ArrayBuffer,
                 (buffer: AudioBuffer) => {
                     elm.gotAudioData(buffer.getChannelData(0));
                 },
-                (err: any) => { console.log("Error decoding audio data", err); }
+                (err: any) => {
+                    console.log("Error decoding audio data", err);
+                },
             );
         };
         reader.readAsArrayBuffer(file);

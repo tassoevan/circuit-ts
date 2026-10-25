@@ -67,24 +67,24 @@ export class Pin {
     setPoint(px: number, py: number, dx: number, dy: number, dax: number, day: number, sx: number, sy: number): void {
         const chip = this.chip;
         if (chip.isFlippedX()) {
-            dx  = -dx;
+            dx = -dx;
             dax = -dax;
             px += chip.cspc2 * (chip.flippedSizeX - 1);
-            sx  = -sx;
+            sx = -sx;
         }
         if (chip.isFlippedY()) {
-            dy  = -dy;
+            dy = -dy;
             day = -day;
             py += chip.cspc2 * (chip.flippedSizeY - 1);
-            sy  = -sy;
+            sy = -sy;
         }
         const xa = px + chip.cspc2 * dx * this.pos + sx;
         const ya = py + chip.cspc2 * dy * this.pos + sy;
-        this.post    = new Point(xa + dax * chip.cspc2, ya + day * chip.cspc2);
-        const busExtra = (this.busWidth > 1) ? 2 : 0;
-        this.stub    = new Point(xa + dax * (chip.cspc + busExtra), ya + day * (chip.cspc + busExtra));
+        this.post = new Point(xa + dax * chip.cspc2, ya + day * chip.cspc2);
+        const busExtra = this.busWidth > 1 ? 2 : 0;
+        this.stub = new Point(xa + dax * (chip.cspc + busExtra), ya + day * (chip.cspc + busExtra));
         this.textloc = new Point(xa, ya);
-        this.post.z  = this.busZ;
+        this.post.z = this.busZ;
         if (this.bubble) {
             this.bubbleX = xa + dax * 10 * chip.csize;
             this.bubbleY = ya + day * 10 * chip.csize;
@@ -94,17 +94,17 @@ export class Pin {
                 this.clockPointsX = new Array(3);
                 this.clockPointsY = new Array(3);
             }
-            this.clockPointsX[0] = xa + dax * chip.cspc - dx * chip.cspc / 2;
-            this.clockPointsY[0] = ya + day * chip.cspc - dy * chip.cspc / 2;
+            this.clockPointsX[0] = xa + dax * chip.cspc - (dx * chip.cspc) / 2;
+            this.clockPointsY[0] = ya + day * chip.cspc - (dy * chip.cspc) / 2;
             this.clockPointsX[1] = xa;
             this.clockPointsY[1] = ya;
-            this.clockPointsX[2] = xa + dax * chip.cspc + dx * chip.cspc / 2;
-            this.clockPointsY[2] = ya + day * chip.cspc + dy * chip.cspc / 2;
+            this.clockPointsX[2] = xa + dax * chip.cspc + (dx * chip.cspc) / 2;
+            this.clockPointsY[2] = ya + day * chip.cspc + (dy * chip.cspc) / 2;
             if (this.text.length > 0) {
-                this.clockPointsX[1] += dax * chip.cspc / 2;
-                this.clockPointsY[1] += day * chip.cspc / 2;
-                this.textloc.x -= dax * chip.cspc / 2;
-                this.textloc.y -= day * chip.cspc / 4;
+                this.clockPointsX[1] += (dax * chip.cspc) / 2;
+                this.clockPointsY[1] += (day * chip.cspc) / 2;
+                this.textloc.x -= (dax * chip.cspc) / 2;
+                this.textloc.y -= (day * chip.cspc) / 4;
             }
         } else {
             this.clockPointsX = null;
@@ -174,31 +174,28 @@ export abstract class ChipElm extends CircuitElm {
     labelX: number = 0;
     labelY: number = 0;
 
-    static readonly FLAG_SMALL         = 1;
-    static readonly FLAG_FLIP_X        = 1 << 10;
-    static readonly FLAG_FLIP_Y        = 1 << 11;
-    static readonly FLAG_FLIP_XY       = 1 << 12;
+    static readonly FLAG_SMALL = 1;
+    static readonly FLAG_FLIP_X = 1 << 10;
+    static readonly FLAG_FLIP_Y = 1 << 11;
+    static readonly FLAG_FLIP_XY = 1 << 12;
     static readonly FLAG_CUSTOM_VOLTAGE = 1 << 13;
     static readonly BIT_ORDER_MSB_FIRST = 0;
     static readonly BIT_ORDER_LSB_FIRST = 1;
-    static readonly BIT_ORDER_BUS       = 2;
+    static readonly BIT_ORDER_BUS = 2;
 
     static readonly SIDE_N = 0;
     static readonly SIDE_S = 1;
     static readonly SIDE_W = 2;
     static readonly SIDE_E = 3;
 
-    static readonly sideFlipXY = [
-        ChipElm.SIDE_W, ChipElm.SIDE_E, ChipElm.SIDE_N, ChipElm.SIDE_S
-    ];
+    static readonly sideFlipXY = [ChipElm.SIDE_W, ChipElm.SIDE_E, ChipElm.SIDE_N, ChipElm.SIDE_S];
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
         if (xb === undefined) {
             super(xa, ya);
-            if (this.needsBits())
-                this.bits = this.defaultBitCount();
+            if (this.needsBits()) this.bits = this.defaultBitCount();
             this.highVoltage = 5;
             this.noDiagonal = true;
             this.setupPins();
@@ -226,19 +223,31 @@ export abstract class ChipElm extends CircuitElm {
         }
     }
 
-    needsBits(): boolean { return false; }
-    hasCustomVoltage(): boolean { return (this.flags & ChipElm.FLAG_CUSTOM_VOLTAGE) !== 0; }
-    useBus(): boolean { return this.bitOrder === ChipElm.BIT_ORDER_BUS; }
-    isDigitalChip(): boolean { return true; }
-    getThreshold(): number { return this.highVoltage / 2; }
-    defaultBitCount(): number { return 4; }
+    needsBits(): boolean {
+        return false;
+    }
+    hasCustomVoltage(): boolean {
+        return (this.flags & ChipElm.FLAG_CUSTOM_VOLTAGE) !== 0;
+    }
+    useBus(): boolean {
+        return this.bitOrder === ChipElm.BIT_ORDER_BUS;
+    }
+    isDigitalChip(): boolean {
+        return true;
+    }
+    getThreshold(): number {
+        return this.highVoltage / 2;
+    }
+    defaultBitCount(): number {
+        return 4;
+    }
 
     setSize(s: number): void {
         this.csize = s;
-        this.cspc  = 8 * s;
+        this.cspc = 8 * s;
         this.cspc2 = this.cspc * 2;
         this.flags &= ~ChipElm.FLAG_SMALL;
-        this.flags |= (s === 1) ? ChipElm.FLAG_SMALL : 0;
+        this.flags |= s === 1 ? ChipElm.FLAG_SMALL : 0;
     }
 
     abstract setupPins(): void;
@@ -259,8 +268,7 @@ export abstract class ChipElm extends CircuitElm {
         for (let i = 0; i !== this.getPostCount(); i++) {
             g.setFont(f);
             const p = this.pins[i];
-            if (p.busZ > 0)
-                continue;
+            if (p.busZ > 0) continue;
             this.setVoltageColor(g, this.nodes[i].v);
             const a = p.post;
             const b = p.stub;
@@ -273,15 +281,14 @@ export abstract class ChipElm extends CircuitElm {
                 g.setColor(CircuitElm.lightGrayColor);
                 CircuitElm.drawThickCircle(g, p.bubbleX, p.bubbleY, 3);
             }
-            if (p.clockPointsX !== null)  {
+            if (p.clockPointsX !== null) {
                 g.setColor(CircuitElm.lightGrayColor);
                 g.drawPolyline(p.clockPointsX, p.clockPointsY!, 3);
             }
             g.setColor(p.selected ? CircuitElm.selectColor : CircuitElm.whiteColor);
             let fsz = 10 * this.csize;
             let availSpace = this.cspc * 2 - 8;
-            if (!hasVertical && this.sizeX > 2)
-                availSpace = this.cspc * 2.5 + this.cspc * (this.sizeX - 3);
+            if (!hasVertical && this.sizeX > 2) availSpace = this.cspc * 2.5 + this.cspc * (this.sizeX - 3);
             const text = p.busWidth > 1 ? p.text + "/" + p.busWidth : p.text;
             while (true) {
                 const sw = g.context.measureText(text).width;
@@ -292,12 +299,9 @@ export abstract class ChipElm extends CircuitElm {
                 }
                 const asc = g.currentFontSize;
                 let tx: number;
-                if (p.side === this.flippedXSide(ChipElm.SIDE_W))
-                    tx = p.textloc.x - (this.cspc - 5);
-                else if (p.side === this.flippedXSide(ChipElm.SIDE_E))
-                    tx = p.textloc.x + (this.cspc - 5) - sw;
-                else
-                    tx = p.textloc.x - sw / 2;
+                if (p.side === this.flippedXSide(ChipElm.SIDE_W)) tx = p.textloc.x - (this.cspc - 5);
+                else if (p.side === this.flippedXSide(ChipElm.SIDE_E)) tx = p.textloc.x + (this.cspc - 5) - sw;
+                else tx = p.textloc.x - sw / 2;
                 g.drawString(text, tx, p.textloc.y + asc / 3);
                 if (p.lineOver) {
                     const ya = p.textloc.y - asc + asc / 3;
@@ -318,7 +322,8 @@ export abstract class ChipElm extends CircuitElm {
     drag(xx: number, yy: number): void {
         yy = this.snapGrid(yy);
         if (xx < this.x) {
-            xx = this.x; yy = this.y;
+            xx = this.x;
+            yy = this.y;
         } else {
             this.y = this.y2 = yy;
             this.x2 = Math.min(this.snapGrid(xx), this.x + (this.sizeX + 1) * this.cspc2);
@@ -327,8 +332,7 @@ export abstract class ChipElm extends CircuitElm {
     }
 
     setPoints(): void {
-        if (this.x2 - this.x > this.sizeX * this.cspc2 && this.isCreating())
-            this.setSize(2);
+        if (this.x2 - this.x > this.sizeX * this.cspc2 && this.isCreating()) this.setSize(2);
         const x0 = this.x + this.cspc2;
         const y0 = this.y;
         const xr = x0 - this.cspc;
@@ -344,17 +348,24 @@ export abstract class ChipElm extends CircuitElm {
         for (let i = 0; i !== this.getPostCount(); i++) {
             const p = this.pins[i];
             p.side = p.side0;
-            if ((this.flags & ChipElm.FLAG_FLIP_XY) !== 0)
-                p.side = ChipElm.sideFlipXY[p.side];
+            if ((this.flags & ChipElm.FLAG_FLIP_XY) !== 0) p.side = ChipElm.sideFlipXY[p.side];
             switch (p.side) {
-                case ChipElm.SIDE_N: p.setPoint(x0, y0,  1,  0,  0, -1, 0,        0        ); break;
-                case ChipElm.SIDE_S: p.setPoint(x0, y0,  1,  0,  0,  1, 0,        ys-this.cspc2); break;
-                case ChipElm.SIDE_W: p.setPoint(x0, y0,  0,  1, -1,  0, 0,        0        ); break;
-                case ChipElm.SIDE_E: p.setPoint(x0, y0,  0,  1,  1,  0, xs-this.cspc2, 0   ); break;
+                case ChipElm.SIDE_N:
+                    p.setPoint(x0, y0, 1, 0, 0, -1, 0, 0);
+                    break;
+                case ChipElm.SIDE_S:
+                    p.setPoint(x0, y0, 1, 0, 0, 1, 0, ys - this.cspc2);
+                    break;
+                case ChipElm.SIDE_W:
+                    p.setPoint(x0, y0, 0, 1, -1, 0, 0, 0);
+                    break;
+                case ChipElm.SIDE_E:
+                    p.setPoint(x0, y0, 0, 1, 1, 0, xs - this.cspc2, 0);
+                    break;
             }
         }
-        this.rectPointsX = [xr, xr+xs, xr+xs, xr];
-        this.rectPointsY = [yr, yr,     yr+ys, yr+ys];
+        this.rectPointsX = [xr, xr + xs, xr + xs, xr];
+        this.rectPointsY = [yr, yr, yr + ys, yr + ys];
         this.setBbox(xr, yr, this.rectPointsX[2], this.rectPointsY[2]);
         this.labelX = xr + xs / 2;
         this.labelY = yr + ys / 2;
@@ -362,8 +373,7 @@ export abstract class ChipElm extends CircuitElm {
 
     initBoundingBox(): void {
         super.initBoundingBox();
-        if (this.pins == null || this.cspc === 0)
-            return;
+        if (this.pins == null || this.cspc === 0) return;
         const xr = this.x + this.cspc2 - this.cspc;
         const yr = this.y - this.cspc;
         const fsx = this.isFlippedXY() ? this.sizeY : this.sizeX;
@@ -382,30 +392,46 @@ export abstract class ChipElm extends CircuitElm {
         const y0 = this.y;
         const xr = x0 - this.cspc;
         const yr = y0 - this.cspc;
-        const xd = (xp - xr) / this.cspc2 - .5;
-        const yd = (yp - yr) / this.cspc2 - .5;
+        const xd = (xp - xr) / this.cspc2 - 0.5;
+        const yd = (yp - yr) / this.cspc2 - 0.5;
         if (xd >= 0 && xd <= this.sizeX && yd >= 0 && yd <= this.sizeY) {
-            const dW = xd, dE = this.sizeX - xd, dN = yd, dS = this.sizeY - yd;
-            const curDist = (currentSide === ChipElm.SIDE_N) ? dN : (currentSide === ChipElm.SIDE_S) ? dS :
-                            (currentSide === ChipElm.SIDE_W) ? dW : dE;
+            const dW = xd,
+                dE = this.sizeX - xd,
+                dN = yd,
+                dS = this.sizeY - yd;
+            const curDist =
+                currentSide === ChipElm.SIDE_N
+                    ? dN
+                    : currentSide === ChipElm.SIDE_S
+                      ? dS
+                      : currentSide === ChipElm.SIDE_W
+                        ? dW
+                        : dE;
             const minDist = Math.min(Math.min(dW, dE), Math.min(dN, dS));
             let side: number;
             if (curDist <= minDist + 1.0) {
                 side = currentSide;
             } else {
-                side = (minDist === dN) ? ChipElm.SIDE_N : (minDist === dS) ? ChipElm.SIDE_S :
-                       (minDist === dW) ? ChipElm.SIDE_W : ChipElm.SIDE_E;
+                side =
+                    minDist === dN
+                        ? ChipElm.SIDE_N
+                        : minDist === dS
+                          ? ChipElm.SIDE_S
+                          : minDist === dW
+                            ? ChipElm.SIDE_W
+                            : ChipElm.SIDE_E;
             }
-            pos[0] = (side === ChipElm.SIDE_N || side === ChipElm.SIDE_S)
-                ? Math.max(0, Math.min(Math.round(xd), this.sizeX - 1))
-                : Math.max(0, Math.min(Math.round(yd), this.sizeY - 1));
+            pos[0] =
+                side === ChipElm.SIDE_N || side === ChipElm.SIDE_S
+                    ? Math.max(0, Math.min(Math.round(xd), this.sizeX - 1))
+                    : Math.max(0, Math.min(Math.round(yd), this.sizeY - 1));
             pos[1] = side;
             return true;
         }
-        const distW = xd < 0          ? -xd              : Number.MAX_VALUE;
-        const distE = xd > this.sizeX ? xd - this.sizeX  : Number.MAX_VALUE;
-        const distN = yd < 0          ? -yd              : Number.MAX_VALUE;
-        const distS = yd > this.sizeY ? yd - this.sizeY  : Number.MAX_VALUE;
+        const distW = xd < 0 ? -xd : Number.MAX_VALUE;
+        const distE = xd > this.sizeX ? xd - this.sizeX : Number.MAX_VALUE;
+        const distN = yd < 0 ? -yd : Number.MAX_VALUE;
+        const distS = yd > this.sizeY ? yd - this.sizeY : Number.MAX_VALUE;
         const minDist = Math.min(Math.min(distW, distE), Math.min(distN, distS));
         if (minDist === distN) {
             pos[0] = Math.max(0, Math.min(Math.round(xd), this.sizeX - 1));
@@ -425,16 +451,18 @@ export abstract class ChipElm extends CircuitElm {
 
     getOverlappingPin(p1: number, p2: number, pin: number): number {
         for (let i = 0; i !== this.getPostCount(); i++) {
-            if (pin === i || this.pins[i].busZ > 0)
-                continue;
-            if (this.pins[i].overlaps(p1, p2))
-                return i;
+            if (pin === i || this.pins[i].busZ > 0) continue;
+            if (this.pins[i].overlaps(p1, p2)) return i;
         }
         return -1;
     }
 
-    getPost(n: number): Point { return this.pins[n].post; }
-    getPostWidth(n: number): number { return this.pins[n].busWidth; }
+    getPost(n: number): Point {
+        return this.pins[n].post;
+    }
+    getPostWidth(n: number): number {
+        return this.pins[n].busWidth;
+    }
 
     abstract getVoltageSourceCount(): number;
 
@@ -450,7 +478,9 @@ export abstract class ChipElm extends CircuitElm {
         console.log("setVoltageSource failed for " + this);
     }
 
-    setHighVoltage(hv: number): void { this.highVoltage = hv; }
+    setHighVoltage(hv: number): void {
+        this.highVoltage = hv;
+    }
 
     stamp(): void {
         let vsc = 0;
@@ -461,8 +491,7 @@ export abstract class ChipElm extends CircuitElm {
                 vsc++;
             }
         }
-        if (vsc !== this.getVoltageSourceCount())
-            console.log("voltage source count does not match number of outputs");
+        if (vsc !== this.getVoltageSourceCount()) console.log("voltage source count does not match number of outputs");
     }
 
     execute(): void {}
@@ -470,8 +499,7 @@ export abstract class ChipElm extends CircuitElm {
     startIteration(): void {
         for (let i = 0; i !== this.getPostCount(); i++) {
             const p = this.pins[i];
-            if (!p.output)
-                p.value = this.nodes[i].v > this.getThreshold();
+            if (!p.output) p.value = this.nodes[i].v > this.getThreshold();
         }
 
         // Skip the first execute() after a load to preserve pin state we just
@@ -481,24 +509,26 @@ export abstract class ChipElm extends CircuitElm {
         // CounterElm reading an inverted reset pin as asserted and zeroing its
         // count). The java version has no such guard and always calls execute()
         // immediately, so chip state doesn't get preserved.
-        if (this.justLoaded)
-            this.justLoaded = false;
-        else
-            this.execute();
+        if (this.justLoaded) this.justLoaded = false;
+        else this.execute();
     }
 
     doStep(): void {
         for (let i = 0; i !== this.getPostCount(); i++) {
             const p = this.pins[i];
             if (p.output)
-                CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[i], p.voltSource!,
-                    p.value ? this.highVoltage : 0);
+                CircuitElm.sim.updateVoltageSource(
+                    CircuitNode.ground,
+                    this.nodes[i],
+                    p.voltSource!,
+                    p.value ? this.highVoltage : 0,
+                );
         }
     }
 
     reset(): void {
         for (let i = 0; i !== this.getPostCount(); i++) {
-            this.pins[i].value    = false;
+            this.pins[i].value = false;
             this.pins[i].curcount = 0;
         }
         this.lastClock = false;
@@ -506,12 +536,9 @@ export abstract class ChipElm extends CircuitElm {
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
-        if (this.bits > 0)
-            CircuitXMLSerializer.dumpAttr(elem, "bi", this.bits);
-        if (this.highVoltage !== 5)
-            CircuitXMLSerializer.dumpAttr(elem, "hv", this.highVoltage);
-        if (this.bitOrder !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "bo", this.bitOrder);
+        if (this.bits > 0) CircuitXMLSerializer.dumpAttr(elem, "bi", this.bits);
+        if (this.highVoltage !== 5) CircuitXMLSerializer.dumpAttr(elem, "hv", this.highVoltage);
+        if (this.bitOrder !== 0) CircuitXMLSerializer.dumpAttr(elem, "bo", this.bitOrder);
     }
 
     dumpXmlState(doc: Document, elem: Element): void {
@@ -527,12 +554,11 @@ export abstract class ChipElm extends CircuitElm {
         // zeroing flags here would wipe FLAG_FLIP_X/Y/XY and any subclass flags (e.g.
         // DFlipFlopElm's reset/set) instead of restoring them.
         const stateRestore = xml.parseStringAttr("ix", null) != null;
-        if (!stateRestore)
-            this.flags = 0; // might get set by setSize() in constructor
+        if (!stateRestore) this.flags = 0; // might get set by setSize() in constructor
         super.undumpXml(xml);
-        this.bits        = xml.parseIntAttr("bi", this.bits);
+        this.bits = xml.parseIntAttr("bi", this.bits);
         this.highVoltage = xml.parseDoubleAttr("hv", this.highVoltage);
-        this.bitOrder    = xml.parseIntAttr("bo", this.bitOrder);
+        this.bitOrder = xml.parseIntAttr("bo", this.bitOrder);
         if (!stateRestore) {
             this.setupPins();
             this.allocNodes();
@@ -540,74 +566,79 @@ export abstract class ChipElm extends CircuitElm {
         }
         for (let i = 0; i !== this.getPostCount(); i++) {
             const v = xml.parseDoubleAttr("v" + i, 0);
-            if (this.pins != null)
-                this.pins[i].value = v > this.getThreshold();
+            if (this.pins != null) this.pins[i].value = v > this.getThreshold();
         }
         this.justLoaded = true;
     }
 
     writeOutput(n: number, value: boolean): void {
-        if (!this.pins[n].output)
-            console.log("pin " + n + " is not an output!");
+        if (!this.pins[n].output) console.log("pin " + n + " is not an output!");
         this.pins[n].value = value;
     }
 
     getInfo(arr: string[]): void {
         arr[0] = this.getChipName();
-        let a = 1, shown = 0;
+        let a = 1,
+            shown = 0;
         for (let i = 0; i !== this.getPostCount(); i++) {
             const p = this.pins[i];
-            if (arr[a] !== null && arr[a] !== undefined)
-                arr[a] += "; ";
-            else
-                arr[a] = "";
+            if (arr[a] !== null && arr[a] !== undefined) arr[a] += "; ";
+            else arr[a] = "";
             let t = p.text;
             if (p.lineOver) t += "'";
-            if (p.clock)    t = "Clk";
+            if (p.clock) t = "Clk";
             if (p.busWidth > 1) {
                 let value = 0;
                 for (let j = 0; j < p.busWidth; j++)
-                    if (this.nodes[i + j].v > this.getThreshold())
-                        value |= 1 << this.pins[i + j].busZ;
+                    if (this.nodes[i + j].v > this.getThreshold()) value |= 1 << this.pins[i + j].busZ;
                 arr[a] += t + " = " + value + " / 0x" + value.toString(16).toUpperCase();
                 i += p.busWidth - 1;
-            } else
-                arr[a] += t + " = " + CircuitElm.getVoltageText(this.nodes[i].v);
-            if (++shown % 2 === 0)
-                a++;
+            } else arr[a] += t + " = " + CircuitElm.getVoltageText(this.nodes[i].v);
+            if (++shown % 2 === 0) a++;
         }
     }
 
     setCurrent(vs: VoltageSource, c: number): void {
         for (let i = 0; i !== this.getPostCount(); i++)
-            if (this.pins[i].output && this.pins[i].voltSource === vs)
-                this.pins[i].current = c;
+            if (this.pins[i].output && this.pins[i].voltSource === vs) this.pins[i].current = c;
     }
 
     validate(): boolean {
         for (let i = 0; i !== this.getPostCount(); i++)
-            if (this.pins[i].output && !this.validateRailNode(i))
-                return false;
+            if (this.pins[i].output && !this.validateRailNode(i)) return false;
         return true;
     }
 
-    getChipName(): string { return "chip"; }
-    getConnection(n1: number, n2: number): boolean { return false; }
-    hasGroundConnection(n1: number): boolean { return this.pins[n1].output; }
+    getChipName(): string {
+        return "chip";
+    }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
+    hasGroundConnection(n1: number): boolean {
+        return this.pins[n1].output;
+    }
 
     getCurrentIntoNode(n: number): number {
         // n may be out of range if this chip's pin count changed (e.g. via edit dialog)
         // after a containing CompositeElm/subcircuit recorded its node mapping.
-        if (n < 0 || n >= this.pins.length)
-            return 0;
+        if (n < 0 || n >= this.pins.length) return 0;
         return this.pins[n].current;
     }
 
-    isFlippedX():  boolean { return this.hasFlag(ChipElm.FLAG_FLIP_X ); }
-    isFlippedY():  boolean { return this.hasFlag(ChipElm.FLAG_FLIP_Y ); }
-    isFlippedXY(): boolean { return this.hasFlag(ChipElm.FLAG_FLIP_XY); }
+    isFlippedX(): boolean {
+        return this.hasFlag(ChipElm.FLAG_FLIP_X);
+    }
+    isFlippedY(): boolean {
+        return this.hasFlag(ChipElm.FLAG_FLIP_Y);
+    }
+    isFlippedXY(): boolean {
+        return this.hasFlag(ChipElm.FLAG_FLIP_XY);
+    }
 
-    allowBus(): boolean { return false; }
+    allowBus(): boolean {
+        return false;
+    }
 
     flippedXSide(s: number): number {
         if (!this.isFlippedX()) return s;
@@ -620,7 +651,7 @@ export abstract class ChipElm extends CircuitElm {
         this.flags ^= ChipElm.FLAG_FLIP_X;
         if (count !== 1) {
             const xs = (this.flippedSizeX + 1) * this.cspc2;
-            this.x  = center2 - this.x - xs;
+            this.x = center2 - this.x - xs;
             this.x2 = center2 - this.x2;
         }
         this.setPoints();
@@ -630,7 +661,7 @@ export abstract class ChipElm extends CircuitElm {
         this.flags ^= ChipElm.FLAG_FLIP_Y;
         if (count !== 1) {
             const ys = (this.flippedSizeY - 1) * this.cspc2;
-            this.y  = center2 - this.y - ys;
+            this.y = center2 - this.y - ys;
             this.y2 = center2 - this.y2;
         }
         this.setPoints();
@@ -638,8 +669,7 @@ export abstract class ChipElm extends CircuitElm {
 
     flipXY(xmy: number, count: number): void {
         this.flags ^= ChipElm.FLAG_FLIP_XY;
-        if (this.isFlippedX() !== this.isFlippedY())
-            this.flags ^= ChipElm.FLAG_FLIP_X | ChipElm.FLAG_FLIP_Y;
+        if (this.isFlippedX() !== this.isFlippedY()) this.flags ^= ChipElm.FLAG_FLIP_X | ChipElm.FLAG_FLIP_Y;
         if (count !== 1) {
             this.x += this.cspc2;
             super.flipXY(xmy, count);
@@ -648,12 +678,13 @@ export abstract class ChipElm extends CircuitElm {
         this.setPoints();
     }
 
-    getNumHandles(): number { return 0; }
+    getNumHandles(): number {
+        return 0;
+    }
 
     getEditInfo(n: number): EditInfo | null {
         if (this.isDigitalChip()) {
-            if (n === 0)
-                return new EditInfo("High Logic Voltage", this.highVoltage).setUnitStep();
+            if (n === 0) return new EditInfo("High Logic Voltage", this.highVoltage).setUnitStep();
             n--;
         }
         if (this.allowBus()) {
@@ -691,23 +722,34 @@ export abstract class ChipElm extends CircuitElm {
         this.setChipEditValue(n, ei);
     }
 
-    getChipEditInfo(n: number): EditInfo | null { return null; }
+    getChipEditInfo(n: number): EditInfo | null {
+        return null;
+    }
     setChipEditValue(n: number, ei: EditInfo): void {}
 
-    makeBitPins(count: number, pos: number, side: number, offset: number, name: string, output: boolean, state: boolean, reversed: boolean): void {
+    makeBitPins(
+        count: number,
+        pos: number,
+        side: number,
+        offset: number,
+        name: string,
+        output: boolean,
+        state: boolean,
+        reversed: boolean,
+    ): void {
         for (let i = 0; i !== count; i++) {
             const ii = reversed ? offset + count - 1 - i : offset + i;
             if (this.useBus()) {
                 this.pins[ii] = new Pin(this, pos, side, name);
                 this.pins[ii].busWidth = count;
-                this.pins[ii].busZ    = i;
+                this.pins[ii].busZ = i;
             } else if (this.bitOrder === ChipElm.BIT_ORDER_LSB_FIRST) {
                 this.pins[ii] = new Pin(this, pos + i, side, name + i);
             } else {
                 this.pins[ii] = new Pin(this, pos + (count - 1 - i), side, name + i);
             }
             this.pins[ii].output = output;
-            this.pins[ii].state  = state;
+            this.pins[ii].state = state;
         }
     }
 
@@ -718,28 +760,25 @@ export abstract class ChipElm extends CircuitElm {
         for (let i = 0; i < data.length; i++) {
             if (bitIndex >= 32) {
                 sb += " " + integer;
-                integer  = 0;
+                integer = 0;
                 bitIndex = 0;
             }
-            if (data[i])
-                integer |= 1 << bitIndex;
+            if (data[i]) integer |= 1 << bitIndex;
             bitIndex++;
         }
-        if (bitIndex > 0)
-            sb += " " + integer;
+        if (bitIndex > 0) sb += " " + integer;
         return sb;
     }
 
     static readBits(st: StringTokenizer, output: boolean[]): void {
-        let integer  = 0;
+        let integer = 0;
         let bitIndex = 32; // force load on first iteration
         for (let i = 0; i < output.length; i++) {
             if (bitIndex >= 32) {
                 if (st.hasMoreTokens()) {
-                    integer  = parseIntStrict(st.nextToken());
+                    integer = parseIntStrict(st.nextToken());
                     bitIndex = 0;
-                } else
-                    break;
+                } else break;
             }
             output[i] = (integer & (1 << bitIndex)) !== 0;
             bitIndex++;
@@ -748,17 +787,16 @@ export abstract class ChipElm extends CircuitElm {
 
     static writeBitsToString(data: boolean[]): string {
         let sb = "";
-        let integer  = 0;
+        let integer = 0;
         let bitIndex = 0;
         for (let i = 0; i < data.length; i++) {
             if (bitIndex >= 32) {
                 if (sb.length > 0) sb += " ";
                 sb += integer;
-                integer  = 0;
+                integer = 0;
                 bitIndex = 0;
             }
-            if (data[i])
-                integer |= 1 << bitIndex;
+            if (data[i]) integer |= 1 << bitIndex;
             bitIndex++;
         }
         if (sb.length > 0) sb += " ";
@@ -768,15 +806,14 @@ export abstract class ChipElm extends CircuitElm {
 
     static readBitsFromString(s: string, output: boolean[]): void {
         const st = new StringTokenizer(s, " ");
-        let integer  = 0;
+        let integer = 0;
         let bitIndex = 32;
         for (let i = 0; i < output.length; i++) {
             if (bitIndex >= 32) {
                 if (st.hasMoreTokens()) {
-                    integer  = parseIntStrict(st.nextToken());
+                    integer = parseIntStrict(st.nextToken());
                     bitIndex = 0;
-                } else
-                    break;
+                } else break;
             }
             output[i] = (integer & (1 << bitIndex)) !== 0;
             bitIndex++;

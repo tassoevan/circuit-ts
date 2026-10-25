@@ -48,8 +48,9 @@ export class LEDElm extends DiodeElm {
             super(xa, ya);
             this.modelName = LEDElm.lastLEDModelName;
             this.setup();
-            this.maxBrightnessCurrent = .01;
-            this.colorR = 1; this.colorG = this.colorB = 0;
+            this.maxBrightnessCurrent = 0.01;
+            this.colorR = 1;
+            this.colorG = this.colorB = 0;
         } else {
             super(xa, ya, xb, yb!, f!, st!);
             if ((f! & (DiodeElm.FLAG_MODEL | DiodeElm.FLAG_FWDROP)) === 0) {
@@ -61,14 +62,16 @@ export class LEDElm extends DiodeElm {
             this.colorR = parseFloatStrict(st!.nextToken());
             this.colorG = parseFloatStrict(st!.nextToken());
             this.colorB = parseFloatStrict(st!.nextToken());
-            this.maxBrightnessCurrent = .01;
+            this.maxBrightnessCurrent = 0.01;
             try {
                 this.maxBrightnessCurrent = parseFloatStrict(st!.nextToken());
             } catch (e) {}
         }
     }
 
-    getDumpType(): number { return 162; }
+    getDumpType(): number {
+        return 162;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -89,9 +92,9 @@ export class LEDElm extends DiodeElm {
     setPoints(): void {
         super.setPoints();
         const cr = 12;
-        this.ledLead1  = this.interpPoint(this.point1, this.point2, .5 - cr / this.dn) as Point;
-        this.ledLead2  = this.interpPoint(this.point1, this.point2, .5 + cr / this.dn) as Point;
-        this.ledCenter = this.interpPoint(this.point1, this.point2, .5) as Point;
+        this.ledLead1 = this.interpPoint(this.point1, this.point2, 0.5 - cr / this.dn) as Point;
+        this.ledLead2 = this.interpPoint(this.point1, this.point2, 0.5 + cr / this.dn) as Point;
+        this.ledCenter = this.interpPoint(this.point1, this.point2, 0.5) as Point;
     }
 
     draw(g: Graphics): void {
@@ -109,35 +112,34 @@ export class LEDElm extends DiodeElm {
         DiodeElm.drawThickCircle(g, this.ledCenter.x, this.ledCenter.y, cr);
         const cr2 = cr - 4;
         let w = this.current / this.maxBrightnessCurrent;
-        if (w > 0)
-            w = 255 * (1 + .2 * Math.log(w));
+        if (w > 0) w = 255 * (1 + 0.2 * Math.log(w));
         if (w > 255) w = 255;
-        if (w < 0)   w = 0;
+        if (w < 0) w = 0;
         const cc = new Color(Math.trunc(this.colorR * w), Math.trunc(this.colorG * w), Math.trunc(this.colorB * w));
         g.setColor(cc);
         g.fillOval(this.ledCenter.x - cr2, this.ledCenter.y - cr2, cr2 * 2, cr2 * 2);
         this.setBbox(this.point1, this.point2, cr2);
         this.updateDotCount();
-        this.drawDots(g, this.point1, this.ledLead1,  this.curcount);
+        this.drawDots(g, this.point1, this.ledLead1, this.curcount);
         this.drawDots(g, this.point2, this.ledLead2, -this.curcount);
         this.drawPosts(g);
     }
 
-    getElmType(): string { return "LED"; }
+    getElmType(): string {
+        return "LED";
+    }
 
     getInfo(arr: string[]): void {
         super.getInfo(arr);
-        if (this.model.oldStyle)
-            arr[0] = "LED";
-        else
-            arr[0] = Locale.LS("LED") + " (" + this.modelName + ")";
+        if (this.model.oldStyle) arr[0] = "LED";
+        else arr[0] = Locale.LS("LED") + " (" + this.modelName + ")";
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0) return new EditInfo("Red Value (0-1)",             this.colorR,              0, 1).setDimensionless();
-        if (n === 1) return new EditInfo("Green Value (0-1)",           this.colorG,              0, 1).setDimensionless();
-        if (n === 2) return new EditInfo("Blue Value (0-1)",            this.colorB,              0, 1).setDimensionless();
-        if (n === 3) return new EditInfo("Max Brightness Current (A)",  this.maxBrightnessCurrent, 0, .1);
+        if (n === 0) return new EditInfo("Red Value (0-1)", this.colorR, 0, 1).setDimensionless();
+        if (n === 1) return new EditInfo("Green Value (0-1)", this.colorG, 0, 1).setDimensionless();
+        if (n === 2) return new EditInfo("Blue Value (0-1)", this.colorB, 0, 1).setDimensionless();
+        if (n === 3) return new EditInfo("Max Brightness Current (A)", this.maxBrightnessCurrent, 0, 0.1);
         return super.getEditInfo(n - 4);
     }
 
@@ -149,7 +151,11 @@ export class LEDElm extends DiodeElm {
         super.setEditValue(n - 4, ei);
     }
 
-    getShortcut(): number { return 'l'.charCodeAt(0); }
+    getShortcut(): number {
+        return "l".charCodeAt(0);
+    }
 
-    setLastModelName(n: string): void { LEDElm.lastLEDModelName = n; }
+    setLastModelName(n: string): void {
+        LEDElm.lastLEDModelName = n;
+    }
 }

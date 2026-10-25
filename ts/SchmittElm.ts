@@ -36,7 +36,9 @@ export class SchmittElm extends InvertingSchmittElm {
         }
     }
 
-    getDumpType(): number { return 182; }
+    getDumpType(): number {
+        return 182;
+    }
 
     lastOutputVoltage: number = 0;
 
@@ -85,13 +87,12 @@ export class SchmittElm extends InvertingSchmittElm {
         super.setPoints();
         const hs = 16;
         let ww = 16;
-        if (ww > this.dn / 2)
-            ww = Math.floor(this.dn / 2);
-        this.lead1 = this.interpPoint(this.point1, this.point2, .5 - ww / this.dn);
-        this.lead2 = this.interpPoint(this.point1, this.point2, .5 + (ww - 3) / this.dn);
+        if (ww > this.dn / 2) ww = Math.floor(this.dn / 2);
+        this.lead1 = this.interpPoint(this.point1, this.point2, 0.5 - ww / this.dn);
+        this.lead2 = this.interpPoint(this.point1, this.point2, 0.5 + (ww - 3) / this.dn);
         const triPoints = this.newPointArray(3);
         this.interpPoint2(this.lead1, this.lead2, triPoints[0], triPoints[1], 0, hs);
-        triPoints[2] = this.interpPoint(this.point1, this.point2, .5 + (ww - 5) / this.dn);
+        triPoints[2] = this.interpPoint(this.point1, this.point2, 0.5 + (ww - 5) / this.dn);
         this.gatePoly = this.createPolygon(triPoints);
     }
     getInfo(arr: string[]): void {
@@ -99,8 +100,7 @@ export class SchmittElm extends InvertingSchmittElm {
     }
 
     getCurrentIntoNode(n: number): number {
-        if (n === 1)
-            return this.current;
+        if (n === 1) return this.current;
         return 0;
     }
 }

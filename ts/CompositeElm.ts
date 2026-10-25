@@ -63,24 +63,26 @@ export abstract class CompositeElm extends CircuitElm {
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number);
     constructor(xx: number, yy: number, xb?: number, yb?: number, f?: number) {
-        if (xb === undefined)
-            super(xx, yy);
-        else
-            super(xx, yy, xb, yb!, f!);
+        if (xb === undefined) super(xx, yy);
+        else super(xx, yy, xb, yb!, f!);
     }
 
-    getChildElmList(): CircuitElm[] { return this.compElmList; }
+    getChildElmList(): CircuitElm[] {
+        return this.compElmList;
+    }
 
-    useEscape(): boolean { return (this.flags & CompositeElm.FLAG_ESCAPE) !== 0; }
+    useEscape(): boolean {
+        return (this.flags & CompositeElm.FLAG_ESCAPE) !== 0;
+    }
 
     loadComposite(stIn: StringTokenizer | null, model: string, externalNodes: number[]): void {
         this.compElmList = [];
         const nodeInfoList: string[] = [];
 
         // Build compElmList from input string, storing node info for later
-        const lines = model.split('\r');
+        const lines = model.split("\r");
         for (const line of lines) {
-            const sp = line.indexOf(' ');
+            const sp = line.indexOf(" ");
             if (sp < 0) continue;
             const ceType = line.substring(0, sp);
             const nodeStr = line.substring(sp + 1);
@@ -88,8 +90,7 @@ export abstract class CompositeElm extends CircuitElm {
             if (stIn != null) {
                 const tint = newce.getDumpType();
                 let dumpedCe = stIn.nextToken();
-                if (this.useEscape())
-                    dumpedCe = CustomLogicModel.unescape(dumpedCe);
+                if (this.useEscape()) dumpedCe = CustomLogicModel.unescape(dumpedCe);
                 const stCe = new StringTokenizer(dumpedCe, this.useEscape() ? " " : "_");
                 const flags = parseIntStrict(stCe.nextToken());
                 newce = CirSim.createCe(tint, 0, 0, 0, 0, flags, stCe);
@@ -98,15 +99,14 @@ export abstract class CompositeElm extends CircuitElm {
                 CirSim.console("failed to create " + ceType + " in CompositeElm");
                 continue;
             }
-            if (newce.isGroundElm())
-                (newce as any).setOldStyle();
+            if (newce.isGroundElm()) (newce as any).setOldStyle();
             newce.parent = this;
             this.compElmList.push(newce);
             nodeInfoList.push(nodeStr);
         }
 
         this.compNodeInfo = nodeInfoList;
-        this.compRefNodeInfo = [];   // the old text format has no expression references
+        this.compRefNodeInfo = []; // the old text format has no expression references
         this.extNodeIds = externalNodes;
         this.numPosts = this.numNodes = externalNodes.length;
         this.posts = new Array(this.numPosts);
@@ -135,18 +135,20 @@ export abstract class CompositeElm extends CircuitElm {
                 continue;
             }
             const className = CirSim.xmlDumpTypeMap.get(tagName);
-            if (className == null)
-                continue;
+            if (className == null) continue;
             // skip non-essential display-only elements
             // GroundElm is only skipped if it has coordinates (newer dump, purely visual)
-            if (className === "WireElm" || className === "RoutedWireElm" ||
-                    className === "LabeledNodeElm" || className === "ScopeElm" ||
-                    className === "GraphicElm" ||
-                    (className === "GroundElm" && childElem.getAttribute("x") != null))
+            if (
+                className === "WireElm" ||
+                className === "RoutedWireElm" ||
+                className === "LabeledNodeElm" ||
+                className === "ScopeElm" ||
+                className === "GraphicElm" ||
+                (className === "GroundElm" && childElem.getAttribute("x") != null)
+            )
                 continue;
             const newce: CircuitElm = CirSim.constructElement(className, 0, 0);
-            if (newce.isGroundElm())
-                (newce as any).setOldStyle();
+            if (newce.isGroundElm()) (newce as any).setOldStyle();
             xml.parseChildElement(childElem);
             newce.undumpXml(xml);
             newce.parent = this;
@@ -204,8 +206,7 @@ export abstract class CompositeElm extends CircuitElm {
             // reference nodes: same node numbers, but they land past the posts and
             // internal nodes rather than continuing the post sequence
             const refInfo = this.compRefNodeInfo[i];
-            if (refInfo == null || refInfo.length === 0)
-                continue;
+            if (refInfo == null || refInfo.length === 0) continue;
             const stRefs = new StringTokenizer(refInfo, " +\t");
             let thisRef = ce.getRefNodeBase();
             while (stRefs.hasMoreTokens()) {
@@ -236,15 +237,13 @@ export abstract class CompositeElm extends CircuitElm {
                 if (compNodeHash.has(id)) {
                     this.compNodeList.push(compNodeHash.get(id)!);
                     compNodeHash.delete(id);
-                } else
-                    throw new Error("missing external node");
+                } else throw new Error("missing external node");
             }
         } catch (e) {
             this.compNodeList = null;
             return;
         }
-        for (const [, cn] of compNodeHash)
-            this.compNodeList.push(cn);
+        for (const [, cn] of compNodeHash) this.compNodeList.push(cn);
 
         // allocate more nodes for sub-elements' internal nodes
         for (let i = 0; i !== this.compElmList.length; i++) {
@@ -264,8 +263,7 @@ export abstract class CompositeElm extends CircuitElm {
     }
 
     preStamp(): void {
-        for (const ce of this.compElmList)
-            ce.preStamp();
+        for (const ce of this.compElmList) ce.preStamp();
         this.buildCompNodeList();
         this.allocNodes();
     }
@@ -277,8 +275,7 @@ export abstract class CompositeElm extends CircuitElm {
             ce.dumpXmlState(doc, child);
 
             // if no state dumped, skip it
-            if (child.attributes.length === 0 && !child.hasChildNodes())
-                continue;
+            if (child.attributes.length === 0 && !child.hasChildNodes()) continue;
             (child as any).setAttribute("ix", i);
             elem.appendChild(child);
         }
@@ -296,8 +293,7 @@ export abstract class CompositeElm extends CircuitElm {
                 continue;
             }
             const ce = this.compElmList[ix];
-            if (elem.tagName !== ce.getXmlDumpType())
-                throw new Error("dump type mismatch for composite child: " + ix);
+            if (elem.tagName !== ce.getXmlDumpType()) throw new Error("dump type mismatch for composite child: " + ix);
             ce.undumpXml(xml);
         }
 
@@ -305,67 +301,68 @@ export abstract class CompositeElm extends CircuitElm {
         xml.parseChildElement(state);
     }
 
-    getConnection(n1: number, n2: number): boolean { return false; }
-    hasGroundConnection(n1: number): boolean { return false; }
-
-    reset(): void {
-        for (const ce of this.compElmList)
-            ce.reset();
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
+    hasGroundConnection(n1: number): boolean {
+        return false;
     }
 
-    getPostCount(): number { return this.numPosts; }
-    getInternalNodeCount(): number { return this.numNodes - this.numPosts; }
+    reset(): void {
+        for (const ce of this.compElmList) ce.reset();
+    }
 
-    getPost(n: number): Point { return this.posts[n]; }
+    getPostCount(): number {
+        return this.numPosts;
+    }
+    getInternalNodeCount(): number {
+        return this.numNodes - this.numPosts;
+    }
+
+    getPost(n: number): Point {
+        return this.posts[n];
+    }
 
     setPost(n: number, p: Point): void;
     setPost(n: number, x: number, y: number): void;
     setPost(n: number, pOrX: Point | number, y?: number): void {
-        if (typeof pOrX === "number")
-            this.posts[n] = new Point(pOrX, y!);
-        else
-            this.posts[n] = pOrX;
+        if (typeof pOrX === "number") this.posts[n] = new Point(pOrX, y!);
+        else this.posts[n] = pOrX;
     }
 
     getPower(): number {
         let power = 0;
-        for (const ce of this.compElmList)
-            power += ce.getPower();
+        for (const ce of this.compElmList) power += ce.getPower();
         return power;
     }
 
     stamp(): void {
-        for (const ce of this.compElmList)
-            ce.setParentList(this.compElmList);
+        for (const ce of this.compElmList) ce.setParentList(this.compElmList);
     }
 
     // called to set node p (local to this element) to equal n (global)
     setNode(p: number, n: CircuitNode): void {
         super.setNode(p, n);
-        if (this.compNodeList == null)
-            return;
+        if (this.compNodeList == null) return;
 
         const cnLinks = this.compNodeList[p].links;
-        for (let i = 0; i < cnLinks.length; i++)
-            cnLinks[i].elm.setNode(cnLinks[i].num, n);
+        for (let i = 0; i < cnLinks.length; i++) cnLinks[i].elm.setNode(cnLinks[i].num, n);
     }
 
-    canViewInScope(): boolean { return false; }
+    canViewInScope(): boolean {
+        return false;
+    }
 
     delete(): void {
-        if (this.compElmList != null)
-            for (const ce of this.compElmList)
-                ce.delete();
+        if (this.compElmList != null) for (const ce of this.compElmList) ce.delete();
         super.delete();
     }
 
     getCurrentIntoNode(n: number): number {
         let c = 0;
-        if (this.compNodeList == null)
-            return 0;
+        if (this.compNodeList == null) return 0;
         const cnLinks = this.compNodeList[n].links;
-        for (let i = 0; i < cnLinks.length; i++)
-            c += cnLinks[i].elm.getCurrentIntoNode(cnLinks[i].num);
+        for (let i = 0; i < cnLinks.length; i++) c += cnLinks[i].elm.getCurrentIntoNode(cnLinks[i].num);
         return c;
     }
 }

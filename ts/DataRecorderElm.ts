@@ -55,8 +55,12 @@ export class DataRecorderElm extends CircuitElm {
         this.setDataCount(xml.parseIntAttr("dc", this.dataCount));
     }
 
-    getDumpType(): number { return 210; }
-    getPostCount(): number { return 1; }
+    getDumpType(): number {
+        return 210;
+    }
+    getPostCount(): number {
+        return 1;
+    }
 
     reset(): void {
         this.dataPtr = 0;
@@ -79,14 +83,15 @@ export class DataRecorderElm extends CircuitElm {
         const s = Locale.LS("export");
         this.drawLabeledNode(g, s, this.point1, this.lead1!);
         this.setVoltageColor(g, this.nodes[0].v);
-        if (selected)
-            g.setColor(CircuitElm.selectColor);
+        if (selected) g.setColor(CircuitElm.selectColor);
         CircuitElm.drawThickLine(g, this.point1, this.lead1!);
         this.drawPosts(g);
         g.restore();
     }
 
-    getVoltageDiff(): number { return this.nodes[0].v; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "data export";
@@ -95,8 +100,7 @@ export class DataRecorderElm extends CircuitElm {
     }
 
     stepFinished(): void {
-        if (this.lastTimeStepCount === CircuitElm.sim.timeStepCount)
-            return;
+        if (this.lastTimeStepCount === CircuitElm.sim.timeStepCount) return;
         this.data[this.dataPtr++] = this.nodes[0].v;
         this.lastTimeStepCount = CircuitElm.sim.timeStepCount;
         if (this.dataPtr >= this.dataCount) {
@@ -113,16 +117,17 @@ export class DataRecorderElm extends CircuitElm {
     }
 
     static getBlobUrl(data: string): string {
-        const blob = new Blob([data], { type: 'text/plain' });
+        const blob = new Blob([data], { type: "text/plain" });
         const win = window as any;
-        if (win.recorderBlob)
-            URL.revokeObjectURL(win.recorderBlob);
+        if (win.recorderBlob) URL.revokeObjectURL(win.recorderBlob);
         const url = URL.createObjectURL(blob);
         win.recorderBlob = url;
         return url;
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             return new EditInfo("# of Data Points", this.dataCount, -1, -1).setDimensionless().setPositive();
@@ -134,13 +139,19 @@ export class DataRecorderElm extends CircuitElm {
                 for (let i = 0; i !== this.dataCount; i++)
                     dataStr += this.data[(i + this.dataPtr) % this.dataCount] + "\n";
             } else {
-                for (let i = 0; i !== this.dataPtr; i++)
-                    dataStr += this.data[i] + "\n";
+                for (let i = 0; i !== this.dataPtr; i++) dataStr += this.data[i] + "\n";
             }
             const now = new Date();
-            const pad = (n: number) => String(n).padStart(2, '0');
-            const fname = "data-" + now.getFullYear() + pad(now.getMonth()+1) + pad(now.getDate()) +
-                "-" + pad(now.getHours()) + pad(now.getMinutes()) + ".circuitjs.txt";
+            const pad = (n: number) => String(n).padStart(2, "0");
+            const fname =
+                "data-" +
+                now.getFullYear() +
+                pad(now.getMonth() + 1) +
+                pad(now.getDate()) +
+                "-" +
+                pad(now.getHours()) +
+                pad(now.getMinutes()) +
+                ".circuitjs.txt";
             const url = DataRecorderElm.getBlobUrl(dataStr);
             const a = document.createElement("a");
             a.textContent = fname;
@@ -153,7 +164,6 @@ export class DataRecorderElm extends CircuitElm {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0 && ei.value > 0)
-            this.setDataCount(Math.trunc(ei.value));
+        if (n === 0 && ei.value > 0) this.setDataCount(Math.trunc(ei.value));
     }
 }

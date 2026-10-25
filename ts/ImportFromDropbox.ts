@@ -32,11 +32,9 @@ export class ImportFromDropbox {
             // Bug in firefox prevents Dropbox dialog working properly in this application
             // even though Dropbox chooser supports firefox
             // See https://github.com/gwtproject/gwt/issues/7923
-            if (/Firefox[/\s](\d+\.\d+)/.test(navigator.userAgent))
-                return false;
+            if (/Firefox[/\s](\d+\.\d+)/.test(navigator.userAgent)) return false;
             return !!(window as any).Dropbox?.isBrowserSupported?.();
-        }
-        catch (err) {
+        } catch (err) {
             return false;
         }
     }
@@ -51,7 +49,7 @@ export class ImportFromDropbox {
     doDropboxImport(): void {
         const options = {
             // Required. Called when a user selects an item in the Chooser.
-            success: function(files: any[]) {
+            success: function (files: any[]) {
                 try {
                     let xhr: XMLHttpRequest;
                     if (files[0].bytes < 100000) {
@@ -63,9 +61,7 @@ export class ImportFromDropbox {
                     }
                     xhr!.open("GET", files[0].link, false);
                     xhr!.send();
-                }
-                catch (err) {
-                }
+                } catch (err) {}
             },
 
             // Optional. Called when the user closes the dialog without selecting a file

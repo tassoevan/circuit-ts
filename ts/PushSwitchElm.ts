@@ -20,7 +20,13 @@
 import { SwitchElm } from "./SwitchElm";
 
 export class PushSwitchElm extends SwitchElm {
-    constructor(xx: number, yy: number) { super(xx, yy, true); }
-    getDumpClass(): Function { return SwitchElm; }
-    getShortcut(): number { return 0; }
+    constructor(xx: number, yy: number) {
+        super(xx, yy, true);
+    }
+    getDumpClass(): Function {
+        return SwitchElm;
+    }
+    getShortcut(): number {
+        return 0;
+    }
 }

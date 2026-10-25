@@ -41,7 +41,7 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true,
+    "skipLibCheck": true
   },
   "exclude": ["old", "node_modules", "vite.config.ts", "AutoTests.test.ts", "CircuitRegression.test.ts"]
 }

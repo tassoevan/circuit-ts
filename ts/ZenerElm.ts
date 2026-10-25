@@ -44,14 +44,18 @@ export class ZenerElm extends DiodeElm {
                 const zvoltage = parseFloatStrict(st!.nextToken());
                 this.model = DiodeModel.getModelWithParameters(this.model.fwdrop, zvoltage);
                 this.modelName = this.model.name;
-//              CirSim.console("model name wparams = " + modelName);
+                //              CirSim.console("model name wparams = " + modelName);
             }
             this.setup();
         }
     }
 
-    showPropertiesOnCreate(): boolean { return true; }
-    getDumpType(): number { return 'z'.charCodeAt(0); }
+    showPropertiesOnCreate(): boolean {
+        return true;
+    }
+    getDumpType(): number {
+        return "z".charCodeAt(0);
+    }
 
     readonly hs = 8;
     declare poly: Polygon;
@@ -98,7 +102,9 @@ export class ZenerElm extends DiodeElm {
 
     readonly default_zvoltage = 5.6;
 
-    getElmType(): string { return "Zener diode"; }
+    getElmType(): string {
+        return "Zener diode";
+    }
 
     getInfo(arr: string[]): void {
         super.getInfo(arr);
@@ -106,9 +112,13 @@ export class ZenerElm extends DiodeElm {
         arr[5] = "Vz = " + DiodeElm.getVoltageText(this.model.breakdownVoltage);
     }
 
-    isZenerElm(): boolean { return true; }
+    isZenerElm(): boolean {
+        return true;
+    }
 
-    getShortcut(): number { return 'z'.charCodeAt(0); }
+    getShortcut(): number {
+        return "z".charCodeAt(0);
+    }
 
     setLastModelName(n: string): void {
         ZenerElm.lastZenerModelName = n;

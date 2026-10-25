@@ -50,8 +50,7 @@ class CirSimTimer {
     }
 
     scheduleRepeating(ms: number): void {
-        if (this.intervalId != null)
-            clearInterval(this.intervalId);
+        if (this.intervalId != null) clearInterval(this.intervalId);
         this.intervalId = setInterval(() => {
             try {
                 this.app.ui?.updateCircuit();
@@ -61,8 +60,7 @@ class CirSimTimer {
                 console.error(e);
                 this.app.consoleExceptionOccurred = true;
             }
-            if (this.app.consoleExceptionOccurred)
-                this.app.ui?.drawExceptionIndicator();
+            if (this.app.consoleExceptionOccurred) this.app.ui?.drawExceptionIndicator();
         }, ms);
     }
 
@@ -86,28 +84,28 @@ export class CirSim {
 
     static theApp: CirSim;
 
-    elmList: any[] = [];  // CircuitElm[]
-    postDrawList: any[] = [];  // Point[]
-    badConnectionList: any[] = [];  // Point[]
-    adjustables: any[] = [];  // Adjustable[]
+    elmList: any[] = []; // CircuitElm[]
+    postDrawList: any[] = []; // Point[]
+    badConnectionList: any[] = []; // Point[]
+    adjustables: any[] = []; // Adjustable[]
 
     // saved context stack for editing subcircuit models
     contextStack: CircuitContext[] = [];
 
     menus: Menus;
     mouse: MouseManager;
-    ui: any = null;          // UIManager — set during UIManager.init()
-    sim: any = null;         // SimulationManager
+    ui: any = null; // UIManager — set during UIManager.init()
+    sim: any = null; // SimulationManager
     undoManager: UndoManager = null!;
     imageExporter: any = null;
-    commands: any = null;    // CommandManager
+    commands: any = null; // CommandManager
     scopeManager: ScopeManager = null;
-    loader: any = null;      // CircuitLoader
+    loader: any = null; // CircuitLoader
     jsInterface: any = null;
 
     analyzeFlag: boolean = false;
     savedFlag: boolean = false;
-    simRunning: boolean = true;  // read directly by UIManager/SimulationManager
+    simRunning: boolean = true; // read directly by UIManager/SimulationManager
     dumpMatrix: boolean = false;
     dcAnalysisFlag: boolean = false;
     autoDCOnReset: boolean = false;
@@ -115,13 +113,14 @@ export class CirSim {
     // isModified() checks whether the circuit really changed.  Clearing it (after a load
     // or save) takes a new savedDump after the next frame, once scopes are set up.
     private unsavedChangesFlag: boolean = false;
-    get unsavedChanges(): boolean { return this.unsavedChangesFlag; }
+    get unsavedChanges(): boolean {
+        return this.unsavedChangesFlag;
+    }
     set unsavedChanges(b: boolean) {
         this.unsavedChangesFlag = b;
-        if (!b)
-            this.savedDumpPending = true;
+        if (!b) this.savedDumpPending = true;
     }
-    savedDump: string | null = null;  // the circuit (without state) as of the last load or save
+    savedDump: string | null = null; // the circuit (without state) as of the last load or save
     savedDumpPending: boolean = true;
     shown: boolean = false;
     developerMode: boolean = false;
@@ -158,7 +157,7 @@ export class CirSim {
     classToLabelMap: Map<string, string> = new Map();
 
     random: { nextInt(): number; nextDouble(): number } = {
-        nextInt:    () => Math.floor(Math.random() * 2147483647),
+        nextInt: () => Math.floor(Math.random() * 2147483647),
         nextDouble: () => Math.random(),
     };
 
@@ -186,7 +185,6 @@ export class CirSim {
     // maps XML dump type string → class name
     static xmlDumpTypeMap: Map<string, string> = new Map();
 
-
     constructor() {
         CirSim.theApp = this;
         this.menus = new Menus();
@@ -195,37 +193,37 @@ export class CirSim {
 
     async init(): Promise<void> {
         // set viewport meta for CSS media queries
-        const meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width';
+        const meta = document.createElement("meta");
+        meta.name = "viewport";
+        meta.content = "width=device-width";
         document.head.appendChild(meta);
 
         let running = true;
 
-        const { SimulationManager } = await import('./SimulationManager');
+        const { SimulationManager } = await import("./SimulationManager");
         this.sim = new SimulationManager(this);
 
         CircuitElm.initClass(this, this.sim);
 
-        const { UIManager } = await import('./UIManager');
+        const { UIManager } = await import("./UIManager");
         this.ui = new UIManager(this);
         this.undoManager = new UndoManager(this);
         this.undoManager.readRecovery();
-        const { ImageExporter } = await import('./ImageExporter');
+        const { ImageExporter } = await import("./ImageExporter");
         this.imageExporter = new ImageExporter(this);
-        const { CommandManager } = await import('./CommandManager');
+        const { CommandManager } = await import("./CommandManager");
         this.commands = new CommandManager(this);
 
-        await import('./Adjustable');
-        await import('./AboutBox');
-        await import('./SliderDialog');
-        await import('./ScopePropertiesDialog');
-        await import('./ShortcutsDialog');
-        await import('./SubcircuitDialog');
-        await import('./ExportAsUrlDialog');
-        await import('./ExportAsImageDialog');
-        await import('./ScopeExportImageDialog');
-        await import('./ImportFromDropboxDialog');
+        await import("./Adjustable");
+        await import("./AboutBox");
+        await import("./SliderDialog");
+        await import("./ScopePropertiesDialog");
+        await import("./ShortcutsDialog");
+        await import("./SubcircuitDialog");
+        await import("./ExportAsUrlDialog");
+        await import("./ExportAsImageDialog");
+        await import("./ScopeExportImageDialog");
+        await import("./ImportFromDropboxDialog");
 
         const qp = new QueryParameters();
         let positiveColor: string | null = null;
@@ -237,28 +235,26 @@ export class CirSim {
 
         try {
             let cct = qp.getValue("cct");
-            if (cct != null)
-                this.startCircuitText = cct.replace(/%24/g, "$");
+            if (cct != null) this.startCircuitText = cct.replace(/%24/g, "$");
             const ctz = qp.getValue("ctz");
-            if (ctz != null)
-                this.startCircuitText = this.decompress(ctz);
+            if (ctz != null) this.startCircuitText = this.decompress(ctz);
             this.startCircuit = qp.getValue("startCircuit");
-            this.startLabel   = qp.getValue("startLabel");
+            this.startLabel = qp.getValue("startLabel");
             this.startCircuitLink = qp.getValue("startCircuitLink");
             running = qp.getBooleanValue("running", true);
             positiveColor = qp.getValue("positiveColor");
             negativeColor = qp.getValue("negativeColor");
-            neutralColor  = qp.getValue("neutralColor");
-            selectColor   = qp.getValue("selectColor");
-            currentColor  = qp.getValue("currentColor");
-            mouseModeReq  = qp.getValue("mouseMode");
+            neutralColor = qp.getValue("neutralColor");
+            selectColor = qp.getValue("selectColor");
+            currentColor = qp.getValue("currentColor");
+            mouseModeReq = qp.getValue("mouseMode");
         } catch (e) {}
 
         this.transform = [0, 0, 0, 0, 0, 0];
         this.shortcuts = new Map();
         this.elmList = [];
 
-        const { registerElements } = await import('./registerElements');
+        const { registerElements } = await import("./registerElements");
         registerElements();
 
         this.ui.init();
@@ -274,7 +270,7 @@ export class CirSim {
             CirSim.console("Exception: " + e);
         }
 
-        const { CircuitLoader } = await import('./CircuitLoader');
+        const { CircuitLoader } = await import("./CircuitLoader");
         this.loader = new CircuitLoader(this, this.sim, this.scopeManager, this.menus);
 
         if (this.startCircuitText != null) {
@@ -292,13 +288,11 @@ export class CirSim {
                 if (this.stopMessage == null && this.startCircuit != null) {
                     this.menus.getSetupList(false);
                     this.menus.readSetupFile(this.startCircuit, this.startLabel);
-                } else
-                    this.menus.getSetupList(true);
+                } else this.menus.getSetupList(true);
             }
         }
 
-        if (mouseModeReq != null)
-            this.commands?.menuPerformed("main", mouseModeReq);
+        if (mouseModeReq != null) this.commands?.menuPerformed("main", mouseModeReq);
 
         this.undoManager?.enableUndoRedo();
         this.commands?.enablePaste();
@@ -308,37 +302,65 @@ export class CirSim {
         this.setSimRunning(running);
     }
 
-    isPrintable(): boolean { return this.menus.printableCheckItem.getState(); }
+    isPrintable(): boolean {
+        return this.menus.printableCheckItem.getState();
+    }
 
     // delegation methods for UIManager
-    setOptionInStorage(key: string, val: boolean): void { this.ui.setOptionInStorage(key, val); }
-    getOptionFromStorage(key: string, val: boolean): boolean { return this.ui.getOptionFromStorage(key, val); }
-    saveShortcuts(): void { this.ui.saveShortcuts(); }
+    setOptionInStorage(key: string, val: boolean): void {
+        this.ui.setOptionInStorage(key, val);
+    }
+    getOptionFromStorage(key: string, val: boolean): boolean {
+        return this.ui.getOptionFromStorage(key, val);
+    }
+    saveShortcuts(): void {
+        this.ui.saveShortcuts();
+    }
 
-    composeSubcircuitMenu(): void { this.ui.composeSubcircuitMenu(); }
+    composeSubcircuitMenu(): void {
+        this.ui.composeSubcircuitMenu();
+    }
 
-    setiFrameHeight(): void { this.ui.setiFrameHeight(); }
+    setiFrameHeight(): void {
+        this.ui.setiFrameHeight();
+    }
 
-    centerCircuit(): void { this.ui.centerCircuit(); }
+    centerCircuit(): void {
+        this.ui.centerCircuit();
+    }
 
-    getCircuitBounds(): Rectangle { return this.ui.getCircuitBounds(); }
+    getCircuitBounds(): Rectangle {
+        return this.ui.getCircuitBounds();
+    }
 
-    setSimRunning(s: boolean): void { this.ui.setSimRunning(s); }
+    setSimRunning(s: boolean): void {
+        this.ui.setSimRunning(s);
+    }
 
-    simIsRunning(): boolean { return this.ui.simIsRunning(); }
+    simIsRunning(): boolean {
+        return this.ui.simIsRunning();
+    }
 
-    repaint(): void { this.ui.repaint(); }
+    repaint(): void {
+        this.ui.repaint();
+    }
 
-    updateCircuit(): void { this.ui.updateCircuit(); }
+    updateCircuit(): void {
+        this.ui.updateCircuit();
+    }
 
     setStopElm(ce: any, msg: string | null): void {
         this.stopElm = ce;
         this.stopMessage = msg;
     }
 
-    drawBottomArea(g: any): void { this.ui.drawBottomArea(g); }
+    drawBottomArea(g: any): void {
+        this.ui.drawBottomArea(g);
+    }
 
-    getBackgroundColor(): any { return this.ui.getBackgroundColor(); }
+    getBackgroundColor(): any {
+        return this.ui.getBackgroundColor();
+    }
 
     onTimeStep(): void {
         this.scopeManager.timeStep();
@@ -352,61 +374,57 @@ export class CirSim {
     }
 
     getElm(n: number): any {
-        if (n >= this.elmList.length)
-            return null;
+        if (n >= this.elmList.length) return null;
         return this.elmList[n];
     }
 
     getIterCount(): number {
         // IES - remove interaction
-        if (this.ui.speedBar.getValue() == 0)
-            return 0;
+        if (this.ui.speedBar.getValue() == 0) return 0;
 
-        return .1 * Math.exp((this.ui.speedBar.getValue() - 61) / 24.);
+        return 0.1 * Math.exp((this.ui.speedBar.getValue() - 61) / 24);
     }
 
     getHint(): string | null {
         const c1 = this.getElm(this.hintItem1);
         const c2 = this.getElm(this.hintItem2);
-        if (c1 == null || c2 == null)
-            return null;
+        if (c1 == null || c2 == null) return null;
         if (this.hintType == CirSim.HINT_LC) {
-            if (!c1.isInductorElm())
-                return null;
-            if (!c2.isCapacitorElm())
-                return null;
-            return Locale.LS("res.f = ") + c1.constructor.getUnitText(1 / (2 * CirSim.pi * Math.sqrt(c1.inductance * c2.capacitance)), "Hz");
+            if (!c1.isInductorElm()) return null;
+            if (!c2.isCapacitorElm()) return null;
+            return (
+                Locale.LS("res.f = ") +
+                c1.constructor.getUnitText(1 / (2 * CirSim.pi * Math.sqrt(c1.inductance * c2.capacitance)), "Hz")
+            );
         }
         if (this.hintType == CirSim.HINT_RC) {
-            if (!c1.isResistorElm())
-                return null;
-            if (!c2.isCapacitorElm())
-                return null;
+            if (!c1.isResistorElm()) return null;
+            if (!c2.isCapacitorElm()) return null;
             return "RC = " + c1.constructor.getUnitText(c1.resistance * c2.capacitance, "s");
         }
         if (this.hintType == CirSim.HINT_3DB_C) {
-            if (!c1.isResistorElm())
-                return null;
-            if (!c2.isCapacitorElm())
-                return null;
-            return Locale.LS("f.3db = ") +
-                c1.constructor.getUnitText(1 / (2 * CirSim.pi * c1.resistance * c2.capacitance), "Hz");
+            if (!c1.isResistorElm()) return null;
+            if (!c2.isCapacitorElm()) return null;
+            return (
+                Locale.LS("f.3db = ") +
+                c1.constructor.getUnitText(1 / (2 * CirSim.pi * c1.resistance * c2.capacitance), "Hz")
+            );
         }
         if (this.hintType == CirSim.HINT_3DB_L) {
-            if (!c1.isResistorElm())
-                return null;
-            if (!c2.isInductorElm())
-                return null;
-            return Locale.LS("f.3db = ") +
-                c1.constructor.getUnitText(c1.resistance / (2 * CirSim.pi * c2.inductance), "Hz");
+            if (!c1.isResistorElm()) return null;
+            if (!c2.isInductorElm()) return null;
+            return (
+                Locale.LS("f.3db = ") +
+                c1.constructor.getUnitText(c1.resistance / (2 * CirSim.pi * c2.inductance), "Hz")
+            );
         }
         if (this.hintType == CirSim.HINT_TWINT) {
-            if (!c1.isResistorElm())
-                return null;
-            if (!c2.isCapacitorElm())
-                return null;
-            return Locale.LS("fc = ") +
-                c1.constructor.getUnitText(1 / (2 * CirSim.pi * c1.resistance * c2.capacitance), "Hz");
+            if (!c1.isResistorElm()) return null;
+            if (!c2.isCapacitorElm()) return null;
+            return (
+                Locale.LS("fc = ") +
+                c1.constructor.getUnitText(1 / (2 * CirSim.pi * c1.resistance * c2.capacitance), "Hz")
+            );
         }
         return null;
     }
@@ -414,29 +432,37 @@ export class CirSim {
     findAdjustable(elm: any, item: number): any {
         for (let i = 0; i !== this.adjustables.length; i++) {
             const a = this.adjustables[i];
-            if (a.elm == elm && a.editItem == item)
-                return a;
+            if (a.elm == elm && a.editItem == item) return a;
         }
         return null;
     }
 
-    static console(text: string): void { console.log(text); }
+    static console(text: string): void {
+        console.log(text);
+    }
 
-    static debugger(): void { debugger; }
+    static debugger(): void {
+        debugger;
+    }
 
-    min(a: number, b: number): number { return (a < b) ? a : b; }
-    max(a: number, b: number): number { return (a > b) ? a : b; }
+    min(a: number, b: number): number {
+        return a < b ? a : b;
+    }
+    max(a: number, b: number): number {
+        return a > b ? a : b;
+    }
 
-    resetAction(): void { this.ui.resetAction(); }
+    resetAction(): void {
+        this.ui.resetAction();
+    }
 
     importCircuitFromText(circuitText: string | null, subcircuitsOnly: boolean): void {
-        const RC_SUBCIRCUITS = 2, RC_RETAIN = 4;
+        const RC_SUBCIRCUITS = 2,
+            RC_RETAIN = 4;
         // subcircuit library files don't replace the circuit
-        if (circuitText != null && this.loader.constructor.isSubcircuitLibrary(circuitText))
-            subcircuitsOnly = true;
-        const flags = subcircuitsOnly ? (RC_SUBCIRCUITS | RC_RETAIN) : 0;
-        if (!subcircuitsOnly)
-            this.resetEditingContext();
+        if (circuitText != null && this.loader.constructor.isSubcircuitLibrary(circuitText)) subcircuitsOnly = true;
+        const flags = subcircuitsOnly ? RC_SUBCIRCUITS | RC_RETAIN : 0;
+        if (!subcircuitsOnly) this.resetEditingContext();
         if (circuitText != null) {
             this.loader.readCircuit(circuitText, flags);
             ExportAsLocalFileDialog.setLastFileName(null);
@@ -448,28 +474,38 @@ export class CirSim {
     }
 
     dumpOptions(): string {
-        let f = (this.menus.dotsCheckItem.getState()) ? 1 : 0;
-        f |= (this.menus.smallGridCheckItem.getState()) ? 2 : 0;
-        f |= (this.menus.voltsCheckItem.getState()) ? 0 : 4;
-        f |= (this.menus.powerCheckItem.getState()) ? 8 : 0;
-        f |= (this.menus.showValuesCheckItem.getState()) ? 0 : 16;
+        let f = this.menus.dotsCheckItem.getState() ? 1 : 0;
+        f |= this.menus.smallGridCheckItem.getState() ? 2 : 0;
+        f |= this.menus.voltsCheckItem.getState() ? 0 : 4;
+        f |= this.menus.powerCheckItem.getState() ? 8 : 0;
+        f |= this.menus.showValuesCheckItem.getState() ? 0 : 16;
         // 32 = linear scale in afilter
         f |= this.sim.adjustTimeStep ? 64 : 0;
         f |= this.autoDCOnReset ? 128 : 0;
-        const dump = "$ " + f + " " +
-            this.sim.maxTimeStep + " " + this.getIterCount() + " " +
-            this.ui.currentBar.getValue() + " " + CircuitElm.voltageRange + " " +
-            this.ui.powerBar.getValue() + " " + this.sim.minTimeStep + "\n";
+        const dump =
+            "$ " +
+            f +
+            " " +
+            this.sim.maxTimeStep +
+            " " +
+            this.getIterCount() +
+            " " +
+            this.ui.currentBar.getValue() +
+            " " +
+            CircuitElm.voltageRange +
+            " " +
+            this.ui.powerBar.getValue() +
+            " " +
+            this.sim.minTimeStep +
+            "\n";
         return dump;
     }
 
     // a click pushes an undo item (and so sets unsavedChanges) even if nothing moves,
     // so check whether the circuit itself is different
     isModified(): boolean {
-        if (!this.unsavedChanges)
-            return false;
-        if (this.savedDump == null || this.savedDumpPending)
-            return true;
+        if (!this.unsavedChanges) return false;
+        if (this.savedDump == null || this.savedDumpPending) return true;
         return UndoManager.withoutSliders(this.dumpCircuit(false)) !== UndoManager.withoutSliders(this.savedDump);
     }
 
@@ -487,10 +523,16 @@ export class CirSim {
         return xml.dumpCircuit();
     }
 
-    setCircuitTitle(s: string | null): void { this.ui.setCircuitTitle(s); }
+    setCircuitTitle(s: string | null): void {
+        this.ui.setCircuitTitle(s);
+    }
 
-    clearCircuit(): void { this.loader.clearCircuit(); }
-    readCircuit(s: string): void { this.loader.readCircuit(s); }
+    clearCircuit(): void {
+        this.loader.clearCircuit();
+    }
+    readCircuit(s: string): void {
+        this.loader.readCircuit(s);
+    }
 
     pushContext(modelName: string): void {
         const ctx = new CircuitContext();
@@ -512,8 +554,7 @@ export class CirSim {
 
     // pop context and return the list of models changed at deeper levels
     popContextAndGetChangedModels(): any[] {
-        if (this.contextStack.length === 0)
-            return [];
+        if (this.contextStack.length === 0) return [];
         const ctx = this.contextStack.splice(this.contextStack.length - 1, 1)[0];
         const RC_NO_CENTER = 8;
         this.loader.readCircuit(ctx.circuitDump, RC_NO_CENTER);
@@ -535,15 +576,13 @@ export class CirSim {
     }
 
     getEditingModelName(): string | null {
-        if (this.contextStack.length === 0)
-            return null;
+        if (this.contextStack.length === 0) return null;
         return this.contextStack[this.contextStack.length - 1].modelName;
     }
 
     // delete sliders for an element
     deleteSliders(elm: any): void {
-        if (this.adjustables == null)
-            return;
+        if (this.adjustables == null) return;
         for (let i = this.adjustables.length - 1; i >= 0; i--) {
             const adj = this.adjustables[i];
             if (adj.elm == elm) {
@@ -558,37 +597,61 @@ export class CirSim {
     }
 
     locateElm(elm: any): number {
-        for (let i = 0; i !== this.elmList.length; i++)
-            if (elm === this.elmList[i])
-                return i;
+        for (let i = 0; i !== this.elmList.length; i++) if (elm === this.elmList[i]) return i;
         return -1;
     }
 
-    setPowerBarEnable(): void { this.ui.setPowerBarEnable(); }
+    setPowerBarEnable(): void {
+        this.ui.setPowerBarEnable();
+    }
 
-    enableItems(): void { this.ui.enableItems(); }
+    enableItems(): void {
+        this.ui.enableItems();
+    }
 
-    setGrid(): void { this.ui.setGrid(); }
+    setGrid(): void {
+        this.ui.setGrid();
+    }
 
-    setToolbar(): void { this.ui.setToolbar(); }
+    setToolbar(): void {
+        this.ui.setToolbar();
+    }
 
-    setMouseMode(mode: number): void { this.ui.setMouseMode(mode); }
+    setMouseMode(mode: number): void {
+        this.ui.setMouseMode(mode);
+    }
 
-    setCursorStyle(s: string): void { this.ui.setCursorStyle(s); }
+    setCursorStyle(s: string): void {
+        this.ui.setCursorStyle(s);
+    }
 
-    dialogIsShowing(): boolean { return this.ui.dialogIsShowing(); }
+    dialogIsShowing(): boolean {
+        return this.ui.dialogIsShowing();
+    }
 
-    modalDialogIsShowing(): boolean { return this.ui.modalDialogIsShowing(); }
+    modalDialogIsShowing(): boolean {
+        return this.ui.modalDialogIsShowing();
+    }
 
-    updateToolbar(): void { this.ui.updateToolbar(); }
+    updateToolbar(): void {
+        this.ui.updateToolbar();
+    }
 
-    getLabelTextForClass(cls: string): string { return this.ui.getLabelTextForClass(cls); }
+    getLabelTextForClass(cls: string): string {
+        return this.ui.getLabelTextForClass(cls);
+    }
 
-    createNewLoadFile(): void { this.ui.createNewLoadFile(); }
+    createNewLoadFile(): void {
+        this.ui.createNewLoadFile();
+    }
 
-    addWidgetToVerticalPanel(w: any): void { this.ui.addWidgetToVerticalPanel(w); }
+    addWidgetToVerticalPanel(w: any): void {
+        this.ui.addWidgetToVerticalPanel(w);
+    }
 
-    removeWidgetFromVerticalPanel(w: any): void { this.ui.removeWidgetFromVerticalPanel(w); }
+    removeWidgetFromVerticalPanel(w: any): void {
+        this.ui.removeWidgetFromVerticalPanel(w);
+    }
 
     register(origClassName: string, elm: any): void {
         let className = origClassName;
@@ -596,23 +659,21 @@ export class CirSim {
             CirSim.dumpTypeMap = new Map<number, string>();
             CirSim.xmlDumpTypeMap = new Map<string, string>();
         }
-        if (elm == null)
-            return;
+        if (elm == null) return;
         const t: number = elm.getDumpType();
         // use the class name from getDumpClass if available
         if (elm.getDumpClass) {
             const cs = elm.getDumpClass();
             if (cs && cs.name) {
                 className = cs.name;
-                const dot = className.lastIndexOf('.');
+                const dot = className.lastIndexOf(".");
                 if (dot >= 0) className = className.substring(dot + 1);
             }
         }
         if (t > 0) {
             const s = CirSim.dumpTypeMap.get(t);
             if (s != null) {
-                if (s !== className)
-                    CirSim.console("dump type conflict for " + className + " " + t);
+                if (s !== className) CirSim.console("dump type conflict for " + className + " " + t);
             } else {
                 CirSim.dumpTypeMap.set(t, className);
             }
@@ -621,8 +682,7 @@ export class CirSim {
         const xt: string = elm.getXmlDumpType ? elm.getXmlDumpType() : className;
         const s2 = CirSim.xmlDumpTypeMap.get(xt);
         if (s2 != null) {
-            if (s2 !== className)
-                CirSim.console("xml dump type conflict for " + className + " " + xt);
+            if (s2 !== className) CirSim.console("xml dump type conflict for " + className + " " + xt);
         } else {
             CirSim.xmlDumpTypeMap.set(xt, className);
         }
@@ -630,42 +690,33 @@ export class CirSim {
 
     static createCe(tint: number, x1: number, y1: number, x2: number, y2: number, f: number, st: StringTokenizer): any {
         // for old files
-        if (tint === 'n'.charCodeAt(0))
-            return ElementFactory.create("NoiseElm", x1, y1, x2, y2, f, st);
+        if (tint === "n".charCodeAt(0)) return ElementFactory.create("NoiseElm", x1, y1, x2, y2, f, st);
 
         const name = CirSim.dumpTypeMap.get(tint);
-        if (name == null)
-            return null;
+        if (name == null) return null;
         return ElementFactory.create(name, x1, y1, x2, y2, f, st);
     }
 
     static constructElement(n: string, x1: number, y1?: number): any {
         const elm = ElementFactory.create(n, x1, y1 ?? 0);
-        if (elm != null)
-            return elm;
+        if (elm != null) return elm;
 
-        if (n == "VoltageElm")
-            return ElementFactory.create("DCVoltageElm", x1, y1 ?? 0);
-        if (n == "TransistorElm")
-            return ElementFactory.create("NTransistorElm", x1, y1 ?? 0);
-        if (n == "MosfetElm")
-            return ElementFactory.create("NMosfetElm", x1, y1 ?? 0);
-        if (n == "JfetElm")
-            return ElementFactory.create("NJfetElm", x1, y1 ?? 0);
-        if (n == "DarlingtonElm")
-            return ElementFactory.create("NDarlingtonElm", x1, y1 ?? 0);
+        if (n == "VoltageElm") return ElementFactory.create("DCVoltageElm", x1, y1 ?? 0);
+        if (n == "TransistorElm") return ElementFactory.create("NTransistorElm", x1, y1 ?? 0);
+        if (n == "MosfetElm") return ElementFactory.create("NMosfetElm", x1, y1 ?? 0);
+        if (n == "JfetElm") return ElementFactory.create("NJfetElm", x1, y1 ?? 0);
+        if (n == "DarlingtonElm") return ElementFactory.create("NDarlingtonElm", x1, y1 ?? 0);
 
         // if you take out RingCounterElm, it will break subcircuits
         // if you take out DecadeElm, it will break the menus and people's saved shortcuts
-        if (n == "DecadeElm" || n == "RingCounterElm")
-            return ElementFactory.create("RingCounterElm", x1, y1 ?? 0);
+        if (n == "DecadeElm" || n == "RingCounterElm") return ElementFactory.create("RingCounterElm", x1, y1 ?? 0);
 
         // if you take out UserDefinedLogicElm, it will break people's saved shortcuts
         if (n == "UserDefinedLogicElm" || n == "CustomLogicElm")
             return ElementFactory.create("CustomLogicElm", x1, y1 ?? 0);
 
         if (n.startsWith("SubcircuitElm:")) {
-            const ix = n.indexOf(':') + 1;
+            const ix = n.indexOf(":") + 1;
             const name = n.substring(ix);
             return HookRegistry.createSubcircuitElm!(x1, y1 ?? 0, name);
         }
@@ -673,8 +724,7 @@ export class CirSim {
     }
 
     updateModels(): void {
-        for (const ce of this.elmList)
-            ce.updateModels();
+        for (const ce of this.elmList) ce.updateModels();
     }
 
     // force all SubcircuitElm with a given model name to re-fetch their model
@@ -690,12 +740,14 @@ export class CirSim {
         this.needAnalyze();
     }
 
-    isSelection(): boolean { return this.ui.isSelection(); }
+    isSelection(): boolean {
+        return this.ui.isSelection();
+    }
 
     isMobile(el: HTMLElement): boolean {
         if (!el) return false;
         const style = getComputedStyle(el);
-        return style.display !== 'none';
+        return style.display !== "none";
     }
 
     decompress(dump: string): string {
@@ -703,8 +755,12 @@ export class CirSim {
     }
 
     // instance wrappers for Java compatibility
-    constructElement(name: string, x: number, y: number): any { return CirSim.constructElement(name, x, y); }
-    console(s: string): void { CirSim.console(s); }
+    constructElement(name: string, x: number, y: number): any {
+        return CirSim.constructElement(name, x, y);
+    }
+    console(s: string): void {
+        CirSim.console(s);
+    }
 
     getrand(x: number): number {
         let q = this.random.nextInt();
@@ -716,8 +772,12 @@ export class CirSim {
 // Simple URL query parameter helper (replaces GWT QueryParameters)
 class QueryParameters {
     private params: URLSearchParams;
-    constructor() { this.params = new URLSearchParams(window.location.search); }
-    getValue(key: string): string | null { return this.params.get(key); }
+    constructor() {
+        this.params = new URLSearchParams(window.location.search);
+    }
+    getValue(key: string): string | null {
+        return this.params.get(key);
+    }
     getBooleanValue(key: string, def: boolean): boolean {
         const v = this.params.get(key);
         if (v == null) return def;

@@ -50,12 +50,9 @@ export class BusLogicInputElm extends SwitchElm {
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "bw", this.busWidth);
-        if (this.value !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "va", this.value);
-        if (this.hiV !== 5)
-            CircuitXMLSerializer.dumpAttr(elem, "hi", this.hiV);
-        if (this.loV !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "lo", this.loV);
+        if (this.value !== 0) CircuitXMLSerializer.dumpAttr(elem, "va", this.value);
+        if (this.hiV !== 5) CircuitXMLSerializer.dumpAttr(elem, "hi", this.hiV);
+        if (this.loV !== 0) CircuitXMLSerializer.dumpAttr(elem, "lo", this.loV);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
@@ -66,11 +63,21 @@ export class BusLogicInputElm extends SwitchElm {
         this.loV = xml.parseDoubleAttr("lo", this.loV);
     }
 
-    getDumpType(): number { return 0; }
-    getPostCount(): number { return this.busWidth; }
-    getNumHandles(): number { return 1; }
-    getPostWidth(n: number): number { return this.busWidth; }
-    getVoltageSourceCount(): number { return this.busWidth; }
+    getDumpType(): number {
+        return 0;
+    }
+    getPostCount(): number {
+        return this.busWidth;
+    }
+    getNumHandles(): number {
+        return 1;
+    }
+    getPostWidth(n: number): number {
+        return this.busWidth;
+    }
+    getVoltageSourceCount(): number {
+        return this.busWidth;
+    }
 
     getPost(n: number): Point {
         return new Point(this.x, this.y, n);
@@ -107,16 +114,19 @@ export class BusLogicInputElm extends SwitchElm {
         g.context.font = "bold " + fontSize + "px SansSerif";
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.whiteColor);
         const s = "" + this.value;
-        this.interpPoint(this.point1, this.point2, this.lead1,
-            1 - (Math.floor(g.context.measureText(s).width) / 2 + 8) / this.dn);
+        this.interpPoint(
+            this.point1,
+            this.point2,
+            this.lead1,
+            1 - (Math.floor(g.context.measureText(s).width) / 2 + 8) / this.dn,
+        );
         this.setBbox(this.point1, this.lead1, 0);
         this.drawCenteredText(g, s, this.x2, this.y2, true);
         this.setVoltageColor(g, this.nodes[0].v);
         CircuitElm.drawThickLine(g, this.point1, this.lead1!, 5);
         if (this.currents !== null) {
             this.current = 0;
-            for (let i = 0; i < this.currents.length; i++)
-                this.current += this.currents[i];
+            for (let i = 0; i < this.currents.length; i++) this.current += this.currents[i];
         }
         this.updateDotCount();
         this.drawDots(g, this.point1, this.lead1!, -this.curcount);
@@ -130,41 +140,48 @@ export class BusLogicInputElm extends SwitchElm {
 
     toggle(): void {
         this.value++;
-        if (this.value >= (1 << this.busWidth))
-            this.value = 0;
+        if (this.value >= 1 << this.busWidth) this.value = 0;
     }
 
     stamp(): void {
         for (let i = 0; i < this.busWidth; i++) {
-            const v = ((this.value & (1 << i)) !== 0) ? this.hiV : this.loV;
+            const v = (this.value & (1 << i)) !== 0 ? this.hiV : this.loV;
             CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[i], this.voltageSources![i], v);
         }
     }
 
     calculateCurrent(): void {}
-    hasGroundConnection(n: number): boolean { return true; }
-    isWireEquivalent(): boolean { return false; }
-    isRemovableWire(): boolean { return false; }
+    hasGroundConnection(n: number): boolean {
+        return true;
+    }
+    isWireEquivalent(): boolean {
+        return false;
+    }
+    isRemovableWire(): boolean {
+        return false;
+    }
 
-    getXmlDumpType(): string { return "bli"; }
+    getXmlDumpType(): string {
+        return "bli";
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "bus input (" + this.busWidth + ")";
         arr[1] = "value = " + this.value;
         arr[2] = "hex = 0x" + this.value.toString(16).toUpperCase();
     }
-    getShortcut(): number { return 0; }
+    getShortcut(): number {
+        return 0;
+    }
 
-    showPropertiesOnCreate(): boolean { return true; }
+    showPropertiesOnCreate(): boolean {
+        return true;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Bus Width", this.busWidth, 2, 32).setDimensionless();
-        if (n === 1)
-            return new EditInfo("Value", this.value).setDimensionless();
-        if (n === 2)
-            return new EditInfo("High Voltage", this.hiV).setUnitStep();
-        if (n === 3)
-            return new EditInfo("Low Voltage", this.loV).setUnitStep();
+        if (n === 0) return new EditInfo("Bus Width", this.busWidth, 2, 32).setDimensionless();
+        if (n === 1) return new EditInfo("Value", this.value).setDimensionless();
+        if (n === 2) return new EditInfo("High Voltage", this.hiV).setUnitStep();
+        if (n === 3) return new EditInfo("Low Voltage", this.loV).setUnitStep();
         return null;
     }
     setEditValue(n: number, ei: EditInfo): void {
@@ -172,14 +189,10 @@ export class BusLogicInputElm extends SwitchElm {
             if (ei.value >= 2) {
                 this.busWidth = Math.floor(ei.value);
                 this.allocNodes();
-            } else
-                ei.setError("must be >= 2");
+            } else ei.setError("must be >= 2");
         }
-        if (n === 1)
-            this.value = Math.floor(ei.value);
-        if (n === 2)
-            this.hiV = ei.value;
-        if (n === 3)
-            this.loV = ei.value;
+        if (n === 1) this.value = Math.floor(ei.value);
+        if (n === 2) this.hiV = ei.value;
+        if (n === 3) this.loV = ei.value;
     }
 }

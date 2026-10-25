@@ -22,7 +22,6 @@ import { DMatrixSparseCSC } from "./DMatrixSparseCSC";
 import { IGrowArray } from "./IGrowArray";
 
 export class SparseLU {
-
     constructor() {}
 
     private readonly gw: IGrowArray = new IGrowArray();
@@ -77,7 +76,7 @@ export class SparseLU {
             const top = SparseLU.solveColB(this.L, true, A, col, this.x, this.pinv, this.gxi, w);
             const xi = this.gxi.data;
             let ipiv = -1;
-            let a = -1.7976931348623157E+308;
+            let a = -1.7976931348623157e308;
 
             for (let p = top; p < n; ++p) {
                 const i = xi[p];
@@ -145,7 +144,9 @@ export class SparseLU {
 
     solve(B: number[], X: number[]): void {
         if (B.length !== this.AnumRows) {
-            throw new Error("Unexpected number of rows in B based on shape of A. Found=" + B.length + " Expected=" + this.AnumRows);
+            throw new Error(
+                "Unexpected number of rows in B based on shape of A. Found=" + B.length + " Expected=" + this.AnumRows,
+            );
         }
 
         const x = SparseLU.adjustD(this.gx, X.length);
@@ -166,7 +167,16 @@ export class SparseLU {
         }
     }
 
-    static solveColB(G: DMatrixSparseCSC, lower: boolean, B: DMatrixSparseCSC, colB: number, x: Float64Array, pinv: Int32Array, g_xi: IGrowArray, w: Int32Array): number {
+    static solveColB(
+        G: DMatrixSparseCSC,
+        lower: boolean,
+        B: DMatrixSparseCSC,
+        colB: number,
+        x: Float64Array,
+        pinv: Int32Array,
+        g_xi: IGrowArray,
+        w: Int32Array,
+    ): number {
         const X_rows = G.numCols;
         const xi = SparseLU.adjustI(g_xi, X_rows);
         const top = SparseLU.searchNzRowsInX(G, B, colB, pinv, xi, w);
@@ -211,12 +221,21 @@ export class SparseLU {
         return top;
     }
 
-    static searchNzRowsInX(G: DMatrixSparseCSC, B: DMatrixSparseCSC, colB: number, pinv: Int32Array, xi: Int32Array, w: Int32Array): number {
+    static searchNzRowsInX(
+        G: DMatrixSparseCSC,
+        B: DMatrixSparseCSC,
+        colB: number,
+        pinv: Int32Array,
+        xi: Int32Array,
+        w: Int32Array,
+    ): number {
         const X_rows = G.numCols;
         if (xi.length < X_rows) {
             throw new Error("xi must be at least G.numCols=" + G.numCols);
         } else if (w.length < 2 * X_rows) {
-            throw new Error("w must be at least 2*G.numCols in length (2*number of rows in X) and first N elements must be zero");
+            throw new Error(
+                "w must be at least 2*G.numCols in length (2*number of rows in X) and first N elements must be zero",
+            );
         } else {
             const idx0 = B.col_idx[colB];
             const idx1 = B.col_idx[colB + 1];
@@ -238,7 +257,14 @@ export class SparseLU {
         }
     }
 
-    private static searchNzRowsInX_DFS(rowB: number, G: DMatrixSparseCSC, top: number, pinv: Int32Array, xi: Int32Array, w: Int32Array): number {
+    private static searchNzRowsInX_DFS(
+        rowB: number,
+        G: DMatrixSparseCSC,
+        top: number,
+        pinv: Int32Array,
+        xi: Int32Array,
+        w: Int32Array,
+    ): number {
         const N = G.numCols;
         let head = 0;
         xi[head] = rowB;
@@ -282,7 +308,7 @@ export class SparseLU {
 
         for (let col = 0; col < N; ++col) {
             const idx1 = L.col_idx[col + 1];
-            const x_j = x[col] /= L.nz_values[idx0];
+            const x_j = (x[col] /= L.nz_values[idx0]);
 
             for (let i = idx0 + 1; i < idx1; ++i) {
                 const row = L.nz_rows[i];
@@ -299,7 +325,7 @@ export class SparseLU {
 
         for (let col = N - 1; col >= 0; --col) {
             const idx0 = U.col_idx[col];
-            const x_j = x[col] /= U.nz_values[idx1 - 1];
+            const x_j = (x[col] /= U.nz_values[idx1 - 1]);
 
             for (let i = idx0; i < idx1 - 1; ++i) {
                 const row = U.nz_rows[i];

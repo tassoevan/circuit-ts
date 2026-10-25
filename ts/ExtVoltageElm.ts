@@ -58,15 +58,23 @@ export class ExtVoltageElm extends RailElm {
         this.drawRailText(g, this.name);
     }
 
-    setVoltage(v: number): void { if (!isNaN(v)) this.voltage = v; }
-    getName(): string { return this.name; }
+    setVoltage(v: number): void {
+        if (!isNaN(v)) this.voltage = v;
+    }
+    getName(): string {
+        return this.name;
+    }
 
     getVoltage(): number {
         return this.voltage;
     }
 
-    getDumpType(): number { return 418; }
-    getShortcut(): number { return 0; }
+    getDumpType(): number {
+        return 418;
+    }
+    getShortcut(): number {
+        return 0;
+    }
 
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
@@ -78,12 +86,15 @@ export class ExtVoltageElm extends RailElm {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.name = ei.textf!.value;
+        if (n === 0) this.name = ei.textf!.value;
     }
 
-    isExtVoltageElm(): boolean { return true; }
-    getElmType(): string { return "ext. voltage"; }
+    isExtVoltageElm(): boolean {
+        return true;
+    }
+    getElmType(): string {
+        return "ext. voltage";
+    }
 
     getInfo(arr: string[]): void {
         super.getInfo(arr);

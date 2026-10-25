@@ -92,11 +92,19 @@ export class JfetElm extends MosfetElm {
             const dsx = CircuitElm.sign(this.dx);
             const dsyn = this.dy === 0 ? 0 : 1;
             if (this.dy === 0) {
-                g.drawString("G", this.gate[1].x - (this.dx < 0 ? -2 : 12), this.gate[1].y + ((this.dy > 0) ? -5 : 12));
-                g.drawString(this.pnp === -1 ? "D" : "S", this.src[0].x - 3 + 9 * (dsx - dsyn * this.pnp), this.src[0].y + 4);
-                g.drawString(this.pnp === -1 ? "S" : "D", this.drn[0].x - 3 + 9 * (dsx - dsyn * this.pnp), this.drn[0].y + 4);
+                g.drawString("G", this.gate[1].x - (this.dx < 0 ? -2 : 12), this.gate[1].y + (this.dy > 0 ? -5 : 12));
+                g.drawString(
+                    this.pnp === -1 ? "D" : "S",
+                    this.src[0].x - 3 + 9 * (dsx - dsyn * this.pnp),
+                    this.src[0].y + 4,
+                );
+                g.drawString(
+                    this.pnp === -1 ? "S" : "D",
+                    this.drn[0].x - 3 + 9 * (dsx - dsyn * this.pnp),
+                    this.drn[0].y + 4,
+                );
             } else if (this.dx === 0) {
-                g.drawString("G", this.gate[1].x - (this.dx < 0 ? -2 : 12), this.gate[1].y + ((this.dy > 0) ? -5 : 12));
+                g.drawString("G", this.gate[1].x - (this.dx < 0 ? -2 : 12), this.gate[1].y + (this.dy > 0 ? -5 : 12));
                 g.drawString(this.pnp === -1 ? "D" : "S", this.src[0].x - 4, this.src[0].y - (this.dy < 0 ? 7 : -14));
                 g.drawString(this.pnp === -1 ? "S" : "D", this.drn[0].x - 4, this.drn[0].y - (this.dy < 0 ? 7 : -14));
             }
@@ -106,10 +114,8 @@ export class JfetElm extends MosfetElm {
     }
 
     getCurrentIntoNode(n: number): number {
-        if (n === 0)
-            return -this.gateCurrent;
-        if (n === 1)
-            return this.gateCurrent + this.ids;
+        if (n === 0) return -this.gateCurrent;
+        if (n === 1) return this.gateCurrent + this.ids;
         return -this.ids;
     }
 
@@ -119,8 +125,7 @@ export class JfetElm extends MosfetElm {
         // find the coordinates of the various points we need to draw
         // the JFET.
         let hs2 = this.hs * this.dsign;
-        if ((this.flags & this.FLAG_FLIP) !== 0)
-            hs2 = -hs2;
+        if ((this.flags & this.FLAG_FLIP) !== 0) hs2 = -hs2;
         this.src = this.newPointArray(3);
         this.drn = this.newPointArray(3);
         this.interpPoint2(this.point1, this.point2, this.src[0], this.drn[0], 1, -hs2);
@@ -136,16 +141,13 @@ export class JfetElm extends MosfetElm {
         if (this.pnp === -1) {
             const x = this.interpPoint(this.gatePt, this.point1, 18 / this.dn);
             this.arrowPoly = this.calcArrow(this.gatePt, x, 12, 5);
-        } else
-            this.arrowPoly = this.calcArrow(this.point1, this.gatePt, 12, 5);
+        } else this.arrowPoly = this.calcArrow(this.point1, this.gatePt, 12, 5);
     }
 
     stamp(): void {
         super.stamp();
-        if (this.pnp < 0)
-            this.diode.stamp(this.nodes[1], this.nodes[0]);
-        else
-            this.diode.stamp(this.nodes[0], this.nodes[1]);
+        if (this.pnp < 0) this.diode.stamp(this.nodes[1], this.nodes[0]);
+        else this.diode.stamp(this.nodes[0], this.nodes[1]);
     }
 
     doStep(): void {
@@ -157,28 +159,47 @@ export class JfetElm extends MosfetElm {
         this.gateCurrent = this.pnp * this.diode.calculateCurrent(this.pnp * (this.nodes[0].v - this.nodes[1].v));
     }
 
-    showBulk(): boolean { return false; }
-    isJfet(): boolean { return true; }
-    hasSwapDS(): boolean { return true; }
+    showBulk(): boolean {
+        return false;
+    }
+    isJfet(): boolean {
+        return true;
+    }
+    hasSwapDS(): boolean {
+        return true;
+    }
 
     static lastJfetModelName: string = "default-jfet";
-    getLastModelName(): string { return JfetElm.lastJfetModelName; }
-    setLastModelName(n: string): void { JfetElm.lastJfetModelName = n; }
+    getLastModelName(): string {
+        return JfetElm.lastJfetModelName;
+    }
+    setLastModelName(n: string): void {
+        JfetElm.lastJfetModelName = n;
+    }
 
-    getDumpType(): number { return 'j'.charCodeAt(0); }
-    isJfetElm(): boolean { return true; }
+    getDumpType(): number {
+        return "j".charCodeAt(0);
+    }
+    isJfetElm(): boolean {
+        return true;
+    }
     // these values are taken from Hayes+Horowitz p155
-    getDefaultThreshold(): number { return -4; }
-    getBackwardCompatibilityBeta(): number { return .00125; }
-    getElmType(): string { return "JFET"; }
+    getDefaultThreshold(): number {
+        return -4;
+    }
+    getBackwardCompatibilityBeta(): number {
+        return 0.00125;
+    }
+    getElmType(): string {
+        return "JFET";
+    }
 
     getInfo(arr: string[]): void {
         this.getFetInfo(arr, "JFET");
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n < 3)
-            return super.getEditInfo(n);
+        if (n < 3) return super.getEditInfo(n);
         return null;
     }
 
@@ -192,18 +213,22 @@ export class JfetElm extends MosfetElm {
 }
 
 export class NJfetElm extends JfetElm {
-    constructor(xx: number, yy: number) { super(xx, yy, false); }
-    getDumpClass(): typeof JfetElm { return JfetElm; }
+    constructor(xx: number, yy: number) {
+        super(xx, yy, false);
+    }
+    getDumpClass(): typeof JfetElm {
+        return JfetElm;
+    }
 }
 
 export class PJfetElm extends JfetElm {
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
-        if (xb !== undefined)
-            super(xa, ya, xb, yb!, f!, st!);
-        else
-            super(xa, ya, true);
+        if (xb !== undefined) super(xa, ya, xb, yb!, f!, st!);
+        else super(xa, ya, true);
     }
-    getDumpClass(): typeof JfetElm { return JfetElm; }
+    getDumpClass(): typeof JfetElm {
+        return JfetElm;
+    }
 }

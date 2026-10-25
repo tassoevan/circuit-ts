@@ -88,23 +88,33 @@ export class WattmeterTrueElm extends CircuitElm {
         this.setup();
     }
 
-    getVoltageSourceCount(): number { return 1; }
-    getPostCount(): number { return 4; }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    getPostCount(): number {
+        return 4;
+    }
 
     drag(xx: number, yy: number): void {
         xx = this.snapGrid(xx);
         yy = this.snapGrid(yy);
         const w1 = Math.max(CircuitElm.app.gridSize, CircuitElm.abs(yy - this.y));
         const w2 = Math.max(CircuitElm.app.gridSize, CircuitElm.abs(xx - this.x));
-        if (w1 > w2) { xx = this.x; this.width = w2; }
-        else { yy = this.y; this.width = w1; }
-        this.x2 = xx; this.y2 = yy;
+        if (w1 > w2) {
+            xx = this.x;
+            this.width = w2;
+        } else {
+            yy = this.y;
+            this.width = w1;
+        }
+        this.x2 = xx;
+        this.y2 = yy;
         this.setPoints();
     }
 
     setPoints(): void {
         super.setPoints();
-        const ds = (this.dy === 0) ? CircuitElm.sign(this.dx) : -CircuitElm.sign(this.dy);
+        const ds = this.dy === 0 ? CircuitElm.sign(this.dx) : -CircuitElm.sign(this.dy);
 
         // get 2 more terminals
         const p3 = this.interpPoint(this.point1, this.point2, 0, -this.width * ds);
@@ -135,11 +145,13 @@ export class WattmeterTrueElm extends CircuitElm {
         this.rectPointsX = [r1.x, r2.x, r4.x, r3.x];
         this.rectPointsY = [r1.y, r2.y, r4.y, r3.y];
 
-        this.center = this.interpPoint(r1, r4, .5);
+        this.center = this.interpPoint(r1, r4, 0.5);
         this.maxTextLen = Math.max(Math.abs(r1.x - r4.x) - 5, 5);
     }
 
-    getPost(n: number): Point { return this.posts[n]; }
+    getPost(n: number): Point {
+        return this.posts[n];
+    }
 
     stamp(): void {
         // 2  3
@@ -155,14 +167,13 @@ export class WattmeterTrueElm extends CircuitElm {
     }
 
     draw(g: Graphics): void {
-        for (let i = 0; i !== 2; i++)
-            this.curcounts[i] = this.updateDotCountImpl(this.currents[i], this.curcounts[i]);
+        for (let i = 0; i !== 2; i++) this.curcounts[i] = this.updateDotCountImpl(this.currents[i], this.curcounts[i]);
         let flip = 1;
         for (let i = 0; i !== 4; i++) {
             this.setVoltageColor(g, this.nodes[i].v);
             CircuitElm.drawThickLine(g, this.posts[i], this.inner[i]);
             if (i === 2 || i === 3)
-                this.drawDots(g, this.posts[i], this.inner[i], this.curcounts[Math.trunc(i/2)] * flip);
+                this.drawDots(g, this.posts[i], this.inner[i], this.curcounts[Math.trunc(i / 2)] * flip);
             // current coil terminals are labeled M (marked) and L, potential coil
             // terminals are labeled C (marked) and V, matching standard wattmeter
             // terminal markings: M L / C V.  Labels sit just inside the box edge,
@@ -176,7 +187,7 @@ export class WattmeterTrueElm extends CircuitElm {
                 g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.whiteColor);
                 const w = Math.trunc(g.context.measureText(label).width);
                 const labelPoint = this.interpPoint(this.posts[i], this.inner[i], 1.5) as Point;
-                g.drawString(label, labelPoint.x - Math.trunc(w/2), labelPoint.y + 4);
+                g.drawString(label, labelPoint.x - Math.trunc(w / 2), labelPoint.y + 4);
             }
             flip *= -1;
         }
@@ -196,13 +207,12 @@ export class WattmeterTrueElm extends CircuitElm {
         while (true) {
             g.setFont(new Font("SansSerif", 0, fsize));
             w = Math.trunc(g.context.measureText(str).width);
-            if (w < this.maxTextLen)
-                break;
+            if (w < this.maxTextLen) break;
             fsize--;
         }
         g.setColor(CircuitElm.whiteColor);
         g.context.textBaseline = "middle";
-        g.drawString(str, this.center.x - Math.trunc(w/2), this.center.y);
+        g.drawString(str, this.center.x - Math.trunc(w / 2), this.center.y);
         g.restore();
     }
 
@@ -225,19 +235,16 @@ export class WattmeterTrueElm extends CircuitElm {
         // initial condition goes through a startup transient far outside its steady-state
         // swing; an all-time extreme would get stuck there and oversize the band forever,
         // so the detector would stop triggering cleanly once the load is reactive.
-        if (p > this.curPeak)
-            this.curPeak = p;
-        if (p < this.curTrough)
-            this.curTrough = p;
+        if (p > this.curPeak) this.curPeak = p;
+        if (p < this.curTrough) this.curTrough = p;
 
-        const band = (this.peak - this.trough) * .05 + Math.abs(this.peak) * 1e-9;
+        const band = (this.peak - this.trough) * 0.05 + Math.abs(this.peak) * 1e-9;
         const above = this.wasAboveMid ? p > mid - band : p > mid + band;
 
         if (above && !this.wasAboveMid) {
             if (this.haveFullCycle) {
                 this.avgPower = this.totalEnergy / this.cycleTime;
-                if (isNaN(this.avgPower))
-                    this.avgPower = 0;
+                if (isNaN(this.avgPower)) this.avgPower = 0;
                 this.lastCycleTime = this.cycleTime;
             } else {
                 // The run up to the first crossing is a partial cycle. Measuring it would
@@ -253,8 +260,7 @@ export class WattmeterTrueElm extends CircuitElm {
         } else if (this.lastCycleTime > 0 && this.cycleTime > this.lastCycleTime * 8) {
             // the waveform stopped or changed shape; don't freeze on a stale reading
             this.avgPower = this.totalEnergy / this.cycleTime;
-            if (isNaN(this.avgPower))
-                this.avgPower = 0;
+            if (isNaN(this.avgPower)) this.avgPower = 0;
             this.totalEnergy = 0;
             this.cycleTime = 0;
             this.peak = this.curPeak;
@@ -266,8 +272,7 @@ export class WattmeterTrueElm extends CircuitElm {
 
         // Constant power never crosses its own mean, so no period is ever measured. Report
         // the running mean until one is, which is the right answer for DC anyway.
-        if (this.lastCycleTime === 0)
-            this.avgPower = mid;
+        if (this.lastCycleTime === 0) this.avgPower = mid;
 
         // Clear the reading once the power has been off for longer than a period.
         if (p === 0) {
@@ -286,14 +291,16 @@ export class WattmeterTrueElm extends CircuitElm {
         this.currents[vn === this.voltSources[1] ? 0 : 1] = c;
     }
     getCurrentIntoNode(n: number): number {
-        if (n % 2 === 0)
-            return -this.currents[Math.trunc(n/2)];
-        else
-            return this.currents[Math.trunc(n/2)];
+        if (n % 2 === 0) return -this.currents[Math.trunc(n / 2)];
+        else return this.currents[Math.trunc(n / 2)];
     }
 
-    getConnection(n1: number, n2: number): boolean { return Math.trunc(n1/2) === Math.trunc(n2/2); }
-    hasGroundConnection(n1: number): boolean { return false; }
+    getConnection(n1: number, n2: number): boolean {
+        return Math.trunc(n1 / 2) === Math.trunc(n2 / 2);
+    }
+    hasGroundConnection(n1: number): boolean {
+        return false;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "wattmeter";
@@ -302,32 +309,48 @@ export class WattmeterTrueElm extends CircuitElm {
         arr[4] = "P = " + CircuitElm.getUnitText(this.getAveragePower(), "W");
     }
 
-    getPower(): number { return this.getVoltageDiff() * this.getCurrent(); }
+    getPower(): number {
+        return this.getVoltageDiff() * this.getCurrent();
+    }
 
     getMeterPower(): number {
         let value: number;
         switch (this.meter) {
-        case this.PM_INST:
-            value = this.getVoltageDiff() * this.getCurrent();
-            break;
-        case this.PM_AVG:
-            value = this.getAveragePower();
-            break;
-        default:
-            value = -1;
+            case this.PM_INST:
+                value = this.getVoltageDiff() * this.getCurrent();
+                break;
+            case this.PM_AVG:
+                value = this.getAveragePower();
+                break;
+            default:
+                value = -1;
         }
         return value;
     }
 
-    canViewInScope(): boolean { return true; }
-    getCurrent(): number { return this.currents[1]; }
-    getVoltageDiff(): number { return this.nodes[1].v - this.nodes[0].v; }
-    getAveragePower(): number { return this.avgPower; }
+    canViewInScope(): boolean {
+        return true;
+    }
+    getCurrent(): number {
+        return this.currents[1];
+    }
+    getVoltageDiff(): number {
+        return this.nodes[1].v - this.nodes[0].v;
+    }
+    getAveragePower(): number {
+        return this.avgPower;
+    }
 
-    canFlipX(): boolean { return false; }
-    canFlipY(): boolean { return false; }
+    canFlipX(): boolean {
+        return false;
+    }
+    canFlipY(): boolean {
+        return false;
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Value", this.selectedValue, -1, -1);
@@ -341,7 +364,6 @@ export class WattmeterTrueElm extends CircuitElm {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.meter = ei.choice!.getSelectedIndex();
+        if (n === 0) this.meter = ei.choice!.getSelectedIndex();
     }
 }

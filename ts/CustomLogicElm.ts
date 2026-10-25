@@ -62,8 +62,7 @@ export class CustomLogicElm extends ChipElm {
     }
 
     dumpXml(doc: Document, elem: Element): void {
-        if (!this.model.dumped)
-            this.model.dumpXml(doc);
+        if (!this.model.dumped) this.model.dumpXml(doc);
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modelName);
     }
@@ -89,11 +88,10 @@ export class CustomLogicElm extends ChipElm {
         }
 
         this.model = CustomLogicModel.getModelWithName(this.modelName);
-        this.inputCount  = this.model.inputs.length;
+        this.inputCount = this.model.inputs.length;
         this.outputCount = this.model.outputs.length;
         this.sizeY = this.inputCount > this.outputCount ? this.inputCount : this.outputCount;
-        if (this.sizeY === 0)
-            this.sizeY = 1;
+        if (this.sizeY === 0) this.sizeY = 1;
         this.sizeX = 2;
         this.postCount = this.inputCount + this.outputCount;
         this.pins = new Array(this.postCount);
@@ -106,19 +104,27 @@ export class CustomLogicElm extends ChipElm {
             this.pins[i + this.inputCount].output = true;
             this.pins[i + this.inputCount].fixName();
         }
-        this.lastValues    = new Array(this.postCount).fill(false);
+        this.lastValues = new Array(this.postCount).fill(false);
         this.patternValues = new Array(26).fill(false);
         this.highImpedance = new Array(this.postCount).fill(false);
     }
 
-    getPostCount(): number { return this.postCount; }
+    getPostCount(): number {
+        return this.postCount;
+    }
 
-    getVoltageSourceCount(): number { return this.outputCount; }
+    getVoltageSourceCount(): number {
+        return this.outputCount;
+    }
 
     // keep track of whether we have any tri-state outputs.  if not, then we can simplify things quite a bit, making the simulation faster
-    hasTriState(): boolean { return this.model == null ? false : this.model.triState; }
+    hasTriState(): boolean {
+        return this.model == null ? false : this.model.triState;
+    }
 
-    nonLinear(): boolean { return this.hasTriState(); }
+    nonLinear(): boolean {
+        return this.hasTriState();
+    }
 
     getInternalNodeCount(): number {
         // for tri-state outputs, we need an internal node to connect a voltage source to, and then connect a resistor from there to the output.
@@ -131,8 +137,7 @@ export class CustomLogicElm extends ChipElm {
     getMatrixConnection(n1: number, n2: number): boolean {
         if (this.hasTriState())
             for (let i = this.inputCount; i !== this.postCount; i++)
-                if (this.comparePair(n1, n2, i, i + this.outputCount))
-                    return true;
+                if (this.comparePair(n1, n2, i, i + this.outputCount)) return true;
         return false;
     }
 
@@ -156,11 +161,20 @@ export class CustomLogicElm extends ChipElm {
             const p = this.pins[i];
             if (p.output) {
                 // connect output voltage source (to internal node if tri-state, otherwise connect directly to output)
-                CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[i + add], p.voltSource, p.value ? this.highVoltage : 0);
+                CircuitElm.sim.updateVoltageSource(
+                    CircuitNode.ground,
+                    this.nodes[i + add],
+                    p.voltSource,
+                    p.value ? this.highVoltage : 0,
+                );
 
                 // add resistor for tri-state if necessary
                 if (this.hasTriState())
-                    CircuitElm.sim.stampResistor(this.nodes[i + add], this.nodes[i], this.highImpedance[i] ? 1e8 : 1e-3);
+                    CircuitElm.sim.stampResistor(
+                        this.nodes[i + add],
+                        this.nodes[i],
+                        this.highImpedance[i] ? 1e8 : 1e-3,
+                    );
             }
         }
     }
@@ -172,64 +186,55 @@ export class CustomLogicElm extends ChipElm {
             let j: number;
             for (j = 0; j !== rl.length; j++) {
                 const x = rl.charAt(j);
-                if (x === '0' || x === '1') {
-                    if (this.pins[j].value === (x === '1'))
-                        continue;
+                if (x === "0" || x === "1") {
+                    if (this.pins[j].value === (x === "1")) continue;
                     break;
                 }
 
                 // don't care
-                if (x === '?')
-                    continue;
+                if (x === "?") continue;
 
                 // up transition
-                if (x === '+') {
-                    if (this.pins[j].value && !this.lastValues[j])
-                        continue;
+                if (x === "+") {
+                    if (this.pins[j].value && !this.lastValues[j]) continue;
                     break;
                 }
 
                 // down transition
-                if (x === '-') {
-                    if (!this.pins[j].value && this.lastValues[j])
-                        continue;
+                if (x === "-") {
+                    if (!this.pins[j].value && this.lastValues[j]) continue;
                     break;
                 }
 
                 // save pattern values
-                if (x >= 'a' && x <= 'z') {
-                    this.patternValues[x.charCodeAt(0) - 'a'.charCodeAt(0)] = this.pins[j].value;
+                if (x >= "a" && x <= "z") {
+                    this.patternValues[x.charCodeAt(0) - "a".charCodeAt(0)] = this.pins[j].value;
                     continue;
                 }
 
                 // compare pattern values
-                if (x >= 'A' && x <= 'Z') {
-                    if (this.patternValues[x.charCodeAt(0) - 'A'.charCodeAt(0)] !== this.pins[j].value)
-                        break;
+                if (x >= "A" && x <= "Z") {
+                    if (this.patternValues[x.charCodeAt(0) - "A".charCodeAt(0)] !== this.pins[j].value) break;
                     continue;
                 }
             }
-            if (j !== rl.length)
-                continue;
+            if (j !== rl.length) continue;
 
             // success
             const rr = this.model.rulesRight[i];
             for (j = 0; j !== rr.length; j++) {
                 const x = rr.charAt(j);
                 this.highImpedance[j + this.inputCount] = false;
-                if (x >= 'a' && x <= 'z')
-                    this.pins[j + this.inputCount].value = this.patternValues[x.charCodeAt(0) - 'a'.charCodeAt(0)];
-                else if (x === '_')
-                    this.highImpedance[j + this.inputCount] = true;
-                else
-                    this.pins[j + this.inputCount].value = (x === '1');
+                if (x >= "a" && x <= "z")
+                    this.pins[j + this.inputCount].value = this.patternValues[x.charCodeAt(0) - "a".charCodeAt(0)];
+                else if (x === "_") this.highImpedance[j + this.inputCount] = true;
+                else this.pins[j + this.inputCount].value = x === "1";
             }
             break;
         }
 
         // save values for transition checking
-        for (let j = 0; j !== this.postCount; j++)
-            this.lastValues[j] = this.pins[j].value;
+        for (let j = 0; j !== this.postCount; j++) this.lastValues[j] = this.pins[j].value;
     }
 
     getChipEditInfo(n: number): EditInfo | null {
@@ -250,8 +255,7 @@ export class CustomLogicElm extends ChipElm {
     setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             const newModelName = ei.textf!.value;
-            if (this.modelName === newModelName)
-                return;
+            if (this.modelName === newModelName) return;
             this.modelName = CustomLogicElm.lastModelName = ei.textf!.value;
             this.model = CustomLogicModel.getModelWithNameOrCopy(this.modelName, this.model);
             this.setupPins();
@@ -268,9 +272,15 @@ export class CustomLogicElm extends ChipElm {
         }
     }
 
-    getDumpType(): number { return 208; }
-    getXmlDumpType(): string { return "cl"; }
-    getElmType(): string { return "custom logic"; }
+    getDumpType(): number {
+        return 208;
+    }
+    getXmlDumpType(): string {
+        return "cl";
+    }
+    getElmType(): string {
+        return "custom logic";
+    }
 
     getInfo(arr: string[]): void {
         super.getInfo(arr);

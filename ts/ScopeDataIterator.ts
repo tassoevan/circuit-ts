@@ -38,14 +38,17 @@ export class ScopeDataIterator implements Iterable<number> {
     skipNonzeroValues(): number {
         for (; this.startIndex < this.validCount; this.startIndex++) {
             const ip = (this.startIndex + this.ipa) & (this.scopePointCount - 1);
-            if (this.plot.maxValues[ip] !== 0)
-                return this.plot.maxValues[ip];
+            if (this.plot.maxValues[ip] !== 0) return this.plot.maxValues[ip];
         }
         return 0;
     }
 
-    getMin(): number { return this.plot.minValues[this.currentIp]; }
-    getMax(): number { return this.plot.maxValues[this.currentIp]; }
+    getMin(): number {
+        return this.plot.minValues[this.currentIp];
+    }
+    getMax(): number {
+        return this.plot.maxValues[this.currentIp];
+    }
 
     [Symbol.iterator](): Iterator<number> {
         let i = this.startIndex;
@@ -57,7 +60,7 @@ export class ScopeDataIterator implements Iterable<number> {
                     return { value: i++, done: false };
                 }
                 return { value: 0, done: true };
-            }
+            },
         };
     }
 }

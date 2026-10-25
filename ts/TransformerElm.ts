@@ -62,34 +62,34 @@ export class TransformerElm extends CircuitElm {
             this.ratio = this.polarity = 1;
             this.width = 32;
             this.noDiagonal = true;
-            this.couplingCoef = .999;
-            this.currents  = new Array(2).fill(0);
+            this.couplingCoef = 0.999;
+            this.currents = new Array(2).fill(0);
             this.curcounts = new Array(2).fill(0);
-	    this.curSourceValue1 = this.curSourceValue2 = this.a1 = this.a2 = this.a3 = this.a4 = 0;
+            this.curSourceValue1 = this.curSourceValue2 = this.a1 = this.a2 = this.a3 = this.a4 = 0;
         } else {
             super(xa, ya, xb, yb!, f!);
-            if (this.hasFlag(TransformerElm.FLAG_VERTICAL))
-                this.width = -Math.max(32, Math.abs(xb-xa));
-            else
-                this.width = Math.max(32, Math.abs(yb!-ya));
+            if (this.hasFlag(TransformerElm.FLAG_VERTICAL)) this.width = -Math.max(32, Math.abs(xb - xa));
+            else this.width = Math.max(32, Math.abs(yb! - ya));
             this.inductance = parseFloatStrict(st!.nextToken());
             this.ratio = parseFloatStrict(st!.nextToken());
-            this.currents  = new Array(2).fill(0);
+            this.currents = new Array(2).fill(0);
             this.curcounts = new Array(2).fill(0);
             this.currents[0] = parseFloatStrict(st!.nextToken());
             this.currents[1] = parseFloatStrict(st!.nextToken());
-            this.couplingCoef = .999;
-	    this.curSourceValue1 = this.curSourceValue2 = this.a1 = this.a2 = this.a3 = this.a4 = 0;
+            this.couplingCoef = 0.999;
+            this.curSourceValue1 = this.curSourceValue2 = this.a1 = this.a2 = this.a3 = this.a4 = 0;
             try {
                 this.couplingCoef = parseFloatStrict(st!.nextToken());
                 this.saturationCurrent = parseFloatStrict(st!.nextToken());
-            } catch (e) { }
+            } catch (e) {}
             this.noDiagonal = true;
-            this.polarity = (this.hasFlag(TransformerElm.FLAG_REVERSE)) ? -1 : 1;
+            this.polarity = this.hasFlag(TransformerElm.FLAG_REVERSE) ? -1 : 1;
         }
     }
 
-    getDumpType(): number { return 'T'.charCodeAt(0); }
+    getDumpType(): number {
+        return "T".charCodeAt(0);
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -97,8 +97,7 @@ export class TransformerElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "ra", this.ratio);
         CircuitXMLSerializer.dumpAttr(elem, "co", this.couplingCoef);
         CircuitXMLSerializer.dumpAttr(elem, "wi", this.width);
-        if (this.saturationCurrent !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "isat", this.saturationCurrent);
+        if (this.saturationCurrent !== 0) CircuitXMLSerializer.dumpAttr(elem, "isat", this.saturationCurrent);
     }
 
     dumpXmlState(doc: Document, elem: Element): void {
@@ -109,10 +108,8 @@ export class TransformerElm extends CircuitElm {
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
 
-        if (this.hasFlag(TransformerElm.FLAG_VERTICAL))
-            this.width = -Math.max(32, Math.abs(this.x2-this.x));
-        else
-            this.width = Math.max(32, Math.abs(this.y2-this.y));
+        if (this.hasFlag(TransformerElm.FLAG_VERTICAL)) this.width = -Math.max(32, Math.abs(this.x2 - this.x));
+        else this.width = Math.max(32, Math.abs(this.y2 - this.y));
 
         this.inductance = xml.parseDoubleAttr("in", this.inductance);
         this.ratio = xml.parseDoubleAttr("ra", this.ratio);
@@ -121,11 +118,15 @@ export class TransformerElm extends CircuitElm {
         this.saturationCurrent = xml.parseDoubleAttr("isat", this.saturationCurrent);
         this.currents[0] = xml.parseDoubleAttr("c0", 0);
         this.currents[1] = xml.parseDoubleAttr("c1", 0);
-        this.polarity = (this.hasFlag(TransformerElm.FLAG_REVERSE)) ? -1 : 1;
+        this.polarity = this.hasFlag(TransformerElm.FLAG_REVERSE) ? -1 : 1;
     }
 
-    nonLinear(): boolean { return this.saturationCurrent > 0; }
-    isTrapezoidal(): boolean { return (this.flags & Inductor.FLAG_BACK_EULER) === 0; }
+    nonLinear(): boolean {
+        return this.saturationCurrent > 0;
+    }
+    isTrapezoidal(): boolean {
+        return (this.flags & Inductor.FLAG_BACK_EULER) === 0;
+    }
 
     draw(g: Graphics): void {
         let i: number;
@@ -134,23 +135,21 @@ export class TransformerElm extends CircuitElm {
             CircuitElm.drawThickLine(g, this.ptEnds[i], this.ptCoil[i]);
         }
         for (i = 0; i !== 2; i++) {
-            this.setPowerColor(g, this.currents[i]*(this.nodes[i].v-this.nodes[i+2].v));
-            let csign = this.dsign*(i === 1 ? -6*this.polarity : 6)*this.flip;
-            if (this.hasFlag(TransformerElm.FLAG_VERTICAL))
-                csign *= -1;
-            this.drawCoil(g, csign, this.ptCoil[i], this.ptCoil[i+2], this.nodes[i].v, this.nodes[i+2].v);
+            this.setPowerColor(g, this.currents[i] * (this.nodes[i].v - this.nodes[i + 2].v));
+            let csign = this.dsign * (i === 1 ? -6 * this.polarity : 6) * this.flip;
+            if (this.hasFlag(TransformerElm.FLAG_VERTICAL)) csign *= -1;
+            this.drawCoil(g, csign, this.ptCoil[i], this.ptCoil[i + 2], this.nodes[i].v, this.nodes[i + 2].v);
         }
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.lightGrayColor);
         for (i = 0; i !== 2; i++) {
-            CircuitElm.drawThickLine(g, this.ptCore[i], this.ptCore[i+2]);
-            if (this.dots !== null)
-                g.fillOval(this.dots[i].x-2, this.dots[i].y-2, 5, 5);
+            CircuitElm.drawThickLine(g, this.ptCore[i], this.ptCore[i + 2]);
+            if (this.dots !== null) g.fillOval(this.dots[i].x - 2, this.dots[i].y - 2, 5, 5);
             this.curcounts[i] = this.updateDotCountImpl(this.currents[i], this.curcounts[i]);
         }
         for (i = 0; i !== 2; i++) {
-            this.drawDots(g, this.ptEnds[i],   this.ptCoil[i],    this.curcounts[i]);
-            this.drawDots(g, this.ptCoil[i],   this.ptCoil[i+2],  this.curcounts[i]);
-            this.drawDots(g, this.ptEnds[i+2], this.ptCoil[i+2],  -this.curcounts[i]);
+            this.drawDots(g, this.ptEnds[i], this.ptCoil[i], this.curcounts[i]);
+            this.drawDots(g, this.ptCoil[i], this.ptCoil[i + 2], this.curcounts[i]);
+            this.drawDots(g, this.ptEnds[i + 2], this.ptCoil[i + 2], -this.curcounts[i]);
         }
         this.drawPosts(g);
         this.setBbox(this.ptEnds[0], this.ptEnds[this.polarity === 1 ? 3 : 1], 0);
@@ -158,47 +157,58 @@ export class TransformerElm extends CircuitElm {
 
     setPoints(): void {
         super.setPoints();
-        if (this.hasFlag(TransformerElm.FLAG_VERTICAL))
-            this.point2.x = this.point1.x;
-        else
-            this.point2.y = this.point1.y;
+        if (this.hasFlag(TransformerElm.FLAG_VERTICAL)) this.point2.x = this.point1.x;
+        else this.point2.y = this.point1.y;
         this.ptEnds = this.newPointArray(4);
         this.ptCoil = this.newPointArray(4);
         this.ptCore = this.newPointArray(4);
         this.ptEnds[0] = this.point1;
         this.ptEnds[1] = this.point2;
         this.flip = this.hasFlag(TransformerElm.FLAG_FLIP) ? -1 : 1;
-        this.interpPoint(this.point1, this.point2, this.ptEnds[2], 0, -this.dsign*this.width*this.flip);
-        this.interpPoint(this.point1, this.point2, this.ptEnds[3], 1, -this.dsign*this.width*this.flip);
-        const ce = .5-12/this.dn;
-        const cd = .5-2/this.dn;
+        this.interpPoint(this.point1, this.point2, this.ptEnds[2], 0, -this.dsign * this.width * this.flip);
+        this.interpPoint(this.point1, this.point2, this.ptEnds[3], 1, -this.dsign * this.width * this.flip);
+        const ce = 0.5 - 12 / this.dn;
+        const cd = 0.5 - 2 / this.dn;
         let i: number;
         for (i = 0; i !== 4; i += 2) {
-            this.interpPoint(this.ptEnds[i], this.ptEnds[i+1], this.ptCoil[i],   ce);
-            this.interpPoint(this.ptEnds[i], this.ptEnds[i+1], this.ptCoil[i+1], 1-ce);
-            this.interpPoint(this.ptEnds[i], this.ptEnds[i+1], this.ptCore[i],   cd);
-            this.interpPoint(this.ptEnds[i], this.ptEnds[i+1], this.ptCore[i+1], 1-cd);
+            this.interpPoint(this.ptEnds[i], this.ptEnds[i + 1], this.ptCoil[i], ce);
+            this.interpPoint(this.ptEnds[i], this.ptEnds[i + 1], this.ptCoil[i + 1], 1 - ce);
+            this.interpPoint(this.ptEnds[i], this.ptEnds[i + 1], this.ptCore[i], cd);
+            this.interpPoint(this.ptEnds[i], this.ptEnds[i + 1], this.ptCore[i + 1], 1 - cd);
         }
         if (this.polarity === -1) {
-            const vsign = (this.hasFlag(TransformerElm.FLAG_VERTICAL)) ? -1 : 1;
+            const vsign = this.hasFlag(TransformerElm.FLAG_VERTICAL) ? -1 : 1;
             this.dots = new Array(2);
-            const dotp = Math.abs(7./this.width);
-            this.dots[0] = this.interpPoint(this.ptCoil[0], this.ptCoil[2], dotp, -7*this.dsign*vsign*this.flip);
-            this.dots[1] = this.interpPoint(this.ptCoil[3], this.ptCoil[1], dotp, -7*this.dsign*vsign*this.flip);
-            let x = this.ptEnds[1]; this.ptEnds[1] = this.ptEnds[3]; this.ptEnds[3] = x;
-            x = this.ptCoil[1]; this.ptCoil[1] = this.ptCoil[3]; this.ptCoil[3] = x;
-        } else
-            this.dots = null;
+            const dotp = Math.abs(7 / this.width);
+            this.dots[0] = this.interpPoint(this.ptCoil[0], this.ptCoil[2], dotp, -7 * this.dsign * vsign * this.flip);
+            this.dots[1] = this.interpPoint(this.ptCoil[3], this.ptCoil[1], dotp, -7 * this.dsign * vsign * this.flip);
+            let x = this.ptEnds[1];
+            this.ptEnds[1] = this.ptEnds[3];
+            this.ptEnds[3] = x;
+            x = this.ptCoil[1];
+            this.ptCoil[1] = this.ptCoil[3];
+            this.ptCoil[3] = x;
+        } else this.dots = null;
     }
 
-    getPost(n: number): Point { return this.ptEnds[n]; }
-    getPostCount(): number { return 4; }
+    getPost(n: number): Point {
+        return this.ptEnds[n];
+    }
+    getPostCount(): number {
+        return 4;
+    }
 
     reset(): void {
         // need to set current-source values here in case one of the nodes is node 0.  In that case
         // calculateCurrent() may get called (from setNodeVoltage()) when analyzing circuit, before
         // startIteration() gets called
-        this.currents[0] = this.currents[1] = this.curcounts[0] = this.curcounts[1] = this.curSourceValue1 = this.curSourceValue2 = 0;
+        this.currents[0] =
+            this.currents[1] =
+            this.curcounts[0] =
+            this.curcounts[1] =
+            this.curSourceValue1 =
+            this.curSourceValue2 =
+                0;
     }
 
     // compute effective inductance with saturation: L(I) = L0 / (1 + (I/Isat)^2)
@@ -210,12 +220,12 @@ export class TransformerElm extends CircuitElm {
 
     // compute a1-a4 companion model coefficients from effective inductances
     computeCoefficients(l1: number, l2: number, m: number): void {
-        const deti = 1/(l1*l2-m*m);
-        const ts = this.isTrapezoidal() ? CircuitElm.sim.timeStep/2 : CircuitElm.sim.timeStep;
-        this.a1 = l2*deti*ts;
-        this.a2 = -m*deti*ts;
-        this.a3 = -m*deti*ts;
-        this.a4 = l1*deti*ts;
+        const deti = 1 / (l1 * l2 - m * m);
+        const ts = this.isTrapezoidal() ? CircuitElm.sim.timeStep / 2 : CircuitElm.sim.timeStep;
+        this.a1 = l2 * deti * ts;
+        this.a2 = -m * deti * ts;
+        this.a3 = -m * deti * ts;
+        this.a4 = l1 * deti * ts;
     }
 
     stamp(): void {
@@ -247,8 +257,8 @@ export class TransformerElm extends CircuitElm {
         //
         // first winding goes from node 0 to 2, second is from 1 to 3
         const l1 = this.inductance;
-        const l2 = this.inductance*this.ratio*this.ratio;
-        const m = this.couplingCoef*Math.sqrt(l1*l2);
+        const l2 = this.inductance * this.ratio * this.ratio;
+        const m = this.couplingCoef * Math.sqrt(l1 * l2);
         this.computeCoefficients(l1, l2, m);
         if (this.saturationCurrent > 0) {
             // nonlinear: conductances will be stamped in doStep()
@@ -273,16 +283,19 @@ export class TransformerElm extends CircuitElm {
         if (this.saturationCurrent > 0) {
             // recompute coefficients with current-dependent inductances
             const l1 = this.calcEffectiveInductance(this.inductance, this.currents[0], this.saturationCurrent);
-            const l2 = this.calcEffectiveInductance(this.inductance*this.ratio*this.ratio, this.currents[1],
-                this.saturationCurrent*this.ratio);
-            const m = this.couplingCoef*Math.sqrt(l1*l2);
+            const l2 = this.calcEffectiveInductance(
+                this.inductance * this.ratio * this.ratio,
+                this.currents[1],
+                this.saturationCurrent * this.ratio,
+            );
+            const m = this.couplingCoef * Math.sqrt(l1 * l2);
             this.computeCoefficients(l1, l2, m);
         }
-        const voltdiff1 = this.nodes[0].v-this.nodes[2].v;
-        const voltdiff2 = this.nodes[1].v-this.nodes[3].v;
+        const voltdiff1 = this.nodes[0].v - this.nodes[2].v;
+        const voltdiff2 = this.nodes[1].v - this.nodes[3].v;
         if (this.isTrapezoidal()) {
-            this.curSourceValue1 = voltdiff1*this.a1+voltdiff2*this.a2+this.currents[0];
-            this.curSourceValue2 = voltdiff1*this.a3+voltdiff2*this.a4+this.currents[1];
+            this.curSourceValue1 = voltdiff1 * this.a1 + voltdiff2 * this.a2 + this.currents[0];
+            this.curSourceValue2 = voltdiff1 * this.a3 + voltdiff2 * this.a4 + this.currents[1];
         } else {
             this.curSourceValue1 = this.currents[0];
             this.curSourceValue2 = this.currents[1];
@@ -302,24 +315,23 @@ export class TransformerElm extends CircuitElm {
     }
 
     calculateCurrent(): void {
-        const voltdiff1 = this.nodes[0].v-this.nodes[2].v;
-        const voltdiff2 = this.nodes[1].v-this.nodes[3].v;
-        this.currents[0] = voltdiff1*this.a1 + voltdiff2*this.a2 + this.curSourceValue1;
-        this.currents[1] = voltdiff1*this.a3 + voltdiff2*this.a4 + this.curSourceValue2;
+        const voltdiff1 = this.nodes[0].v - this.nodes[2].v;
+        const voltdiff2 = this.nodes[1].v - this.nodes[3].v;
+        this.currents[0] = voltdiff1 * this.a1 + voltdiff2 * this.a2 + this.curSourceValue1;
+        this.currents[1] = voltdiff1 * this.a3 + voltdiff2 * this.a4 + this.curSourceValue2;
     }
 
     getCurrentIntoNode(n: number): number {
-        if (n < 2)
-            return -this.currents[n];
-        return this.currents[n-2];
+        if (n < 2) return -this.currents[n];
+        return this.currents[n - 2];
     }
 
     getInfo(arr: string[]): void {
-        arr[0] = (this.saturationCurrent > 0) ? "transformer (sat)" : "transformer";
+        arr[0] = this.saturationCurrent > 0 ? "transformer (sat)" : "transformer";
         arr[1] = "L = " + CircuitElm.getUnitText(this.inductance, "H");
         arr[2] = "Ratio = 1:" + this.ratio;
-        arr[3] = "Vd1 = " + CircuitElm.getVoltageText(this.nodes[0].v-this.nodes[2].v);
-        arr[4] = "Vd2 = " + CircuitElm.getVoltageText(this.nodes[1].v-this.nodes[3].v);
+        arr[3] = "Vd1 = " + CircuitElm.getVoltageText(this.nodes[0].v - this.nodes[2].v);
+        arr[4] = "Vd2 = " + CircuitElm.getVoltageText(this.nodes[1].v - this.nodes[3].v);
         arr[5] = "I1 = " + CircuitElm.getCurrentText(this.currents[0]);
         arr[6] = "I2 = " + CircuitElm.getCurrentText(this.currents[1]);
         if (this.saturationCurrent > 0) {
@@ -329,102 +341,83 @@ export class TransformerElm extends CircuitElm {
     }
 
     getConnection(n1: number, n2: number): boolean {
-        if (this.comparePair(n1, n2, 0, 2))
-            return true;
-        if (this.comparePair(n1, n2, 1, 3))
-            return true;
+        if (this.comparePair(n1, n2, 0, 2)) return true;
+        if (this.comparePair(n1, n2, 1, 3)) return true;
         return false;
     }
 
     // VCCS stamps couple all nodes, so they must all be in the same matrix
-    getMatrixConnection(n1: number, n2: number): boolean { return true; }
+    getMatrixConnection(n1: number, n2: number): boolean {
+        return true;
+    }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Primary Inductance (H)", this.inductance, .01, 5).setPositive();
-        if (n === 1)
-            return new EditInfo("Ratio (N1/N2)", 1/this.ratio, 1, 10).setDimensionless().setPositive();
+        if (n === 0) return new EditInfo("Primary Inductance (H)", this.inductance, 0.01, 5).setPositive();
+        if (n === 1) return new EditInfo("Ratio (N1/N2)", 1 / this.ratio, 1, 10).setDimensionless().setPositive();
         if (n === 2)
-            return new EditInfo("Coupling Coefficient", this.couplingCoef, 0, 1).
-                setDimensionless().setPositive();
+            return new EditInfo("Coupling Coefficient", this.couplingCoef, 0, 1).setDimensionless().setPositive();
         if (n === 3) {
             const ei = new EditInfo("", 0, -1, -1);
-            ei.checkbox = new Checkbox("Trapezoidal Approximation",
-                                       this.isTrapezoidal());
+            ei.checkbox = new Checkbox("Trapezoidal Approximation", this.isTrapezoidal());
             return ei;
         }
         if (n === 4) {
             const ei = new EditInfo("", 0, -1, -1);
-            ei.checkbox = new Checkbox("Swap Secondary Polarity",
-                                       this.polarity === -1);
+            ei.checkbox = new Checkbox("Swap Secondary Polarity", this.polarity === -1);
             return ei;
         }
-        if (n === 5)
-            return new EditInfo("Saturation Current (A) (0=none)", this.saturationCurrent);
+        if (n === 5) return new EditInfo("Saturation Current (A) (0=none)", this.saturationCurrent);
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0 && ei.value > 0)
-            this.inductance = ei.value;
-        if (n === 1 && ei.value > 0)
-            this.ratio = 1/ei.value;
+        if (n === 0 && ei.value > 0) this.inductance = ei.value;
+        if (n === 1 && ei.value > 0) this.ratio = 1 / ei.value;
         if (n === 2) {
-            if (ei.value > 0 && ei.value < 1)
-                this.couplingCoef = ei.value;
-            else
-                ei.setError("must be > 0 and < 1");
+            if (ei.value > 0 && ei.value < 1) this.couplingCoef = ei.value;
+            else ei.setError("must be > 0 and < 1");
         }
         if (n === 3) {
-            if (ei.checkbox!.getState())
-                this.flags &= ~Inductor.FLAG_BACK_EULER;
-            else
-                this.flags |= Inductor.FLAG_BACK_EULER;
+            if (ei.checkbox!.getState()) this.flags &= ~Inductor.FLAG_BACK_EULER;
+            else this.flags |= Inductor.FLAG_BACK_EULER;
         }
         if (n === 4) {
-            this.polarity = (ei.checkbox!.getState()) ? -1 : 1;
-            if (ei.checkbox!.getState())
-                this.flags |= TransformerElm.FLAG_REVERSE;
-            else
-                this.flags &= ~TransformerElm.FLAG_REVERSE;
+            this.polarity = ei.checkbox!.getState() ? -1 : 1;
+            if (ei.checkbox!.getState()) this.flags |= TransformerElm.FLAG_REVERSE;
+            else this.flags &= ~TransformerElm.FLAG_REVERSE;
             this.setPoints();
         }
         if (n === 5) {
-            if (ei.value >= 0)
-                this.saturationCurrent = ei.value;
-            else
-                ei.setError("must be >= 0");
+            if (ei.value >= 0) this.saturationCurrent = ei.value;
+            else ei.setError("must be >= 0");
         }
     }
 
-    getShortcut(): number { return 'T'.charCodeAt(0); }
+    getShortcut(): number {
+        return "T".charCodeAt(0);
+    }
 
     drag(xx: number, yy: number): void {
         xx = this.snapGrid(xx);
         yy = this.snapGrid(yy);
-        if (Math.abs(xx-this.x) > Math.abs(yy-this.y)) {
+        if (Math.abs(xx - this.x) > Math.abs(yy - this.y)) {
             this.flags &= ~TransformerElm.FLAG_VERTICAL;
-        } else
-            this.flags |= TransformerElm.FLAG_VERTICAL;
-        if (this.hasFlag(TransformerElm.FLAG_VERTICAL))
-            this.width = -Math.max(32, Math.abs(xx-this.x));
-        else
-            this.width = Math.max(32, Math.abs(yy-this.y));
-        if (xx === this.x)
-            yy = this.y;
-        this.x2 = xx; this.y2 = yy;
+        } else this.flags |= TransformerElm.FLAG_VERTICAL;
+        if (this.hasFlag(TransformerElm.FLAG_VERTICAL)) this.width = -Math.max(32, Math.abs(xx - this.x));
+        else this.width = Math.max(32, Math.abs(yy - this.y));
+        if (xx === this.x) yy = this.y;
+        this.x2 = xx;
+        this.y2 = yy;
         this.setPoints();
     }
 
     flipX(c2: number, count: number): void {
-        if (this.hasFlag(TransformerElm.FLAG_VERTICAL))
-            this.flags ^= TransformerElm.FLAG_FLIP;
+        if (this.hasFlag(TransformerElm.FLAG_VERTICAL)) this.flags ^= TransformerElm.FLAG_FLIP;
         super.flipX(c2, count);
     }
 
     flipY(c2: number, count: number): void {
-        if (!this.hasFlag(TransformerElm.FLAG_VERTICAL))
-            this.flags ^= TransformerElm.FLAG_FLIP;
+        if (!this.hasFlag(TransformerElm.FLAG_VERTICAL)) this.flags ^= TransformerElm.FLAG_FLIP;
         super.flipY(c2, count);
     }
 

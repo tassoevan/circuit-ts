@@ -34,12 +34,9 @@ export class EditDiodeModelDialog extends EditDialog {
     }
 
     apply(): boolean {
-        if (!super.apply())
-            return false;
-        if (this.model.name === null || this.model.name.length === 0)
-            this.model.pickName();
-        if (this.diodeElm !== null)
-            this.diodeElm.newModelCreated(this.model);
+        if (!super.apply()) return false;
+        if (this.model.name === null || this.model.name.length === 0) this.model.pickName();
+        if (this.diodeElm !== null) this.diodeElm.newModelCreated(this.model);
         return true;
     }
 
@@ -47,8 +44,7 @@ export class EditDiodeModelDialog extends EditDialog {
         super.closeDialog();
         const edlg = CirSim.editDialog;
         CirSim.console("resetting dialog " + edlg);
-        if (edlg !== null)
-            edlg.resetDialog();
+        if (edlg !== null) edlg.resetDialog();
         CirSim.diodeModelEditDialog = null;
     }
 }

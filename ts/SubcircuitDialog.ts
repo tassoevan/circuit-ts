@@ -59,17 +59,17 @@ export class SubcircuitDialog extends Dialog {
             b.onclick = handler;
             buttons.appendChild(b);
         };
-        addButton("Make Local",      () => this.handleMakeLocal());
-        addButton("Make Global",     () => this.handleMakeGlobal());
+        addButton("Make Local", () => this.handleMakeLocal());
+        addButton("Make Global", () => this.handleMakeGlobal());
         addButton("Make Persistent", () => this.handleMakePersistent());
-        addButton("Save",            () => this.handleSave());
-        addButton("Delete",          () => this.handleDelete());
-        addButton("Done",            () => this.closeDialog());
+        addButton("Save", () => this.handleSave());
+        addButton("Delete", () => this.handleDelete());
+        addButton("Done", () => this.closeDialog());
     }
 
     // fill list box, selecting the models in selected
     private populateList(selected: Set<SubcircuitModel>): void {
-        this.subcircuits = SubcircuitModel.getModelList().filter(m => !m.isBuiltin());
+        this.subcircuits = SubcircuitModel.getModelList().filter((m) => !m.isBuiltin());
         this.subcircuitListBox.innerHTML = "";
         for (const m of this.subcircuits) {
             const opt = document.createElement("option");
@@ -82,10 +82,8 @@ export class SubcircuitDialog extends Dialog {
     private getSelected(): SubcircuitModel[] {
         const sel: SubcircuitModel[] = [];
         const opts = this.subcircuitListBox.options;
-        for (let i = 0; i < opts.length; i++)
-            if (opts[i].selected) sel.push(this.subcircuits[i]);
-        if (sel.length === 0)
-            window.alert(Locale.LS("Please select one or more subcircuits."));
+        for (let i = 0; i < opts.length; i++) if (opts[i].selected) sel.push(this.subcircuits[i]);
+        if (sel.length === 0) window.alert(Locale.LS("Please select one or more subcircuits."));
         return sel;
     }
 
@@ -112,7 +110,7 @@ export class SubcircuitDialog extends Dialog {
         const sel = this.getSelected();
         if (sel.length === 0) return;
         const data = SubcircuitModel.dumpLibrary(sel);
-        const base = (sel.length === 1) ? sel[0].name.replace(/[\\/:*?"<>|]/g, "_") : "subcircuits";
+        const base = sel.length === 1 ? sel[0].name.replace(/[\\/:*?"<>|]/g, "_") : "subcircuits";
         const fname = base + ".txt";
         new ExportAsLocalFileDialog(data, fname, "Save Subcircuits").show();
     }
@@ -121,15 +119,16 @@ export class SubcircuitDialog extends Dialog {
         const sel = this.getSelected();
         if (sel.length === 0) return;
         const inUse = SubcircuitModel.getModelNamesInUse();
-        const used = sel.filter(m => inUse.has(m.name));
+        const used = sel.filter((m) => inUse.has(m.name));
         if (used.length > 0) {
-            window.alert(Locale.LS("Can't delete subcircuits in use in the current circuit: ") +
-                used.map(m => m.name).join(", "));
+            window.alert(
+                Locale.LS("Can't delete subcircuits in use in the current circuit: ") +
+                    used.map((m) => m.name).join(", "),
+            );
             return;
         }
-        const names = sel.map(m => m.name).join(", ");
-        if (!window.confirm(Locale.LS("Are you sure you want to delete ") + names + "?"))
-            return;
+        const names = sel.map((m) => m.name).join(", ");
+        if (!window.confirm(Locale.LS("Are you sure you want to delete ") + names + "?")) return;
         for (const m of sel) m.remove();
         this.populateList(new Set());
     }

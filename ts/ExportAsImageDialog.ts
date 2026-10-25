@@ -85,8 +85,7 @@ export class ExportAsImageDialog extends Dialog {
 
     apply(): boolean {
         let fname = this.textBox.value;
-        if (!fname.includes("."))
-            fname += this.ext;
+        if (!fname.includes(".")) fname += this.ext;
         const a = document.createElement("a");
         a.textContent = fname;
         a.href = this.dataURL;

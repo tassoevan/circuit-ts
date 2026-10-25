@@ -19,22 +19,22 @@
 import { parseIntStrict } from "./NumberParse";
 
 export class Color {
-    static readonly white     = new Color(255, 255, 255);
+    static readonly white = new Color(255, 255, 255);
     static readonly lightGray = new Color(192, 192, 192);
-    static readonly gray      = new Color(128, 128, 128);
-    static readonly GRAY      = new Color(128, 128, 128);
+    static readonly gray = new Color(128, 128, 128);
+    static readonly GRAY = new Color(128, 128, 128);
     static readonly dark_gray = new Color(64, 64, 64);
-    static readonly darkGray  = new Color(64, 64, 64);
-    static readonly black     = new Color(0, 0, 0);
-    static readonly red       = new Color(255, 0, 0);
-    static readonly pink      = new Color(255, 175, 175);
-    static readonly orange    = new Color(255, 200, 0);
-    static readonly yellow    = new Color(255, 255, 0);
-    static readonly green     = new Color(0, 255, 0);
-    static readonly magenta   = new Color(255, 0, 255);
-    static readonly cyan      = new Color(0, 255, 255);
-    static readonly blue      = new Color(0, 0, 255);
-    static readonly NONE      = new Color("");
+    static readonly darkGray = new Color(64, 64, 64);
+    static readonly black = new Color(0, 0, 0);
+    static readonly red = new Color(255, 0, 0);
+    static readonly pink = new Color(255, 175, 175);
+    static readonly orange = new Color(255, 200, 0);
+    static readonly yellow = new Color(255, 255, 0);
+    static readonly green = new Color(0, 255, 0);
+    static readonly magenta = new Color(255, 0, 255);
+    static readonly cyan = new Color(0, 255, 255);
+    static readonly blue = new Color(0, 0, 255);
+    static readonly NONE = new Color("");
 
     private r: number = 0;
     private g: number = 0;
@@ -67,16 +67,19 @@ export class Color {
         }
     }
 
-    getRed(): number   { return this.r; }
-    getGreen(): number { return this.g; }
-    getBlue(): number  { return this.b; }
+    getRed(): number {
+        return this.r;
+    }
+    getGreen(): number {
+        return this.g;
+    }
+    getBlue(): number {
+        return this.b;
+    }
 
     getHexValue(): string {
-        if (this.colorText !== null)
-            return this.colorText;
-        return "#" + this.pad(this.r.toString(16))
-                   + this.pad(this.g.toString(16))
-                   + this.pad(this.b.toString(16));
+        if (this.colorText !== null) return this.colorText;
+        return "#" + this.pad(this.r.toString(16)) + this.pad(this.g.toString(16)) + this.pad(this.b.toString(16));
     }
 
     private pad(s: string): string {
@@ -86,8 +89,7 @@ export class Color {
     }
 
     toString(): string {
-        if (this.colorText !== null)
-            return this.colorText;
+        if (this.colorText !== null) return this.colorText;
         return "red=" + this.r + ", green=" + this.g + ", blue=" + this.b;
     }
 }

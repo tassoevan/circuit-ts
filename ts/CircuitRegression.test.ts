@@ -31,8 +31,16 @@ const SAMPLE_EVERY = 50;
 // circuit (full scale), so values near zero aren't held to a tighter standard than the rest
 const TOLERANCE = 1e-3;
 
-interface Sample { t: number; volts: number[][]; currents: number[] }
-interface Result { elements: string[]; stop: string | null; samples: Sample[] }
+interface Sample {
+    t: number;
+    volts: number[][];
+    currents: number[];
+}
+interface Result {
+    elements: string[];
+    stop: string | null;
+    samples: Sample[];
+}
 
 beforeAll(initHeadless);
 
@@ -41,7 +49,9 @@ const round = (x: number) => Number(x.toPrecision(6));
 function runCircuit(text: string): { result: Result; log: string[] } {
     const { app, sim } = createApp();
     const log: string[] = [];
-    const consoleLog = vi.spyOn(console, "log").mockImplementation((...a: any[]) => { log.push(a.join(" ")); });
+    const consoleLog = vi.spyOn(console, "log").mockImplementation((...a: any[]) => {
+        log.push(a.join(" "));
+    });
     try {
         app.loader.readCircuit(text, M.CircuitLoader.RC_NO_CENTER);
         resetCircuit(app, sim);
@@ -52,7 +62,9 @@ function runCircuit(text: string): { result: Result; log: string[] } {
             if (s % SAMPLE_EVERY === 0 && app.stopMessage == null)
                 result.samples.push({
                     t: round(sim.t),
-                    volts: elms.map((ce: any) => ce.nodes.slice(0, ce.getPostCount()).map((n: any) => round(n?.v ?? 0))),
+                    volts: elms.map((ce: any) =>
+                        ce.nodes.slice(0, ce.getPostCount()).map((n: any) => round(n?.v ?? 0)),
+                    ),
                     currents: elms.map((ce: any) => round(ce.getCurrent())),
                 });
         }
@@ -65,9 +77,11 @@ function runCircuit(text: string): { result: Result; log: string[] } {
 
 // one sample per line, so a re-recording diffs readably
 function format(result: Result): string {
-    const lines = result.samples.map(s => "    " + JSON.stringify(s));
-    return `{\n  "elements": ${JSON.stringify(result.elements)},\n  "stop": ${JSON.stringify(result.stop)},\n` +
-        `  "samples": [\n${lines.join(",\n")}\n  ]\n}\n`;
+    const lines = result.samples.map((s) => "    " + JSON.stringify(s));
+    return (
+        `{\n  "elements": ${JSON.stringify(result.elements)},\n  "stop": ${JSON.stringify(result.stop)},\n` +
+        `  "samples": [\n${lines.join(",\n")}\n  ]\n}\n`
+    );
 }
 
 function compare(actual: Result, expected: Result): string[] {
@@ -79,14 +93,14 @@ function compare(actual: Result, expected: Result): string[] {
     if (actual.samples.length !== expected.samples.length)
         return [...failures, `${actual.samples.length} samples, expected ${expected.samples.length}`];
 
-    const fullScaleV = Math.max(...expected.samples.flatMap(s => s.volts.flat().map(Math.abs)), 0);
-    const fullScaleI = Math.max(...expected.samples.flatMap(s => s.currents.map(Math.abs)), 0);
+    const fullScaleV = Math.max(...expected.samples.flatMap((s) => s.volts.flat().map(Math.abs)), 0);
+    const fullScaleI = Math.max(...expected.samples.flatMap((s) => s.currents.map(Math.abs)), 0);
     const close = (a: number, e: number, fullScale: number) =>
         Math.abs(a - e) <= TOLERANCE * Math.max(Math.abs(e), fullScale) + 1e-12;
     for (let s = 0; s !== expected.samples.length && failures.length < 10; s++) {
-        const a = actual.samples[s], e = expected.samples[s];
-        if (!close(a.t, e.t, e.t))
-            failures.push(`sample ${s}: t=${a.t}, expected ${e.t}`);
+        const a = actual.samples[s],
+            e = expected.samples[s];
+        if (!close(a.t, e.t, e.t)) failures.push(`sample ${s}: t=${a.t}, expected ${e.t}`);
         for (let i = 0; i !== e.volts.length && failures.length < 10; i++) {
             const elm = `${expected.elements[i]} #${i}`;
             for (let p = 0; p !== e.volts[i].length; p++)
@@ -100,11 +114,14 @@ function compare(actual: Result, expected: Result): string[] {
 }
 
 function circuitFiles(dir: string, prefix = ""): string[] {
-    return fs.readdirSync(dir, { withFileTypes: true }).flatMap(d => {
-        if (d.isDirectory())
-            return d.name === "expected" ? [] : circuitFiles(path.join(dir, d.name), prefix + d.name + "/");
-        return /\.(txt|circuitjs)$/.test(d.name) && !NOT_CIRCUITS.has(d.name) ? [prefix + d.name] : [];
-    }).sort();
+    return fs
+        .readdirSync(dir, { withFileTypes: true })
+        .flatMap((d) => {
+            if (d.isDirectory())
+                return d.name === "expected" ? [] : circuitFiles(path.join(dir, d.name), prefix + d.name + "/");
+            return /\.(txt|circuitjs)$/.test(d.name) && !NOT_CIRCUITS.has(d.name) ? [prefix + d.name] : [];
+        })
+        .sort();
 }
 
 describe("circuit regression", () => {
@@ -115,7 +132,7 @@ describe("circuit regression", () => {
         }
         it(name, () => {
             const { result, log } = runCircuit(fs.readFileSync(path.join(circuitDir, name), "utf8"));
-            expect(log.filter(l => /exception|unrecognized/i.test(l))).toEqual([]);
+            expect(log.filter((l) => /exception|unrecognized/i.test(l))).toEqual([]);
 
             const expectedFile = path.join(expectedDir, name + ".json");
             if (record) {

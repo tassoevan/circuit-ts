@@ -5,14 +5,12 @@
 
 export function parseIntStrict(s: string, radix?: number): number {
     const n = parseInt(s, radix);
-    if (isNaN(n))
-        throw new Error("invalid integer: " + JSON.stringify(s));
+    if (isNaN(n)) throw new Error("invalid integer: " + JSON.stringify(s));
     return n;
 }
 
 export function parseFloatStrict(s: string): number {
     const n = parseFloat(s);
-    if (isNaN(n))
-        throw new Error("invalid float: " + JSON.stringify(s));
+    if (isNaN(n)) throw new Error("invalid float: " + JSON.stringify(s));
     return n;
 }

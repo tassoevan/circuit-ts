@@ -80,8 +80,7 @@ export class AmmeterElm extends CircuitElm {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "me", this.meter);
         CircuitXMLSerializer.dumpAttr(elem, "sc", this.scale);
-        if (this.label.length > 0)
-            CircuitXMLSerializer.dumpAttr(elem, "lb", this.label);
+        if (this.label.length > 0) CircuitXMLSerializer.dumpAttr(elem, "lb", this.label);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
@@ -93,8 +92,10 @@ export class AmmeterElm extends CircuitElm {
 
     getMeter(): string {
         switch (this.meter) {
-        case AmmeterElm.AM_VOL: return "I";
-        case AmmeterElm.AM_RMS: return "Irms";
+            case AmmeterElm.AM_VOL:
+                return "I";
+            case AmmeterElm.AM_RMS:
+                return "Irms";
         }
         return "";
     }
@@ -105,7 +106,7 @@ export class AmmeterElm extends CircuitElm {
 
     setPoints(): void {
         super.setPoints();
-        this.mid    = this.interpPoint(this.point1, this.point2, 0.6);
+        this.mid = this.interpPoint(this.point1, this.point2, 0.6);
         this.center = this.interpPoint(this.point1, this.point2, 0.5);
         this.arrowPoly = this.calcArrow(this.point1, this.mid, 14, 7);
     }
@@ -151,16 +152,20 @@ export class AmmeterElm extends CircuitElm {
             this.zerocount++;
             if (this.zerocount > 5) {
                 this.total = 0;
-                this.rmsI  = 0;
-                this.maxI  = 0;
-                this.minI  = 0;
+                this.rmsI = 0;
+                this.maxI = 0;
+                this.minI = 0;
             }
         } else {
             this.zerocount = 0;
         }
         switch (this.meter) {
-        case AmmeterElm.AM_VOL: this.selectedValue = this.current; break;
-        case AmmeterElm.AM_RMS: this.selectedValue = this.rmsI; break;
+            case AmmeterElm.AM_VOL:
+                this.selectedValue = this.current;
+                break;
+            case AmmeterElm.AM_RMS:
+                this.selectedValue = this.rmsI;
+                break;
         }
     }
 
@@ -186,9 +191,14 @@ export class AmmeterElm extends CircuitElm {
             g.setColor(CircuitElm.whiteColor);
             g.setFont(CircuitElm.unitsFont);
             const len = this.circleSize * 2;
-            const plusPoint = this.interpPoint(this.point1, this.point2, (this.dn / 2 - len / 2 - 4) / this.dn, -10 * this.dsign);
+            const plusPoint = this.interpPoint(
+                this.point1,
+                this.point2,
+                (this.dn / 2 - len / 2 - 4) / this.dn,
+                -10 * this.dsign,
+            );
             if (this.y2 > this.y) plusPoint.y += 4;
-            if (this.y  > this.y2) plusPoint.y += 3;
+            if (this.y > this.y2) plusPoint.y += 3;
             const w = Math.floor(g.context.measureText("+").width);
             g.drawString("+", plusPoint.x - w / 2, plusPoint.y);
             width = this.circleSize;
@@ -198,17 +208,22 @@ export class AmmeterElm extends CircuitElm {
         this.setBbox(this.point1, this.point2, width);
         let s = "A";
         switch (this.meter) {
-        case AmmeterElm.AM_VOL: s = CircuitElm.getUnitTextWithScale(this.getCurrent(), "A", this.scale); break;
-        case AmmeterElm.AM_RMS: s = CircuitElm.getUnitTextWithScale(this.rmsI, "A(rms)", this.scale); break;
+            case AmmeterElm.AM_VOL:
+                s = CircuitElm.getUnitTextWithScale(this.getCurrent(), "A", this.scale);
+                break;
+            case AmmeterElm.AM_RMS:
+                s = CircuitElm.getUnitTextWithScale(this.rmsI, "A(rms)", this.scale);
+                break;
         }
 
-        if (this.label.length > 0)
-            s = this.label + " " + s;
+        if (this.label.length > 0) s = this.label + " " + s;
         this.drawValues(g, s, width);
         this.drawPosts(g);
     }
 
-    getDumpType(): number { return 370; }
+    getDumpType(): number {
+        return 370;
+    }
 
     setVoltageSource(n: number, v: VoltageSource): void {
         super.setVoltageSource(n, v);
@@ -223,28 +238,42 @@ export class AmmeterElm extends CircuitElm {
         return (this.flags & AmmeterElm.FLAG_SHOWCURRENT) !== 0;
     }
 
-    getVoltageSourceCount(): number { return 1; }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "Ammeter";
         switch (this.meter) {
-        case AmmeterElm.AM_VOL: arr[1] = "I = "    + CircuitElm.getUnitText(this.current, "A"); break;
-        case AmmeterElm.AM_RMS: arr[1] = "Irms = " + CircuitElm.getUnitText(this.rmsI, "A"); break;
+            case AmmeterElm.AM_VOL:
+                arr[1] = "I = " + CircuitElm.getUnitText(this.current, "A");
+                break;
+            case AmmeterElm.AM_RMS:
+                arr[1] = "Irms = " + CircuitElm.getUnitText(this.rmsI, "A");
+                break;
         }
     }
 
-    getPower(): number { return 0; }
-    getVoltageDiff(): number { return this.nodes[0].v; }
+    getPower(): number {
+        return 0;
+    }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
 
     // do not optimize out, even though isWireEquivalent() is true
     // (because we need current calculated every timestep)
-    isWireEquivalent(): boolean { return true; }
+    isWireEquivalent(): boolean {
+        return true;
+    }
 
     drawAsCircle(): boolean {
         return (this.flags & AmmeterElm.FLAG_CIRCLE) !== 0;
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Value", this.selectedValue, -1, -1);
@@ -282,6 +311,7 @@ export class AmmeterElm extends CircuitElm {
         if (n === 3) this.label = ei.textf ? ei.textf.value : (ei.text ?? "");
     }
 
-    getExprRefName(): string | null { return this.label.length > 0 ? this.label : null; }
-
+    getExprRefName(): string | null {
+        return this.label.length > 0 ? this.label : null;
+    }
 }

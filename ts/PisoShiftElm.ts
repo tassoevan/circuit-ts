@@ -48,13 +48,14 @@ export class PisoShiftElm extends ChipElm {
         this.setupPins();
     }
 
-    dumpXml(doc: Document, elem: Element): void { super.dumpXml(doc, elem); }
+    dumpXml(doc: Document, elem: Element): void {
+        super.dumpXml(doc, elem);
+    }
 
     dumpXmlState(doc: Document, elem: Element): void {
         super.dumpXmlState(doc, elem);
         const newData = new Array<boolean>(this.data.length).fill(false);
-        for (let i = 0; i < this.data.length; i++)
-            newData[i] = this.data[(i + this.dataIndex) % this.data.length];
+        for (let i = 0; i < this.data.length; i++) newData[i] = this.data[(i + this.dataIndex) % this.data.length];
         CircuitXMLSerializer.dumpAttr(elem, "dt", ChipElm.writeBitsToString(newData));
     }
 
@@ -63,15 +64,24 @@ export class PisoShiftElm extends ChipElm {
         this.data = new Array<boolean>(this.bits).fill(false);
         this.dataIndex = 0;
         const dt = xml.parseStringAttr("dt", null);
-        if (dt !== null)
-            ChipElm.readBitsFromString(dt, this.data);
+        if (dt !== null) ChipElm.readBitsFromString(dt, this.data);
     }
 
-    getDumpType(): number { return 186; }
-    getChipName(): string { return "PISO shift register"; }
-    needsBits(): boolean { return true; }
-    defaultBitCount(): number { return 8; }
-    hasNewBhvr(): boolean { return (this.flags & PisoShiftElm.FLAG_NEW_BEHAVIOR) !== 0; }
+    getDumpType(): number {
+        return 186;
+    }
+    getChipName(): string {
+        return "PISO shift register";
+    }
+    needsBits(): boolean {
+        return true;
+    }
+    defaultBitCount(): number {
+        return 8;
+    }
+    hasNewBhvr(): boolean {
+        return (this.flags & PisoShiftElm.FLAG_NEW_BEHAVIOR) !== 0;
+    }
 
     reset(): void {
         super.reset();
@@ -92,21 +102,29 @@ export class PisoShiftElm extends ChipElm {
 
         if (this.hasNewBhvr()) {
             this.pins[3] = new Pin(this, 0, ChipElm.SIDE_W, "SER");
-            if (this.data && this.data.length > 0)
-                this.pins[2].value = this.data[0];
+            if (this.data && this.data.length > 0) this.pins[2].value = this.data[0];
             this.dataPinIndex = 4;
         } else {
             this.dataPinIndex = 3;
         }
 
         for (let i = 0; i < this.bits; i++)
-            this.pins[this.dataPinIndex + i] = new Pin(this, this.bits - i, ChipElm.SIDE_N, "D" + (this.bits - (i + 1)));
+            this.pins[this.dataPinIndex + i] = new Pin(
+                this,
+                this.bits - i,
+                ChipElm.SIDE_N,
+                "D" + (this.bits - (i + 1)),
+            );
 
         this.allocNodes();
     }
 
-    getPostCount(): number { return (this.hasNewBhvr() ? 4 : 3) + this.bits; }
-    getVoltageSourceCount(): number { return 1; }
+    getPostCount(): number {
+        return (this.hasNewBhvr() ? 4 : 3) + this.bits;
+    }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
 
     execute(): void {
         // LOAD raised
@@ -119,28 +137,26 @@ export class PisoShiftElm extends ChipElm {
                 } else {
                     this.dataIndex = -1;
                 }
-                for (let i = 0; i < this.data.length; i++)
-                    this.data[i] = this.pins[this.dataPinIndex + i].value;
+                for (let i = 0; i < this.data.length; i++) this.data[i] = this.pins[this.dataPinIndex + i].value;
             }
         }
         // CLK raised
         if (this.pins[1].value !== this.clockState) {
             this.clockState = this.pins[1].value;
             if (this.clockState) {
-                if (this.dataIndex >= 0)
-                    this.data[this.dataIndex] = this.hasNewBhvr() && this.pins[3].value;
+                if (this.dataIndex >= 0) this.data[this.dataIndex] = this.hasNewBhvr() && this.pins[3].value;
                 this.dataIndex++;
-                if (this.dataIndex >= this.data.length)
-                    this.dataIndex = 0;
+                if (this.dataIndex >= this.data.length) this.dataIndex = 0;
                 this.pins[2].value = this.data[this.dataIndex];
             }
         }
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
+        if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         return null;
     }
 

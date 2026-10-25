@@ -35,11 +35,15 @@ export class TunnelDiodeElm extends CircuitElm {
         this.setup();
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     setup(): void {}
 
-    getDumpType(): number { return 175; }
+    getDumpType(): number {
+        return 175;
+    }
 
     readonly hs = 8;
     poly!: Polygon;
@@ -52,7 +56,7 @@ export class TunnelDiodeElm extends CircuitElm {
         const pa = this.newPointArray(2);
         this.interpPoint2(this.lead1!, this.lead2!, pa[0], pa[1], 0, this.hs);
         this.interpPoint2(this.lead1!, this.lead2!, this.cathode[0], this.cathode[1], 1, this.hs);
-        this.interpPoint2(this.lead1!, this.lead2!, this.cathode[2], this.cathode[3], .8, this.hs);
+        this.interpPoint2(this.lead1!, this.lead2!, this.cathode[2], this.cathode[3], 0.8, this.hs);
         this.poly = this.createPolygon(pa[0], pa[1], this.lead2!);
     }
 
@@ -87,10 +91,8 @@ export class TunnelDiodeElm extends CircuitElm {
 
     limitStep(vnew: number, vold: number): number {
         // Prevent voltage changes of more than 1V when iterating.
-        if (vnew > vold + 1)
-            return vold + 1;
-        if (vnew < vold - 1)
-            return vold - 1;
+        if (vnew > vold + 1) return vold + 1;
+        if (vnew < vold - 1) return vold - 1;
         return vnew;
     }
 
@@ -99,29 +101,31 @@ export class TunnelDiodeElm extends CircuitElm {
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
     }
 
-    static readonly pvp  = .1;
-    static readonly pip  = 4.7e-3;
-    static readonly pvv  = .37;
-    static readonly pvt  = .026;
-    static readonly pvpp = .525;
-    static readonly piv  = 370e-6;
+    static readonly pvp = 0.1;
+    static readonly pip = 4.7e-3;
+    static readonly pvv = 0.37;
+    static readonly pvt = 0.026;
+    static readonly pvpp = 0.525;
+    static readonly piv = 370e-6;
 
     doStep(): void {
         let voltdiff = this.nodes[0].v - this.nodes[1].v;
-        if (Math.abs(voltdiff - this.lastvoltdiff) > .01)
-            CircuitElm.sim.converged = false;
+        if (Math.abs(voltdiff - this.lastvoltdiff) > 0.01) CircuitElm.sim.converged = false;
         voltdiff = this.limitStep(voltdiff, this.lastvoltdiff);
         this.lastvoltdiff = voltdiff;
 
         const { pvp, pip, pvv, pvt, pvpp, piv } = TunnelDiodeElm;
         const i0 = piv * Math.exp(-pvv);
-        const i = pip * Math.exp(-pvpp / pvt) * (Math.exp(voltdiff / pvt) - 1) +
+        const i =
+            pip * Math.exp(-pvpp / pvt) * (Math.exp(voltdiff / pvt) - 1) +
             pip * (voltdiff / pvp) * Math.exp(1 - voltdiff / pvp) +
-            piv * Math.exp(voltdiff - pvv) - i0;
+            piv * Math.exp(voltdiff - pvv) -
+            i0;
 
-        const geq = pip * Math.exp(-pvpp / pvt) * Math.exp(voltdiff / pvt) / pvt +
-            pip * Math.exp(1 - voltdiff / pvp) / pvp
-            - Math.exp(1 - voltdiff / pvp) * pip * voltdiff / (pvp * pvp) +
+        const geq =
+            (pip * Math.exp(-pvpp / pvt) * Math.exp(voltdiff / pvt)) / pvt +
+            (pip * Math.exp(1 - voltdiff / pvp)) / pvp -
+            (Math.exp(1 - voltdiff / pvp) * pip * voltdiff) / (pvp * pvp) +
             Math.exp(voltdiff - pvv) * piv;
         const nc = i - geq * voltdiff;
         CircuitElm.sim.stampConductance(this.nodes[0], this.nodes[1], geq);
@@ -132,9 +136,11 @@ export class TunnelDiodeElm extends CircuitElm {
         const voltdiff = this.nodes[0].v - this.nodes[1].v;
         const { pvp, pip, pvv, pvt, pvpp, piv } = TunnelDiodeElm;
         const i0 = piv * Math.exp(-pvv);
-        this.current = pip * Math.exp(-pvpp / pvt) * (Math.exp(voltdiff / pvt) - 1) +
+        this.current =
+            pip * Math.exp(-pvpp / pvt) * (Math.exp(voltdiff / pvt) - 1) +
             pip * (voltdiff / pvp) * Math.exp(1 - voltdiff / pvp) +
-            piv * Math.exp(voltdiff - pvv) - i0;
+            piv * Math.exp(voltdiff - pvv) -
+            i0;
     }
 
     getInfo(arr: string[]): void {

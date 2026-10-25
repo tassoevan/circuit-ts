@@ -57,7 +57,9 @@ export class ComparatorElm extends CompositeElm {
         }
     }
 
-    getDumpType(): number { return 401; }
+    getDumpType(): number {
+        return 401;
+    }
 
     setSize(s: number): void {
         this.opsize = s;
@@ -66,7 +68,9 @@ export class ComparatorElm extends CompositeElm {
         this.flags = (this.flags & ~this.FLAG_SMALL) | (s === 1 ? this.FLAG_SMALL : 0);
     }
 
-    getConnection(n1: number, n2: number): boolean { return false; }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
 
     draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.opheight * 2);
@@ -90,20 +94,18 @@ export class ComparatorElm extends CompositeElm {
 
     setPoints(): void {
         super.setPoints();
-        if (this.dn > 150 && this.isCreating())
-            this.setSize(2);
+        if (this.dn > 150 && this.isCreating()) this.setSize(2);
         let ww = this.opwidth;
-        if (ww > this.dn / 2)
-            ww = Math.trunc(this.dn / 2);
+        if (ww > this.dn / 2) ww = Math.trunc(this.dn / 2);
         this.calcLeads(ww * 2);
         const hs = this.opheight * this.dsign;
         this.in1p = this.newPointArray(2);
         this.in2p = this.newPointArray(2);
         this.textp = this.newPointArray(3);
         const sgn = this.hasFlag(this.FLAG_SWAP) ? -1 : 1;
-        this.interpPoint2(this.point1, this.point2, this.in1p[0],  this.in2p[0], 0, hs * sgn);
-        this.interpPoint2(this.lead1!,  this.lead2!,  this.in1p[1],  this.in2p[1], 0, hs * sgn);
-        this.interpPoint2(this.lead1!,  this.lead2!,  this.textp[0], this.textp[1], 0.2, hs * sgn);
+        this.interpPoint2(this.point1, this.point2, this.in1p[0], this.in2p[0], 0, hs * sgn);
+        this.interpPoint2(this.lead1!, this.lead2!, this.in1p[1], this.in2p[1], 0, hs * sgn);
+        this.interpPoint2(this.lead1!, this.lead2!, this.textp[0], this.textp[1], 0.2, hs * sgn);
         this.interpPoint(this.lead1!, this.lead2!, this.textp[2], 0.5, 0);
         const tris = this.newPointArray(2);
         this.interpPoint2(this.lead1!, this.lead2!, tris[0], tris[1], 0, hs * 2);
@@ -121,14 +123,12 @@ export class ComparatorElm extends CompositeElm {
     }
 
     flipX(c2: number, count: number): void {
-        if (this.dx === 0)
-            this.flags ^= this.FLAG_SWAP;
+        if (this.dx === 0) this.flags ^= this.FLAG_SWAP;
         super.flipX(c2, count);
     }
 
     flipY(c2: number, count: number): void {
-        if (this.dy === 0)
-            this.flags ^= this.FLAG_SWAP;
+        if (this.dy === 0) this.flags ^= this.FLAG_SWAP;
         super.flipY(c2, count);
     }
 

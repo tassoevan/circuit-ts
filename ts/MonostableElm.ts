@@ -35,7 +35,9 @@ export class MonostableElm extends ChipElm {
     private lastRisingEdge: number = 0;
     private delay: number = 0.01;
 
-    invertTrigger(): boolean { return (this.flags & MonostableElm.FLAG_INVERT_TRIGGER) !== 0; }
+    invertTrigger(): boolean {
+        return (this.flags & MonostableElm.FLAG_INVERT_TRIGGER) !== 0;
+    }
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
@@ -48,7 +50,9 @@ export class MonostableElm extends ChipElm {
         this.reset();
     }
 
-    getChipName(): string { return "Monostable"; }
+    getChipName(): string {
+        return "Monostable";
+    }
 
     setupPins(): void {
         this.sizeX = 2;
@@ -70,8 +74,12 @@ export class MonostableElm extends ChipElm {
         this.triggered = this.prevInputValue = false;
     }
 
-    getPostCount(): number { return 3; }
-    getVoltageSourceCount(): number { return 2; }
+    getPostCount(): number {
+        return 3;
+    }
+    getVoltageSourceCount(): number {
+        return 2;
+    }
 
     execute(): void {
         const trigValue = this.pins[0].value !== this.invertTrigger();
@@ -102,7 +110,9 @@ export class MonostableElm extends ChipElm {
         this.reset();
     }
 
-    getDumpType(): number { return 194; }
+    getDumpType(): number {
+        return 194;
+    }
 
     getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
@@ -110,18 +120,14 @@ export class MonostableElm extends ChipElm {
             ei.checkbox = new Checkbox("Retriggerable", this.retriggerable);
             return ei;
         }
-        if (n === 1)
-            return new EditInfo("Period (s)", this.delay, 0.001, 0.1);
-        if (n === 2)
-            return EditInfo.createCheckbox("Invert Trigger", this.invertTrigger());
+        if (n === 1) return new EditInfo("Period (s)", this.delay, 0.001, 0.1);
+        if (n === 2) return EditInfo.createCheckbox("Invert Trigger", this.invertTrigger());
         return super.getChipEditInfo(n);
     }
 
     setChipEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.retriggerable = ei.checkbox!.getState();
-        if (n === 1)
-            this.delay = ei.value;
+        if (n === 0) this.retriggerable = ei.checkbox!.getState();
+        if (n === 1) this.delay = ei.value;
         if (n === 2) {
             this.flags = ei.changeFlag(this.flags, MonostableElm.FLAG_INVERT_TRIGGER);
             this.setupPins();
@@ -133,7 +139,9 @@ export class MonostableElm extends ChipElm {
     addJSMethods(): void {
         super.addJSMethods();
         const p = this._jsProxy!;
-        p['getPeriod'] = () => this.delay;
-        p['setPeriod'] = (v: number) => { this.delay = v; };
+        p["getPeriod"] = () => this.delay;
+        p["setPeriod"] = (v: number) => {
+            this.delay = v;
+        };
     }
 }

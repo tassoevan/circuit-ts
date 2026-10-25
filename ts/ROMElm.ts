@@ -24,7 +24,6 @@ import { CircuitNode } from "./CircuitNode";
 import { StringTokenizer } from "./StringTokenizer";
 
 export class ROMElm extends SRAMElm {
-
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
@@ -35,15 +34,17 @@ export class ROMElm extends SRAMElm {
         }
     }
 
-    getChipName(): string { return "ROM"; }
-    getDumpType(): number { return 436; }
+    getChipName(): string {
+        return "ROM";
+    }
+    getDumpType(): number {
+        return 436;
+    }
 
     // no WE pin; just OE + address + data
     setupPins(): void {
-	if (this.addressBits === undefined)
-	    this.addressBits = 0;
-        if (this.addressBits === 0)
-            this.addressBits = this.dataBits = 4;
+        if (this.addressBits === undefined) this.addressBits = 0;
+        if (this.addressBits === 0) this.addressBits = this.dataBits = 4;
         this.sizeX = 2;
         const addrY = this.useBus() ? 1 : this.addressBits;
         const dataY = this.useBus() ? 1 : this.dataBits;
@@ -59,7 +60,16 @@ export class ROMElm extends SRAMElm {
         this.dataNodes = 1 + this.addressBits;
         this.internalNodes = 1 + this.addressBits + this.dataBits;
 
-        this.makeBitPins(this.addressBits, this.sizeY - addrY, ChipElm.SIDE_W, this.addressNodes, "A", false, false, true);
+        this.makeBitPins(
+            this.addressBits,
+            this.sizeY - addrY,
+            ChipElm.SIDE_W,
+            this.addressNodes,
+            "A",
+            false,
+            false,
+            true,
+        );
         this.makeBitPins(this.dataBits, this.sizeY - dataY, ChipElm.SIDE_E, this.dataNodes, "D", true, false, true);
         this.allocNodes();
     }
@@ -74,21 +84,25 @@ export class ROMElm extends SRAMElm {
         // get address
         this.address = 0;
         for (let i = 0; i !== this.addressBits; i++)
-            this.address |= (this.nodes[this.addressNodes + i].v > this.getThreshold()) ? 1 << (this.addressBits - 1 - i) : 0;
+            this.address |=
+                this.nodes[this.addressNodes + i].v > this.getThreshold() ? 1 << (this.addressBits - 1 - i) : 0;
 
         const dataObj = this.map.get(this.address);
-        const data = (dataObj === undefined) ? 0 : dataObj;
+        const data = dataObj === undefined ? 0 : dataObj;
         for (let i = 0; i !== this.dataBits; i++) {
             const p = this.pins[i + this.dataNodes];
-            CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[this.internalNodes + i], p.voltSource,
-                (data & (1 << (this.dataBits - 1 - i))) === 0 ? 0 : this.highVoltage);
+            CircuitElm.sim.updateVoltageSource(
+                CircuitNode.ground,
+                this.nodes[this.internalNodes + i],
+                p.voltSource,
+                (data & (1 << (this.dataBits - 1 - i))) === 0 ? 0 : this.highVoltage,
+            );
 
             // if output enabled, stamp a small resistor from internal voltage source to data pin.
             // if output disabled, stamp a large pulldown resistor from data pin to ground.
             if (outputEnabled)
                 CircuitElm.sim.stampResistor(this.nodes[this.internalNodes + i], this.nodes[this.dataNodes + i], 1);
-            else
-                CircuitElm.sim.stampResistor(this.nodes[this.dataNodes + i], CircuitNode.ground, 1e8);
+            else CircuitElm.sim.stampResistor(this.nodes[this.dataNodes + i], CircuitNode.ground, 1e8);
         }
     }
 

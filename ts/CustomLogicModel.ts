@@ -40,24 +40,20 @@ export class CustomLogicModel implements Editable {
     triState: boolean = false;
 
     static getModelWithName(name: string): CustomLogicModel {
-        if (CustomLogicModel.modelMap == null)
-            CustomLogicModel.modelMap = new Map<string, CustomLogicModel>();
+        if (CustomLogicModel.modelMap == null) CustomLogicModel.modelMap = new Map<string, CustomLogicModel>();
         let lm = CustomLogicModel.modelMap.get(name);
-        if (lm != null)
-            return lm;
+        if (lm != null) return lm;
         lm = new CustomLogicModel();
         lm.name = name;
-        lm.infoText = (name === "default") ? "custom logic" : name;
+        lm.infoText = name === "default" ? "custom logic" : name;
         CustomLogicModel.modelMap.set(name, lm);
         return lm;
     }
 
     static getModelWithNameOrCopy(name: string, oldmodel: CustomLogicModel | null): CustomLogicModel {
-        if (CustomLogicModel.modelMap == null)
-            CustomLogicModel.modelMap = new Map<string, CustomLogicModel>();
+        if (CustomLogicModel.modelMap == null) CustomLogicModel.modelMap = new Map<string, CustomLogicModel>();
         const lm = CustomLogicModel.modelMap.get(name);
-        if (lm != null)
-            return lm;
+        if (lm != null) return lm;
         const copy = new CustomLogicModel(oldmodel ?? undefined);
         copy.name = name;
         copy.infoText = name;
@@ -66,26 +62,24 @@ export class CustomLogicModel implements Editable {
     }
 
     static clearDumpedFlags(): void {
-        if (CustomLogicModel.modelMap == null)
-            return;
-        for (const m of CustomLogicModel.modelMap.values())
-            m.dumped = false;
+        if (CustomLogicModel.modelMap == null) return;
+        for (const m of CustomLogicModel.modelMap.values()) m.dumped = false;
     }
 
     constructor(copy?: CustomLogicModel) {
         if (copy === undefined) {
-            this.inputs    = this.listToArray("A,B");
-            this.outputs   = this.listToArray("C,D");
-            this.rulesLeft  = [];
+            this.inputs = this.listToArray("A,B");
+            this.outputs = this.listToArray("C,D");
+            this.rulesLeft = [];
             this.rulesRight = [];
             this.rules = "";
         } else {
-            this.flags     = copy.flags;
-            this.inputs    = copy.inputs;
-            this.outputs   = copy.outputs;
-            this.infoText  = copy.infoText;
-            this.rules     = copy.rules;
-            this.rulesLeft  = copy.rulesLeft;
+            this.flags = copy.flags;
+            this.inputs = copy.inputs;
+            this.outputs = copy.outputs;
+            this.infoText = copy.infoText;
+            this.rules = copy.rules;
+            this.rulesLeft = copy.rulesLeft;
             this.rulesRight = copy.rulesRight;
         }
     }
@@ -97,11 +91,11 @@ export class CustomLogicModel implements Editable {
     }
 
     undump(st: { nextToken(): string }): void {
-        this.flags   = parseIntStrict(st.nextToken());
-        this.inputs  = this.listToArray(CustomLogicModel.unescape(st.nextToken()));
+        this.flags = parseIntStrict(st.nextToken());
+        this.inputs = this.listToArray(CustomLogicModel.unescape(st.nextToken()));
         this.outputs = this.listToArray(CustomLogicModel.unescape(st.nextToken()));
         this.infoText = CustomLogicModel.unescape(st.nextToken());
-        this.rules   = CustomLogicModel.unescape(st.nextToken());
+        this.rules = CustomLogicModel.unescape(st.nextToken());
         this.parseRules(null);
     }
 
@@ -112,17 +106,16 @@ export class CustomLogicModel implements Editable {
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
-        this.flags   = xml.parseIntAttr("f", this.flags);
-        this.inputs  = this.listToArray(xml.parseStringAttr("in", null) ?? "");
+        this.flags = xml.parseIntAttr("f", this.flags);
+        this.inputs = this.listToArray(xml.parseStringAttr("in", null) ?? "");
         this.outputs = this.listToArray(xml.parseStringAttr("o", null) ?? "");
         this.infoText = xml.parseStringAttr("if", null) ?? "";
-        this.rules   = (xml.parseContents() ?? "").trim();
+        this.rules = (xml.parseContents() ?? "").trim();
         this.parseRules(null);
     }
 
     arrayToList(arr: string[] | null): string {
-        if (arr == null || arr.length === 0)
-            return "";
+        if (arr == null || arr.length === 0) return "";
         return arr.join(",");
     }
 
@@ -130,7 +123,9 @@ export class CustomLogicModel implements Editable {
         return arr.split(",");
     }
 
-    getEditTitle(): string { return "Edit Custom Logic Model"; }
+    getEditTitle(): string {
+        return "Edit Custom Logic Model";
+    }
 
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
@@ -166,38 +161,31 @@ export class CustomLogicModel implements Editable {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.inputs  = this.listToArray(ei.textf!.value);
-        if (n === 1)
-            this.outputs = this.listToArray(ei.textf!.value);
-        if (n === 2)
-            this.infoText = ei.textf!.value;
+        if (n === 0) this.inputs = this.listToArray(ei.textf!.value);
+        if (n === 1) this.outputs = this.listToArray(ei.textf!.value);
+        if (n === 2) this.infoText = ei.textf!.value;
         if (n === 3) {
             this.rules = (ei.textArea.element as HTMLTextAreaElement).value;
             this.parseRules(ei);
         }
         if (n === 4) {
-            if (ei.checkbox!.getState())
-                this.flags |= CustomLogicModel.FLAG_SCHMITT;
-            else
-                this.flags &= ~CustomLogicModel.FLAG_SCHMITT;
+            if (ei.checkbox!.getState()) this.flags |= CustomLogicModel.FLAG_SCHMITT;
+            else this.flags &= ~CustomLogicModel.FLAG_SCHMITT;
         }
         CirSim.theApp.updateModels();
     }
 
     parseRules(ei: EditInfo | null): void {
         const lines = this.rules.split("\n");
-        this.rulesLeft  = [];
+        this.rulesLeft = [];
         this.rulesRight = [];
         this.triState = false;
         for (let i = 0; i !== lines.length; i++) {
             const s = lines[i].toLowerCase().trim();
-            if (s.length === 0 || s.startsWith("#"))
-                continue;
+            if (s.length === 0 || s.startsWith("#")) continue;
             const s0 = s.replace(/ /g, "").split("=");
             if (s0.length !== 2) {
-                if (ei != null)
-                    ei.setError("error on line " + (i + 1));
+                if (ei != null) ei.setError("error on line " + (i + 1));
                 return;
             }
             if (s0[0].length < this.inputs.length) {
@@ -207,7 +195,13 @@ export class CustomLogicModel implements Editable {
             }
             if (s0[0].length > this.inputs.length + this.outputs.length) {
                 if (ei != null)
-                    ei.setError("must have <= " + (this.inputs.length + this.outputs.length) + " digits on left side (line " + (i + 1) + ")");
+                    ei.setError(
+                        "must have <= " +
+                            (this.inputs.length + this.outputs.length) +
+                            " digits on left side (line " +
+                            (i + 1) +
+                            ")",
+                    );
                 return;
             }
             if (s0[1].length !== this.outputs.length) {
@@ -221,17 +215,16 @@ export class CustomLogicModel implements Editable {
             for (let j = 0; j !== rl.length; j++) {
                 const x = rl.charCodeAt(j);
                 const xc = rl.charAt(j);
-                if (xc === '?' || xc === '+' || xc === '-' || xc === '0' || xc === '1') {
+                if (xc === "?" || xc === "+" || xc === "-" || xc === "0" || xc === "1") {
                     newRl += xc;
                     continue;
                 }
-                if (xc < 'a' || xc > 'z') {
-                    if (ei != null)
-                        ei.setError("error on line " + (i + 1));
+                if (xc < "a" || xc > "z") {
+                    if (ei != null) ei.setError("error on line " + (i + 1));
                     return;
                 }
                 // if a letter appears twice, capitalize it the 2nd time so we can compare
-                const idx = x - 'a'.charCodeAt(0);
+                const idx = x - "a".charCodeAt(0);
                 if (used[idx]) {
                     newRl += xc.toUpperCase();
                     continue;
@@ -240,8 +233,7 @@ export class CustomLogicModel implements Editable {
                 newRl += xc;
             }
             const rr = s0[1];
-            if (rr.includes("_"))
-                this.triState = true;
+            if (rr.includes("_")) this.triState = true;
             this.rulesLeft.push(newRl);
             this.rulesRight.push(rr);
         }
@@ -251,50 +243,41 @@ export class CustomLogicModel implements Editable {
         this.dumped = true;
         const elem = doc.createElement("clm");
         CircuitXMLSerializer.dumpAttr(elem, "nm", this.name);
-        CircuitXMLSerializer.dumpAttr(elem, "f",  this.flags);
+        CircuitXMLSerializer.dumpAttr(elem, "f", this.flags);
         CircuitXMLSerializer.dumpAttr(elem, "in", this.arrayToList(this.inputs));
-        CircuitXMLSerializer.dumpAttr(elem, "o",  this.arrayToList(this.outputs));
+        CircuitXMLSerializer.dumpAttr(elem, "o", this.arrayToList(this.outputs));
         CircuitXMLSerializer.dumpAttr(elem, "if", this.infoText);
         elem.appendChild(doc.createTextNode(this.rules));
         doc.documentElement.appendChild(elem);
     }
 
     static escape(s: string): string {
-        if (s.length === 0)
-            return "\\0";
-        return s.replace(/\\/g, "\\\\")
-                .replace(/\n/g, "\\n")
-                .replace(/ /g, "\\s")
-                .replace(/\+/g, "\\p")
-                .replace(/=/g, "\\q")
-                .replace(/#/g, "\\h")
-                .replace(/&/g, "\\a")
-                .replace(/\r/g, "\\r");
+        if (s.length === 0) return "\\0";
+        return s
+            .replace(/\\/g, "\\\\")
+            .replace(/\n/g, "\\n")
+            .replace(/ /g, "\\s")
+            .replace(/\+/g, "\\p")
+            .replace(/=/g, "\\q")
+            .replace(/#/g, "\\h")
+            .replace(/&/g, "\\a")
+            .replace(/\r/g, "\\r");
     }
 
     static unescape(s: string): string {
-        if (s === "\\0")
-            return "";
+        if (s === "\\0") return "";
         let i = 0;
         while (i < s.length) {
-            if (s.charAt(i) === '\\') {
+            if (s.charAt(i) === "\\") {
                 const c = s.charAt(i + 1);
-                if (c === 'n')
-                    s = s.substring(0, i) + "\n" + s.substring(i + 2);
-                else if (c === 'r')
-                    s = s.substring(0, i) + "\r" + s.substring(i + 2);
-                else if (c === 's')
-                    s = s.substring(0, i) + " " + s.substring(i + 2);
-                else if (c === 'p')
-                    s = s.substring(0, i) + "+" + s.substring(i + 2);
-                else if (c === 'q')
-                    s = s.substring(0, i) + "=" + s.substring(i + 2);
-                else if (c === 'h')
-                    s = s.substring(0, i) + "#" + s.substring(i + 2);
-                else if (c === 'a')
-                    s = s.substring(0, i) + "&" + s.substring(i + 2);
-                else
-                    s = s.substring(0, i) + s.substring(i + 1);
+                if (c === "n") s = s.substring(0, i) + "\n" + s.substring(i + 2);
+                else if (c === "r") s = s.substring(0, i) + "\r" + s.substring(i + 2);
+                else if (c === "s") s = s.substring(0, i) + " " + s.substring(i + 2);
+                else if (c === "p") s = s.substring(0, i) + "+" + s.substring(i + 2);
+                else if (c === "q") s = s.substring(0, i) + "=" + s.substring(i + 2);
+                else if (c === "h") s = s.substring(0, i) + "#" + s.substring(i + 2);
+                else if (c === "a") s = s.substring(0, i) + "&" + s.substring(i + 2);
+                else s = s.substring(0, i) + s.substring(i + 1);
             }
             i++;
         }

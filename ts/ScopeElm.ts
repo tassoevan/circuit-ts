@@ -25,7 +25,6 @@ import { StringTokenizer } from "./StringTokenizer";
 import { CircuitXMLDeserializer } from "./CircuitXMLDeserializer";
 
 export class ScopeElm extends CircuitElm {
-
     declare elmScope: Scope;
 
     constructor(xx: number, yy: number);
@@ -61,8 +60,7 @@ export class ScopeElm extends CircuitElm {
         const j1 = CircuitElm.app.mouse.transformY(Math.min(this.y, this.y2));
         const j2 = CircuitElm.app.mouse.transformY(Math.max(this.y, this.y2));
         const r = new Rectangle(i1, j1, i2 - i1, j2 - j1);
-        if (!r.equals(this.elmScope.rect))
-            this.elmScope.setRect(r);
+        if (!r.equals(this.elmScope.rect)) this.elmScope.setRect(r);
     }
 
     setPoints(): void {
@@ -87,9 +85,13 @@ export class ScopeElm extends CircuitElm {
         this.elmScope = null!;
     }
 
-    canViewInScope(): boolean { return false; }
+    canViewInScope(): boolean {
+        return false;
+    }
 
-    getDumpType(): number { return 403; }
+    getDumpType(): number {
+        return 403;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -123,9 +125,17 @@ export class ScopeElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    getPostCount(): number { return 0; }
-    getNumHandles(): number { return 2; }
-    isScopeElm(): boolean { return true; }
+    getPostCount(): number {
+        return 0;
+    }
+    getNumHandles(): number {
+        return 2;
+    }
+    isScopeElm(): boolean {
+        return true;
+    }
 
-    selectScope(mx: number, my: number): void { this.elmScope.selectScope(mx, my); }
+    selectScope(mx: number, my: number): void {
+        this.elmScope.selectScope(mx, my);
+    }
 }

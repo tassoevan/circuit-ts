@@ -38,7 +38,7 @@ export class Diode {
         this.vscale = model.vscale;
         this.vdcoef = model.vdcoef;
 
-//	sim.console("setup " + leakage + " " + zvoltage + " " + model.emissionCoefficient + " " +  vdcoef);
+        //	sim.console("setup " + leakage + " " + zvoltage + " " + model.emissionCoefficient + " " +  vdcoef);
 
         // critical voltage for limiting; current is vscale/sqrt(2) at
         // this voltage
@@ -46,11 +46,10 @@ export class Diode {
         // translated, *positive* critical voltage for limiting in Zener breakdown region;
         // limitstep() uses this with translated voltages in an analogous fashion to vcrit.
         this.vzcrit = Diode.vt * Math.log(Diode.vt / (Math.sqrt(2) * this.leakage));
-        if (this.zvoltage === 0)
-            this.zoffset = 0;
+        if (this.zvoltage === 0) this.zoffset = 0;
         else {
             // calculate offset which will give us 5mA at zvoltage
-            const i = -.005;
+            const i = -0.005;
             this.zoffset = this.zvoltage - Math.log(-(1 + i / this.leakage)) / Diode.vzcoef;
         }
     }
@@ -91,7 +90,7 @@ export class Diode {
         // const oo = vnew;  // unused
 
         // check new voltage; has current changed by factor of e^2?
-        if (vnew > this.vcrit && Math.abs(vnew - vold) > (this.vscale + this.vscale)) {
+        if (vnew > this.vcrit && Math.abs(vnew - vold) > this.vscale + this.vscale) {
             if (vold > 0) {
                 arg = 1 + (vnew - vold) / this.vscale;
                 if (arg > 0) {
@@ -117,7 +116,7 @@ export class Diode {
             vnew = -vnew - this.zoffset;
             vold = -vold - this.zoffset;
 
-            if (vnew > this.vzcrit && Math.abs(vnew - vold) > (Diode.vt + Diode.vt)) {
+            if (vnew > this.vzcrit && Math.abs(vnew - vold) > Diode.vt + Diode.vt) {
                 if (vold > 0) {
                     arg = 1 + (vnew - vold) / Diode.vt;
                     if (arg > 0) {
@@ -145,8 +144,7 @@ export class Diode {
 
     doStep(voltdiff: number): void {
         // used to have .1 here, but needed .01 for peak detector
-        if (Math.abs(voltdiff - this.lastvoltdiff) > .01)
-            this.sim.converged = false;
+        if (Math.abs(voltdiff - this.lastvoltdiff) > 0.01) this.sim.converged = false;
         voltdiff = this.limitStep(voltdiff, this.lastvoltdiff);
         this.lastvoltdiff = voltdiff;
 
@@ -156,9 +154,8 @@ export class Diode {
         if (this.sim.subIterations > 100) {
             // if we have trouble converging, put a conductance in parallel with the diode.
             // Gradually increase the conductance value for each iteration.
-            gmin = Math.exp(-9 * Math.log(10) * (1 - this.sim.subIterations / 3000.));
-            if (gmin > .1)
-                gmin = .1;
+            gmin = Math.exp(-9 * Math.log(10) * (1 - this.sim.subIterations / 3000));
+            if (gmin > 0.1) gmin = 0.1;
         }
 
         if (voltdiff >= 0 || this.zvoltage === 0) {
@@ -182,15 +179,16 @@ export class Diode {
              * nc is I(Vd) + I'(Vd)*(-Vd)
              */
 
-            const geq = this.leakage * (
-                this.vdcoef * Math.exp(voltdiff * this.vdcoef) + Diode.vzcoef * Math.exp((-voltdiff - this.zoffset) * Diode.vzcoef)
-            ) + gmin;
+            const geq =
+                this.leakage *
+                    (this.vdcoef * Math.exp(voltdiff * this.vdcoef) +
+                        Diode.vzcoef * Math.exp((-voltdiff - this.zoffset) * Diode.vzcoef)) +
+                gmin;
 
-            const nc = this.leakage * (
-                Math.exp(voltdiff * this.vdcoef)
-                - Math.exp((-voltdiff - this.zoffset) * Diode.vzcoef)
-                - 1
-            ) + geq * (-voltdiff);
+            const nc =
+                this.leakage *
+                    (Math.exp(voltdiff * this.vdcoef) - Math.exp((-voltdiff - this.zoffset) * Diode.vzcoef) - 1) +
+                geq * -voltdiff;
 
             this.sim.stampConductance(this.nodes[0], this.nodes[1], geq);
             this.sim.stampCurrentSource(this.nodes[0], this.nodes[1], nc);
@@ -198,12 +196,9 @@ export class Diode {
     }
 
     calculateCurrent(voltdiff: number): number {
-        if (voltdiff >= 0 || this.zvoltage === 0)
-            return this.leakage * (Math.exp(voltdiff * this.vdcoef) - 1);
-        return this.leakage * (
-            Math.exp(voltdiff * this.vdcoef)
-            - Math.exp((-voltdiff - this.zoffset) * Diode.vzcoef)
-            - 1
+        if (voltdiff >= 0 || this.zvoltage === 0) return this.leakage * (Math.exp(voltdiff * this.vdcoef) - 1);
+        return (
+            this.leakage * (Math.exp(voltdiff * this.vdcoef) - Math.exp((-voltdiff - this.zoffset) * Diode.vzcoef) - 1)
         );
     }
 }

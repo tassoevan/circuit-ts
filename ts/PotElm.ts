@@ -32,7 +32,7 @@ import { parseFloatStrict } from "./NumberParse";
 
 export class PotElm extends CircuitElm {
     readonly FLAG_SHOW_VALUES = 1;
-    readonly FLAG_FLIP        = 2;
+    readonly FLAG_FLIP = 2;
     readonly FLAG_FLIP_OFFSET = 4;
 
     position: number = 0.5;
@@ -76,20 +76,27 @@ export class PotElm extends CircuitElm {
             this.maxResistance = parseFloatStrict(st!.nextToken());
             this.position = parseFloatStrict(st!.nextToken());
             let text = st!.nextToken();
-            while (st!.hasMoreTokens())
-                text += ' ' + st!.nextToken();
+            while (st!.hasMoreTokens()) text += " " + st!.nextToken();
             this.sliderText = text;
             this.createSlider();
         }
     }
 
-    getPostCount(): number { return 3; }
-    getDumpType(): number { return 174; }
-    getXmlDumpType(): string { return "pt"; }
-    isPotElm(): boolean { return true; }
+    getPostCount(): number {
+        return 3;
+    }
+    getDumpType(): number {
+        return 174;
+    }
+    getXmlDumpType(): string {
+        return "pt";
+    }
+    isPotElm(): boolean {
+        return true;
+    }
 
     getPost(n: number): Point {
-        return (n === 0) ? this.point1 : (n === 1) ? this.point2 : this.post3;
+        return n === 0 ? this.point1 : n === 1 ? this.point2 : this.post3;
     }
 
     dumpXml(doc: Document, elem: Element): void {
@@ -97,19 +104,17 @@ export class PotElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "ma", this.maxResistance);
         CircuitXMLSerializer.dumpAttr(elem, "po", this.position);
         CircuitXMLSerializer.dumpAttr(elem, "sl", this.sliderText);
-        if (this.link !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "li", this.link);
+        if (this.link !== 0) CircuitXMLSerializer.dumpAttr(elem, "li", this.link);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.maxResistance = xml.parseDoubleAttr("ma", this.maxResistance);
-        this.position      = xml.parseDoubleAttr("po", this.position);
-        this.sliderText    = xml.parseStringAttr("sl", this.sliderText);
+        this.position = xml.parseDoubleAttr("po", this.position);
+        this.sliderText = xml.parseStringAttr("sl", this.sliderText);
         this.setLink(xml.parseIntAttr("li", 0));
         this.slider?.setValue(this.calcSliderValue());
-        if (this.labelEl != null)
-            this.labelEl.textContent = this.sliderText;
+        if (this.labelEl != null) this.labelEl.textContent = this.sliderText;
     }
 
     calcSliderValue(): number {
@@ -133,7 +138,7 @@ export class PotElm extends CircuitElm {
         }
         if (!transferred) {
             if (this.labelEl != null) CircuitElm.app.removeWidgetFromVerticalPanel(this.labelEl);
-            if (this.slider  != null) CircuitElm.app.removeWidgetFromVerticalPanel(this.slider.element);
+            if (this.slider != null) CircuitElm.app.removeWidgetFromVerticalPanel(this.slider.element);
         }
         this.slider = null;
         this.labelEl = null;
@@ -158,9 +163,9 @@ export class PotElm extends CircuitElm {
                 }
             }
         }
-        const lbl = document.createElement('div');
+        const lbl = document.createElement("div");
         lbl.textContent = this.sliderText;
-        lbl.className = 'topSpace';
+        lbl.className = "topSpace";
         this.labelEl = lbl;
         CircuitElm.app.addWidgetToVerticalPanel(lbl);
 
@@ -171,8 +176,7 @@ export class PotElm extends CircuitElm {
             this.setPoints();
             if (this.link !== 0) {
                 for (const ce of CircuitElm.app.elmList) {
-                    if (ce instanceof PotElm && ce !== this && ce.link === this.link)
-                        ce.setPoints();
+                    if (ce instanceof PotElm && ce !== this && ce.link === this.link) ce.setPoints();
                 }
             }
         });
@@ -191,32 +195,29 @@ export class PotElm extends CircuitElm {
         const app = CircuitElm.app;
         let offset = 0;
         let myLen = 0;
-        if ((CircuitElm.abs(this.dx) > CircuitElm.abs(this.dy)) !== this.hasFlag(this.FLAG_FLIP)) {
-            myLen = 2 * app.gridSize * Math.sign(this.dx) *
-                    Math.ceil(CircuitElm.abs(this.dx) / (2 * app.gridSize));
+        if (CircuitElm.abs(this.dx) > CircuitElm.abs(this.dy) !== this.hasFlag(this.FLAG_FLIP)) {
+            myLen = 2 * app.gridSize * Math.sign(this.dx) * Math.ceil(CircuitElm.abs(this.dx) / (2 * app.gridSize));
             this.point2.x = this.point1.x + myLen;
-            offset = (this.dx < 0) ? this.dy : -this.dy;
+            offset = this.dx < 0 ? this.dy : -this.dy;
             this.point2.y = this.point1.y;
         } else {
-            myLen = 2 * app.gridSize * Math.sign(this.dy) *
-                    Math.ceil(CircuitElm.abs(this.dy) / (2 * app.gridSize));
+            myLen = 2 * app.gridSize * Math.sign(this.dy) * Math.ceil(CircuitElm.abs(this.dy) / (2 * app.gridSize));
             if (this.dy !== 0) {
                 this.point2.y = this.point1.y + myLen;
-                offset = (this.dy > 0) ? this.dx : -this.dx;
+                offset = this.dy > 0 ? this.dx : -this.dx;
                 this.point2.x = this.point1.x;
             }
         }
-        if (offset === 0)
-            offset = this.hasFlag(this.FLAG_FLIP_OFFSET) ? -app.gridSize : app.gridSize;
+        if (offset === 0) offset = this.hasFlag(this.FLAG_FLIP_OFFSET) ? -app.gridSize : app.gridSize;
         this.dn = CircuitElm.distance(this.point1, this.point2);
         const bodyLen = 32;
         this.calcLeads(bodyLen);
         this.position = this.slider!.getValue() * 0.0099 + 0.005;
         const soff = (this.position - 0.5) * bodyLen;
-        this.post3     = this.interpPoint(this.point1, this.point2, 0.5, offset);
-        this.corner2   = this.interpPoint(this.point1, this.point2, soff / this.dn + 0.5, offset);
+        this.post3 = this.interpPoint(this.point1, this.point2, 0.5, offset);
+        this.corner2 = this.interpPoint(this.point1, this.point2, soff / this.dn + 0.5, offset);
         this.arrowPoint = this.interpPoint(this.point1, this.point2, soff / this.dn + 0.5, 8 * CircuitElm.sign(offset));
-        this.midpoint   = this.interpPoint(this.point1, this.point2, soff / this.dn + 0.5);
+        this.midpoint = this.interpPoint(this.point1, this.point2, soff / this.dn + 0.5);
         this.arrow1 = new Point();
         this.arrow2 = new Point();
         const clen = CircuitElm.abs(offset) - 8;
@@ -242,13 +243,18 @@ export class PotElm extends CircuitElm {
             for (let i = 0; i !== segments; i++) {
                 let nx = 0;
                 switch (i & 3) {
-                case 0: nx = 1; break;
-                case 2: nx = -1; break;
-                default: nx = 0; break;
+                    case 0:
+                        nx = 1;
+                        break;
+                    case 2:
+                        nx = -1;
+                        break;
+                    default:
+                        nx = 0;
+                        break;
                 }
-                const v = i < divide
-                    ? v1 + (v3 - v1) * i / divide
-                    : v3 + (v2 - v3) * (i - divide) / (segments - divide);
+                const v =
+                    i < divide ? v1 + ((v3 - v1) * i) / divide : v3 + ((v2 - v3) * (i - divide)) / (segments - divide);
                 this.setVoltageColor(g, v);
                 this.interpPoint(this.lead1!, this.lead2!, CircuitElm.ps1, i * segf, hs * ox);
                 this.interpPoint(this.lead1!, this.lead2!, CircuitElm.ps2, (i + 1) * segf, hs * nx);
@@ -260,9 +266,8 @@ export class PotElm extends CircuitElm {
             this.interpPoint2(this.lead1!, this.lead2!, CircuitElm.ps1, CircuitElm.ps2, 0, hs);
             CircuitElm.drawThickLine(g, CircuitElm.ps1, CircuitElm.ps2);
             for (let i = 0; i !== segments; i++) {
-                const v = i < divide
-                    ? v1 + (v3 - v1) * i / divide
-                    : v3 + (v2 - v3) * (i - divide) / (segments - divide);
+                const v =
+                    i < divide ? v1 + ((v3 - v1) * i) / divide : v3 + ((v2 - v3) * (i - divide)) / (segments - divide);
                 this.setVoltageColor(g, v);
                 this.interpPoint2(this.lead1!, this.lead2!, CircuitElm.ps1, CircuitElm.ps2, i * segf, hs);
                 this.interpPoint2(this.lead1!, this.lead2!, this.ps3, this.ps4, (i + 1) * segf, hs);
@@ -284,32 +289,59 @@ export class PotElm extends CircuitElm {
             this.drawDots(g, this.point1, this.midpoint, this.curcount1);
             this.drawDots(g, this.point2, this.midpoint, this.curcount2);
             this.drawDots(g, this.post3, this.corner2, this.curcount3);
-            this.drawDots(g, this.corner2, this.midpoint,
-                this.addCurCount(this.curcount3, CircuitElm.distance(this.post3, this.corner2)));
+            this.drawDots(
+                g,
+                this.corner2,
+                this.midpoint,
+                this.addCurCount(this.curcount3, CircuitElm.distance(this.post3, this.corner2)),
+            );
         }
         this.drawPosts(g);
 
         if (this.showValues() && this.resistance1 > 0 && (this.flags & this.FLAG_SHOW_VALUES) !== 0) {
-            const reverseY = (this.post3.x < this.lead1!.x && this.lead1!.x === this.lead2!.x);
-            const reverseX = (this.post3.y < this.lead1!.y && this.lead1!.x !== this.lead2!.x);
-            const rev = (this.lead1!.x === this.lead2!.x && this.lead1!.y < this.lead2!.y) ||
-                        (this.lead1!.y === this.lead2!.y && this.lead1!.x > this.lead2!.x);
-            const s1 = CircuitElm.getShortUnitText(rev ? this.resistance2 : this.resistance1, this.showOhmSymbol() ? Locale.ohmString : "");
-            const s2 = CircuitElm.getShortUnitText(rev ? this.resistance1 : this.resistance2, this.showOhmSymbol() ? Locale.ohmString : "");
+            const reverseY = this.post3.x < this.lead1!.x && this.lead1!.x === this.lead2!.x;
+            const reverseX = this.post3.y < this.lead1!.y && this.lead1!.x !== this.lead2!.x;
+            const rev =
+                (this.lead1!.x === this.lead2!.x && this.lead1!.y < this.lead2!.y) ||
+                (this.lead1!.y === this.lead2!.y && this.lead1!.x > this.lead2!.x);
+            const s1 = CircuitElm.getShortUnitText(
+                rev ? this.resistance2 : this.resistance1,
+                this.showOhmSymbol() ? Locale.ohmString : "",
+            );
+            const s2 = CircuitElm.getShortUnitText(
+                rev ? this.resistance1 : this.resistance2,
+                this.showOhmSymbol() ? Locale.ohmString : "",
+            );
             g.save();
             g.setFont(CircuitElm.valueFont);
             g.setColor(CircuitElm.whiteColor);
             const ya = g.currentFontSize / 2;
             let w = g.measureWidth(s1);
             if (this.lead1!.x === this.lead2!.x)
-                g.drawString(s1, !reverseY ? this.arrowPoint.x + 2 : this.arrowPoint.x - 2 - w, Math.max(this.arrow1.y, this.arrow2.y) + 5 + ya);
+                g.drawString(
+                    s1,
+                    !reverseY ? this.arrowPoint.x + 2 : this.arrowPoint.x - 2 - w,
+                    Math.max(this.arrow1.y, this.arrow2.y) + 5 + ya,
+                );
             else
-                g.drawString(s1, Math.min(this.arrow1.x, this.arrow2.x) - 2 - w, !reverseX ? this.arrowPoint.y + 4 + ya : this.arrowPoint.y - 4);
+                g.drawString(
+                    s1,
+                    Math.min(this.arrow1.x, this.arrow2.x) - 2 - w,
+                    !reverseX ? this.arrowPoint.y + 4 + ya : this.arrowPoint.y - 4,
+                );
             w = g.measureWidth(s2);
             if (this.lead1!.x === this.lead2!.x)
-                g.drawString(s2, !reverseY ? this.arrowPoint.x + 2 : this.arrowPoint.x - 2 - w, Math.min(this.arrow1.y, this.arrow2.y) - 3);
+                g.drawString(
+                    s2,
+                    !reverseY ? this.arrowPoint.x + 2 : this.arrowPoint.x - 2 - w,
+                    Math.min(this.arrow1.y, this.arrow2.y) - 3,
+                );
             else
-                g.drawString(s2, Math.max(this.arrow1.x, this.arrow2.x) + 2, !reverseX ? this.arrowPoint.y + 4 + ya : this.arrowPoint.y - 4);
+                g.drawString(
+                    s2,
+                    Math.max(this.arrow1.x, this.arrow2.x) + 2,
+                    !reverseX ? this.arrowPoint.y + 4 + ya : this.arrowPoint.y - 4,
+                );
             g.restore();
         }
     }
@@ -399,8 +431,7 @@ export class PotElm extends CircuitElm {
     }
 
     flipXY(xmy: number, count: number): void {
-        if (CircuitElm.abs(this.dx) === CircuitElm.abs(this.dy))
-            this.flags ^= this.FLAG_FLIP;
+        if (CircuitElm.abs(this.dx) === CircuitElm.abs(this.dy)) this.flags ^= this.FLAG_FLIP;
         this.flags ^= this.FLAG_FLIP_OFFSET;
         super.flipXY(xmy, count);
     }

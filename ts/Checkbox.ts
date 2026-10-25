@@ -21,7 +21,15 @@ export class Checkbox {
     name: string;
     state: boolean;
     element: HTMLInputElement | null = null;
-    constructor(name: string, state: boolean) { this.name = name; this.state = state; }
-    getState(): boolean { return this.element ? this.element.checked : this.state; }
-    setState(s: boolean): void { this.state = s; if (this.element) this.element.checked = s; }
+    constructor(name: string, state: boolean) {
+        this.name = name;
+        this.state = state;
+    }
+    getState(): boolean {
+        return this.element ? this.element.checked : this.state;
+    }
+    setState(s: boolean): void {
+        this.state = s;
+        if (this.element) this.element.checked = s;
+    }
 }

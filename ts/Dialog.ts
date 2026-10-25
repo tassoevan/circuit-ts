@@ -31,7 +31,10 @@ export class Dialog {
         document.body.appendChild(this.dialogEl);
         this.dialogEl.addEventListener("keydown", (e: KeyboardEvent) => {
             if (e.key === "Enter") this.enterPressed();
-            if (e.key === "Escape") { e.preventDefault(); this.closeDialog(); }
+            if (e.key === "Escape") {
+                e.preventDefault();
+                this.closeDialog();
+            }
         });
         this.setupDragging();
     }
@@ -53,17 +56,13 @@ export class Dialog {
 
     private setupDragging(): void {
         this.dialogEl.addEventListener("pointerdown", (e: PointerEvent) => {
-            if (e.button !== 0)
-                return;
+            if (e.button !== 0) return;
             const target = e.target as HTMLElement | null;
-            if (!target || target.closest(Dialog.NO_DRAG_SELECTOR))
-                return;
+            if (!target || target.closest(Dialog.NO_DRAG_SELECTOR)) return;
             // don't start a drag on the backdrop (clicks outside the dialog box
             // are still reported with the dialog as target)
             const r = this.dialogEl.getBoundingClientRect();
-            if (e.clientX < r.left || e.clientX > r.right ||
-                e.clientY < r.top || e.clientY > r.bottom)
-                return;
+            if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
             this.dlgDragStartX = e.clientX;
             this.dlgDragStartY = e.clientY;
             this.dragOrigLeft = r.left;
@@ -74,14 +73,12 @@ export class Dialog {
         });
 
         this.dialogEl.addEventListener("pointermove", (e: PointerEvent) => {
-            if (this.dragPointerId !== e.pointerId)
-                return;
+            if (this.dragPointerId !== e.pointerId) return;
             const dx = e.clientX - this.dlgDragStartX;
             const dy = e.clientY - this.dlgDragStartY;
             if (!this.dlgDragging) {
                 // small threshold so that clicks and text selection still work
-                if (Math.abs(dx) < 3 && Math.abs(dy) < 3)
-                    return;
+                if (Math.abs(dx) < 3 && Math.abs(dy) < 3) return;
                 this.dlgDragging = true;
                 // switch from the browser's automatic centering to explicit
                 // positioning, keeping the dialog where it currently is
@@ -100,10 +97,8 @@ export class Dialog {
         });
 
         const endDrag = (e: PointerEvent) => {
-            if (this.dragPointerId !== e.pointerId)
-                return;
-            if (this.dialogEl.hasPointerCapture(e.pointerId))
-                this.dialogEl.releasePointerCapture(e.pointerId);
+            if (this.dragPointerId !== e.pointerId) return;
+            if (this.dialogEl.hasPointerCapture(e.pointerId)) this.dialogEl.releasePointerCapture(e.pointerId);
             this.dragPointerId = -1;
             this.dlgDragging = false;
         };
@@ -121,12 +116,13 @@ export class Dialog {
         this.dialogEl.style.top = y + "px";
     }
 
-    isShowing(): boolean { return this.dialogEl.open; }
+    isShowing(): boolean {
+        return this.dialogEl.open;
+    }
 
     show(): void {
         this.dialogEl.showModal();
-        if (CirSim.dialogShowing !== this)
-            this.parentDialog = CirSim.dialogShowing;
+        if (CirSim.dialogShowing !== this) this.parentDialog = CirSim.dialogShowing;
         CirSim.dialogShowing = this;
     }
 
@@ -136,19 +132,19 @@ export class Dialog {
     }
 
     closeDialog(): void {
-        if (this.dialogEl.open)
-            this.dialogEl.close();
+        if (this.dialogEl.open) this.dialogEl.close();
         if (CirSim.dialogShowing === this) {
             const p = this.parentDialog;
-            CirSim.dialogShowing = (p && p.isShowing()) ? p : null;
+            CirSim.dialogShowing = p && p.isShowing() ? p : null;
         }
         document.body.removeChild(this.dialogEl);
     }
 
     enterPressed(): void {
-        if (this.closeOnEnter && this.apply())
-            this.closeDialog();
+        if (this.closeOnEnter && this.apply()) this.closeDialog();
     }
 
-    apply(): boolean { return true; }
+    apply(): boolean {
+        return true;
+    }
 }

@@ -73,29 +73,59 @@ export class EditInfo {
         return ei;
     }
 
-    setDimensionless(): EditInfo { this.dimensionless = true; return this; }
-    setUnitStep(): EditInfo { this.unitStep = true; return this; }
-    disallowSliders(): EditInfo { this.noSliders = true; return this; }
-    setIsColor(): EditInfo { this.isColor = true; return this; }
-    newColumnMethod(): EditInfo { this.newColumn = true; return this; }
+    setDimensionless(): EditInfo {
+        this.dimensionless = true;
+        return this;
+    }
+    setUnitStep(): EditInfo {
+        this.unitStep = true;
+        return this;
+    }
+    disallowSliders(): EditInfo {
+        this.noSliders = true;
+        return this;
+    }
+    setIsColor(): EditInfo {
+        this.isColor = true;
+        return this;
+    }
+    newColumnMethod(): EditInfo {
+        this.newColumn = true;
+        return this;
+    }
     changeFlag(flags: number, bit: number): number {
-        if (this.checkbox.getState())
-            return flags | bit;
+        if (this.checkbox.getState()) return flags | bit;
         return flags & ~bit;
     }
     changeFlagInverted(flags: number, bit: number): number {
-        if (!this.checkbox.getState())
-            return flags | bit;
+        if (!this.checkbox.getState()) return flags | bit;
         return flags & ~bit;
     }
-    setError(s: string): void { this.error = s; }
-    setErrorFieldName(s: string): EditInfo { this.errorFieldName = s; return this; }
-    setPositive(): EditInfo { this.positive = true; return this; }
-    setNonNegative(): EditInfo { this.nonNegative = true; return this; }
+    setError(s: string): void {
+        this.error = s;
+    }
+    setErrorFieldName(s: string): EditInfo {
+        this.errorFieldName = s;
+        return this;
+    }
+    setPositive(): EditInfo {
+        this.positive = true;
+        return this;
+    }
+    setNonNegative(): EditInfo {
+        this.nonNegative = true;
+        return this;
+    }
 
     canCreateAdjustable(): boolean {
-        return this.choice == null && this.checkbox == null && this.button == null &&
-            this.textArea == null && this.widget == null && !this.noSliders;
+        return (
+            this.choice == null &&
+            this.checkbox == null &&
+            this.button == null &&
+            this.textArea == null &&
+            this.widget == null &&
+            !this.noSliders
+        );
     }
 
     static makeLink(file: string, text: string): string {

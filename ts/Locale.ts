@@ -23,32 +23,27 @@ import { moduleBaseURL } from "./ModuleBase";
 
 export class Locale {
     static ohmString = "Ω";
-    static muString  = "μ";
+    static muString = "μ";
 
     static localizationMap: Map<string, string> = new Map();
 
     static LS(s: string): string {
-        if (s == null)
-            return s;
+        if (s == null) return s;
 
-        if (s.length === 0)
-            return s;
+        if (s.length === 0) return s;
 
         const sm = Locale.localizationMap.get(s);
-        if (sm != null)
-            return sm;
+        if (sm != null) return sm;
 
         // use trailing ~ to differentiate strings that are the same in English but need
         // different translations.
         // remove these if there's no translation.
-        const ix = s.indexOf('~');
-        if (ix !== s.length - 1)
-            return s;
+        const ix = s.indexOf("~");
+        if (ix !== s.length - 1) return s;
 
         s = s.substring(0, ix);
         const sm2 = Locale.localizationMap.get(s);
-        if (sm2 != null)
-            return sm2;
+        if (sm2 != null) return sm2;
 
         return s;
     }
@@ -62,7 +57,9 @@ export class Locale {
                 return region === "US" || (region === "CA" && orCanada);
             }
             return false;
-        } catch (e) { return false; }
+        } catch (e) {
+            return false;
+        }
     }
 
     static weAreInGermany(): boolean {
@@ -70,15 +67,16 @@ export class Locale {
             const languages = navigator.languages;
             const l = (languages && languages.length > 0 ? languages[0] : navigator.language) || "";
             return l.toUpperCase().startsWith("DE");
-        } catch (e) { return false; }
+        } catch (e) {
+            return false;
+        }
     }
 
     // Ported from circuitjs1.java: circuitjs1.language()
     static language(): string {
         const nav = navigator as any;
         if (nav.languages) {
-            if (nav.languages.length > 0)
-                return nav.languages[0];
+            if (nav.languages.length > 0) return nav.languages[0];
             else
                 // Some embedded browsers return an empty navigator.languages
                 return "en-US";
@@ -89,21 +87,20 @@ export class Locale {
 
     // Ported from circuitjs1.java: circuitjs1.convertUnicodeEscapes()
     static convertUnicodeEscapes(input: string): string {
-        if (input.indexOf("\\u") < 0)
-            return input;
+        if (input.indexOf("\\u") < 0) return input;
         let result = "";
         const length = input.length;
         let i = 0;
 
         while (i < length) {
-            if (i + 5 < length && input.charAt(i) === '\\' && input.charAt(i + 1) === 'u') {
+            if (i + 5 < length && input.charAt(i) === "\\" && input.charAt(i + 1) === "u") {
                 // Found a Unicode escape sequence
                 const hexCode = input.substring(i + 2, i + 6);
                 const codePoint = parseIntStrict(hexCode, 16);
                 if (!isNaN(codePoint)) {
                     // Convert hex code to a Unicode character
                     result += String.fromCharCode(codePoint);
-                    i += 6;  // Skip past the escape sequence
+                    i += 6; // Skip past the escape sequence
                 } else {
                     // If the hex code is invalid, append as is
                     result += "\\u" + hexCode;
@@ -124,18 +121,19 @@ export class Locale {
         const lines = data.split(/\r?\n/);
         for (let i = 0; i !== lines.length; i++) {
             let line = lines[i];
-            if (line.length === 0)
-                continue;
+            if (line.length === 0) continue;
             if (line.charAt(0) !== '"') {
                 console.log("ignoring line in string catalog: " + line);
                 continue;
             }
             line = Locale.convertUnicodeEscapes(line);
             const q2 = line.indexOf('"', 1);
-            if ((q2 < 0)
-                || (line.charAt(q2 + 1) !== '=')
-                || (line.charAt(q2 + 2) !== '"')
-                || (line.charAt(line.length - 1) !== '"')) {
+            if (
+                q2 < 0 ||
+                line.charAt(q2 + 1) !== "=" ||
+                line.charAt(q2 + 2) !== '"' ||
+                line.charAt(line.length - 1) !== '"'
+            ) {
                 console.log("ignoring line in string catalog: " + line);
                 continue;
             }
@@ -155,19 +153,15 @@ export class Locale {
             try {
                 stor = window.localStorage;
             } catch (e) {}
-            if (stor != null)
-                lang = stor.getItem("language");
-            if (lang == null)
-                lang = Locale.language();
+            if (stor != null) lang = stor.getItem("language");
+            if (lang == null) lang = Locale.language();
         }
 
         console.log("got language " + lang);
 
         // check for Taiwan Chinese. Otherwise, strip the region code
-        if (lang.toLowerCase() === "zh-tw" || lang.toLowerCase() === "zh-cht")
-            lang = "zh-tw";
-        else
-            lang = lang.replace(/-.*/, "");
+        if (lang.toLowerCase() === "zh-tw" || lang.toLowerCase() === "zh-cht") lang = "zh-tw";
+        else lang = lang.replace(/-.*/, "");
 
         if (lang.startsWith("en")) {
             // no need to load locale file for English

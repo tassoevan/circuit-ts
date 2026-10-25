@@ -24,5 +24,7 @@ export class ACVoltageElm extends VoltageElm {
         super(xx, yy, VoltageElm.WF_AC);
         this.maxVoltage = 120 * Math.sqrt(2);
     }
-    getDumpClass() { return VoltageElm; }
+    getDumpClass() {
+        return VoltageElm;
+    }
 }

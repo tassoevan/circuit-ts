@@ -37,37 +37,53 @@ import { ScrollValuePopup } from "./ScrollValuePopup";
 import { Locale } from "./Locale";
 import { HookRegistry } from "./HookRegistry";
 import {
-    VAL_POWER, VAL_POWER_OLD, VAL_VOLTAGE, VAL_CURRENT,
-    VAL_IB, VAL_IC, VAL_IE, VAL_VBE, VAL_VBC, VAL_VCE,
-    VAL_R, VAL_CHARGE,
-    UNITS_V, UNITS_A, UNITS_W, UNITS_OHMS, UNITS_C, UNITS_COUNT,
-    V_POSITION_STEPS, MIN_MAN_SCALE, multa,
+    VAL_POWER,
+    VAL_POWER_OLD,
+    VAL_VOLTAGE,
+    VAL_CURRENT,
+    VAL_IB,
+    VAL_IC,
+    VAL_IE,
+    VAL_VBE,
+    VAL_VBC,
+    VAL_VCE,
+    VAL_R,
+    VAL_CHARGE,
+    UNITS_V,
+    UNITS_A,
+    UNITS_W,
+    UNITS_OHMS,
+    UNITS_C,
+    UNITS_COUNT,
+    V_POSITION_STEPS,
+    MIN_MAN_SCALE,
+    multa,
 } from "./ScopeConstants";
 
 // also bit positions 25, 26, 27 should not be used because they might be set by old trigger mode code
 
 export class Scope {
-    static readonly VAL_POWER     = VAL_POWER;
+    static readonly VAL_POWER = VAL_POWER;
     static readonly VAL_POWER_OLD = VAL_POWER_OLD;
-    static readonly VAL_VOLTAGE   = VAL_VOLTAGE;
-    static readonly VAL_CURRENT   = VAL_CURRENT;
-    static readonly VAL_IB        = VAL_IB;
-    static readonly VAL_IC        = VAL_IC;
-    static readonly VAL_IE        = VAL_IE;
-    static readonly VAL_VBE       = VAL_VBE;
-    static readonly VAL_VBC       = VAL_VBC;
-    static readonly VAL_VCE       = VAL_VCE;
-    static readonly VAL_R         = VAL_R;
-    static readonly VAL_CHARGE    = VAL_CHARGE;
-    static readonly UNITS_V       = UNITS_V;
-    static readonly UNITS_A       = UNITS_A;
-    static readonly UNITS_W       = UNITS_W;
-    static readonly UNITS_OHMS    = UNITS_OHMS;
-    static readonly UNITS_C       = UNITS_C;
-    static readonly UNITS_COUNT   = UNITS_COUNT;
+    static readonly VAL_VOLTAGE = VAL_VOLTAGE;
+    static readonly VAL_CURRENT = VAL_CURRENT;
+    static readonly VAL_IB = VAL_IB;
+    static readonly VAL_IC = VAL_IC;
+    static readonly VAL_IE = VAL_IE;
+    static readonly VAL_VBE = VAL_VBE;
+    static readonly VAL_VBC = VAL_VBC;
+    static readonly VAL_VCE = VAL_VCE;
+    static readonly VAL_R = VAL_R;
+    static readonly VAL_CHARGE = VAL_CHARGE;
+    static readonly UNITS_V = UNITS_V;
+    static readonly UNITS_A = UNITS_A;
+    static readonly UNITS_W = UNITS_W;
+    static readonly UNITS_OHMS = UNITS_OHMS;
+    static readonly UNITS_C = UNITS_C;
+    static readonly UNITS_COUNT = UNITS_COUNT;
     static readonly multa: number[] = multa;
     static readonly V_POSITION_STEPS = V_POSITION_STEPS;
-    static readonly MIN_MAN_SCALE    = MIN_MAN_SCALE;
+    static readonly MIN_MAN_SCALE = MIN_MAN_SCALE;
 
     scopePointCount: number = 128;
     position: number;
@@ -115,7 +131,7 @@ export class Scope {
     static lastManDivisions: number = 8;
     drawGridLines: boolean = true;
     somethingSelected: boolean = false;
-    exporting: boolean = false;  // drawing for PNG/SVG export; ignore mouse/menu selection
+    exporting: boolean = false; // drawing for PNG/SVG export; ignore mouse/menu selection
 
     trigger: ScopeTrigger = new ScopeTrigger();
 
@@ -171,8 +187,7 @@ export class Scope {
     // check if any plot has the given value (unlike showingValue which checks ALL plots)
     hasPlotValue(v: number): boolean {
         for (let i = 0; i !== this.plots.length; i++) {
-            if (this.plots[i].value === v)
-                return true;
+            if (this.plots[i].value === v) return true;
         }
         return false;
     }
@@ -188,26 +203,38 @@ export class Scope {
             }
         } else {
             for (let i = this.plots.length - 1; i >= 0; i--) {
-                if (this.plots[i].value === val && this.plots.length > 1)
-                    this.plots.splice(i, 1);
+                if (this.plots[i].value === val && this.plots.length > 1) this.plots.splice(i, 1);
             }
         }
         this.calcVisiblePlots();
         this.resetGraph();
     }
 
-    showCharge(b: boolean): void { this.showPlotValue(VAL_CHARGE, b); }
-    showPower(b: boolean): void  { this.showPlotValue(VAL_POWER, b); }
+    showCharge(b: boolean): void {
+        this.showPlotValue(VAL_CHARGE, b);
+    }
+    showPower(b: boolean): void {
+        this.showPlotValue(VAL_POWER, b);
+    }
 
-    showMaxF(b: boolean): void { this.showMax = b; }
-    showScaleF(b: boolean): void { this.showScale = b; }
-    showMinF(b: boolean): void { this.showMin = b; }
-    showP2PF(b: boolean): void { this.showP2P = b; }
-    showFreqF(b: boolean): void { this.showFreq = b; }
+    showMaxF(b: boolean): void {
+        this.showMax = b;
+    }
+    showScaleF(b: boolean): void {
+        this.showScale = b;
+    }
+    showMinF(b: boolean): void {
+        this.showMin = b;
+    }
+    showP2PF(b: boolean): void {
+        this.showP2P = b;
+    }
+    showFreqF(b: boolean): void {
+        this.showFreq = b;
+    }
 
     setManualScale(value: boolean, roundup: boolean): void {
-        if (value !== this.manualScale)
-            this.plot2d.clearView();
+        if (value !== this.manualScale) this.plot2d.clearView();
         this.manualScale = value;
         for (const p of this.plots) {
             if (!p.manScaleSet) {
@@ -218,21 +245,19 @@ export class Scope {
         }
     }
 
-    resetGraph(full: boolean = false): void { this.resetGraphFull(full); }
+    resetGraph(full: boolean = false): void {
+        this.resetGraphFull(full);
+    }
 
     resetGraphFull(full: boolean): void {
         this.scopePointCount = 1;
-        while (this.scopePointCount <= this.rect.width)
-            this.scopePointCount *= 2;
+        while (this.scopePointCount <= this.rect.width) this.scopePointCount *= 2;
         // Double buffer for trigger mode to prevent overwriting displayed data
-        if (this.trigger.isActive())
-            this.scopePointCount *= 2;
-        if (this.plots === null)
-            this.plots = [];
+        if (this.trigger.isActive()) this.scopePointCount *= 2;
+        if (this.plots === null) this.plots = [];
         this.showNegative = false;
         let i;
-        for (i = 0; i !== this.plots.length; i++)
-            this.plots[i].reset(this.scopePointCount, this.speed, full);
+        for (i = 0; i !== this.plots.length; i++) this.plots[i].reset(this.scopePointCount, this.speed, full);
         this.calcVisiblePlots();
         this.scopeTimeStep = this.sim.maxTimeStep;
         this.plot2d.allocImage();
@@ -241,34 +266,36 @@ export class Scope {
     }
 
     setManualScaleValue(plotId: number, d: number): void {
-        if (plotId >= this.visiblePlots.length)
-            return; // Shouldn't happen, but just in case...
+        if (plotId >= this.visiblePlots.length) return; // Shouldn't happen, but just in case...
         this.plot2d.clearView();
         this.visiblePlots[plotId].manScale = d;
         this.visiblePlots[plotId].manScaleSet = true;
     }
 
     getScaleValue(): number {
-        if (this.visiblePlots.length === 0)
-            return 0;
+        if (this.visiblePlots.length === 0) return 0;
         const p = this.visiblePlots[0];
         return this.scale[p.units];
     }
 
     getScaleUnitsText(): string {
-        if (this.visiblePlots.length === 0)
-            return "V";
+        if (this.visiblePlots.length === 0) return "V";
         const p = this.visiblePlots[0];
         return Scope.getScaleUnitsTextStatic(p.units);
     }
 
     static getScaleUnitsTextStatic(units: number): string {
         switch (units) {
-        case UNITS_A: return "A";
-        case UNITS_OHMS: return Locale.ohmString;
-        case UNITS_W: return "W";
-        case UNITS_C: return "C";
-        default: return "V";
+            case UNITS_A:
+                return "A";
+            case UNITS_OHMS:
+                return Locale.ohmString;
+            case UNITS_W:
+                return "W";
+            case UNITS_C:
+                return "C";
+            default:
+                return "V";
         }
     }
 
@@ -276,9 +303,13 @@ export class Scope {
         this.manDivisions = Scope.lastManDivisions = d;
     }
 
-    active(): boolean { return this.plots.length > 0 && this.plots[0].elm !== null; }
+    active(): boolean {
+        return this.plots.length > 0 && this.plots[0].elm !== null;
+    }
 
-    isTriggered(): boolean { return this.trigger.isTriggered(); }
+    isTriggered(): boolean {
+        return this.trigger.isTriggered();
+    }
 
     displayStartIndex(plot: ScopePlot, w: number): number {
         return this.trigger.displayStartIndex(plot, w, this.scopePointCount);
@@ -288,14 +319,18 @@ export class Scope {
         return this.trigger.validDataCount(plot, ipa, w, this.scopePointCount);
     }
 
-    checkTrigger(): void { this.trigger.check(this.visiblePlots, this.plot2d.enabled, this.sim, this.scopePointCount, this.rect.width); }
+    checkTrigger(): void {
+        this.trigger.check(this.visiblePlots, this.plot2d.enabled, this.sim, this.scopePointCount, this.rect.width);
+    }
 
     setTriggerMode(mode: number): void {
         this.trigger.mode = mode;
         this.resetGraph();
     }
 
-    drawTriggerIndicator(g: Graphics): void { this.trigger.drawIndicator(g, this.visiblePlots, this.rect); }
+    drawTriggerIndicator(g: Graphics): void {
+        this.trigger.drawIndicator(g, this.visiblePlots, this.rect);
+    }
 
     initialize(): void {
         this.resetGraph();
@@ -314,10 +349,8 @@ export class Scope {
             let i;
             for (i = 0; i !== this.plots.length; i++) {
                 const plot = this.plots[i];
-                if (plot.units === UNITS_V)
-                    this.showV = true;
-                if (plot.units === UNITS_A)
-                    this.showI = true;
+                if (plot.units === UNITS_V) this.showV = true;
+                if (plot.units === UNITS_A) this.showI = true;
             }
         }
     }
@@ -325,7 +358,9 @@ export class Scope {
     calcVisiblePlots(): void {
         this.visiblePlots = [];
         let i;
-        let vc = 0, ac = 0, oc = 0;
+        let vc = 0,
+            ac = 0,
+            oc = 0;
         if (!this.plot2d.enabled) {
             for (i = 0; i !== this.plots.length; i++) {
                 const plot = this.plots[i];
@@ -344,9 +379,9 @@ export class Scope {
                     plot.assignColor(oc++);
                 }
             }
-        } else { // In 2D mode show all plots so scales can be adjusted for any
-            for (i = 0; i < this.plots.length; i++)
-                this.visiblePlots.push(this.plots[i]);
+        } else {
+            // In 2D mode show all plots so scales can be adjusted for any
+            for (i = 0; i < this.plots.length; i++) this.visiblePlots.push(this.plots[i]);
         }
     }
 
@@ -354,36 +389,33 @@ export class Scope {
         const w = this.rect.width;
         const h = this.rect.height;
         this.rect = r;
-        if (this.rect.width !== w || (this.plot2d.enabled && this.rect.height !== h))
-            this.resetGraph();
+        if (this.rect.width !== w || (this.plot2d.enabled && this.rect.height !== h)) this.resetGraph();
     }
 
-    getWidth(): number { return this.rect.width; }
+    getWidth(): number {
+        return this.rect.width;
+    }
 
-    rightEdge(): number { return this.rect.x + this.rect.width; }
+    rightEdge(): number {
+        return this.rect.x + this.rect.width;
+    }
 
     setElm(ce: CircuitElm | null): void {
         this.plots = [];
-        if (ce !== null && ce.isTransistorElm())
-            this.setValue(VAL_VCE, ce);
-        else
-            this.setValue(0, ce);
+        if (ce !== null && ce.isTransistorElm()) this.setValue(VAL_VCE, ce);
+        else this.setValue(0, ce);
         this.initialize();
     }
 
     addElm(ce: CircuitElm): void {
-        if (ce.isTransistorElm())
-            this.addValue(VAL_VCE, ce);
-        else
-            this.addValue(0, ce);
+        if (ce.isTransistorElm()) this.addValue(VAL_VCE, ce);
+        else this.addValue(0, ce);
     }
 
     setValueNum(val: number): void {
-        if (this.plots.length > 2 || this.plots.length === 0)
-            return;
+        if (this.plots.length > 2 || this.plots.length === 0) return;
         const ce = this.plots[0].elm;
-        if (this.plots.length === 2 && this.plots[1].elm !== ce)
-            return;
+        if (this.plots.length === 2 && this.plots[1].elm !== ce) return;
         this.plot2d.enabled = this.plot2d.plotXY = false;
         this.setValue(val, ce);
     }
@@ -393,22 +425,22 @@ export class Scope {
             this.plots.push(new ScopePlot(ce, UNITS_V, VAL_VOLTAGE, this.getManScaleFromMaxScale(UNITS_V, false)));
 
             // create plot for current if applicable
-            if (ce !== null &&
-                    this.app.menus.dotsCheckItem.getState() &&
-                    !ce.isOutputElm() &&
-                    !ce.isLogicOutputElm() &&
-                    !ce.isAudioOutputElm() &&
-                    !ce.isTestPointElm() &&
-                    !ce.isProbeElm())
+            if (
+                ce !== null &&
+                this.app.menus.dotsCheckItem.getState() &&
+                !ce.isOutputElm() &&
+                !ce.isLogicOutputElm() &&
+                !ce.isAudioOutputElm() &&
+                !ce.isTestPointElm() &&
+                !ce.isProbeElm()
+            )
                 this.plots.push(new ScopePlot(ce, UNITS_A, VAL_CURRENT, this.getManScaleFromMaxScale(UNITS_A, false)));
         } else {
             if (ce === null) return;
             const u = ce.getScopeUnits(val);
             this.plots.push(new ScopePlot(ce, u, val, this.getManScaleFromMaxScale(u, false)));
-            if (u === UNITS_V)
-                this.showV = true;
-            if (u === UNITS_A)
-                this.showI = true;
+            if (u === UNITS_V) this.showV = true;
+            if (u === UNITS_A) this.showI = true;
         }
         this.calcVisiblePlots();
         this.resetGraph();
@@ -427,15 +459,38 @@ export class Scope {
         if (ival > 0) {
             this.plots = [];
             if (ce === null) return;
-            this.plots.push(new ScopePlot(ce, ce.getScopeUnits(val),  val,  this.getManScaleFromMaxScale(ce.getScopeUnits(val), false)));
-            this.plots.push(new ScopePlot(ce, ce.getScopeUnits(ival), ival, this.getManScaleFromMaxScale(ce.getScopeUnits(ival), false)));
+            this.plots.push(
+                new ScopePlot(
+                    ce,
+                    ce.getScopeUnits(val),
+                    val,
+                    this.getManScaleFromMaxScale(ce.getScopeUnits(val), false),
+                ),
+            );
+            this.plots.push(
+                new ScopePlot(
+                    ce,
+                    ce.getScopeUnits(ival),
+                    ival,
+                    this.getManScaleFromMaxScale(ce.getScopeUnits(ival), false),
+                ),
+            );
             return;
         }
         if (yelm !== null) {
             this.plots = [];
             if (ce === null) return;
-            this.plots.push(new ScopePlot(ce,   ce.getScopeUnits(val),  0, this.getManScaleFromMaxScale(ce.getScopeUnits(val), false)));
-            this.plots.push(new ScopePlot(yelm, ce.getScopeUnits(ival), 0, this.getManScaleFromMaxScale(ce.getScopeUnits(val), false)));
+            this.plots.push(
+                new ScopePlot(ce, ce.getScopeUnits(val), 0, this.getManScaleFromMaxScale(ce.getScopeUnits(val), false)),
+            );
+            this.plots.push(
+                new ScopePlot(
+                    yelm,
+                    ce.getScopeUnits(ival),
+                    0,
+                    this.getManScaleFromMaxScale(ce.getScopeUnits(val), false),
+                ),
+            );
             return;
         }
         this.setValueNum(val);
@@ -453,8 +508,7 @@ export class Scope {
         let i;
         for (i = 0; i !== this.plots.length; i++) {
             const sp = this.plots[i];
-            if (sp.value !== v)
-                return false;
+            if (sp.value !== v) return false;
         }
         return true;
     }
@@ -467,10 +521,8 @@ export class Scope {
         let gotv = false;
         for (i = 0; i !== this.plots.length; i++) {
             const sp = this.plots[i];
-            if (sp.value === VAL_VOLTAGE)
-                gotv = true;
-            else if (sp.value !== VAL_CURRENT && sp.value !== VAL_CHARGE)
-                return false;
+            if (sp.value === VAL_VOLTAGE) gotv = true;
+            else if (sp.value !== VAL_CURRENT && sp.value !== VAL_CHARGE) return false;
         }
         return gotv;
     }
@@ -495,11 +547,15 @@ export class Scope {
         let i;
         let lastPlot: ScopePlot | null = null;
         for (i = 0; i !== this.visiblePlots.length; i++) {
-            if (pos >= arr.length)
-                return pos;
+            if (pos >= arr.length) return pos;
             const s = new Scope(this.app, this.sim);
             const sp = this.visiblePlots[i];
-            if (lastPlot !== null && lastPlot.elm === sp.elm && lastPlot.value === VAL_VOLTAGE && sp.value === VAL_CURRENT)
+            if (
+                lastPlot !== null &&
+                lastPlot.elm === sp.elm &&
+                lastPlot.value === VAL_VOLTAGE &&
+                sp.value === VAL_CURRENT
+            )
                 continue;
             s.setValue(sp.value, sp.elm);
             s.position = pos;
@@ -515,8 +571,7 @@ export class Scope {
         if (plot < this.visiblePlots.length) {
             const p = this.visiblePlots[plot];
             const idx = this.plots.indexOf(p);
-            if (idx >= 0)
-                this.plots.splice(idx, 1);
+            if (idx >= 0) this.plots.splice(idx, 1);
             this.calcVisiblePlots();
         }
     }
@@ -524,14 +579,12 @@ export class Scope {
     // called for each timestep
     timeStep(): void {
         let i;
-        for (i = 0; i !== this.plots.length; i++)
-            this.plots[i].timeStep();
+        for (i = 0; i !== this.plots.length; i++) this.plots[i].timeStep();
 
         this.checkTrigger();
 
         // For 2d plots we draw here rather than in the drawing routine
-        if (this.plot2d.enabled)
-            this.plot2d.timeStep();
+        if (this.plot2d.enabled) this.plot2d.timeStep();
     }
 
     /*
@@ -573,10 +626,8 @@ export class Scope {
         const outR45 = 6;
         if (this.showSettingsWheel()) {
             g.context.save();
-            if (this.cursorInSettingsWheel())
-                g.setColor(CircuitElm.selectColor);
-            else
-                g.setColor(Color.dark_gray);
+            if (this.cursorInSettingsWheel()) g.setColor(CircuitElm.selectColor);
+            else g.setColor(Color.dark_gray);
             g.context.translate(this.rect.x + 18, this.rect.y + this.rect.height - 18);
             CircuitElm.drawThickCircle(g, 0, 0, inR);
             CircuitElm.drawThickLine(g, -outR, 0, -inR, 0);
@@ -596,21 +647,21 @@ export class Scope {
     }
 
     cursorInSettingsWheel(): boolean {
-        return this.showSettingsWheel() &&
-                this.app.mouse.mouseCursorX >= this.rect.x &&
-                this.app.mouse.mouseCursorX <= this.rect.x + 36 &&
-                this.app.mouse.mouseCursorY >= this.rect.y + this.rect.height - 36 &&
-                this.app.mouse.mouseCursorY <= this.rect.y + this.rect.height;
+        return (
+            this.showSettingsWheel() &&
+            this.app.mouse.mouseCursorX >= this.rect.x &&
+            this.app.mouse.mouseCursorX <= this.rect.x + 36 &&
+            this.app.mouse.mouseCursorY >= this.rect.y + this.rect.height - 36 &&
+            this.app.mouse.mouseCursorY <= this.rect.y + this.rect.height
+        );
     }
 
     // does another scope have something selected?
     checkForSelectionElsewhere(): void {
         // if mouse is here, then selection is already set by checkForSelection()
-        if (Scope.cursorScope === this)
-            return;
+        if (Scope.cursorScope === this) return;
         // don't hijack the plot being dragged
-        if (this.draggingPlotY)
-            return;
+        if (this.draggingPlotY) return;
 
         if (Scope.cursorScope === null || this.visiblePlots.length === 0) {
             this.selectedPlot = -1;
@@ -631,13 +682,14 @@ export class Scope {
         this.selectedPlot = 0;
     }
 
-    draw(g: Graphics): void { this.drawImpl(g, false); }
+    draw(g: Graphics): void {
+        this.drawImpl(g, false);
+    }
 
     // forExport suppresses mouse-driven UI chrome (settings wheel, selection highlight
     // wash, cursor readout) that shouldn't appear in an exported PNG/SVG
     private drawImpl(g: Graphics, forExport: boolean): void {
-        if (this.plots.length === 0)
-            return;
+        if (this.plots.length === 0) return;
 
         // reset if timestep changed
         if (this.scopeTimeStep !== this.sim.maxTimeStep) {
@@ -650,8 +702,7 @@ export class Scope {
             return;
         }
 
-        if (!forExport)
-            this.drawSettingsWheel(g);
+        if (!forExport) this.drawSettingsWheel(g);
         g.context.save();
         g.setColor(Color.red);
         g.context.translate(this.rect.x, this.rect.y);
@@ -665,17 +716,21 @@ export class Scope {
         let i;
         for (i = 0; i !== UNITS_COUNT; i++) {
             this.reduceRange[i] = false;
-            if (this.maxScale && !this.manualScale)
-                this.scale[i] = 1e-4;
+            if (this.maxScale && !this.manualScale) this.scale[i] = 1e-4;
         }
 
         let si;
-        this.somethingSelected = false;  // is one of our plots selected?
+        this.somethingSelected = false; // is one of our plots selected?
 
         for (si = 0; si !== this.visiblePlots.length; si++) {
             const plot = this.visiblePlots[si];
             this.calcPlotScale(plot);
-            if (this.app.scopeManager.scopeSelected === -1 && plot.elm !== null && plot.elm.isMouseElm() && !this.exporting)
+            if (
+                this.app.scopeManager.scopeSelected === -1 &&
+                plot.elm !== null &&
+                plot.elm.isMouseElm() &&
+                !this.exporting
+            )
                 this.somethingSelected = true;
             this.reduceRange[plot.units] = true;
         }
@@ -684,10 +739,8 @@ export class Scope {
 
         const somethingSelectedHere = this.somethingSelected;
 
-        if (!this.exporting)
-            this.checkForSelectionElsewhere();
-        if (this.selectedPlot >= 0)
-            this.somethingSelected = true;
+        if (!this.exporting) this.checkForSelectionElsewhere();
+        if (this.selectedPlot >= 0) this.somethingSelected = true;
 
         if (!forExport && (somethingSelectedHere || sel)) {
             g.context.save();
@@ -696,14 +749,12 @@ export class Scope {
             g.fillRect(0, 0, this.rect.width, this.rect.height);
             g.context.restore();
         }
-        if (this.getSingleElm() !== null)
-            this.somethingSelected = false;
+        if (this.getSingleElm() !== null) this.somethingSelected = false;
 
         this.drawGridLines = true;
         let allPlotsSameUnits = true;
         for (i = 1; i < this.visiblePlots.length; i++) {
-            if (this.visiblePlots[i].units !== this.visiblePlots[0].units)
-                allPlotsSameUnits = false; // Don't draw horizontal grid lines unless all plots are in same units
+            if (this.visiblePlots[i].units !== this.visiblePlots[0].units) allPlotsSameUnits = false; // Don't draw horizontal grid lines unless all plots are in same units
         }
 
         if ((allPlotsSameUnits || this.showMax || this.showMin || this.showP2P) && this.visiblePlots.length > 0)
@@ -731,17 +782,13 @@ export class Scope {
 
         g.restore();
 
-        if (!forExport)
-            this.drawCursor(g);
+        if (!forExport) this.drawCursor(g);
 
         if (this.plots[0].ptr > 5 && !this.manualScale) {
-            for (i = 0; i !== UNITS_COUNT; i++)
-                if (this.scale[i] > 1e-4 && this.reduceRange[i])
-                    this.scale[i] /= 2;
+            for (i = 0; i !== UNITS_COUNT; i++) if (this.scale[i] > 1e-4 && this.reduceRange[i]) this.scale[i] /= 2;
         }
 
-        if (this.properties !== null && this.properties.isShowing())
-            this.properties.refreshDraw();
+        if (this.properties !== null && this.properties.isShowing()) this.properties.refreshDraw();
     }
 
     // calculate maximum and minimum values for all plots of given units
@@ -749,42 +796,34 @@ export class Scope {
         this.maxValue = -1e8;
         this.minValue = 1e8;
         for (const plot of this.visiblePlots) {
-            if (plot.units !== units)
-                continue;
+            if (plot.units !== units) continue;
             const ipa = this.displayStartIndex(plot, this.rect.width);
             const validCount = this.validDataCount(plot, ipa, this.rect.width);
             const sdi = new ScopeDataIterator(this.scopePointCount, ipa, validCount, plot);
             for (const i of sdi) {
-                if (sdi.getMax() > this.maxValue)
-                    this.maxValue = sdi.getMax();
-                if (sdi.getMin() < this.minValue)
-                    this.minValue = sdi.getMin();
+                if (sdi.getMax() > this.maxValue) this.maxValue = sdi.getMax();
+                if (sdi.getMin() < this.minValue) this.minValue = sdi.getMin();
             }
         }
     }
 
     // adjust scale of a plot
     calcPlotScale(plot: ScopePlot): void {
-        if (this.manualScale)
-            return;
+        if (this.manualScale) return;
         let max = 0;
         let gridMax = this.scale[plot.units];
         const ipa = this.displayStartIndex(plot, this.rect.width);
         const validCount = this.validDataCount(plot, ipa, this.rect.width);
         const sdi = new ScopeDataIterator(this.scopePointCount, ipa, validCount, plot);
         for (const i of sdi) {
-            if (sdi.getMax() > max)
-                max = sdi.getMax();
-            if (sdi.getMin() < -max)
-                max = -sdi.getMin();
+            if (sdi.getMax() > max) max = sdi.getMax();
+            if (sdi.getMin() < -max) max = -sdi.getMin();
         }
         // scale fixed at maximum?
-        if (this.maxScale)
-            gridMax = Math.max(max, gridMax);
+        if (this.maxScale) gridMax = Math.max(max, gridMax);
         else
             // adjust in powers of two
-            while (max > gridMax)
-                gridMax *= 2;
+            while (max > gridMax) gridMax *= 2;
         this.scale[plot.units] = gridMax;
     }
 
@@ -794,13 +833,13 @@ export class Scope {
 
         const ts = this.sim.maxTimeStep * this.speed;
         while (gsx < ts * 20) {
-            gsx *= multa[(multptr++) % 3];
+            gsx *= multa[multptr++ % 3];
         }
         return gsx;
     }
 
     getGridMaxFromManScale(plot: ScopePlot): number {
-        return ((this.manDivisions) / 2 + 0.05) * plot.manScale;
+        return (this.manDivisions / 2 + 0.05) * plot.manScale;
     }
 
     // Compute grid display parameters for a plot. Sets plot.plotOffset, plot.gridMult,
@@ -826,16 +865,15 @@ export class Scope {
                     this.showNegative = true;
                 }
                 gridMid = (mx + mn) * 0.5;
-                gridMax = (mx - mn) * 0.55;  // leave space at top and bottom
+                gridMax = (mx - mn) * 0.55; // leave space at top and bottom
             }
             this.gridStepY = 1e-8;
             let multptr = 0;
-            while (this.gridStepY < 20 * gridMax / maxy)
-                this.gridStepY *= multa[(multptr++) % 3];
+            while (this.gridStepY < (20 * gridMax) / maxy) this.gridStepY *= multa[multptr++ % 3];
         } else {
             gridMid = 0;
             gridMax = this.getGridMaxFromManScale(plot);
-            positionOffset = gridMax * 2.0 * (plot.manVPosition) / (V_POSITION_STEPS);
+            positionOffset = (gridMax * 2.0 * plot.manVPosition) / V_POSITION_STEPS;
             this.gridStepY = plot.manScale;
         }
         plot.gridStepY = this.gridStepY;
@@ -844,7 +882,13 @@ export class Scope {
         return gridMid;
     }
 
-    drawHVGridLines(g: Graphics, plot: ScopePlot, gridMid: number, allPlotsSameUnits: boolean, allSelected: boolean): void {
+    drawHVGridLines(
+        g: Graphics,
+        plot: ScopePlot,
+        gridMid: number,
+        allPlotsSameUnits: boolean,
+        allSelected: boolean,
+    ): void {
         const maxy = Math.trunc((this.rect.height - 1) / 2);
         let minorDiv = "#404040";
         let majorDiv = "#A0A0A0";
@@ -853,49 +897,48 @@ export class Scope {
             majorDiv = "#808080";
             this.curColor = "#A0A000";
         }
-        if (allSelected)
-            majorDiv = CircuitElm.selectColor.getHexValue();
+        if (allSelected) majorDiv = CircuitElm.selectColor.getHexValue();
         const highlightCenter = !this.isManualScale();
 
         // horizontal gridlines; only show non-center lines if units are unambiguous
-        const showHGridLines = (this.gridStepY !== 0) && (this.isManualScale() || allPlotsSameUnits);
+        const showHGridLines = this.gridStepY !== 0 && (this.isManualScale() || allPlotsSameUnits);
         for (let ll = -100; ll <= 100; ll++) {
-            if (ll !== 0 && !showHGridLines)
-                continue;
+            if (ll !== 0 && !showHGridLines) continue;
             const yl = maxy - (ll * this.gridStepY - gridMid) * plot.gridMult;
-            if (yl < 0 || yl >= this.rect.height - 1)
-                continue;
+            if (yl < 0 || yl >= this.rect.height - 1) continue;
             g.setColor(ll === 0 && highlightCenter ? majorDiv : minorDiv);
             g.drawLine(0, yl, this.rect.width - 1, yl);
         }
 
         // vertical (time) gridlines
         const ts = this.sim.maxTimeStep * this.speed;
-        const tRight = this.isTriggered() ? this.trigger.time + ts * this.rect.width / 2 : this.sim.t;
+        const tRight = this.isTriggered() ? this.trigger.time + (ts * this.rect.width) / 2 : this.sim.t;
         const tstart = tRight - ts * this.rect.width;
         const tx = tRight - (tRight % this.gridStepX);
         for (let ll = 0; ; ll++) {
             const tl = tx - this.gridStepX * ll;
             const gx = Math.trunc((tl - tstart) / ts);
-            if (gx < 0)
-                break;
-            if (gx >= this.rect.width || tl < 0)
-                continue;
-            g.setColor(((tl + this.gridStepX / 4) % (this.gridStepX * 10)) < this.gridStepX ? majorDiv : minorDiv);
+            if (gx < 0) break;
+            if (gx >= this.rect.width || tl < 0) continue;
+            g.setColor((tl + this.gridStepX / 4) % (this.gridStepX * 10) < this.gridStepX ? majorDiv : minorDiv);
             g.drawLine(gx, 0, gx, this.rect.height - 1);
         }
     }
 
     drawPlot(g: Graphics, plot: ScopePlot, allPlotsSameUnits: boolean, selected: boolean, allSelected: boolean): void {
-        if (plot.elm === null)
-            return;
+        if (plot.elm === null) return;
         const maxy = Math.trunc((this.rect.height - 1) / 2);
 
-        let color = (this.somethingSelected) ? "#A0A0A0" : plot.color;
-        if (allSelected || (this.app.scopeManager.scopeSelected === -1 && this.getSingleElm() === null && plot.elm.isMouseElm() && !this.exporting))
+        let color = this.somethingSelected ? "#A0A0A0" : plot.color;
+        if (
+            allSelected ||
+            (this.app.scopeManager.scopeSelected === -1 &&
+                this.getSingleElm() === null &&
+                plot.elm.isMouseElm() &&
+                !this.exporting)
+        )
             color = CircuitElm.selectColor.getHexValue();
-        else if (selected)
-            color = plot.color;
+        else if (selected) color = plot.color;
 
         const ipa = this.displayStartIndex(plot, this.rect.width);
         const maxV = plot.maxValues;
@@ -907,8 +950,7 @@ export class Scope {
         let curMinRangeLo = minRangeLo;
 
         this.gridStepX = this.calcGridStepX();
-        if (this.drawGridLines)
-            this.drawHVGridLines(g, plot, gridMid, allPlotsSameUnits, allSelected);
+        if (this.drawGridLines) this.drawHVGridLines(g, plot, gridMid, allPlotsSameUnits, allSelected);
         this.drawGridLines = false;
 
         g.setColor(color);
@@ -921,7 +963,8 @@ export class Scope {
         // In triggered mode, only draw up to the current write pointer.
         // Data beyond that is stale (old circular buffer contents).
         const drawWidth = this.validDataCount(plot, ipa, this.rect.width);
-        let ox = -1, oy = -1;
+        let ox = -1,
+            oy = -1;
         let i;
         for (i = 0; i !== drawWidth; i++) {
             const ip = (i + ipa) & (this.scopePointCount - 1);
@@ -935,8 +978,7 @@ export class Scope {
                     minRangeHi = 1000;
                 }
                 if (ox !== -1) {
-                    if (minvy === oy && maxvy === oy)
-                        continue;
+                    if (minvy === oy && maxvy === oy) continue;
                     g.drawLine(ox, maxy - oy, i, maxy - oy);
                     ox = oy = -1;
                 }
@@ -948,8 +990,7 @@ export class Scope {
                 g.drawLine(i, maxy - minvy, i, maxy - maxvy);
             }
         }
-        if (ox !== -1)
-            g.drawLine(ox, maxy - oy, i - 1, maxy - oy);
+        if (ox !== -1) g.drawLine(ox, maxy - oy, i - 1, maxy - oy);
     }
 
     static clearCursorInfo(): void {
@@ -960,35 +1001,27 @@ export class Scope {
     mouseXToTime(mouseX: number): number {
         if (this.isTriggered())
             return this.trigger.time + this.sim.maxTimeStep * this.speed * (mouseX - this.rect.x - this.rect.width / 2);
-        else
-            return this.sim.t - this.sim.maxTimeStep * this.speed * (this.rect.x + this.rect.width - mouseX);
+        else return this.sim.t - this.sim.maxTimeStep * this.speed * (this.rect.x + this.rect.width - mouseX);
     }
 
     selectScope(mouseX: number, mouseY: number): void {
-        if (!this.rect.contains(mouseX, mouseY))
-            return;
-        if (this.plot2d.enabled || this.visiblePlots.length === 0)
-            Scope.cursorTime = -1;
-        else
-            Scope.cursorTime = this.mouseXToTime(mouseX);
+        if (!this.rect.contains(mouseX, mouseY)) return;
+        if (this.plot2d.enabled || this.visiblePlots.length === 0) Scope.cursorTime = -1;
+        else Scope.cursorTime = this.mouseXToTime(mouseX);
         this.checkForSelection(mouseX, mouseY);
         Scope.cursorScope = this;
     }
 
     mousePressed(mouseX: number, mouseY: number): void {
-        if (!this.rect.contains(mouseX, mouseY))
-            return;
-        if (this.plot2d.enabled || this.fftPlot.enabled || this.visiblePlots.length === 0)
-            return;
+        if (!this.rect.contains(mouseX, mouseY)) return;
+        if (this.plot2d.enabled || this.fftPlot.enabled || this.visiblePlots.length === 0) return;
         Scope.dragStartTime = this.mouseXToTime(mouseX);
     }
 
     // find selected plot
     checkForSelection(mouseX: number, mouseY: number): void {
-        if (this.app.modalDialogIsShowing())
-            return;
-        if (this.draggingPlotY)
-            return;
+        if (this.app.modalDialogIsShowing()) return;
+        if (this.draggingPlotY) return;
         if (!this.rect.contains(mouseX, mouseY)) {
             this.selectedPlot = -1;
             return;
@@ -1014,61 +1047,61 @@ export class Scope {
             }
         }
         this.selectedPlot = best;
-        if (this.selectedPlot >= 0)
-            Scope.cursorUnits = this.visiblePlots[this.selectedPlot].units;
+        if (this.selectedPlot >= 0) Scope.cursorUnits = this.visiblePlots[this.selectedPlot].units;
     }
 
     timeToX(t: number): number {
         if (this.isTriggered())
-            return Math.trunc(this.rect.x + this.rect.width / 2 + (t - this.trigger.time) / (this.sim.maxTimeStep * this.speed));
-        else
-            return -Math.trunc((this.sim.t - t) / (this.sim.maxTimeStep * this.speed) - this.rect.x - this.rect.width);
+            return Math.trunc(
+                this.rect.x + this.rect.width / 2 + (t - this.trigger.time) / (this.sim.maxTimeStep * this.speed),
+            );
+        else return -Math.trunc((this.sim.t - t) / (this.sim.maxTimeStep * this.speed) - this.rect.x - this.rect.width);
     }
 
     // draw a dot on the selected plot at pixel x; return the plot value there, or NaN if out of range
     drawPlotDot(g: Graphics, plot: ScopePlot, x: number): number {
-        if (x < this.rect.x || x >= this.rect.x + this.rect.width)
-            return NaN;
+        if (x < this.rect.x || x >= this.rect.x + this.rect.width) return NaN;
         const ipa = this.displayStartIndex(this.plots[0], this.rect.width);
         const ip = (x - this.rect.x + ipa) & (this.scopePointCount - 1);
         const value = plot.maxValues[ip];
         const vy = plot.gridMult * (value + plot.plotOffset);
         const dotY = this.rect.y + Math.trunc((this.rect.height - 1) / 2) - vy;
         g.setColor(plot.color);
-        if (dotY >= this.rect.y && dotY < this.rect.y + this.rect.height)
-            g.fillOval(x - 2, dotY - 2, 5, 5);
+        if (dotY >= this.rect.y && dotY < this.rect.y + this.rect.height) g.fillOval(x - 2, dotY - 2, 5, 5);
         return value;
     }
 
     drawCursor(g: Graphics): void {
-        if (this.app.modalDialogIsShowing())
-            return;
-        if (Scope.cursorScope === null)
-            return;
+        if (this.app.modalDialogIsShowing()) return;
+        if (Scope.cursorScope === null) return;
         const info: (string | null)[] = new Array(7).fill(null);
         let cursorX = -1;
         let ct = 0;
         let cursorValue = NaN;
-        const plot = this.visiblePlots.length > 0 ? this.visiblePlots[this.selectedPlot >= 0 ? this.selectedPlot : 0] : null;
+        const plot =
+            this.visiblePlots.length > 0 ? this.visiblePlots[this.selectedPlot >= 0 ? this.selectedPlot : 0] : null;
         if (Scope.cursorTime >= 0) {
             cursorX = this.timeToX(Scope.cursorTime);
             if (plot !== null) {
                 cursorValue = this.drawPlotDot(g, plot, cursorX);
-                if (Scope.dragStartTime < 0 && !isNaN(cursorValue))
-                    info[ct++] = plot.getUnitText(cursorValue);
+                if (Scope.dragStartTime < 0 && !isNaN(cursorValue)) info[ct++] = plot.getUnitText(cursorValue);
             }
         }
 
         // show FFT even if there's no plots (in which case cursorTime/cursorX will be invalid)
         if (this.fftPlot.enabled && Scope.cursorScope === this) {
-            if (cursorX < 0)
-                cursorX = this.app.mouse.mouseCursorX;
+            if (cursorX < 0) cursorX = this.app.mouse.mouseCursorX;
             ct = this.fftPlot.addCursorInfo(info as string[], ct, this.app.mouse.mouseCursorX);
-        } else if (cursorX < this.rect.x)
-            return;
+        } else if (cursorX < this.rect.x) return;
 
         // draw drag-start cursor and delta readout
-        if (Scope.dragStartTime >= 0 && Scope.cursorScope === this && plot !== null && !this.plot2d.enabled && !this.fftPlot.enabled) {
+        if (
+            Scope.dragStartTime >= 0 &&
+            Scope.cursorScope === this &&
+            plot !== null &&
+            !this.plot2d.enabled &&
+            !this.fftPlot.enabled
+        ) {
             const dragX = this.timeToX(Scope.dragStartTime);
             if (dragX >= this.rect.x && dragX < this.rect.x + this.rect.width) {
                 g.setColor(CircuitElm.lightGrayColor);
@@ -1083,8 +1116,7 @@ export class Scope {
             }
         }
 
-        if (this.visiblePlots.length > 0)
-            info[ct++] = CircuitElm.getTimeText(Scope.cursorTime);
+        if (this.visiblePlots.length > 0) info[ct++] = CircuitElm.getTimeText(Scope.cursorTime);
 
         if (Scope.cursorScope !== this) {
             // don't show cursor info if not enough room, or stacked with selected one
@@ -1098,24 +1130,28 @@ export class Scope {
     }
 
     drawCursorInfo(g: Graphics, info: string[] | null, ct: number, x: number, drawY: boolean): void {
-        let szw = 0, szh = 15 * ct;
+        let szw = 0,
+            szh = 15 * ct;
         let i;
         if (info !== null) {
             for (i = 0; i !== ct; i++) {
                 const w = g.context.measureText(info[i]).width;
-                if (w > szw)
-                    szw = w;
+                if (w > szw) szw = w;
             }
         }
 
         g.setColor(CircuitElm.whiteColor);
         g.drawLine(x, this.rect.y, x, this.rect.y + this.rect.height);
         if (drawY)
-            g.drawLine(this.rect.x, this.app.mouse.mouseCursorY, this.rect.x + this.rect.width, this.app.mouse.mouseCursorY);
+            g.drawLine(
+                this.rect.x,
+                this.app.mouse.mouseCursorY,
+                this.rect.x + this.rect.width,
+                this.app.mouse.mouseCursorY,
+            );
         g.setColor(this.app.isPrintable() ? Color.white : Color.black);
         let bx = x;
-        if (bx < szw / 2)
-            bx = szw / 2;
+        if (bx < szw / 2) bx = szw / 2;
         g.fillRect(bx - szw / 2, this.rect.y - szh, szw, szh);
         if (info !== null) {
             g.setColor(CircuitElm.whiteColor);
@@ -1127,10 +1163,9 @@ export class Scope {
     }
 
     canShowRMS(): boolean {
-        if (this.visiblePlots.length === 0)
-            return false;
+        if (this.visiblePlots.length === 0) return false;
         const plot = this.visiblePlots[0];
-        return (plot.units === UNITS_V || plot.units === UNITS_A);
+        return plot.units === UNITS_V || plot.units === UNITS_A;
     }
 
     drawInfoText(g: Graphics, text: string): void {
@@ -1139,20 +1174,16 @@ export class Scope {
 
     getScopeText(): string | null {
         // multiple elms?  don't show text (unless one is selected)
-        if (this.selectedPlot < 0 && this.getSingleElm() === null)
-            return null;
+        if (this.selectedPlot < 0 && this.getSingleElm() === null) return null;
 
         // no visible plots?
-        if (this.visiblePlots.length === 0)
-            return null;
+        if (this.visiblePlots.length === 0) return null;
 
         let plot = this.visiblePlots[0];
         if (this.selectedPlot >= 0 && this.visiblePlots.length > this.selectedPlot)
             plot = this.visiblePlots[this.selectedPlot];
-        if (plot.elm === null)
-            return "";
-        else
-            return plot.elm.getScopeText(plot.value);
+        if (plot.elm === null) return "";
+        else return plot.elm.getScopeText(plot.value);
     }
 
     getScopeLabelOrText(): string;
@@ -1163,21 +1194,16 @@ export class Scope {
         if (t === null) {
             // if we're drawing the info and showElmInfo is true, return null so we don't print redundant info.
             // But don't do that if we're getting the scope label to generate "Add to Existing Scope" menu.
-            if (fi && this.showElmInfo)
-                return "";
+            if (fi && this.showElmInfo) return "";
             t = this.getScopeText();
-            if (t === null)
-                return "";
+            if (t === null) return "";
             return Locale.LS(t);
-        } else
-            return t;
+        } else return t;
     }
 
     setSpeed(sp: number): void {
-        if (sp < 1)
-            sp = 1;
-        if (sp > 1024)
-            sp = 1024;
+        if (sp < 1) sp = 1;
+        if (sp > 1024) sp = 1024;
         this.speed = sp;
         this.resetGraph();
     }
@@ -1188,16 +1214,15 @@ export class Scope {
     }
 
     exportCSV(): void {
-        if (this.visiblePlots.length === 0)
-            return;
+        if (this.visiblePlots.length === 0) return;
         let sb = "time";
         let i;
         for (i = 0; i !== this.visiblePlots.length; i++) {
             const plot = this.visiblePlots[i];
             const name = plot.elm !== null ? plot.elm.getClassName().replace("Elm", "") : "unknown";
             const unit = Scope.getScaleUnitsTextStatic(plot.units);
-            sb += ",\"" + name + " " + unit + " min\"";
-            sb += ",\"" + name + " " + unit + " max\"";
+            sb += ',"' + name + " " + unit + ' min"';
+            sb += ',"' + name + " " + unit + ' max"';
         }
         sb += "\n";
         // all visible plots share the same scopePointCount and speed
@@ -1208,8 +1233,7 @@ export class Scope {
         const ipa = plot0.startIndex(w);
         for (i = 0; i !== w; i++) {
             const t = tStart + ts * i;
-            if (t < 0)
-                continue;
+            if (t < 0) continue;
             sb += t;
             let j;
             for (j = 0; j !== this.visiblePlots.length; j++) {
@@ -1224,9 +1248,9 @@ export class Scope {
     }
 
     static downloadCSV(data: string, filename: string): void {
-        const blob = new Blob([data], { type: 'text/csv' });
+        const blob = new Blob([data], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
@@ -1243,10 +1267,10 @@ export class Scope {
     exportPNG(transparent: boolean = false): void {
         // render at the display's pixel density so the PNG is as sharp as the on-screen scope
         const scale = window.devicePixelRatio || 1;
-        const cv = document.createElement('canvas');
+        const cv = document.createElement("canvas");
         cv.width = Math.round(this.rect.width * scale);
         cv.height = Math.round(this.rect.height * scale);
-        const context = cv.getContext('2d') as CanvasRenderingContext2D;
+        const context = cv.getContext("2d") as CanvasRenderingContext2D;
         context.scale(scale, scale);
         this.drawForExport(context, transparent);
         Scope.downloadDataURL(cv.toDataURL(), "scope.png");
@@ -1269,10 +1293,8 @@ export class Scope {
             // match the on-screen background: docked scopes (position >= 0) sit in the
             // bottom area, drawn #eee/#111 in UIManager.drawBottomArea(); embedded scope
             // elements (position == -1) are drawn on the main canvas background
-            if (this.position >= 0)
-                g.setColor(this.app.isPrintable() ? "#eee" : "#111");
-            else
-                g.setColor(this.app.isPrintable() ? Color.white : Color.black);
+            if (this.position >= 0) g.setColor(this.app.isPrintable() ? "#eee" : "#111");
+            else g.setColor(this.app.isPrintable() ? Color.white : Color.black);
             g.fillRect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
         }
         // draw all plots in their own colors (as if the mouse weren't over the scope),
@@ -1289,7 +1311,7 @@ export class Scope {
     }
 
     static downloadDataURL(dataURL: string, filename: string): void {
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = dataURL;
         a.download = filename;
         document.body.appendChild(a);
@@ -1298,9 +1320,9 @@ export class Scope {
     }
 
     static downloadSVG(data: string, filename: string): void {
-        const blob = new Blob([data], { type: 'image/svg+xml' });
+        const blob = new Blob([data], { type: "image/svg+xml" });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
@@ -1317,8 +1339,7 @@ export class Scope {
     }
 
     slowDown(): void {
-        if (this.speed < 1024)
-            this.speed *= 2;
+        if (this.speed < 1024) this.speed *= 2;
         this.resetGraph();
     }
 
@@ -1328,8 +1349,7 @@ export class Scope {
 
     // start dragging the currently selected plot up/down (manual scale mode only)
     startDragPlotY(mouseX: number, mouseY: number): boolean {
-        if (!this.rect.contains(mouseX, mouseY))
-            return false;
+        if (!this.rect.contains(mouseX, mouseY)) return false;
         if (!this.isManualScale() || this.selectedPlot < 0 || this.selectedPlot >= this.visiblePlots.length)
             return false;
         this.draggingPlotY = true;
@@ -1340,18 +1360,16 @@ export class Scope {
     }
 
     dragPlotY(mouseY: number): void {
-        if (this.selectedPlot < 0 || this.selectedPlot >= this.visiblePlots.length)
-            return;
+        if (this.selectedPlot < 0 || this.selectedPlot >= this.visiblePlots.length) return;
         const maxy = Math.max(1, Math.trunc((this.rect.height - 1) / 2));
         const dy = mouseY - this.dragPlotYMouseStart;
-        let newPos = this.dragPlotYInitialPosition - Math.round(dy * V_POSITION_STEPS / (2.0 * maxy));
+        let newPos = this.dragPlotYInitialPosition - Math.round((dy * V_POSITION_STEPS) / (2.0 * maxy));
         newPos = Math.max(-V_POSITION_STEPS, Math.min(V_POSITION_STEPS, newPos));
         this.visiblePlots[this.selectedPlot].manVPosition = newPos;
     }
 
     static endDragPlotY(): void {
-        if (Scope.draggingPlotYScope != null)
-            Scope.draggingPlotYScope.draggingPlotY = false;
+        if (Scope.draggingPlotYScope != null) Scope.draggingPlotYScope.draggingPlotY = false;
         Scope.draggingPlotYScope = null;
     }
 
@@ -1360,14 +1378,13 @@ export class Scope {
         const elm = this.plots[0].elm;
         let i;
         for (i = 1; i < this.plots.length; i++) {
-            if (this.plots[i].elm !== elm)
-                return null;
+            if (this.plots[i].elm !== elm) return null;
         }
         return elm;
     }
 
     canMenu(): boolean {
-        return (this.plots[0].elm !== null);
+        return this.plots[0].elm !== null;
     }
 
     canShowResistance(): boolean {
@@ -1376,59 +1393,50 @@ export class Scope {
     }
 
     isShowingVceAndIc(): boolean {
-        return this.plot2d.enabled && this.plots.length === 2 && this.plots[0].value === VAL_VCE && this.plots[1].value === VAL_IC;
+        return (
+            this.plot2d.enabled &&
+            this.plots.length === 2 &&
+            this.plots[0].value === VAL_VCE &&
+            this.plots[1].value === VAL_IC
+        );
     }
 
-    dumpXml(doc: Document, root: Element): void { this.serializer.dumpXml(doc, root); }
-    undumpXml(xml: CircuitXMLDeserializer): void { this.serializer.undumpXml(xml); }
-    undump(st: StringTokenizer): void { this.serializer.undump(st); }
-    saveAsDefault(): void { this.serializer.saveAsDefault(); }
+    dumpXml(doc: Document, root: Element): void {
+        this.serializer.dumpXml(doc, root);
+    }
+    undumpXml(xml: CircuitXMLDeserializer): void {
+        this.serializer.undumpXml(xml);
+    }
+    undump(st: StringTokenizer): void {
+        this.serializer.undump(st);
+    }
+    saveAsDefault(): void {
+        this.serializer.saveAsDefault();
+    }
 
     handleMenu(mi: string, state: boolean): void {
-        if (mi === "maxscale")
-            this.maxScaleToggle();
-        if (mi === "showvoltage")
-            this.showVoltage(state);
-        if (mi === "showcurrent")
-            this.showCurrent(state);
-        if (mi === "showscale")
-            this.showScaleF(state);
-        if (mi === "showpeak")
-            this.showMaxF(state);
-        if (mi === "shownegpeak")
-            this.showMinF(state);
-        if (mi === "showp2p")
-            this.showP2PF(state);
-        if (mi === "showfreq")
-            this.showFreqF(state);
-        if (mi === "showfft")
-            this.fftPlot.show(state);
-        if (mi === "logspectrum")
-            this.fftPlot.logSpectrum = state;
-        if (mi === "showrms")
-            this.showRMS = state;
-        if (mi === "showaverage")
-            this.showAverage = state;
-        if (mi === "showduty")
-            this.showDutyCycle = state;
-        if (mi === "showphaseangle")
-            this.fftPlot.showPhaseAngle = state;
-        if (mi === "showelminfo")
-            this.showElmInfo = state;
-        if (mi === "showpower")
-            this.showPower(state);
-        if (mi === "showib")
-            this.showPlotValue(VAL_IB, state);
-        if (mi === "showic")
-            this.showPlotValue(VAL_IC, state);
-        if (mi === "showie")
-            this.showPlotValue(VAL_IE, state);
-        if (mi === "showvbe")
-            this.showPlotValue(VAL_VBE, state);
-        if (mi === "showvbc")
-            this.showPlotValue(VAL_VBC, state);
-        if (mi === "showvce")
-            this.showPlotValue(VAL_VCE, state);
+        if (mi === "maxscale") this.maxScaleToggle();
+        if (mi === "showvoltage") this.showVoltage(state);
+        if (mi === "showcurrent") this.showCurrent(state);
+        if (mi === "showscale") this.showScaleF(state);
+        if (mi === "showpeak") this.showMaxF(state);
+        if (mi === "shownegpeak") this.showMinF(state);
+        if (mi === "showp2p") this.showP2PF(state);
+        if (mi === "showfreq") this.showFreqF(state);
+        if (mi === "showfft") this.fftPlot.show(state);
+        if (mi === "logspectrum") this.fftPlot.logSpectrum = state;
+        if (mi === "showrms") this.showRMS = state;
+        if (mi === "showaverage") this.showAverage = state;
+        if (mi === "showduty") this.showDutyCycle = state;
+        if (mi === "showphaseangle") this.fftPlot.showPhaseAngle = state;
+        if (mi === "showelminfo") this.showElmInfo = state;
+        if (mi === "showpower") this.showPower(state);
+        if (mi === "showib") this.showPlotValue(VAL_IB, state);
+        if (mi === "showic") this.showPlotValue(VAL_IC, state);
+        if (mi === "showie") this.showPlotValue(VAL_IE, state);
+        if (mi === "showvbe") this.showPlotValue(VAL_VBE, state);
+        if (mi === "showvbc") this.showPlotValue(VAL_VBC, state);
+        if (mi === "showvce") this.showPlotValue(VAL_VCE, state);
         if (mi === "showvcevsic") {
             this.plot2d.enabled = true;
             this.plot2d.plotXY = false;
@@ -1441,46 +1449,44 @@ export class Scope {
             this.plot2d.plotXY = false;
             this.resetGraph();
         }
-        if (mi === "manualscale")
-            this.setManualScale(state, true);
+        if (mi === "manualscale") this.setManualScale(state, true);
         if (mi === "plotxy") {
             this.plot2d.plotXY = this.plot2d.enabled = state;
             if (this.plot2d.enabled) {
                 this.plots = this.visiblePlots;
                 this.plot2d.plotX = 0;
                 this.plot2d.plotY = Math.min(1, this.plots.length - 1);
-                this.plot2d.plotBrightness = this.plot2d.plotColorR = this.plot2d.plotColorG = this.plot2d.plotColorB = -1;
+                this.plot2d.plotBrightness =
+                    this.plot2d.plotColorR =
+                    this.plot2d.plotColorG =
+                    this.plot2d.plotColorB =
+                        -1;
             }
-            if (this.plot2d.enabled && this.plots.length === 1)
-                this.selectY();
+            if (this.plot2d.enabled && this.plots.length === 1) this.selectY();
             this.resetGraph();
         }
-        if (mi === "showresistance")
-            this.showPlotValue(VAL_R, state);
-        if (mi === "showcharge")
-            this.showCharge(state);
+        if (mi === "showresistance") this.showPlotValue(VAL_R, state);
+        if (mi === "showcharge") this.showCharge(state);
     }
 
-//    void select() {
-//        sim.setMouseElm(elm);
-//        if (plotXY) {
-//            sim.plotXElm = elm;
-//            sim.plotYElm = yElm;
-//        }
-//    }
+    //    void select() {
+    //        sim.setMouseElm(elm);
+    //        if (plotXY) {
+    //            sim.plotXElm = elm;
+    //            sim.plotYElm = yElm;
+    //        }
+    //    }
 
     selectY(): void {
-        const yElm = (this.plots.length === 2) ? this.plots[1].elm : null;
-        let e = (yElm === null) ? -1 : this.app.locateElm(yElm);
+        const yElm = this.plots.length === 2 ? this.plots[1].elm : null;
+        let e = yElm === null ? -1 : this.app.locateElm(yElm);
         const firstE = e;
         while (true) {
             for (e++; e < this.app.elmList.length; e++) {
                 const ce = this.app.getElm(e);
-                if ((ce.isOutputElm() || ce.isProbeElm()) &&
-                        ce !== this.plots[0].elm) {
+                if ((ce.isOutputElm() || ce.isProbeElm()) && ce !== this.plots[0].elm) {
                     const yElm2 = ce;
-                    if (this.plots.length === 1)
-                        this.plots.push(new ScopePlot(yElm2, UNITS_V));
+                    if (this.plots.length === 1) this.plots.push(new ScopePlot(yElm2, UNITS_V));
                     else {
                         this.plots[1].elm = yElm2;
                         this.plots[1].units = UNITS_V;
@@ -1488,8 +1494,7 @@ export class Scope {
                     return;
                 }
             }
-            if (firstE === -1)
-                return;
+            if (firstE === -1) return;
             e = -1;
         }
         // not reached
@@ -1514,17 +1519,14 @@ export class Scope {
     }
 
     showingElm(e: CircuitElm): boolean {
-        for (let i = 0; i !== this.plots.length; i++)
-            if (this.plots[i].elm === e)
-                return true;
+        for (let i = 0; i !== this.plots.length; i++) if (this.plots[i].elm === e) return true;
         return false;
     }
 
     viewingWire(): boolean {
         let i;
         for (i = 0; i !== this.plots.length; i++)
-            if (this.plots[i].elm !== null && this.plots[i].elm!.isWireEquivalent())
-                return true;
+            if (this.plots[i].elm !== null && this.plots[i].elm!.isWireEquivalent()) return true;
         return false;
     }
 
@@ -1533,23 +1535,20 @@ export class Scope {
     // visible plot elements get an empty label (highlighted but unlabelled).
     addScopePlotRoles(roles: Map<CircuitElm, string>): void {
         if (this.plot2d.plotXY) {
-            this.addPlotRole(roles, this.plot2d.plotX,          "X");
-            this.addPlotRole(roles, this.plot2d.plotY,          "Y");
+            this.addPlotRole(roles, this.plot2d.plotX, "X");
+            this.addPlotRole(roles, this.plot2d.plotY, "Y");
             this.addPlotRole(roles, this.plot2d.plotBrightness, "Br");
-            this.addPlotRole(roles, this.plot2d.plotColorR,     "R");
-            this.addPlotRole(roles, this.plot2d.plotColorG,     "G");
-            this.addPlotRole(roles, this.plot2d.plotColorB,     "B");
+            this.addPlotRole(roles, this.plot2d.plotColorR, "R");
+            this.addPlotRole(roles, this.plot2d.plotColorG, "G");
+            this.addPlotRole(roles, this.plot2d.plotColorB, "B");
         } else {
-            for (const p of this.visiblePlots)
-                if (p.elm !== null)
-                    this.addElmRole(roles, p.elm, "");
+            for (const p of this.visiblePlots) if (p.elm !== null) this.addElmRole(roles, p.elm, "");
         }
     }
 
     private addPlotRole(roles: Map<CircuitElm, string>, idx: number, role: string): void {
         if (idx < 0 || idx >= this.plots.length) return;
-        if (this.plots[idx].elm !== null)
-            this.addElmRole(roles, this.plots[idx].elm!, role);
+        if (this.plots[idx].elm !== null) this.addElmRole(roles, this.plots[idx].elm!, role);
     }
 
     private addElmRole(roles: Map<CircuitElm, string>, elm: CircuitElm, role: string): void {
@@ -1567,11 +1566,9 @@ export class Scope {
             if (this.app.locateElm(plot.elm) < 0) {
                 this.plots.splice(i--, 1);
                 removed = true;
-            } else
-                ret = false;
+            } else ret = false;
         }
-        if (removed)
-            this.calcVisiblePlots();
+        if (removed) this.calcVisiblePlots();
         return ret;
     }
 
@@ -1584,11 +1581,8 @@ export class Scope {
         // call with "roundUp=true" to get a "sensible" suggestion for the scale. When importing from
         // a legacy file then call with "roundUp=false" to stay as close as possible to the old presentation
         let s = this.scale[units];
-        if (units > UNITS_A)
-            s = 0.5 * s;
-        if (roundUp)
-            return HookRegistry.scopeNextHighestScale!((2 * s) / (this.manDivisions));
-        else
-            return (2 * s) / (this.manDivisions);
+        if (units > UNITS_A) s = 0.5 * s;
+        if (roundUp) return HookRegistry.scopeNextHighestScale!((2 * s) / this.manDivisions);
+        else return (2 * s) / this.manDivisions;
     }
 }

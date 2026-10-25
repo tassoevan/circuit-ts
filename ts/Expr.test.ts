@@ -6,7 +6,7 @@ function parse(s: string) {
     const p = new ExprParser(s);
     const e = p.parseExpression();
     const refs = p.getNodeRefs();
-    return { e, refs, names: refs.map(r => r.name), err: p.gotError() };
+    return { e, refs, names: refs.map((r) => r.name), err: p.gotError() };
 }
 
 function evalWith(s: string, nodeValues: number[], values?: number[]) {

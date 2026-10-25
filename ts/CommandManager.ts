@@ -43,7 +43,6 @@ import { ScopeElm } from "./ScopeElm";
 import { parseIntStrict } from "./NumberParse";
 
 export class CommandManager {
-
     app: CirSim;
     clipboard: string = "";
 
@@ -58,16 +57,13 @@ export class CommandManager {
             window.alert(Locale.LS("Editing disabled.  Re-enable from the Options menu."));
             return;
         }
-        if (item == "about")
-            CirSim.aboutBox = new (window as any).AboutBox(CirSim.versionString);
+        if (item == "about") CirSim.aboutBox = new (window as any).AboutBox(CirSim.versionString);
         if (item == "importfromlocalfile") {
             this.app.undoManager?.pushUndo();
             this.app.ui?.loadFileInput?.element.click();
         }
-        if (item == "importfromtext")
-            new ImportFromTextDialog(this.app);
-        if (item == "importfromdropbox")
-            CirSim.dialogShowing = new (window as any).ImportFromDropboxDialog(this.app);
+        if (item == "importfromtext") new ImportFromTextDialog(this.app);
+        if (item == "importfromdropbox") CirSim.dialogShowing = new (window as any).ImportFromDropboxDialog(this.app);
         if (item == "exportasurl") {
             this.doExportAsUrl();
             this.app.unsavedChanges = false;
@@ -80,26 +76,20 @@ export class CommandManager {
             this.doExportAsText();
             this.app.unsavedChanges = false;
         }
-        if (item == "exportasimage")
-            this.app.imageExporter?.doExportAsImage();
+        if (item == "exportasimage") this.app.imageExporter?.doExportAsImage();
         if (item == "copypng") {
             this.app.imageExporter?.doImageToClipboard();
-            if (this.app.ui?.contextPanel != null)
-                this.app.ui.contextPanel.remove(); this.app.ui.contextPanel = null;
+            if (this.app.ui?.contextPanel != null) this.app.ui.contextPanel.remove();
+            this.app.ui.contextPanel = null;
         }
-        if (item == "exportassvg")
-            this.app.imageExporter?.doExportAsSVG();
-        if (item == "createsubcircuit")
-            this.doCreateSubcircuit();
-        if (item == "dcanalysis")
-            this.doDCAnalysis();
-        if (item == "print")
-            this.app.imageExporter?.doPrint();
-        if (item == "recover")
-            this.app.undoManager?.doRecover();
+        if (item == "exportassvg") this.app.imageExporter?.doExportAsSVG();
+        if (item == "createsubcircuit") this.doCreateSubcircuit();
+        if (item == "dcanalysis") this.doDCAnalysis();
+        if (item == "print") this.app.imageExporter?.doPrint();
+        if (item == "recover") this.app.undoManager?.doRecover();
 
-        if ((menu == "elm" || menu == "scopepop") && contextPanel != null)
-            contextPanel.remove(); this.app.ui.contextPanel = null;
+        if ((menu == "elm" || menu == "scopepop") && contextPanel != null) contextPanel.remove();
+        this.app.ui.contextPanel = null;
         if (menu == "options" && item == "shortcuts") {
             CirSim.dialogShowing = new (window as any).ShortcutsDialog(this.app);
             CirSim.dialogShowing.show();
@@ -114,37 +104,25 @@ export class CommandManager {
             CirSim.commandPalette = new CommandPalette(this.app);
             CirSim.commandPalette.show();
         }
-        if (menu == "options" && item == "other")
-            this.doEdit(new EditOptions(this.app, this.app.sim));
-        if (item == "undo")
-            this.app.undoManager?.doUndo();
-        if (item == "redo")
-            this.app.undoManager?.doRedo();
-        if (item == "runstop")
-            this.app.setSimRunning(!this.app.simIsRunning());
+        if (menu == "options" && item == "other") this.doEdit(new EditOptions(this.app, this.app.sim));
+        if (item == "undo") this.app.undoManager?.doUndo();
+        if (item == "redo") this.app.undoManager?.doRedo();
+        if (item == "runstop") this.app.setSimRunning(!this.app.simIsRunning());
 
         // if the mouse is hovering over an element, and a shortcut key is pressed, operate on that element (treat it like a context menu item selection)
         if (menu == "key" && this.app.mouse.getMouseElm() != null) {
             this.app.mouse.menuElm = this.app.mouse.getMouseElm();
             menu = "elm";
         }
-        if (menu != "elm")
-            this.app.mouse.menuElm = null;
+        if (menu != "elm") this.app.mouse.menuElm = null;
 
-        if (item == "cut")
-            this.doCut();
-        if (item == "copy")
-            this.doCopy();
-        if (item == "paste")
-            this.doPaste(null);
-        if (item == "duplicate")
-            this.doDuplicate();
-        if (item == "flip")
-            this.app.mouse.doFlip();
-        if (item == "split")
-            this.app.mouse.doSplit(this.app.mouse.menuElm);
-        if (item == "selectAll")
-            this.app.mouse.doSelectAll();
+        if (item == "cut") this.doCut();
+        if (item == "copy") this.doCopy();
+        if (item == "paste") this.doPaste(null);
+        if (item == "duplicate") this.doDuplicate();
+        if (item == "flip") this.app.mouse.doFlip();
+        if (item == "split") this.app.mouse.doSplit(this.app.mouse.menuElm);
+        if (item == "selectAll") this.app.mouse.doSelectAll();
 
         if (item == "centercircuit") {
             this.app.undoManager?.pushUndo();
@@ -175,52 +153,40 @@ export class CommandManager {
             this.app.undoManager?.pushUndo();
             (window as any).TestCreator?.createTest(this.app);
         }
-        if (item == "stackAll")
-            (this.app.scopeManager as any).stackAll?.();
-        if (item == "unstackAll")
-            (this.app.scopeManager as any).unstackAll?.();
-        if (item == "combineAll")
-            (this.app.scopeManager as any).combineAll?.();
-        if (item == "separateAll")
-            (this.app.scopeManager as any).separateAll?.();
-        if (item == "zoomin")
-            this.app.mouse.zoomCircuit(20, true);
-        if (item == "zoomout")
-            this.app.mouse.zoomCircuit(-20, true);
-        if (item == "zoom100")
-            this.app.mouse.setCircuitScale(1, true);
-        if (menu == "elm" && item == "edit")
-            this.doEdit(this.app.mouse.menuElm);
+        if (item == "stackAll") (this.app.scopeManager as any).stackAll?.();
+        if (item == "unstackAll") (this.app.scopeManager as any).unstackAll?.();
+        if (item == "combineAll") (this.app.scopeManager as any).combineAll?.();
+        if (item == "separateAll") (this.app.scopeManager as any).separateAll?.();
+        if (item == "zoomin") this.app.mouse.zoomCircuit(20, true);
+        if (item == "zoomout") this.app.mouse.zoomCircuit(-20, true);
+        if (item == "zoom100") this.app.mouse.setCircuitScale(1, true);
+        if (menu == "elm" && item == "edit") this.doEdit(this.app.mouse.menuElm);
         if (item == "delete") {
-            if (menu != "elm")
-                this.app.mouse.menuElm = null;
+            if (menu != "elm") this.app.mouse.menuElm = null;
             this.app.undoManager?.pushUndo();
             this.doDelete(true);
         }
-        if (item == "sliders")
-            this.doSliders(this.app.mouse.menuElm);
+        if (item == "sliders") this.doSliders(this.app.mouse.menuElm);
 
         if (item == "viewInScope" && this.app.mouse.menuElm != null) {
             let i: number;
             for (i = 0; i != this.app.scopeManager.scopeCount; i++)
-                if (this.app.scopeManager.scopes[i].getElm() == null)
-                    break;
+                if (this.app.scopeManager.scopes[i].getElm() == null) break;
             if (i == this.app.scopeManager.scopeCount) {
-                if (this.app.scopeManager.scopeCount == this.app.scopeManager.scopes.length)
-                    return;
+                if (this.app.scopeManager.scopeCount == this.app.scopeManager.scopes.length) return;
                 this.app.scopeManager.scopeCount++;
                 this.app.scopeManager.scopes[i] = new Scope(this.app, this.app.sim);
                 this.app.scopeManager.scopes[i].position = i;
             }
             this.app.scopeManager.scopes[i].setElm(this.app.mouse.menuElm);
-            if (i > 0)
-                this.app.scopeManager.scopes[i].speed = this.app.scopeManager.scopes[i-1].speed;
+            if (i > 0) this.app.scopeManager.scopes[i].speed = this.app.scopeManager.scopes[i - 1].speed;
         }
 
         if (item == "viewInFloatScope" && this.app.mouse.menuElm != null) {
             const newScope = new ScopeElm(
                 this.app.snapGrid(this.app.mouse.menuElm.x + 50),
-                this.app.snapGrid(this.app.mouse.menuElm.y + 50));
+                this.app.snapGrid(this.app.mouse.menuElm.y + 50),
+            );
             this.app.elmList.push(newScope);
             newScope.setScopeElm(this.app.mouse.menuElm);
             // need to rebuild scopeElmArr
@@ -231,10 +197,8 @@ export class CommandManager {
             const n = parseIntStrict(item.substring(10));
             const sm = this.app.scopeManager as any;
             if (n < sm.scopeCount + (sm.countScopeElms?.() ?? 0)) {
-                if (n < sm.scopeCount)
-                    sm.scopes[n].addElm(this.app.mouse.menuElm);
-                else
-                    sm.getNthScopeElm(n - sm.scopeCount).elmScope.addElm(this.app.mouse.menuElm);
+                if (n < sm.scopeCount) sm.scopes[n].addElm(this.app.mouse.menuElm);
+                else sm.getNthScopeElm(n - sm.scopeCount).elmScope.addElm(this.app.mouse.menuElm);
             }
             sm.scopeMenuSelected = -1;
         }
@@ -243,14 +207,11 @@ export class CommandManager {
             this.app.undoManager?.pushUndo();
             const sm = this.app.scopeManager as any;
             let s: any;
-            if (sm.menuScope != -1)
-                s = sm.scopes[sm.menuScope];
-            else
-                s = this.app.mouse.getMouseElm()?.elmScope;
+            if (sm.menuScope != -1) s = sm.scopes[sm.menuScope];
+            else s = this.app.mouse.getMouseElm()?.elmScope;
 
             if (item == "dock") {
-                if (sm.scopeCount == sm.scopes.length)
-                    return;
+                if (sm.scopeCount == sm.scopes.length) return;
                 sm.scopes[sm.scopeCount] = this.app.mouse.getMouseElm()?.elmScope;
                 this.app.mouse.getMouseElm()?.clearElmScope();
                 sm.scopes[sm.scopeCount].position = sm.scopeCount;
@@ -259,49 +220,33 @@ export class CommandManager {
             }
             if (item == "undock") {
                 const elm = s.getElm();
-                const newScope = new ScopeElm(
-                    this.app.snapGrid(elm.x + 50),
-                    this.app.snapGrid(elm.y + 50));
+                const newScope = new ScopeElm(this.app.snapGrid(elm.x + 50), this.app.snapGrid(elm.y + 50));
                 this.app.elmList.push(newScope);
                 newScope.setElmScope(sm.scopes[sm.menuScope]);
                 // remove scope from list.  setupScopes() will fix the positions
-                for (let i = sm.menuScope; i < sm.scopeCount; i++)
-                    sm.scopes[i] = sm.scopes[i+1];
+                for (let i = sm.menuScope; i < sm.scopeCount; i++) sm.scopes[i] = sm.scopes[i + 1];
                 sm.scopeCount--;
-                this.app.needAnalyze();      // need to rebuild scopeElmArr
+                this.app.needAnalyze(); // need to rebuild scopeElmArr
             }
-            if (item == "remove")
-                s.setElm(null);  // setupScopes() will clean this up
-            if (item == "removeplot")
-                s.removePlot(sm.menuPlot);
-            if (item == "speed2")
-                s.speedUp();
-            if (item == "speed1/2")
-                s.slowDown();
-            if (item == "maxscale")
-                s.maxScaleToggle();
-            if (item == "stack")
-                sm.stackScope(sm.menuScope);
-            if (item == "unstack")
-                sm.unstackScope(sm.menuScope);
-            if (item == "combine")
-                sm.combineScope(sm.menuScope);
-            if (item == "selecty")
-                s.selectY();
-            if (item == "reset")
-                s.resetGraph(true);
-            if (item == "exportcsv")
-                s.exportCSV();
-            if (item == "exportimage")
-                s.exportImage();
-            if (item == "properties")
-                s.showProperties();
+            if (item == "remove") s.setElm(null); // setupScopes() will clean this up
+            if (item == "removeplot") s.removePlot(sm.menuPlot);
+            if (item == "speed2") s.speedUp();
+            if (item == "speed1/2") s.slowDown();
+            if (item == "maxscale") s.maxScaleToggle();
+            if (item == "stack") sm.stackScope(sm.menuScope);
+            if (item == "unstack") sm.unstackScope(sm.menuScope);
+            if (item == "combine") sm.combineScope(sm.menuScope);
+            if (item == "selecty") s.selectY();
+            if (item == "reset") s.resetGraph(true);
+            if (item == "exportcsv") s.exportCSV();
+            if (item == "exportimage") s.exportImage();
+            if (item == "properties") s.showProperties();
             sm.deleteUnusedScopeElms?.();
         }
 
         if (menu == "circuits" && item.indexOf("setup ") == 0) {
             this.app.undoManager?.pushUndo();
-            const sp = item.indexOf(' ', 6);
+            const sp = item.indexOf(" ", 6);
             this.app.menus.readSetupFile(item.substring(6, sp), item.substring(sp + 1));
         }
         if (item == "newblankcircuit") {
@@ -311,34 +256,25 @@ export class CommandManager {
 
         // IES: Moved from itemStateChanged()
         if (menu == "main") {
-            if (contextPanel != null)
-                contextPanel.remove(); this.app.ui.contextPanel = null;
+            if (contextPanel != null) contextPanel.remove();
+            this.app.ui.contextPanel = null;
             this.app.setMouseMode(MouseManager.MODE_ADD_ELM);
             const s = item;
-            if (s.length > 0)
-                this.app.ui.mouseModeStr = s;
-            if (s == "DragAll")
-                this.app.setMouseMode(MouseManager.MODE_DRAG_ALL);
-            else if (s == "DragRow")
-                this.app.setMouseMode(MouseManager.MODE_DRAG_ROW);
-            else if (s == "DragColumn")
-                this.app.setMouseMode(MouseManager.MODE_DRAG_COLUMN);
-            else if (s == "DragSelected")
-                this.app.setMouseMode(MouseManager.MODE_DRAG_SELECTED);
-            else if (s == "DragPost")
-                this.app.setMouseMode(MouseManager.MODE_DRAG_POST);
-            else if (s == "Select")
-                this.app.setMouseMode(MouseManager.MODE_SELECT);
+            if (s.length > 0) this.app.ui.mouseModeStr = s;
+            if (s == "DragAll") this.app.setMouseMode(MouseManager.MODE_DRAG_ALL);
+            else if (s == "DragRow") this.app.setMouseMode(MouseManager.MODE_DRAG_ROW);
+            else if (s == "DragColumn") this.app.setMouseMode(MouseManager.MODE_DRAG_COLUMN);
+            else if (s == "DragSelected") this.app.setMouseMode(MouseManager.MODE_DRAG_SELECTED);
+            else if (s == "DragPost") this.app.setMouseMode(MouseManager.MODE_DRAG_POST);
+            else if (s == "Select") this.app.setMouseMode(MouseManager.MODE_SELECT);
 
             this.app.updateToolbar();
 
             this.app.mouse.tempMouseMode = this.app.mouse.mouseMode;
         }
         if (item == "fullscreen") {
-            if (!Graphics.isFullScreen)
-                Graphics.viewFullScreen();
-            else
-                Graphics.exitFullScreen();
+            if (!Graphics.isFullScreen) Graphics.viewFullScreen();
+            else Graphics.exitFullScreen();
             this.app.centerCircuit();
         }
 
@@ -347,8 +283,7 @@ export class CommandManager {
 
     doEdit(eable: any, pushUndo: boolean = true): void {
         this.app.mouse.clearSelection();
-        if (pushUndo)
-            this.app.undoManager?.pushUndo();
+        if (pushUndo) this.app.undoManager?.pushUndo();
         if (CirSim.editDialog != null) {
             CirSim.editDialog.setVisible(false);
             CirSim.editDialog = null;
@@ -378,8 +313,7 @@ export class CommandManager {
 
     doCreateSubcircuit(): void {
         const dlg = new EditSubcircuitModelDialog();
-        if (!dlg.createModel())
-            return;
+        if (!dlg.createModel()) return;
         dlg.createDialog();
         CirSim.dialogShowing = dlg;
         CirSim.dialogShowing.show();
@@ -398,8 +332,7 @@ export class CommandManager {
 
     setMenuSelection(): void {
         if (this.app.mouse.menuElm != null) {
-            if (this.app.mouse.menuElm.selected)
-                return;
+            if (this.app.mouse.menuElm.selected) return;
             this.app.mouse.clearSelection();
             this.app.mouse.menuElm.setSelected(true);
         }
@@ -407,17 +340,17 @@ export class CommandManager {
 
     countSelected(): number {
         let count = 0;
-        for (const ce of this.app.elmList)
-            if (ce.isSelected())
-                count++;
+        for (const ce of this.app.elmList) if (ce.isSelected()) count++;
         return count;
     }
 
     prepareFlip(): { cx: number; cy: number; count: number } {
         this.app.undoManager?.pushUndo();
         this.setMenuSelection();
-        let minx = 30000, maxx = -30000;
-        let miny = 30000, maxy = -30000;
+        let minx = 30000,
+            maxx = -30000;
+        let miny = 30000,
+            maxy = -30000;
         const count = this.countSelected();
         for (const ce of this.app.elmList) {
             if (ce.isSelected() || count == 0) {
@@ -435,9 +368,7 @@ export class CommandManager {
     mirrorX(): void {
         const fi = this.prepareFlip();
         const center2 = fi.cx * 2;
-        for (const ce of this.app.elmList)
-            if (ce.isSelected() || fi.count == 0)
-                ce.flipX(center2, fi.count);
+        for (const ce of this.app.elmList) if (ce.isSelected() || fi.count == 0) ce.flipX(center2, fi.count);
         this.app.needAnalyze();
     }
 
@@ -445,9 +376,7 @@ export class CommandManager {
     mirrorY(): void {
         const fi = this.prepareFlip();
         const center2 = fi.cy * 2;
-        for (const ce of this.app.elmList)
-            if (ce.isSelected() || fi.count == 0)
-                ce.flipY(center2, fi.count);
+        for (const ce of this.app.elmList) if (ce.isSelected() || fi.count == 0) ce.flipY(center2, fi.count);
         this.app.needAnalyze();
     }
 
@@ -497,15 +426,13 @@ export class CommandManager {
     }
 
     doDelete(pushUndoFlag: boolean): void {
-        if (pushUndoFlag)
-            this.app.undoManager?.pushUndo();
+        if (pushUndoFlag) this.app.undoManager?.pushUndo();
         let hasDeleted = false;
 
         for (let i = this.app.elmList.length - 1; i >= 0; i--) {
             const ce = this.app.elmList[i];
             if (this.willDelete(ce)) {
-                if (ce.isMouseElm())
-                    this.app.mouse.setMouseElm(null);
+                if (ce.isMouseElm()) this.app.mouse.setMouseElm(null);
                 ce.delete();
                 this.app.elmList.splice(i, 1);
                 hasDeleted = true;
@@ -548,18 +475,16 @@ export class CommandManager {
     }
 
     doCopy(): void {
-        const clearSel = (this.app.mouse.menuElm != null && !this.app.mouse.menuElm.selected);
+        const clearSel = this.app.mouse.menuElm != null && !this.app.mouse.menuElm.selected;
         this.setMenuSelection();
         this.clipboard = this.copyOfSelectedElms();
-        if (clearSel)
-            this.app.mouse.clearSelection();
+        if (clearSel) this.app.mouse.clearSelection();
         this.writeClipboardToStorage();
         this.enablePaste();
     }
 
     enablePaste(): void {
-        if (this.clipboard == null || this.clipboard.length == 0)
-            this.readClipboardFromStorage();
+        if (this.clipboard == null || this.clipboard.length == 0) this.readClipboardFromStorage();
         this.app.menus.pasteItem.setEnabled(this.clipboard != null && this.clipboard.length > 0);
     }
 
@@ -577,10 +502,8 @@ export class CommandManager {
         // get old bounding box
         for (const ce of this.app.elmList) {
             const bb = ce.getBoundingBox();
-            if (oldbb != null)
-                oldbb = oldbb.union(bb);
-            else
-                oldbb = bb;
+            if (oldbb != null) oldbb = oldbb.union(bb);
+            else oldbb = bb;
         }
 
         // add new items
@@ -589,11 +512,9 @@ export class CommandManager {
 
         // don't recenter circuit if we're going to paste in place because that will change the transform
         // in fact, don't ever recenter circuit, unless old circuit was empty
-        if (oldsz > 0)
-            flags |= CircuitLoader.RC_NO_CENTER;
+        if (oldsz > 0) flags |= CircuitLoader.RC_NO_CENTER;
 
-        if (dump != null)
-            this.app.loader.readCircuit(dump, flags);
+        if (dump != null) this.app.loader.readCircuit(dump, flags);
         else {
             this.readClipboardFromStorage();
             this.app.loader.readCircuit(this.clipboard, flags);
@@ -605,15 +526,14 @@ export class CommandManager {
             const ce = this.app.elmList[i];
             ce.setSelected(true);
             const bb = ce.getBoundingBox();
-            if (newbb != null)
-                newbb = newbb.union(bb);
-            else
-                newbb = bb;
+            if (newbb != null) newbb = newbb.union(bb);
+            else newbb = bb;
         }
 
         if (oldbb != null && newbb != null) {
             // find a place on the edge for new items
-            let dx = 0, dy = 0;
+            let dx = 0,
+                dy = 0;
             const spacew = this.app.circuitArea.width - oldbb.width - newbb.width;
             const spaceh = this.app.circuitArea.height - oldbb.height - newbb.height;
 
@@ -623,21 +543,21 @@ export class CommandManager {
                 dy = this.app.snapGrid(oldbb.y - newbb.y);
             }
 
-            if (spacew > spaceh)
-                dx = this.app.snapGrid(oldbb.x + oldbb.width  - newbb.x + this.app.gridSize);
-            else
-                dy = this.app.snapGrid(oldbb.y + oldbb.height - newbb.y + this.app.gridSize);
+            if (spacew > spaceh) dx = this.app.snapGrid(oldbb.x + oldbb.width - newbb.x + this.app.gridSize);
+            else dy = this.app.snapGrid(oldbb.y + oldbb.height - newbb.y + this.app.gridSize);
 
             // move new items near the mouse if possible
-            if (this.app.mouse.mouseCursorX > 0 && this.app.circuitArea.contains(this.app.mouse.mouseCursorX, this.app.mouse.mouseCursorY)) {
+            if (
+                this.app.mouse.mouseCursorX > 0 &&
+                this.app.circuitArea.contains(this.app.mouse.mouseCursorX, this.app.mouse.mouseCursorY)
+            ) {
                 const gx = this.app.mouse.inverseTransformX(this.app.mouse.mouseCursorX);
                 const gy = this.app.mouse.inverseTransformY(this.app.mouse.mouseCursorY);
                 const mdx = this.app.snapGrid(gx - (newbb.x + newbb.width / 2));
                 const mdy = this.app.snapGrid(gy - (newbb.y + newbb.height / 2));
                 let i: number;
                 for (i = oldsz; i != this.app.elmList.length; i++) {
-                    if (!this.app.elmList[i].allowMove(mdx, mdy))
-                        break;
+                    if (!this.app.elmList[i].allowMove(mdx, mdy)) break;
                 }
                 if (i == this.app.elmList.length) {
                     dx = mdx;
@@ -646,8 +566,7 @@ export class CommandManager {
             }
 
             // move the new items
-            for (let i = oldsz; i != this.app.elmList.length; i++)
-                this.app.elmList[i].move(dx, dy);
+            for (let i = oldsz; i != this.app.elmList.length; i++) this.app.elmList[i].move(dx, dy);
         }
         this.app.needAnalyze();
         this.app.undoManager?.writeRecoveryToStorage();

@@ -126,9 +126,15 @@ export class OpAmpRealElm extends CompositeElm {
     private initModel(): void {
         this.flags |= CompositeElm.FLAG_ESCAPE;
         switch (this.modelType) {
-            case OpAmpRealElm.MODEL_741:   this.init741(); break;
-            case OpAmpRealElm.MODEL_324:   this.init324(); break;
-            case OpAmpRealElm.MODEL_324v2: this.init324v2(); break;
+            case OpAmpRealElm.MODEL_741:
+                this.init741();
+                break;
+            case OpAmpRealElm.MODEL_324:
+                this.init324();
+                break;
+            case OpAmpRealElm.MODEL_324v2:
+                this.init324v2();
+                break;
         }
         this.curCounts = new Array(5).fill(0);
         this.setPoints();
@@ -137,9 +143,12 @@ export class OpAmpRealElm extends CompositeElm {
     private init741(): void {
         this.loadComposite(null, OpAmpRealElm.model741String, OpAmpRealElm.model741ExternalNodes);
         const cap = this.getCapacitor();
-        if (cap) { cap.capacitance = 30e-12 / (this.slewRate / 0.6); cap.voltdiff = this.capValue; }
+        if (cap) {
+            cap.capacitance = 30e-12 / (this.slewRate / 0.6);
+            cap.voltdiff = this.capValue;
+        }
         for (let i = 0; i !== 11; i++)
-            (this.compElmList[21+i] as ResistorElm).resistance = OpAmpRealElm.model741resistances[i];
+            (this.compElmList[21 + i] as ResistorElm).resistance = OpAmpRealElm.model741resistances[i];
         const currentMult = this.currentLimit / this.defaultCurrentLimit;
         (this.compElmList[21] as ResistorElm).resistance /= currentMult;
         (this.compElmList[22] as ResistorElm).resistance /= currentMult;
@@ -151,10 +160,13 @@ export class OpAmpRealElm extends CompositeElm {
         const st = new StringTokenizer(OpAmpRealElm.lm324ModelDump, "/");
         this.loadComposite(st, OpAmpRealElm.lm324ModelString, OpAmpRealElm.lm324ExternalNodes);
         const cap = this.getCapacitor();
-        if (cap) { cap.capacitance = 10e-12 / (this.slewRate / 0.55); cap.voltdiff = this.capValue; }
+        if (cap) {
+            cap.capacitance = 10e-12 / (this.slewRate / 0.55);
+            cap.voltdiff = this.capValue;
+        }
         const currentMult = this.currentLimit / this.defaultCurrentLimit;
         (this.compElmList[11] as ResistorElm).resistance /= currentMult;
-        (this.compElmList[9]  as TransistorElm).setBeta(currentMult * 100);
+        (this.compElmList[9] as TransistorElm).setBeta(currentMult * 100);
         (this.compElmList[10] as TransistorElm).setBeta(currentMult * 100);
         (this.compElmList[12] as TransistorElm).setBeta(currentMult * 100);
         (this.compElmList[16] as TransistorElm).setBeta(currentMult * 100);
@@ -198,7 +210,9 @@ export class OpAmpRealElm extends CompositeElm {
         if (cap) cap.voltdiff = voltdiff;
     }
 
-    getConnection(n1: number, n2: number): boolean { return true; }
+    getConnection(n1: number, n2: number): boolean {
+        return true;
+    }
 
     draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.opheight * 2);
@@ -235,19 +249,19 @@ export class OpAmpRealElm extends CompositeElm {
         this.calcLeads(ww * 2);
         const hs = this.opheight * this.dsign;
         const hsswap = (this.flags & this.FLAG_SWAP) !== 0 ? -hs : hs;
-        this.in1p  = this.newPointArray(2);
-        this.in2p  = this.newPointArray(2);
+        this.in1p = this.newPointArray(2);
+        this.in2p = this.newPointArray(2);
         this.textp = this.newPointArray(2);
         this.rail1p = this.newPointArray(2);
         this.rail2p = this.newPointArray(2);
-        this.interpPoint2(this.point1, this.point2, this.in1p[0],  this.in2p[0],  0, hsswap);
-        this.interpPoint2(this.lead1!, this.lead2!,  this.in1p[1],  this.in2p[1],  0, hsswap);
-        this.interpPoint2(this.lead1!, this.lead2!,  this.textp[0], this.textp[1], 0.2, hsswap);
-        const railPos = 0.5 - ((this.dn/2) % CircuitElm.app.gridSize) / (ww * 2);
-        this.interpPoint2(this.lead1!, this.lead2!, this.rail1p[1], this.rail2p[1], railPos, hs*2*(1-railPos));
-        this.interpPoint2(this.lead1!, this.lead2!, this.rail1p[0], this.rail2p[0], railPos, hs*2);
+        this.interpPoint2(this.point1, this.point2, this.in1p[0], this.in2p[0], 0, hsswap);
+        this.interpPoint2(this.lead1!, this.lead2!, this.in1p[1], this.in2p[1], 0, hsswap);
+        this.interpPoint2(this.lead1!, this.lead2!, this.textp[0], this.textp[1], 0.2, hsswap);
+        const railPos = 0.5 - ((this.dn / 2) % CircuitElm.app.gridSize) / (ww * 2);
+        this.interpPoint2(this.lead1!, this.lead2!, this.rail1p[1], this.rail2p[1], railPos, hs * 2 * (1 - railPos));
+        this.interpPoint2(this.lead1!, this.lead2!, this.rail1p[0], this.rail2p[0], railPos, hs * 2);
         const tris = this.newPointArray(2);
-        this.interpPoint2(this.lead1!, this.lead2!, tris[0], tris[1], 0, hs*2);
+        this.interpPoint2(this.lead1!, this.lead2!, tris[0], tris[1], 0, hs * 2);
         this.triangle = this.createPolygon(tris[0], tris[1], this.lead2!);
         this.plusFont = new Font("SansSerif", 0, 14);
         this.setPost(0, this.in1p[0]);
@@ -257,8 +271,12 @@ export class OpAmpRealElm extends CompositeElm {
         this.setPost(4, this.rail2p[0]);
     }
 
-    getDumpType(): number { return 409; }
-    getElmType(): string { return "op-amp"; }
+    getDumpType(): number {
+        return 409;
+    }
+    getElmType(): string {
+        return "op-amp";
+    }
 
     getInfo(arr: string[]): void {
         const type = this.modelType === OpAmpRealElm.MODEL_741 ? "LM741" : "LM324";
@@ -269,7 +287,9 @@ export class OpAmpRealElm extends CompositeElm {
         arr[4] = "Iout = " + CircuitElm.getCurrentText(this.getCurrentIntoNode(2));
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo(EditInfo.makeLink("opampreal.html", "Model"), this.modelType);
@@ -299,8 +319,7 @@ export class OpAmpRealElm extends CompositeElm {
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.modelType = ei.choice!.getSelectedIndex();
-            if (ei.choice!.getItemCount() === 2 && this.modelType === 1)
-                this.modelType = OpAmpRealElm.MODEL_324v2;
+            if (ei.choice!.getItemCount() === 2 && this.modelType === 1) this.modelType = OpAmpRealElm.MODEL_324v2;
             this.capValue = 0;
             this.initModel();
             ei.newDialog = true;
@@ -309,10 +328,20 @@ export class OpAmpRealElm extends CompositeElm {
             this.flags = ei.changeFlag(this.flags, this.FLAG_SWAP);
             this.setPoints();
         }
-        if (n === 2) { this.slewRate = ei.value; this.initModel(); }
-        if (n === 3) { this.currentLimit = ei.value; this.initModel(); }
+        if (n === 2) {
+            this.slewRate = ei.value;
+            this.initModel();
+        }
+        if (n === 3) {
+            this.currentLimit = ei.value;
+            this.initModel();
+        }
     }
 
-    canFlipX(): boolean { return this.dy === 0; }
-    canFlipY(): boolean { return this.dx === 0; }
+    canFlipX(): boolean {
+        return this.dy === 0;
+    }
+    canFlipY(): boolean {
+        return this.dx === 0;
+    }
 }

@@ -44,13 +44,13 @@ class LookupEntry {
         let result = "";
         let pos = 0;
         while (pos < this.template.length) {
-            const open = this.template.indexOf('{', pos);
+            const open = this.template.indexOf("{", pos);
             if (open < 0) {
                 result += this.template.substring(pos);
                 break;
             }
             result += this.template.substring(pos, open);
-            const close = this.template.indexOf('}', open);
+            const close = this.template.indexOf("}", open);
             if (close < 0) {
                 result += this.template.substring(open);
                 break;
@@ -64,10 +64,8 @@ class LookupEntry {
                     es.values[0] = value; // a = input value
                     const res = expr!.eval(es);
                     const intRes = Math.floor(res);
-                    if (res === intRes)
-                        result += intRes;
-                    else
-                        result += res;
+                    if (res === intRes) result += intRes;
+                    else result += res;
                 } else {
                     CirSim.console("ep.got error: " + exprStr);
                     result += "{" + exprStr + "}";
@@ -99,17 +97,26 @@ export class InstructionDisplayElm extends CircuitElm {
         }
     }
 
-    getXmlDumpType(): string { return "ins"; }
-    getPostCount(): number { return this.busWidth; }
-    getPostWidth(n: number): number { return this.busWidth; }
-    getNumHandles(): number { return 1; }
-    getVoltageSourceCount(): number { return 0; }
+    getXmlDumpType(): string {
+        return "ins";
+    }
+    getPostCount(): number {
+        return this.busWidth;
+    }
+    getPostWidth(n: number): number {
+        return this.busWidth;
+    }
+    getNumHandles(): number {
+        return 1;
+    }
+    getVoltageSourceCount(): number {
+        return 0;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "bw", this.busWidth);
-        if (this.threshold !== 2.5)
-            CircuitXMLSerializer.dumpAttr(elem, "th", this.threshold);
+        if (this.threshold !== 2.5) CircuitXMLSerializer.dumpAttr(elem, "th", this.threshold);
         if (this.lookupText != null && this.lookupText.length > 0)
             elem.appendChild(doc.createTextNode(this.lookupText));
     }
@@ -126,8 +133,7 @@ export class InstructionDisplayElm extends CircuitElm {
         } catch (e) {
             CirSim.console("exception in undump " + e);
         }
-        if (this.lookupText === null)
-            this.lookupText = "";
+        if (this.lookupText === null) this.lookupText = "";
         this.parseEntries(null);
     }
 
@@ -142,9 +148,7 @@ export class InstructionDisplayElm extends CircuitElm {
 
     readInputValue(): number {
         let value = 0;
-        for (let i = 0; i !== this.busWidth; i++)
-            if (this.nodes[i].v > this.threshold)
-                value |= 1 << i;
+        for (let i = 0; i !== this.busWidth; i++) if (this.nodes[i].v > this.threshold) value |= 1 << i;
         return value;
     }
 
@@ -152,8 +156,7 @@ export class InstructionDisplayElm extends CircuitElm {
         const value = this.readInputValue();
         for (let i = 0; i !== this.entries.length; i++) {
             const entry = this.entries[i];
-            if (value >= entry.lo && value <= entry.hi)
-                return entry.getText(value);
+            if (value >= entry.lo && value <= entry.hi) return entry.getText(value);
         }
         return String(value);
     }
@@ -165,13 +168,16 @@ export class InstructionDisplayElm extends CircuitElm {
         g.context.font = (selected ? "bold " : "") + fontSize + "px SansSerif";
         g.setColor(selected ? CircuitElm.selectColor : CircuitElm.lightGrayColor);
         const s = this.getDisplayText();
-        this.interpPoint(this.point1, this.point2, this.lead1,
-            1 - (Math.floor(g.context.measureText(s).width) / 2 + 8) / this.dn);
+        this.interpPoint(
+            this.point1,
+            this.point2,
+            this.lead1,
+            1 - (Math.floor(g.context.measureText(s).width) / 2 + 8) / this.dn,
+        );
         this.setBbox(this.point1, this.lead1, 0);
         this.drawCenteredText(g, s, this.x2, this.y2, true);
         this.setVoltageColor(g, this.nodes[0].v);
-        if (selected)
-            g.setColor(CircuitElm.selectColor);
+        if (selected) g.setColor(CircuitElm.selectColor);
         CircuitElm.drawThickLine(g, this.point1, this.lead1!, 5);
         this.drawPosts(g);
         g.restore();
@@ -182,7 +188,9 @@ export class InstructionDisplayElm extends CircuitElm {
         router.addObstacle(this.x2 - 10, this.y2 - 10, this.x2 + 10, this.y2 + 10);
     }
 
-    getVoltageDiff(): number { return this.nodes[0].v; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "instruction display";
@@ -192,10 +200,8 @@ export class InstructionDisplayElm extends CircuitElm {
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Bus Width", this.busWidth, 2, 32).setDimensionless();
-        if (n === 1)
-            return new EditInfo("Threshold Voltage", this.threshold);
+        if (n === 0) return new EditInfo("Bus Width", this.busWidth, 2, 32).setDimensionless();
+        if (n === 1) return new EditInfo("Threshold Voltage", this.threshold);
         if (n === 2) {
             const ei = new EditInfo("Lookup Table", 0);
             ei.textArea = { value: this.lookupText, element: null };
@@ -209,11 +215,9 @@ export class InstructionDisplayElm extends CircuitElm {
             if (ei.value >= 1 && ei.value <= 32) {
                 this.busWidth = Math.floor(ei.value);
                 this.allocNodes();
-            } else
-                ei.setError("must be between 1 and 32");
+            } else ei.setError("must be between 1 and 32");
         }
-        if (n === 1)
-            this.threshold = ei.value;
+        if (n === 1) this.threshold = ei.value;
         if (n === 2) {
             this.lookupText = ei.textArea.element ? ei.textArea.element.value : ei.textArea.value;
             this.parseEntries(ei);
@@ -222,17 +226,14 @@ export class InstructionDisplayElm extends CircuitElm {
 
     parseEntries(ei: EditInfo | null): void {
         this.entries = [];
-        if (this.lookupText === null || this.lookupText.length === 0)
-            return;
+        if (this.lookupText === null || this.lookupText.length === 0) return;
         const lines = this.lookupText.split("\n");
         for (let i = 0; i !== lines.length; i++) {
             const line = lines[i].trim();
-            if (line.length === 0)
-                continue;
-            const eq = line.indexOf('=');
+            if (line.length === 0) continue;
+            const eq = line.indexOf("=");
             if (eq < 0) {
-                if (ei !== null)
-                    ei.setError("missing =: " + line);
+                if (ei !== null) ei.setError("missing =: " + line);
                 continue;
             }
             const key = line.substring(0, eq).trim();
@@ -253,21 +254,19 @@ export class InstructionDisplayElm extends CircuitElm {
 
     findDash(s: string): number {
         let start = 0;
-        if (s.startsWith("0x") || s.startsWith("0X"))
-            start = 2;
-        else if (s.startsWith("0b") || s.startsWith("0B"))
-            start = 2;
-        return s.indexOf('-', start);
+        if (s.startsWith("0x") || s.startsWith("0X")) start = 2;
+        else if (s.startsWith("0b") || s.startsWith("0B")) start = 2;
+        return s.indexOf("-", start);
     }
 
     parseNumber(s: string): number {
         s = s.trim();
-        if (s.startsWith("0x") || s.startsWith("0X"))
-            return parseIntStrict(s.substring(2), 16);
-        if (s.startsWith("0b") || s.startsWith("0B"))
-            return parseIntStrict(s.substring(2), 2);
+        if (s.startsWith("0x") || s.startsWith("0X")) return parseIntStrict(s.substring(2), 16);
+        if (s.startsWith("0b") || s.startsWith("0B")) return parseIntStrict(s.substring(2), 2);
         return parseIntStrict(s);
     }
 
-    getConnection(n1: number, n2: number): boolean { return false; }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
 }

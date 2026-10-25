@@ -40,34 +40,32 @@ import { parseIntStrict, parseFloatStrict } from "./NumberParse";
  * CirSim should only call high-level methods on this class.
  */
 export class CircuitLoader {
-
-    private readonly app: CirSim;     // was CirSim – the main app/UI object
-    private readonly sim: SimulationManager;      // the simulation engine
-    private readonly scopes: ScopeManager;        // to clear/add scopes
-    private readonly menus: Menus;                // to toggle check items (dots, volts, etc.)
+    private readonly app: CirSim; // was CirSim – the main app/UI object
+    private readonly sim: SimulationManager; // the simulation engine
+    private readonly scopes: ScopeManager; // to clear/add scopes
+    private readonly menus: Menus; // to toggle check items (dots, volts, etc.)
 
     // Flags (copied from CirSim for clarity – you can keep them here or reference app's constants)
-    static readonly RC_RETAIN       = 1;
-    static readonly RC_NO_CENTER    = 2;
-    static readonly RC_SUBCIRCUITS  = 4;
-    static readonly RC_KEEP_TITLE   = 8;
+    static readonly RC_RETAIN = 1;
+    static readonly RC_NO_CENTER = 2;
+    static readonly RC_SUBCIRCUITS = 4;
+    static readonly RC_KEEP_TITLE = 8;
 
-    constructor(app: CirSim, sim: SimulationManager,
-                scopes: ScopeManager, menus: Menus) {
-        this.app   = app;
-        this.sim   = sim;
+    constructor(app: CirSim, sim: SimulationManager, scopes: ScopeManager, menus: Menus) {
+        this.app = app;
+        this.sim = sim;
         this.scopes = scopes;
         this.menus = menus;
     }
 
     clearCircuit(): void {
-	WireRouter.lastRouter = null;
+        WireRouter.lastRouter = null;
         this.app.mouse.clearMouseElm();
         for (const ce of this.app.elmList) {
             ce.delete();
         }
         this.sim.resetTime();
-	this.sim.solverType = SimulationManager.SOLVER_AUTO;
+        this.sim.solverType = SimulationManager.SOLVER_AUTO;
         this.app.elmList.length = 0;
         this.app.hintType = -1;
         this.sim.maxTimeStep = 5e-6;
@@ -107,12 +105,9 @@ export class CircuitLoader {
         const xml = new CircuitXMLDeserializer(this.app);
         const models = SubcircuitModel.loadLibrary(xml, doc.documentElement);
         // make any existing instances pick up the new definitions
-        for (const m of models)
-            this.app.refreshModels(m.name);
-        if (models.length === 0)
-            this.app.ui.showToast(Locale.LS("No subcircuits found in file"));
-        else
-            this.app.ui.showToast(Locale.LS("Loaded subcircuits: ") + models.map(m => m.name).join(", "));
+        for (const m of models) this.app.refreshModels(m.name);
+        if (models.length === 0) this.app.ui.showToast(Locale.LS("No subcircuits found in file"));
+        else this.app.ui.showToast(Locale.LS("Loaded subcircuits: ") + models.map((m) => m.name).join(", "));
     }
 
     readCircuit(text: string, flags: number = 0): void {
@@ -121,8 +116,7 @@ export class CircuitLoader {
             return;
         }
         if (text.startsWith("<")) {
-	    if ((flags & CircuitLoader.RC_RETAIN) == 0)
-		this.clearCircuit();
+            if ((flags & CircuitLoader.RC_RETAIN) == 0) this.clearCircuit();
             const xml = new CircuitXMLDeserializer(this.app);
             xml.readCircuit(text, flags);
             return;
@@ -170,33 +164,32 @@ export class CircuitLoader {
                 const type = st.nextToken();
                 let tint = type.charCodeAt(0);
                 try {
-                    if (subs && tint !== '.'.charCodeAt(0)) continue;
+                    if (subs && tint !== ".".charCodeAt(0)) continue;
 
-                    if (tint === 'o'.charCodeAt(0)) {
+                    if (tint === "o".charCodeAt(0)) {
                         const sc = new Scope(this.app, this.sim);
                         sc.undump(st);
                         this.scopes.addScope(sc);
                         break;
                     }
-                    if (tint === 'h'.charCodeAt(0)) {
+                    if (tint === "h".charCodeAt(0)) {
                         this.readHint(st);
                         break;
                     }
-                    if (tint === '$'.charCodeAt(0)) {
+                    if (tint === "$".charCodeAt(0)) {
                         this.readOptions(st, flags);
                         break;
                     }
-                    if (tint === '!'.charCodeAt(0)) {
+                    if (tint === "!".charCodeAt(0)) {
                         CustomLogicModel.undumpModel(st);
                         break;
                     }
-                    if (tint === '%'.charCodeAt(0) || tint === '?'.charCodeAt(0) || tint === 'B'.charCodeAt(0)) {
+                    if (tint === "%".charCodeAt(0) || tint === "?".charCodeAt(0) || tint === "B".charCodeAt(0)) {
                         // ignore afilter-specific stuff
                         break;
                     }
 
-                    if (tint >= '0'.charCodeAt(0) && tint <= '9'.charCodeAt(0))
-                        tint = parseIntStrict(type);
+                    if (tint >= "0".charCodeAt(0) && tint <= "9".charCodeAt(0)) tint = parseIntStrict(type);
 
                     if (tint === 34) {
                         DiodeModel.undumpModel(st);
@@ -208,11 +201,10 @@ export class CircuitLoader {
                     }
                     if (tint === 38) {
                         const adj = new (window as any).Adjustable(st, this.app);
-                        if (adj.elm != null)
-                            this.app.adjustables.push(adj);
+                        if (adj.elm != null) this.app.adjustables.push(adj);
                         break;
                     }
-                    if (tint === '.'.charCodeAt(0)) {
+                    if (tint === ".".charCodeAt(0)) {
                         SubcircuitModel.undumpModel(st);
                         break;
                     }
@@ -221,7 +213,7 @@ export class CircuitLoader {
                     const y1 = parseIntStrict(st.nextToken());
                     const x2 = parseIntStrict(st.nextToken());
                     const y2 = parseIntStrict(st.nextToken());
-                    const f  = parseIntStrict(st.nextToken());
+                    const f = parseIntStrict(st.nextToken());
 
                     const newce = CirSim.createCe(tint, x1, y1, x2, y2, f, st);
                     if (newce == null) {
@@ -232,7 +224,7 @@ export class CircuitLoader {
                     this.app.elmList.push(newce);
                 } catch (ee) {
                     CirSim.console("exception while undumping " + ee);
-		    debugger;
+                    debugger;
                     this.app.consoleExceptionOccurred = true;
                     break;
                 }
@@ -240,7 +232,7 @@ export class CircuitLoader {
             }
         }
 
-	this.finishReadCircuit(flags);
+        this.finishReadCircuit(flags);
     }
 
     finishReadCircuit(flags: number): void {
@@ -249,24 +241,21 @@ export class CircuitLoader {
 
         if ((flags & CircuitLoader.RC_RETAIN) == 0) {
             for (let i = 0; i < this.app.adjustables.length; i++) {
-                if (!this.app.adjustables[i].createSlider(this.app))
-                    this.app.adjustables.splice(i--, 1);
+                if (!this.app.adjustables[i].createSlider(this.app)) this.app.adjustables.splice(i--, 1);
             }
         }
 
         this.app.needAnalyze();
-        if ((flags & CircuitLoader.RC_NO_CENTER) == 0)
-            this.app.centerCircuit();
+        if ((flags & CircuitLoader.RC_NO_CENTER) == 0) this.app.centerCircuit();
 
-        if ((flags & CircuitLoader.RC_SUBCIRCUITS) != 0)
-            this.app.updateModels();
+        if ((flags & CircuitLoader.RC_SUBCIRCUITS) != 0) this.app.updateModels();
 
         // AudioInputElm.clearCache();
         // DataInputElm.clearCache();
     }
 
     private readHint(st: StringTokenizer): void {
-        this.app.hintType  = parseIntStrict(st.nextToken());
+        this.app.hintType = parseIntStrict(st.nextToken());
         this.app.hintItem1 = parseIntStrict(st.nextToken());
         this.app.hintItem2 = parseIntStrict(st.nextToken());
     }
@@ -274,8 +263,7 @@ export class CircuitLoader {
     private readOptions(st: StringTokenizer, importFlags: number): void {
         const flags = parseIntStrict(st.nextToken());
         if ((importFlags & CircuitLoader.RC_RETAIN) != 0) {
-            if ((flags & 2) != 0)
-                this.menus.smallGridCheckItem.setState(true);
+            if ((flags & 2) != 0) this.menus.smallGridCheckItem.setState(true);
             return;
         }
 
@@ -304,20 +292,19 @@ export class CircuitLoader {
     }
 
     async loadFileFromURL(url: string): Promise<void> {
-	try {
-	    const response = await fetch(url);
-	    if (response.ok) {
-		const text = await response.text();
-		this.readCircuit(text, CircuitLoader.RC_KEEP_TITLE);
-		this.app.unsavedChanges = false;
-		this.app.savedFlag = true;
-	    } else {
-		window.alert(Locale.LS("Can't load circuit!"));
-		console.log("Bad file server response:" + response.statusText);
-	    }
-	} catch (e) {
-	    console.log("failed file reading", e);
-	}
+        try {
+            const response = await fetch(url);
+            if (response.ok) {
+                const text = await response.text();
+                this.readCircuit(text, CircuitLoader.RC_KEEP_TITLE);
+                this.app.unsavedChanges = false;
+                this.app.savedFlag = true;
+            } else {
+                window.alert(Locale.LS("Can't load circuit!"));
+                console.log("Bad file server response:" + response.statusText);
+            }
+        } catch (e) {
+            console.log("failed file reading", e);
+        }
     }
-
 }

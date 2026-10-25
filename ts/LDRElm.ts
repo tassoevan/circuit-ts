@@ -41,8 +41,12 @@ export class LDRElm extends CircuitElm {
         this.createSlider();
     }
 
-    getPostCount(): number { return 2; }
-    getDumpType(): number { return 374; }
+    getPostCount(): number {
+        return 2;
+    }
+    getDumpType(): number {
+        return 374;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -113,9 +117,12 @@ export class LDRElm extends CircuitElm {
         ctx.save();
         ctx.lineWidth = 3.0;
         ctx.transform(
-            (this.lead2!.x - this.lead1!.x) / len, (this.lead2!.y - this.lead1!.y) / len,
-            -(this.lead2!.y - this.lead1!.y) / len, (this.lead2!.x - this.lead1!.x) / len,
-            this.lead1!.x, this.lead1!.y
+            (this.lead2!.x - this.lead1!.x) / len,
+            (this.lead2!.y - this.lead1!.y) / len,
+            -(this.lead2!.y - this.lead1!.y) / len,
+            (this.lead2!.x - this.lead1!.x) / len,
+            this.lead1!.x,
+            this.lead1!.y,
         );
         const grad = ctx.createLinearGradient(0, 0, len, 0);
         grad.addColorStop(0, this.getVoltageColor(g, this.nodes[0].v).getHexValue());
@@ -125,8 +132,8 @@ export class LDRElm extends CircuitElm {
             ctx.beginPath();
             ctx.moveTo(0, 0);
             for (let i = 0; i < 4; i++) {
-                ctx.lineTo((1 + 4*i) * len / 16, hs);
-                ctx.lineTo((3 + 4*i) * len / 16, -hs);
+                ctx.lineTo(((1 + 4 * i) * len) / 16, hs);
+                ctx.lineTo(((3 + 4 * i) * len) / 16, -hs);
             }
             ctx.lineTo(len, 0);
             ctx.stroke();
@@ -135,10 +142,16 @@ export class LDRElm extends CircuitElm {
         }
         // LDR arrows
         ctx.beginPath();
-        ctx.moveTo(-8, 26); ctx.lineTo(8, 12);
-        ctx.moveTo(2, 12);  ctx.lineTo(8, 12); ctx.lineTo(8, 18);
-        ctx.moveTo(12, 26); ctx.lineTo(26, 12);
-        ctx.moveTo(20, 12); ctx.lineTo(26, 12); ctx.lineTo(26, 18);
+        ctx.moveTo(-8, 26);
+        ctx.lineTo(8, 12);
+        ctx.moveTo(2, 12);
+        ctx.lineTo(8, 12);
+        ctx.lineTo(8, 18);
+        ctx.moveTo(12, 26);
+        ctx.lineTo(26, 12);
+        ctx.moveTo(20, 12);
+        ctx.lineTo(26, 12);
+        ctx.lineTo(26, 18);
         ctx.stroke();
         ctx.restore();
         if (this.showValues()) {
@@ -168,7 +181,9 @@ export class LDRElm extends CircuitElm {
         arr[4] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Slider Text", 0, -1, -1);

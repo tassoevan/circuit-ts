@@ -30,7 +30,7 @@ export class ExtListEntry {
     constructor(name: string, node: number, pos?: number, side?: number) {
         this.name = name;
         this.node = node;
-        this.pos  = pos  ?? 0;
+        this.pos = pos ?? 0;
         this.side = side ?? 2; // ChipElm.SIDE_W = 2
     }
 }

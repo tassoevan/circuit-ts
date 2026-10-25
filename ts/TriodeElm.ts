@@ -27,7 +27,7 @@ import { StringTokenizer } from "./StringTokenizer";
 import { parseFloatStrict } from "./NumberParse";
 
 export class TriodeElm extends CircuitElm {
-    static readonly FLAG_FLIP     = 1;
+    static readonly FLAG_FLIP = 1;
     static readonly FLAG_DSIGN_FIX = 2;
 
     mu: number;
@@ -45,12 +45,12 @@ export class TriodeElm extends CircuitElm {
     constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
         if (xb === undefined) {
             super(xxOrXa, yyOrYa);
-            this.mu  = 93;
+            this.mu = 93;
             this.kg1 = 680;
             this.flags |= TriodeElm.FLAG_DSIGN_FIX;
         } else {
             super(xxOrXa, yyOrYa, xb, yb!, f!);
-            this.mu  = parseFloatStrict(st!.nextToken());
+            this.mu = parseFloatStrict(st!.nextToken());
             this.kg1 = parseFloatStrict(st!.nextToken());
         }
         this.setup();
@@ -60,7 +60,9 @@ export class TriodeElm extends CircuitElm {
         this.noDiagonal = true;
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     reset(): void {
         this.curcount = 0;
@@ -74,11 +76,13 @@ export class TriodeElm extends CircuitElm {
 
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
-        this.mu  = xml.parseDoubleAttr("mu", this.mu);
+        this.mu = xml.parseDoubleAttr("mu", this.mu);
         this.kg1 = xml.parseDoubleAttr("kg", this.kg1);
     }
 
-    getDumpType(): number { return 173; }
+    getDumpType(): number {
+        return 173;
+    }
 
     plate!: Point[];
     grid!: Point[];
@@ -89,11 +93,11 @@ export class TriodeElm extends CircuitElm {
 
     setPoints(): void {
         super.setPoints();
-        const s = ((this.flags & TriodeElm.FLAG_DSIGN_FIX) !== 0) ? this.dsign : 1;
-        const flip = ((this.flags & TriodeElm.FLAG_FLIP) !== 0) ? -s : s;
+        const s = (this.flags & TriodeElm.FLAG_DSIGN_FIX) !== 0 ? this.dsign : 1;
+        const flip = (this.flags & TriodeElm.FLAG_FLIP) !== 0 ? -s : s;
         this.plate = this.newPointArray(4);
-        this.grid  = this.newPointArray(8);
-        this.cath  = this.newPointArray(4);
+        this.grid = this.newPointArray(8);
+        this.cath = this.newPointArray(4);
         this.grid[0] = this.point1;
         const nearw = 8 * flip;
         this.plate[1] = this.interpPoint(this.point1, this.point2, 1, nearw);
@@ -130,22 +134,20 @@ export class TriodeElm extends CircuitElm {
         // draw grid
         this.setVoltageColor(g, this.nodes[1].v);
         this.setPowerColor(g, this.currentg * (this.nodes[1].v - this.nodes[2].v));
-        for (let i = 0; i !== 8; i += 2)
-            CircuitElm.drawThickLine(g, this.grid[i], this.grid[i + 1]);
+        for (let i = 0; i !== 8; i += 2) CircuitElm.drawThickLine(g, this.grid[i], this.grid[i + 1]);
         // draw cathode
         this.setVoltageColor(g, this.nodes[2].v);
         this.setPowerColor(g, 0);
-        for (let i = 0; i !== 3; i++)
-            CircuitElm.drawThickLine(g, this.cath[i], this.cath[i + 1]);
+        for (let i = 0; i !== 3; i++) CircuitElm.drawThickLine(g, this.cath[i], this.cath[i + 1]);
         // draw dots
         this.curcountp = this.updateDotCountImpl(this.currentp, this.curcountp);
         this.curcountc = this.updateDotCountImpl(this.currentc, this.curcountc);
         this.curcountg = this.updateDotCountImpl(this.currentg, this.curcountg);
         if (!this.isCreating()) {
             this.drawDots(g, this.plate[0], this.midgrid, this.curcountp);
-            this.drawDots(g, this.midgrid,  this.midcath, this.curcountc);
-            this.drawDots(g, this.midcath,  this.cath[1], this.addCurCount(this.curcountc, 8));
-            this.drawDots(g, this.cath[1],  this.cath[0], this.addCurCount(this.curcountc, 8));
+            this.drawDots(g, this.midgrid, this.midcath, this.curcountc);
+            this.drawDots(g, this.midcath, this.cath[1], this.addCurCount(this.curcountc, 8));
+            this.drawDots(g, this.cath[1], this.cath[0], this.addCurCount(this.curcountc, 8));
             this.drawDots(g, this.point1, this.midgrid, this.curcountg);
         }
         this.drawPosts(g);
@@ -158,20 +160,26 @@ export class TriodeElm extends CircuitElm {
     }
 
     getPost(n: number): Point {
-        return (n === 0) ? this.plate[0] : (n === 1) ? this.grid[0] : this.cath[0];
+        return n === 0 ? this.plate[0] : n === 1 ? this.grid[0] : this.cath[0];
     }
 
-    getPostCount(): number { return 3; }
+    getPostCount(): number {
+        return 3;
+    }
 
     getPower(): number {
-        return (this.nodes[this.plateN].v - this.nodes[this.cathN].v) * this.currentc +
-            (this.nodes[this.gridN].v - this.nodes[this.cathN].v) * this.currentg;
+        return (
+            (this.nodes[this.plateN].v - this.nodes[this.cathN].v) * this.currentc +
+            (this.nodes[this.gridN].v - this.nodes[this.cathN].v) * this.currentg
+        );
     }
 
-    getCurrent(): number { return this.currentc; }
+    getCurrent(): number {
+        return this.currentc;
+    }
 
-    readonly gridN  = 1;
-    readonly cathN  = 2;
+    readonly gridN = 1;
+    readonly cathN = 2;
     readonly plateN = 0;
 
     lastv0: number = 0;
@@ -180,15 +188,17 @@ export class TriodeElm extends CircuitElm {
 
     doStep(): void {
         const vs = [this.nodes[0].v, this.nodes[1].v, this.nodes[2].v];
-        if (vs[1] > this.lastv1 + .5) vs[1] = this.lastv1 + .5;
-        if (vs[1] < this.lastv1 - .5) vs[1] = this.lastv1 - .5;
-        if (vs[2] > this.lastv2 + .5) vs[2] = this.lastv2 + .5;
-        if (vs[2] < this.lastv2 - .5) vs[2] = this.lastv2 - .5;
+        if (vs[1] > this.lastv1 + 0.5) vs[1] = this.lastv1 + 0.5;
+        if (vs[1] < this.lastv1 - 0.5) vs[1] = this.lastv1 - 0.5;
+        if (vs[2] > this.lastv2 + 0.5) vs[2] = this.lastv2 + 0.5;
+        if (vs[2] < this.lastv2 - 0.5) vs[2] = this.lastv2 - 0.5;
         const vgk = vs[this.gridN] - vs[this.cathN];
         const vpk = vs[this.plateN] - vs[this.cathN];
-        if (Math.abs(this.lastv0 - vs[0]) > .01 ||
-            Math.abs(this.lastv1 - vs[1]) > .01 ||
-            Math.abs(this.lastv2 - vs[2]) > .01)
+        if (
+            Math.abs(this.lastv0 - vs[0]) > 0.01 ||
+            Math.abs(this.lastv1 - vs[1]) > 0.01 ||
+            Math.abs(this.lastv2 - vs[2]) > 0.01
+        )
             CircuitElm.sim.converged = false;
         this.lastv0 = vs[0];
         this.lastv1 = vs[1];
@@ -198,31 +208,30 @@ export class TriodeElm extends CircuitElm {
         let Gds = 0;
         const ival = vgk + vpk / this.mu;
         this.currentg = 0;
-        if (vgk > .01) {
+        if (vgk > 0.01) {
             CircuitElm.sim.stampResistor(this.nodes[this.gridN], this.nodes[this.cathN], this.gridCurrentR);
             this.currentg = vgk / this.gridCurrentR;
-        } else
-            CircuitElm.sim.stampResistor(this.nodes[this.gridN], this.nodes[this.cathN], 1e8);
+        } else CircuitElm.sim.stampResistor(this.nodes[this.gridN], this.nodes[this.cathN], 1e8);
         if (ival < 0) {
             Gds = 1e-8;
             ids = vpk * Gds;
         } else {
             ids = Math.pow(ival, 1.5) / this.kg1;
-            const q = 1.5 * Math.sqrt(ival) / this.kg1;
+            const q = (1.5 * Math.sqrt(ival)) / this.kg1;
             Gds = q;
             gm = q / this.mu;
         }
         this.currentp = ids;
         this.currentc = ids + this.currentg;
         const rs = -ids + Gds * vpk + gm * vgk;
-        CircuitElm.sim.stampMatrix(this.nodes[this.plateN], this.nodes[this.plateN],  Gds);
-        CircuitElm.sim.stampMatrix(this.nodes[this.plateN], this.nodes[this.cathN],  -Gds - gm);
-        CircuitElm.sim.stampMatrix(this.nodes[this.plateN], this.nodes[this.gridN],   gm);
-        CircuitElm.sim.stampMatrix(this.nodes[this.cathN],  this.nodes[this.plateN], -Gds);
-        CircuitElm.sim.stampMatrix(this.nodes[this.cathN],  this.nodes[this.cathN],   Gds + gm);
-        CircuitElm.sim.stampMatrix(this.nodes[this.cathN],  this.nodes[this.gridN],  -gm);
-        CircuitElm.sim.stampRightSide(this.nodes[this.plateN],  rs);
-        CircuitElm.sim.stampRightSide(this.nodes[this.cathN],  -rs);
+        CircuitElm.sim.stampMatrix(this.nodes[this.plateN], this.nodes[this.plateN], Gds);
+        CircuitElm.sim.stampMatrix(this.nodes[this.plateN], this.nodes[this.cathN], -Gds - gm);
+        CircuitElm.sim.stampMatrix(this.nodes[this.plateN], this.nodes[this.gridN], gm);
+        CircuitElm.sim.stampMatrix(this.nodes[this.cathN], this.nodes[this.plateN], -Gds);
+        CircuitElm.sim.stampMatrix(this.nodes[this.cathN], this.nodes[this.cathN], Gds + gm);
+        CircuitElm.sim.stampMatrix(this.nodes[this.cathN], this.nodes[this.gridN], -gm);
+        CircuitElm.sim.stampRightSide(this.nodes[this.plateN], rs);
+        CircuitElm.sim.stampRightSide(this.nodes[this.cathN], -rs);
     }
 
     stamp(): void {
@@ -234,7 +243,7 @@ export class TriodeElm extends CircuitElm {
     getInfo(arr: string[]): void {
         arr[0] = "triode";
         const vac = this.nodes[this.plateN].v - this.nodes[this.cathN].v;
-        const vgc = this.nodes[this.gridN].v  - this.nodes[this.cathN].v;
+        const vgc = this.nodes[this.gridN].v - this.nodes[this.cathN].v;
         const vag = this.nodes[this.plateN].v - this.nodes[this.gridN].v;
         arr[1] = "Vac = " + CircuitElm.getVoltageText(vac);
         arr[2] = "Vgc = " + CircuitElm.getVoltageText(vgc);
@@ -244,39 +253,43 @@ export class TriodeElm extends CircuitElm {
     }
 
     // grid not connected to other terminals
-    getConnection(n1: number, n2: number): boolean { return !(n1 === 1 || n2 === 1); }
-    getMatrixConnection(n1: number, n2: number): boolean { return true; }
+    getConnection(n1: number, n2: number): boolean {
+        return !(n1 === 1 || n2 === 1);
+    }
+    getMatrixConnection(n1: number, n2: number): boolean {
+        return true;
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("mu", this.mu, 0, 0).setDimensionless().setPositive();
-        if (n === 1)
-            return new EditInfo("kg1", this.kg1, 0, 0).setDimensionless().setPositive();
+        if (n === 0) return new EditInfo("mu", this.mu, 0, 0).setDimensionless().setPositive();
+        if (n === 1) return new EditInfo("kg1", this.kg1, 0, 0).setDimensionless().setPositive();
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0) this.mu  = ei.value;
+        if (n === 0) this.mu = ei.value;
         if (n === 1) this.kg1 = ei.value;
     }
 
-    canViewInScope(): boolean { return true; }
-    getVoltageDiff(): number { return this.nodes[this.plateN].v - this.nodes[this.cathN].v; }
+    canViewInScope(): boolean {
+        return true;
+    }
+    getVoltageDiff(): number {
+        return this.nodes[this.plateN].v - this.nodes[this.cathN].v;
+    }
 
     flipX(c2: number, count: number): void {
-        if (this.x === this.x2)
-            this.flags ^= TriodeElm.FLAG_FLIP;
-        if ((this.flags & TriodeElm.FLAG_DSIGN_FIX) === 0 && this.x !== this.x2)
-            this.flags ^= TriodeElm.FLAG_FLIP;
+        if (this.x === this.x2) this.flags ^= TriodeElm.FLAG_FLIP;
+        if ((this.flags & TriodeElm.FLAG_DSIGN_FIX) === 0 && this.x !== this.x2) this.flags ^= TriodeElm.FLAG_FLIP;
         super.flipX(c2, count);
     }
 
     flipY(c2: number, count: number): void {
-        if (this.y === this.y2)
-            this.flags ^= TriodeElm.FLAG_FLIP;
-        if ((this.flags & TriodeElm.FLAG_DSIGN_FIX) === 0 && this.y !== this.y2)
-            this.flags ^= TriodeElm.FLAG_FLIP;
+        if (this.y === this.y2) this.flags ^= TriodeElm.FLAG_FLIP;
+        if ((this.flags & TriodeElm.FLAG_DSIGN_FIX) === 0 && this.y !== this.y2) this.flags ^= TriodeElm.FLAG_FLIP;
         super.flipY(c2, count);
     }
 
@@ -284,5 +297,4 @@ export class TriodeElm extends CircuitElm {
         this.flags ^= TriodeElm.FLAG_FLIP;
         super.flipXY(xmy, count);
     }
-
 }

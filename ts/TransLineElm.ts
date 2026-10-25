@@ -70,10 +70,18 @@ export class TransLineElm extends CircuitElm {
         }
     }
 
-    getDumpType(): number { return 171; }
-    getPostCount(): number { return 4; }
-    getInternalNodeCount(): number { return 2; }
-    getXmlDumpType(): string { return "tl"; }
+    getDumpType(): number {
+        return 171;
+    }
+    getPostCount(): number {
+        return 4;
+    }
+    getInternalNodeCount(): number {
+        return 2;
+    }
+    getXmlDumpType(): string {
+        return "tl";
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -108,8 +116,7 @@ export class TransLineElm extends CircuitElm {
     }
 
     reset(): void {
-        if (CircuitElm.sim.maxTimeStep === 0)
-            return;
+        if (CircuitElm.sim.maxTimeStep === 0) return;
         this.lenSteps = Math.trunc(this.delay / CircuitElm.sim.maxTimeStep);
         if (this.lenSteps > 100000) {
             this.voltageL = this.voltageR = null;
@@ -124,7 +131,7 @@ export class TransLineElm extends CircuitElm {
 
     setPoints(): void {
         super.setPoints();
-        const ds = (this.dy === 0) ? CircuitElm.sign(this.dx) : -CircuitElm.sign(this.dy);
+        const ds = this.dy === 0 ? CircuitElm.sign(this.dx) : -CircuitElm.sign(this.dy);
         const p3 = this.interpPoint(this.point1, this.point2, 0, -this.width * ds);
         const p4 = this.interpPoint(this.point1, this.point2, 1, -this.width * ds);
         const sep = CircuitElm.app.gridSize / 2;
@@ -148,9 +155,12 @@ export class TransLineElm extends CircuitElm {
         const segf = 1 / segments;
 
         g.setColor(Color.darkGray);
-        g.fillRect(this.inner[2].x, this.inner[2].y,
-                   this.inner[1].x - this.inner[2].x + 2,
-                   this.inner[1].y - this.inner[2].y + 2);
+        g.fillRect(
+            this.inner[2].x,
+            this.inner[2].y,
+            this.inner[1].x - this.inner[2].x + 2,
+            this.inner[1].y - this.inner[2].y + 2,
+        );
 
         for (let i = 0; i !== 4; i++) {
             this.setVoltageColor(g, this.nodes[i].v);
@@ -159,8 +169,8 @@ export class TransLineElm extends CircuitElm {
 
         if (this.voltageL != null) {
             for (let i = 0; i !== segments; i++) {
-                const ix1 = (ix0 - Math.trunc(this.lenSteps * i / segments)) % this.lenSteps;
-                const ix2 = (ix0 - Math.trunc(this.lenSteps * (segments - 1 - i) / segments)) % this.lenSteps;
+                const ix1 = (ix0 - Math.trunc((this.lenSteps * i) / segments)) % this.lenSteps;
+                const ix2 = (ix0 - Math.trunc((this.lenSteps * (segments - 1 - i)) / segments)) % this.lenSteps;
                 const v = (this.voltageL[ix1] + this.voltageR[ix2]) / 2;
                 this.setVoltageColor(g, v);
                 this.interpPoint(this.inner[0], this.inner[1], CircuitElm.ps1, i * segf);
@@ -196,10 +206,8 @@ export class TransLineElm extends CircuitElm {
     }
 
     setCurrent(vs: VoltageSource, c: number): void {
-        if (vs === this.voltSource1)
-            this.current1 = c;
-        else
-            this.current2 = c;
+        if (vs === this.voltSource1) this.current1 = c;
+        else this.current2 = c;
     }
 
     stamp(): void {
@@ -233,21 +241,28 @@ export class TransLineElm extends CircuitElm {
     }
 
     stepFinished(): void {
-        if (CircuitElm.sim.timeStepCount === this.lastStepCount)
-            return;
+        if (CircuitElm.sim.timeStepCount === this.lastStepCount) return;
         this.lastStepCount = CircuitElm.sim.timeStepCount;
         this.ptr = (this.ptr + 1) % this.lenSteps;
     }
 
-    getPost(n: number): Point { return this.posts[n]; }
+    getPost(n: number): Point {
+        return this.posts[n];
+    }
 
-    getVoltageSourceCount(): number { return 2; }
-    hasGroundConnection(n1: number): boolean { return false; }
-    getConnection(n1: number, n2: number): boolean { return false; }
+    getVoltageSourceCount(): number {
+        return 2;
+    }
+    hasGroundConnection(n1: number): boolean {
+        return false;
+    }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
 
     getMatrixConnection(n1: number, n2: number): boolean {
         // odd nodes == right side, even nodes == left side
-        return (n1 % 2) === (n2 % 2);
+        return n1 % 2 === n2 % 2;
     }
 
     getInfo(arr: string[]): void {
@@ -259,10 +274,8 @@ export class TransLineElm extends CircuitElm {
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Delay (s)", this.delay, 0, 0).setPositive();
-        if (n === 1)
-            return new EditInfo("Impedance (ohms)", this.imped, 0, 0).setPositive();
+        if (n === 0) return new EditInfo("Delay (s)", this.delay, 0, 0).setPositive();
+        if (n === 1) return new EditInfo("Impedance (ohms)", this.imped, 0, 0).setPositive();
         return null;
     }
 
@@ -284,6 +297,10 @@ export class TransLineElm extends CircuitElm {
         return this.current2;
     }
 
-    canFlipX(): boolean { return this.dy === 0; }
-    canFlipY(): boolean { return this.dx === 0; }
+    canFlipX(): boolean {
+        return this.dy === 0;
+    }
+    canFlipY(): boolean {
+        return this.dx === 0;
+    }
 }

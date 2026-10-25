@@ -71,7 +71,9 @@ export class ExprEngine {
 
     // roll the current values into the previous-timestep slots that lasta..lasti,
     // lastoutput and dvdt()/didt() read.  called once per timestep, from stepFinished().
-    stepFinished(output: number): void { this.state.updateLastValues(output); }
+    stepFinished(output: number): void {
+        this.state.updateLastValues(output);
+    }
 
     constructor(owner: ExprOwner) {
         this.owner = owner;
@@ -88,10 +90,14 @@ export class ExprEngine {
         return parser.gotError();
     }
 
-    getRefCount(): number { return this.refs.length; }
+    getRefCount(): number {
+        return this.refs.length;
+    }
 
     // two nodes per reference: the positive and negative end of the referenced quantity
-    getRefNodeCount(): number { return 2 * this.refs.length; }
+    getRefNodeCount(): number {
+        return 2 * this.refs.length;
+    }
 
     // index in the owner's nodes[] of the positive node of reference k
     refNodeIndex(k: number): number {
@@ -118,7 +124,7 @@ export class ExprEngine {
         for (let k = 0; k !== this.getRefCount(); k++) {
             const ref = this.refs[k];
             const ix = this.refNodeIndex(k);
-            this.owner.setNode(ix,     CircuitNode.ground);
+            this.owner.setNode(ix, CircuitNode.ground);
             this.owner.setNode(ix + 1, CircuitNode.ground);
 
             // a labeled node wins over an element with the same name
@@ -136,12 +142,11 @@ export class ExprEngine {
                     elm = elmList[j];
                     break;
                 }
-            if (elm == null || elm.getPostCount() < 2)
-                continue;  // unresolved; the slots stay ground and getInfo() reports it
+            if (elm == null || elm.getPostCount() < 2) continue; // unresolved; the slots stay ground and getInfo() reports it
             this.refElms[k] = elm;
             // take the meter's nodes even for a current reference, where we don't stamp
             // against them: its voltage source row has to land in the same matrix as us.
-            this.owner.setNode(ix,     elm.getNode(0));
+            this.owner.setNode(ix, elm.getNode(0));
             this.owner.setNode(ix + 1, elm.getNode(1));
         }
     }
@@ -154,19 +159,15 @@ export class ExprEngine {
     // Only fills gaps: a name resolved at the top level keeps the element it found.
     resolveRefElmsByNode(elmList: CircuitElm[]): void {
         for (let k = 0; k !== this.getRefCount(); k++) {
-            if (!this.refs[k].current || this.refElms[k] != null)
-                continue;
+            if (!this.refs[k].current || this.refElms[k] != null) continue;
             const ix = this.refNodeIndex(k);
             const n0 = this.owner.nodes[ix];
             const n1 = this.owner.nodes[ix + 1];
-            if (n0 === n1)
-                continue;  // unresolved (both ground)
+            if (n0 === n1) continue; // unresolved (both ground)
             for (let j = 0; j !== elmList.length; j++) {
                 const ce = elmList[j];
-                if (ce === this.owner || ce.voltSource == null || ce.getPostCount() < 2)
-                    continue;
-                if ((ce.getNode(0) === n0 && ce.getNode(1) === n1) ||
-                        (ce.getNode(0) === n1 && ce.getNode(1) === n0)) {
+                if (ce === this.owner || ce.voltSource == null || ce.getPostCount() < 2) continue;
+                if ((ce.getNode(0) === n0 && ce.getNode(1) === n1) || (ce.getNode(0) === n1 && ce.getNode(1) === n0)) {
                     this.refElms[k] = ce;
                     break;
                 }
@@ -175,67 +176,59 @@ export class ExprEngine {
     }
 
     // total number of expression inputs we take a derivative against
-    getInputCount(): number { return this.pinInputCount + this.refs.length; }
+    getInputCount(): number {
+        return this.pinInputCount + this.refs.length;
+    }
 
     getInputValue(i: number): number {
-        if (i < this.pinInputCount)
-            return this.owner.nodes[i].v;
+        if (i < this.pinInputCount) return this.owner.nodes[i].v;
         const k = i - this.pinInputCount;
         const elm = this.refElms[k];
-        if (this.refs[k].current)
-            return (elm == null) ? 0 : elm.getCurrent();
+        if (this.refs[k].current) return elm == null ? 0 : elm.getCurrent();
         const ix = this.refNodeIndex(k);
         return this.owner.nodes[ix].v - this.owner.nodes[ix + 1].v;
     }
 
     setInputValue(i: number, v: number): void {
-        if (i < this.pinInputCount)
-            this.state.values[i] = v;
-        else
-            this.state.nodeValues[i - this.pinInputCount] = v;
+        if (i < this.pinInputCount) this.state.values[i] = v;
+        else this.state.nodeValues[i - this.pinInputCount] = v;
     }
 
     // the node pair input i is a voltage across.  ground/ground for a current reference,
     // which stamps against a voltage source row instead.
     getInputNodePos(i: number): CircuitNode {
-        if (i < this.pinInputCount)
-            return this.owner.nodes[i];
+        if (i < this.pinInputCount) return this.owner.nodes[i];
         const k = i - this.pinInputCount;
         return this.refs[k].current ? CircuitNode.ground : this.owner.nodes[this.refNodeIndex(k)];
     }
 
     getInputNodeNeg(i: number): CircuitNode {
-        if (i < this.pinInputCount)
-            return CircuitNode.ground;
+        if (i < this.pinInputCount) return CircuitNode.ground;
         const k = i - this.pinInputCount;
         return this.refs[k].current ? CircuitNode.ground : this.owner.nodes[this.refNodeIndex(k) + 1];
     }
 
     // the voltage source input i is the current through, or null if it's a voltage
     getInputVS(i: number): VoltageSource | null {
-        if (i < this.pinInputCount)
-            return null;
+        if (i < this.pinInputCount) return null;
         const k = i - this.pinInputCount;
-        if (!this.refs[k].current)
-            return null;
+        if (!this.refs[k].current) return null;
         const elm = this.refElms[k];
-        return (elm == null) ? null : elm.voltSource;
+        return elm == null ? null : elm.voltSource;
     }
 
     // have all our inputs settled?  currents get a tighter window than voltages, matching
     // what CCCSElm/CCVSElm already do for their current inputs.
     checkConvergence(baseLimit: number): boolean {
         for (let i = 0; i !== this.getInputCount(); i++) {
-            const lim = (this.getInputVS(i) != null) ? baseLimit * 0.1 : baseLimit;
-            if (Math.abs(this.getInputValue(i) - this.lastInputs[i]) > lim)
-                return false;
+            const lim = this.getInputVS(i) != null ? baseLimit * 0.1 : baseLimit;
+            if (Math.abs(this.getInputValue(i) - this.lastInputs[i]) > lim) return false;
         }
         return true;
     }
 
     saveInputs(): void {
-        for (let i = 0; i !== this.getInputCount(); i++)
-            this.lastInputs[i] = this.getInputValue(i);
+        for (let i = 0; i !== this.getInputCount(); i++) this.lastInputs[i] = this.getInputValue(i);
     }
 
     // evaluate the expression and stamp the linearization of each input's contribution,
@@ -247,8 +240,7 @@ export class ExprEngine {
         const n = this.getInputCount();
         const e = this.expr!;
 
-        for (let i = 0; i !== n; i++)
-            this.setInputValue(i, this.getInputValue(i));
+        for (let i = 0; i !== n; i++) this.setInputValue(i, this.getInputValue(i));
         this.state.t = SimulationManager.theSim.t;
         const v0 = sgn * e.eval(this.state);
         this.value = v0;
@@ -263,13 +255,10 @@ export class ExprEngine {
             this.setInputValue(i, x0 - dv);
             const v2 = sgn * e.eval(this.state);
             let dx = (v - v2) / dv;
-            if (Math.abs(dx) < 1e-6)
-                dx = (dx > 0) ? 1e-6 : -1e-6;
+            if (Math.abs(dx) < 1e-6) dx = dx > 0 ? 1e-6 : -1e-6;
             const vs = this.getInputVS(i);
-            if (vs != null)
-                this.owner.stampInputDerivativeVS(vs, dx);
-            else
-                this.owner.stampInputDerivative(this.getInputNodePos(i), this.getInputNodeNeg(i), dx);
+            if (vs != null) this.owner.stampInputDerivativeVS(vs, dx);
+            else this.owner.stampInputDerivative(this.getInputNodePos(i), this.getInputNodeNeg(i), dx);
             rs -= dx * x0;
             this.setInputValue(i, x0);
         }
@@ -281,10 +270,9 @@ export class ExprEngine {
     addUnresolvedInfo(arr: string[], i: number): number {
         for (let k = 0; k !== this.getRefCount(); k++) {
             const ref = this.refs[k];
-            const resolved = this.refElms[k] != null ||
-                (!ref.current && HookRegistry.getLabeledNode?.(ref.name) != null);
-            if (!resolved)
-                arr[i++] = "unknown name: " + (ref.current ? "i(" : "v(") + ref.name + ")";
+            const resolved =
+                this.refElms[k] != null || (!ref.current && HookRegistry.getLabeledNode?.(ref.name) != null);
+            if (!resolved) arr[i++] = "unknown name: " + (ref.current ? "i(" : "v(") + ref.name + ")";
             else if (ref.current && this.getInputVS(k + this.pinInputCount) == null)
                 arr[i++] = "not a current meter: " + ref.name;
         }

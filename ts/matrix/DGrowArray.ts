@@ -26,7 +26,9 @@ export class DGrowArray {
         this.length = length;
     }
 
-    reset(): void { this.reshape(0); }
+    reset(): void {
+        this.reshape(0);
+    }
 
     /**
      * Changes the array's length and doesn't attempt to preserve previous values if a new array is required
@@ -69,14 +71,12 @@ export class DGrowArray {
     }
 
     get(index: number): number {
-        if (index < 0 || index >= this.length)
-            throw new Error("Out of bounds");
+        if (index < 0 || index >= this.length) throw new Error("Out of bounds");
         return this.data[index];
     }
 
     set(index: number, value: number): void {
-        if (index < 0 || index >= this.length)
-            throw new Error("Out of bounds");
+        if (index < 0 || index >= this.length) throw new Error("Out of bounds");
         this.data[index] = value;
     }
 

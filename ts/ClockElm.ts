@@ -29,6 +29,10 @@ export class ClockElm extends RailElm {
         this.flags |= this.FLAG_CLOCK;
     }
 
-    getDumpClass() { return RailElm; }
-    getShortcut(): number { return 0; }
+    getDumpClass() {
+        return RailElm;
+    }
+    getShortcut(): number {
+        return 0;
+    }
 }

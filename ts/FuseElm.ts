@@ -67,9 +67,13 @@ export class FuseElm extends CircuitElm {
         this.blown = xml.parseBooleanAttr("bl", this.blown);
     }
 
-    getDumpType(): number { return 404; }
+    getDumpType(): number {
+        return 404;
+    }
 
-    isIECSymbol(): boolean { return (this.flags & this.FLAG_IEC_SYMBOL) !== 0; }
+    isIECSymbol(): boolean {
+        return (this.flags & this.FLAG_IEC_SYMBOL) !== 0;
+    }
 
     reset(): void {
         super.reset();
@@ -89,7 +93,11 @@ export class FuseElm extends CircuitElm {
         if (temp < 0.3333) {
             const val = temp * 3;
             const x = Math.max(0, Math.trunc(255 * val));
-            return new Color(x + (255 - x) * c.getRed() / 255, (255 - x) * c.getGreen() / 255, (255 - x) * c.getBlue() / 255);
+            return new Color(
+                x + ((255 - x) * c.getRed()) / 255,
+                ((255 - x) * c.getGreen()) / 255,
+                ((255 - x) * c.getBlue()) / 255,
+            );
         }
         if (temp < 0.6667) {
             const x = Math.max(0, Math.trunc((temp - 0.3333) * 3 * 255));
@@ -112,9 +120,12 @@ export class FuseElm extends CircuitElm {
         ctx.save();
         ctx.lineWidth = 3.0;
         ctx.transform(
-            (this.lead2!.x - this.lead1!.x) / len, (this.lead2!.y - this.lead1!.y) / len,
-            -(this.lead2!.y - this.lead1!.y) / len, (this.lead2!.x - this.lead1!.x) / len,
-            this.lead1!.x, this.lead1!.y
+            (this.lead2!.x - this.lead1!.x) / len,
+            (this.lead2!.y - this.lead1!.y) / len,
+            -(this.lead2!.y - this.lead1!.y) / len,
+            (this.lead2!.x - this.lead1!.x) / len,
+            this.lead1!.x,
+            this.lead1!.y,
         );
         ctx.strokeStyle = this.getTempColor(g).getHexValue();
         if (!this.isIECSymbol()) {
@@ -123,7 +134,7 @@ export class FuseElm extends CircuitElm {
                 ctx.beginPath();
                 ctx.moveTo(0, 0);
                 for (let i = 0; i <= segments; i++)
-                    ctx.lineTo(i * len / segments, hs * Math.sin(i * Math.PI * 2 / segments));
+                    ctx.lineTo((i * len) / segments, hs * Math.sin((i * Math.PI * 2) / segments));
                 ctx.stroke();
             }
         } else {
@@ -149,7 +160,9 @@ export class FuseElm extends CircuitElm {
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     startIteration(): void {
         const i = this.getCurrent();
@@ -158,44 +171,38 @@ export class FuseElm extends CircuitElm {
         this.heat += i * i * CircuitElm.sim.timeStep;
 
         // dissipate heat.  we assume the fuse can dissipate its entire i2t in 3 seconds
-        this.heat -= CircuitElm.sim.timeStep * this.i2t / 3;
+        this.heat -= (CircuitElm.sim.timeStep * this.i2t) / 3;
 
-        if (this.heat < 0)
-            this.heat = 0;
-        if (this.heat > this.i2t)
-            this.blown = true;
+        if (this.heat < 0) this.heat = 0;
+        if (this.heat > this.i2t) this.blown = true;
     }
 
     doStep(): void {
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.blown ? this.blownResistance : this.resistance);
     }
 
-    getElmType(): string { return "fuse"; }
+    getElmType(): string {
+        return "fuse";
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = this.blown ? "fuse (blown)" : "fuse";
         this.getBasicInfo(arr);
         arr[3] = "R = " + CircuitElm.getUnitText(this.resistance, Locale.ohmString);
         arr[4] = "I2t = " + this.i2t;
-        if (!this.blown)
-            arr[5] = Math.trunc(this.heat * 100 / this.i2t) + "% " + Locale.LS("melted");
+        if (!this.blown) arr[5] = Math.trunc((this.heat * 100) / this.i2t) + "% " + Locale.LS("melted");
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("I2t", this.i2t, 0, 0).setPositive();
-        if (n === 1)
-            return new EditInfo("Resistance", this.resistance, 0, 0).setPositive();
-        if (n === 2)
-            return EditInfo.createCheckbox("IEC Symbol", this.isIECSymbol());
+        if (n === 0) return new EditInfo("I2t", this.i2t, 0, 0).setPositive();
+        if (n === 1) return new EditInfo("Resistance", this.resistance, 0, 0).setPositive();
+        if (n === 2) return EditInfo.createCheckbox("IEC Symbol", this.isIECSymbol());
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.i2t = ei.value;
-        if (n === 1)
-            this.resistance = ei.value;
+        if (n === 0) this.i2t = ei.value;
+        if (n === 1) this.resistance = ei.value;
         if (n === 2) {
             this.flags = ei.changeFlag(this.flags, this.FLAG_IEC_SYMBOL);
             this.setPoints();

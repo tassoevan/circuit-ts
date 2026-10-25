@@ -77,7 +77,9 @@ export class CapacitorElm extends CircuitElm {
             this.allocNodes();
         }
     }
-    isTrapezoidal(): boolean { return (this.flags & CapacitorElm.FLAG_BACK_EULER) === 0; }
+    isTrapezoidal(): boolean {
+        return (this.flags & CapacitorElm.FLAG_BACK_EULER) === 0;
+    }
 
     reset(): void {
         super.reset();
@@ -89,8 +91,12 @@ export class CapacitorElm extends CircuitElm {
         super.reset();
         this.voltdiff = this.current = this.curcount = this.curSourceValue = 0;
     }
-    isCapacitorElm(): boolean { return true; }
-    getDumpType(): number { return 'c'.charCodeAt(0); }
+    isCapacitorElm(): boolean {
+        return true;
+    }
+    getDumpType(): number {
+        return "c".charCodeAt(0);
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -118,15 +124,15 @@ export class CapacitorElm extends CircuitElm {
 
     setPoints(): void {
         super.setPoints();
-        const f = (this.dn/2-4)/this.dn;
+        const f = (this.dn / 2 - 4) / this.dn;
         // calc leads
         this.lead1 = this.interpPoint(this.point1, this.point2, f);
-        this.lead2 = this.interpPoint(this.point1, this.point2, 1-f);
+        this.lead2 = this.interpPoint(this.point1, this.point2, 1 - f);
         // calc plates
         this.plate1 = this.newPointArray(2);
         this.plate2 = this.newPointArray(2);
         this.interpPoint2(this.point1, this.point2, this.plate1[0], this.plate1[1], f, 12);
-        this.interpPoint2(this.point1, this.point2, this.plate2[0], this.plate2[1], 1-f, 12);
+        this.interpPoint2(this.point1, this.point2, this.plate2[0], this.plate2[1], 1 - f, 12);
     }
 
     draw(g: Graphics): void {
@@ -138,19 +144,17 @@ export class CapacitorElm extends CircuitElm {
         CircuitElm.drawThickLine(g, this.point1, this.lead1);
         this.setPowerColor(g, false);
         CircuitElm.drawThickLine(g, this.plate1[0], this.plate1[1]);
-        if (this.showPower())
-            g.setColor(Color.gray);
+        if (this.showPower()) g.setColor(Color.gray);
 
         // draw second lead and plate
         this.setVoltageColor(g, this.nodes[1].v);
         CircuitElm.drawThickLine(g, this.point2, this.lead2);
         this.setPowerColor(g, false);
-        if (this.platePoints == null)
-            CircuitElm.drawThickLine(g, this.plate2[0], this.plate2[1]);
+        if (this.platePoints == null) CircuitElm.drawThickLine(g, this.plate2[0], this.plate2[1]);
         else {
             let i: number;
-            for (i = 0; i !== this.platePoints.length-1; i++)
-                CircuitElm.drawThickLine(g, this.platePoints[i], this.platePoints[i+1]);
+            for (i = 0; i !== this.platePoints.length - 1; i++)
+                CircuitElm.drawThickLine(g, this.platePoints[i], this.platePoints[i + 1]);
         }
 
         this.updateDotCount();
@@ -177,17 +181,15 @@ export class CapacitorElm extends CircuitElm {
         // ideal capacitor, capNode2 is node 1.  If series resistance, capNode2 = 2
         // and we place a resistor between nodes 2 and 1.
         // 2 is an internal node, 0 and 1 are the capacitor terminals.
-        this.capNode2 = (this.seriesResistance > 0) ? 2 : 1;
+        this.capNode2 = this.seriesResistance > 0 ? 2 : 1;
 
         // capacitor companion model using trapezoidal approximation
         // (Norton equivalent) consists of a current source in
         // parallel with a resistor.  Trapezoidal is more accurate
         // than backward euler but can cause oscillatory behavior
         // if RC is small relative to the timestep.
-        if (this.isTrapezoidal())
-            this.compResistance = CircuitElm.sim.timeStep/(2*this.capacitance);
-        else
-            this.compResistance = CircuitElm.sim.timeStep/this.capacitance;
+        if (this.isTrapezoidal()) this.compResistance = CircuitElm.sim.timeStep / (2 * this.capacitance);
+        else this.compResistance = CircuitElm.sim.timeStep / this.capacitance;
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[this.capNode2], this.compResistance);
         //CircuitElm.sim.stampRightSide(this.nodes[0]);
         //CircuitElm.sim.stampRightSide(this.nodes[this.capNode2]);
@@ -195,35 +197,33 @@ export class CapacitorElm extends CircuitElm {
             CircuitElm.sim.stampResistor(this.nodes[1], this.nodes[2], this.seriesResistance);
     }
     startIteration(): void {
-        if (this.isTrapezoidal())
-            this.curSourceValue = -this.voltdiff/this.compResistance-this.current;
-        else
-            this.curSourceValue = -this.voltdiff/this.compResistance;
+        if (this.isTrapezoidal()) this.curSourceValue = -this.voltdiff / this.compResistance - this.current;
+        else this.curSourceValue = -this.voltdiff / this.compResistance;
     }
 
     stepFinished(): void {
-        this.voltdiff = this.nodes[0].v-this.nodes[this.capNode2].v;
+        this.voltdiff = this.nodes[0].v - this.nodes[this.capNode2].v;
         this.calculateCurrent();
     }
 
     calculateCurrent(): void {
         const voltdiff = this.nodes[0].v - this.nodes[this.capNode2].v;
         if (this.doDcAnalysis()) {
-            this.current = voltdiff/1e8;
+            this.current = voltdiff / 1e8;
             return;
         }
         // we check compResistance because this might get called
         // before stamp(), which sets compResistance, causing
         // infinite current
-        if (this.compResistance > 0)
-            this.current = voltdiff/this.compResistance + this.curSourceValue;
+        if (this.compResistance > 0) this.current = voltdiff / this.compResistance + this.curSourceValue;
     }
     doStep(): void {
-        if (this.doDcAnalysis())
-            return;
+        if (this.doDcAnalysis()) return;
         CircuitElm.sim.stampCurrentSource(this.nodes[0], this.nodes[this.capNode2], this.curSourceValue);
     }
-    getInternalNodeCount(): number { return (!this.doDcAnalysis() && this.seriesResistance > 0) ? 1 : 0; }
+    getInternalNodeCount(): number {
+        return !this.doDcAnalysis() && this.seriesResistance > 0 ? 1 : 0;
+    }
     getInfo(arr: string[]): void {
         arr[0] = "capacitor";
         this.getBasicInfo(arr);
@@ -235,54 +235,59 @@ export class CapacitorElm extends CircuitElm {
         return Locale.LS("capacitor") + ", " + CircuitElm.getUnitText(this.capacitance, "F");
     }
     getScopeValue(x: number): number {
-        if (x === Scope.VAL_CHARGE)
-            return this.capacitance * this.voltdiff;
+        if (x === Scope.VAL_CHARGE) return this.capacitance * this.voltdiff;
         return super.getScopeValue(x);
     }
     getScopeUnits(x: number): number {
-        if (x === Scope.VAL_CHARGE)
-            return Scope.UNITS_C;
+        if (x === Scope.VAL_CHARGE) return Scope.UNITS_C;
         return super.getScopeUnits(x);
     }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Capacitance (F)", this.capacitance, 1e-6, 1e-3);
+        if (n === 0) return new EditInfo("Capacitance (F)", this.capacitance, 1e-6, 1e-3);
         if (n === 1) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Trapezoidal Approximation", this.isTrapezoidal());
             return ei;
         }
-        if (n === 2)
-            return new EditInfo("Initial Voltage (on Reset)", this.initialVoltage);
-        if (n === 3)
-            return new EditInfo("Series Resistance", this.seriesResistance);
+        if (n === 2) return new EditInfo("Initial Voltage (on Reset)", this.initialVoltage);
+        if (n === 3) return new EditInfo("Series Resistance", this.seriesResistance);
         // if you add more things here, check PolarCapacitorElm
         return null;
     }
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.capacitance = (ei.value > 0) ? ei.value : 1e-12;
+        if (n === 0) this.capacitance = ei.value > 0 ? ei.value : 1e-12;
         if (n === 1) {
-            if (ei.checkbox!.getState())
-                this.flags &= ~CapacitorElm.FLAG_BACK_EULER;
-            else
-                this.flags |= CapacitorElm.FLAG_BACK_EULER;
+            if (ei.checkbox!.getState()) this.flags &= ~CapacitorElm.FLAG_BACK_EULER;
+            else this.flags |= CapacitorElm.FLAG_BACK_EULER;
         }
-        if (n === 2)
-            this.initialVoltage = ei.value;
+        if (n === 2) this.initialVoltage = ei.value;
         if (n === 3) {
             this.seriesResistance = ei.value;
             this.allocNodes();
         }
     }
-    getShortcut(): number { return 'c'.charCodeAt(0); }
-    getCapacitance(): number { return this.capacitance; }
-    getSeriesResistance(): number { return this.seriesResistance; }
-    setCapacitance(c: number): void { this.capacitance = c; }
-    setSeriesResistance(c: number): void { this.seriesResistance = c; }
-    isIdealCapacitor(): boolean { return (this.seriesResistance === 0); }
+    getShortcut(): number {
+        return "c".charCodeAt(0);
+    }
+    getCapacitance(): number {
+        return this.capacitance;
+    }
+    getSeriesResistance(): number {
+        return this.seriesResistance;
+    }
+    setCapacitance(c: number): void {
+        this.capacitance = c;
+    }
+    setSeriesResistance(c: number): void {
+        this.seriesResistance = c;
+    }
+    isIdealCapacitor(): boolean {
+        return this.seriesResistance === 0;
+    }
 
-    addRoutingObstacle(wr: WireRouter): void { this.addRoutingObstacleWithLeads(wr, 12); }
+    addRoutingObstacle(wr: WireRouter): void {
+        this.addRoutingObstacleWithLeads(wr, 12);
+    }
     validate(): boolean {
         if (this.isIdealCapacitor()) {
             let fpi = new FindPathInfo(FindPathInfo.SHORT, this, this.getNode(1), CircuitElm.sim);
@@ -294,7 +299,7 @@ export class CapacitorElm extends CircuitElm {
                 if (fpi.findPath(this.getNode(0))) {
                     // loop of ideal capacitors; set a small series resistance to avoid
                     // oscillation in case one of them has voltage on it
-                    this.setSeriesResistance(.1);
+                    this.setSeriesResistance(0.1);
                     return false;
                 }
             }

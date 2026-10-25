@@ -56,7 +56,7 @@ export class SRAMElm extends ChipElm {
             super(xxOrXa, yyOrYa, xb, yb!, f!, st!);
             this.map = new Map();
             this.addressBits = parseIntStrict(st!.nextToken());
-            this.dataBits    = parseIntStrict(st!.nextToken());
+            this.dataBits = parseIntStrict(st!.nextToken());
             this.setupPins();
             try {
                 // load contents
@@ -64,20 +64,17 @@ export class SRAMElm extends ChipElm {
                 while (true) {
                     const a_str = st!.nextToken();
                     let a = parseIntStrict(a_str);
-                    if (a < 0)
-                        break;
+                    if (a < 0) break;
                     let v = parseIntStrict(st!.nextToken());
                     this.map.set(a, v);
                     while (true) {
                         v = parseIntStrict(st!.nextToken());
-                        if (v < 0)
-                            break;
+                        if (v < 0) break;
                         this.map.set(++a, v);
                     }
                 }
             } catch (e) {}
-            if ((this.flags & SRAMElm.FLAG_RELOAD_ON_RESET) !== 0)
-                this.initialMap = new Map(this.map);
+            if ((this.flags & SRAMElm.FLAG_RELOAD_ON_RESET) !== 0) this.initialMap = new Map(this.map);
         }
     }
 
@@ -88,8 +85,7 @@ export class SRAMElm extends ChipElm {
     }
     dumpXmlState(doc: Document, elem: Element): void {
         super.dumpXmlState(doc, elem);
-        if (this.map.size > 0)
-            elem.appendChild(doc.createTextNode(this.contentsToString()));
+        if (this.map.size > 0) elem.appendChild(doc.createTextNode(this.contentsToString()));
     }
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
@@ -109,14 +105,18 @@ export class SRAMElm extends ChipElm {
             this.map = new Map(this.initialMap);
     }
 
-    nonLinear(): boolean { return true; }
-    allowBus(): boolean { return true; }
-    getChipName(): string { return "Static RAM"; }
+    nonLinear(): boolean {
+        return true;
+    }
+    allowBus(): boolean {
+        return true;
+    }
+    getChipName(): string {
+        return "Static RAM";
+    }
     setupPins(): void {
-	if (this.addressBits === undefined)
-	    this.addressBits = 0;
-	if (this.dataBits === undefined)
-	    this.dataBits = 0;
+        if (this.addressBits === undefined) this.addressBits = 0;
+        if (this.dataBits === undefined) this.dataBits = 0;
         this.sizeX = 2;
         const addrY = this.useBus() ? 1 : this.addressBits;
         const dataY = this.useBus() ? 1 : this.dataBits;
@@ -130,7 +130,16 @@ export class SRAMElm extends ChipElm {
         this.addressNodes = 2;
         this.dataNodes = 2 + this.addressBits;
         this.internalNodes = 2 + this.addressBits + this.dataBits;
-        this.makeBitPins(this.addressBits, this.sizeY - addrY, ChipElm.SIDE_W, this.addressNodes, "A", false, false, true);
+        this.makeBitPins(
+            this.addressBits,
+            this.sizeY - addrY,
+            ChipElm.SIDE_W,
+            this.addressNodes,
+            "A",
+            false,
+            false,
+            true,
+        );
         this.makeBitPins(this.dataBits, this.sizeY - dataY, ChipElm.SIDE_E, this.dataNodes, "D", true, false, true);
         this.allocNodes();
     }
@@ -138,16 +147,16 @@ export class SRAMElm extends ChipElm {
         return 2 + this.addressBits + this.dataBits;
     }
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Address Bits", this.addressBits, 1, 1).setDimensionless();
-        if (n === 1)
-            return new EditInfo("# of Data Bits", this.dataBits, 1, 1).setDimensionless();
+        if (n === 0) return new EditInfo("# of Address Bits", this.addressBits, 1, 1).setDimensionless();
+        if (n === 1) return new EditInfo("# of Data Bits", this.dataBits, 1, 1).setDimensionless();
         if (n === 2) {
             const ei = new EditInfo("Contents", 0);
-            ei.textArea = { value: SRAMElm.contentsOverride !== null ? SRAMElm.contentsOverride : this.contentsToString(), element: null };
+            ei.textArea = {
+                value: SRAMElm.contentsOverride !== null ? SRAMElm.contentsOverride : this.contentsToString(),
+                element: null,
+            };
             SRAMElm.contentsOverride = null;
-            if (SRAMElm.fileNameOverride !== null)
-                this.loadedFileName = SRAMElm.fileNameOverride;
+            if (SRAMElm.fileNameOverride !== null) this.loadedFileName = SRAMElm.fileNameOverride;
             SRAMElm.fileNameOverride = null;
             return ei;
         }
@@ -157,9 +166,7 @@ export class SRAMElm extends ChipElm {
             return ei;
         }
         if (n === 4 && SRAMElm.loadFileSupported()) {
-            const ei = new EditInfo(
-                this.loadedFileName !== null ? "Loaded: " + this.loadedFileName : "",
-                0, -1, -1);
+            const ei = new EditInfo(this.loadedFileName !== null ? "Loaded: " + this.loadedFileName : "", 0, -1, -1);
             const input = document.createElement("input");
             input.type = "file";
             input.addEventListener("change", () => {
@@ -172,8 +179,7 @@ export class SRAMElm extends ChipElm {
         const reloadIdx = SRAMElm.loadFileSupported() ? 5 : 4;
         if (n === reloadIdx) {
             const ei = new EditInfo("", 0, -1, -1);
-            ei.checkbox = new Checkbox("Restore Contents on Reset",
-                (this.flags & SRAMElm.FLAG_RELOAD_ON_RESET) !== 0);
+            ei.checkbox = new Checkbox("Restore Contents on Reset", (this.flags & SRAMElm.FLAG_RELOAD_ON_RESET) !== 0);
             return ei;
         }
         return super.getChipEditInfo(n);
@@ -200,11 +206,9 @@ export class SRAMElm extends ChipElm {
             let str = "0x0:";
             for (let i = 0; i < n; i += bytesPerValue) {
                 let val = 0;
-                for (let j = 0; j < bytesPerValue; j++)
-                    val = (val << 8) | arr[i + j];
+                for (let j = 0; j < bytesPerValue; j++) val = (val << 8) | arr[i + j];
                 let hex = val.toString(16).toUpperCase();
-                while (hex.length < hexDigits)
-                    hex = "0" + hex;
+                while (hex.length < hexDigits) hex = "0" + hex;
                 str += " 0x" + hex;
             }
             SRAMElm.doLoadCallback(str, file.name);
@@ -226,18 +230,14 @@ export class SRAMElm extends ChipElm {
         const maxI = 1 << this.addressBits;
         for (let i = 0; i < maxI; i++) {
             let val = this.map.get(i);
-            if (val === undefined || val === 0)
-                continue;
-            s += (hex ? i.toString(16).toUpperCase() : "" + i) + ": " +
-                 (hex ? this.toHex(val) : "" + val);
+            if (val === undefined || val === 0) continue;
+            s += (hex ? i.toString(16).toUpperCase() : "" + i) + ": " + (hex ? this.toHex(val) : "" + val);
             let ct = 1;
             while (true) {
                 val = this.map.get(++i);
-                if (val === undefined || val === 0)
-                    break;
+                if (val === undefined || val === 0) break;
                 s += " " + (hex ? this.toHex(val) : "" + val);
-                if (++ct === 8)
-                    break;
+                if (++ct === 8) break;
             }
             s += "\n";
         }
@@ -268,12 +268,9 @@ export class SRAMElm extends ChipElm {
     }
 
     parseNumber(str: string): number {
-        if (str.startsWith("0x"))
-            return parseIntStrict(str.substring(2), 16);
-        if (this.hasFlag(SRAMElm.FLAG_HEX_DISPLAY))
-            return parseIntStrict(str, 16);
-        if (str.startsWith("0b"))
-            return parseIntStrict(str.substring(2), 2);
+        if (str.startsWith("0x")) return parseIntStrict(str.substring(2), 16);
+        if (this.hasFlag(SRAMElm.FLAG_HEX_DISPLAY)) return parseIntStrict(str, 16);
+        if (str.startsWith("0b")) return parseIntStrict(str.substring(2), 2);
         return parseIntStrict(str);
     }
 
@@ -283,26 +280,22 @@ export class SRAMElm extends ChipElm {
                 this.addressBits = Math.floor(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be between 2 and 16");
+            } else ei.setError("must be between 2 and 16");
         }
         if (n === 1) {
             if (ei.value >= 2 && ei.value <= 16) {
                 this.dataBits = Math.floor(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be between 2 and 16");
+            } else ei.setError("must be between 2 and 16");
         }
         if (n === 2) {
             this.parseContentsString(ei.textArea.element ? ei.textArea.element.value : ei.textArea.value);
-            if ((this.flags & SRAMElm.FLAG_RELOAD_ON_RESET) !== 0)
-                this.initialMap = new Map(this.map);
+            if ((this.flags & SRAMElm.FLAG_RELOAD_ON_RESET) !== 0) this.initialMap = new Map(this.map);
         }
         if (n === 3) {
             const oldFlags = this.flags;
-            if (ei.textArea && ei.textArea.element)
-                this.parseContentsString(ei.textArea.element.value);
+            if (ei.textArea && ei.textArea.element) this.parseContentsString(ei.textArea.element.value);
             this.flags = ei.changeFlag(this.flags, SRAMElm.FLAG_HEX_DISPLAY);
             if (this.flags !== oldFlags) {
                 SRAMElm.contentsOverride = this.contentsToString();
@@ -312,14 +305,16 @@ export class SRAMElm extends ChipElm {
         const reloadIdx = SRAMElm.loadFileSupported() ? 5 : 4;
         if (n === reloadIdx) {
             this.flags = ei.changeFlag(this.flags, SRAMElm.FLAG_RELOAD_ON_RESET);
-            if ((this.flags & SRAMElm.FLAG_RELOAD_ON_RESET) !== 0)
-                this.initialMap = new Map(this.map);
-            else
-                this.initialMap = null;
+            if ((this.flags & SRAMElm.FLAG_RELOAD_ON_RESET) !== 0) this.initialMap = new Map(this.map);
+            else this.initialMap = null;
         }
     }
-    getVoltageSourceCount(): number { return this.dataBits; }
-    getInternalNodeCount(): number { return this.dataBits; }
+    getVoltageSourceCount(): number {
+        return this.dataBits;
+    }
+    getInternalNodeCount(): number {
+        return this.dataBits;
+    }
     setVoltageSource(j: number, vs: VoltageSource): void {
         super.setVoltageSource(j, vs);
         vs.setNodes(CircuitNode.ground, this.nodes[this.internalNodes + j]);
@@ -327,8 +322,7 @@ export class SRAMElm extends ChipElm {
     getMatrixConnection(n1: number, n2: number): boolean {
         // each internal node connects to its corresponding data pin
         for (let i = 0; i !== this.dataBits; i++)
-            if (this.comparePair(n1, n2, this.internalNodes + i, this.dataNodes + i))
-                return true;
+            if (this.comparePair(n1, n2, this.internalNodes + i, this.dataNodes + i)) return true;
         return false;
     }
 
@@ -345,41 +339,46 @@ export class SRAMElm extends ChipElm {
 
     doStep(): void {
         const writeEnabled = this.nodes[0].v < this.getThreshold();
-        const outputEnabled = (this.nodes[1].v < this.getThreshold()) && !writeEnabled;
+        const outputEnabled = this.nodes[1].v < this.getThreshold() && !writeEnabled;
 
         // get address
         this.address = 0;
         for (let i = 0; i !== this.addressBits; i++) {
-            this.address |= (this.nodes[this.addressNodes + i].v > this.getThreshold()) ? 1 << (this.addressBits - 1 - i) : 0;
+            this.address |=
+                this.nodes[this.addressNodes + i].v > this.getThreshold() ? 1 << (this.addressBits - 1 - i) : 0;
         }
 
         const dataObj = this.map.get(this.address);
-        const data = (dataObj === undefined) ? 0 : dataObj;
+        const data = dataObj === undefined ? 0 : dataObj;
         for (let i = 0; i !== this.dataBits; i++) {
             const p = this.pins[i + this.dataNodes];
-            CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[this.internalNodes + i], p.voltSource,
-                (data & (1 << (this.dataBits - 1 - i))) === 0 ? 0 : this.highVoltage);
+            CircuitElm.sim.updateVoltageSource(
+                CircuitNode.ground,
+                this.nodes[this.internalNodes + i],
+                p.voltSource,
+                (data & (1 << (this.dataBits - 1 - i))) === 0 ? 0 : this.highVoltage,
+            );
 
             // if output enabled, stamp a small resistor from internal voltage source to data pin.
             // if output disabled, stamp a large pulldown resistor from data pin to ground.
             if (outputEnabled)
                 CircuitElm.sim.stampResistor(this.nodes[this.internalNodes + i], this.nodes[this.dataNodes + i], 1);
-            else
-                CircuitElm.sim.stampResistor(this.nodes[this.dataNodes + i], CircuitNode.ground, 1e8);
+            else CircuitElm.sim.stampResistor(this.nodes[this.dataNodes + i], CircuitNode.ground, 1e8);
         }
     }
 
     stepFinished(): void {
         let data = 0;
         const writeEnabled = this.nodes[0].v < this.getThreshold();
-        if (!writeEnabled)
-            return;
+        if (!writeEnabled) return;
 
         // store data in RAM
         for (let i = 0; i !== this.dataBits; i++) {
-            data |= (this.nodes[this.dataNodes + i].v > this.getThreshold()) ? 1 << (this.dataBits - 1 - i) : 0;
+            data |= this.nodes[this.dataNodes + i].v > this.getThreshold() ? 1 << (this.dataBits - 1 - i) : 0;
         }
         this.map.set(this.address, data);
     }
-    getDumpType(): number { return 413; }
+    getDumpType(): number {
+        return 413;
+    }
 }

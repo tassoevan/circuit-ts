@@ -28,20 +28,21 @@ await Locale.load();
 // plain page-relative path (not ModuleBase-relative): register() resolves
 // it against circuitjs.html's own location, which is where it needs to
 // live for its scope to cover the whole deployed site.
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
     const registerServiceWorker = () => {
-        navigator.serviceWorker.register('service-worker.js').then(registration => {
-            console.log('Service Worker registered with scope:', registration.scope);
-        }).catch(error => {
-            console.error('Service Worker registration failed:', error);
-        });
+        navigator.serviceWorker
+            .register("service-worker.js")
+            .then((registration) => {
+                console.log("Service Worker registered with scope:", registration.scope);
+            })
+            .catch((error) => {
+                console.error("Service Worker registration failed:", error);
+            });
     };
     // The top-level await above can outlast the page's load event, in which
     // case a 'load' listener added now would never fire.
-    if (document.readyState === 'complete')
-        registerServiceWorker();
-    else
-        window.addEventListener('load', registerServiceWorker);
+    if (document.readyState === "complete") registerServiceWorker();
+    else window.addEventListener("load", registerServiceWorker);
 }
 
 const app = new CirSim();

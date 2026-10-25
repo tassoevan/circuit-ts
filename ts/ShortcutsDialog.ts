@@ -56,8 +56,7 @@ export class ShortcutsDialog extends Dialog {
         let i: number;
         for (i = 0; i !== this.ui.mainMenuItems.length; i++) {
             const item = this.ui.mainMenuItems[i];
-            if (item.getShortcut().length > 1)
-                break;
+            if (item.getShortcut().length > 1) break;
             rowNames.push(item.getLabel());
             rowInitialShortcuts.push(item.getShortcut());
             this.rowMenuItemIndex.push(i);
@@ -65,8 +64,7 @@ export class ShortcutsDialog extends Dialog {
         let runStopShortcut = "";
         let commandPaletteShortcut = "/";
         for (const [key, value] of this.sim.shortcuts) {
-            if (value === CirSim.RUNSTOP_SHORTCUT_ACTION)
-                runStopShortcut = String.fromCharCode(key);
+            if (value === CirSim.RUNSTOP_SHORTCUT_ACTION) runStopShortcut = String.fromCharCode(key);
             else if (value === CirSim.COMMAND_PALETTE_SHORTCUT_ACTION)
                 commandPaletteShortcut = String.fromCharCode(key);
         }
@@ -95,8 +93,13 @@ export class ShortcutsDialog extends Dialog {
             this.shortcuts.push(rowInitialShortcuts[i]);
             text.addEventListener("keydown", (ev: KeyboardEvent) => {
                 const keyCode = ev.keyCode;
-                const placeholder = KeyNames.keyCodeToPlaceholder(keyCode, ev.shiftKey,
-                    ev.ctrlKey, ev.altKey, ev.metaKey);
+                const placeholder = KeyNames.keyCodeToPlaceholder(
+                    keyCode,
+                    ev.shiftKey,
+                    ev.ctrlKey,
+                    ev.altKey,
+                    ev.metaKey,
+                );
                 if (placeholder >= 0) {
                     ev.preventDefault();
                     this.setRowShortcut(row, text, String.fromCharCode(placeholder));
@@ -108,8 +111,7 @@ export class ShortcutsDialog extends Dialog {
             text.addEventListener("keypress", (ev: KeyboardEvent) => {
                 ev.preventDefault();
                 const cc = ev.charCode ?? ev.which;
-                if (cc >= 32 && cc < 127)
-                    this.setRowShortcut(row, text, String.fromCharCode(cc));
+                if (cc >= 32 && cc < 127) this.setRowShortcut(row, text, String.fromCharCode(cc));
             });
             const textTd = document.createElement("td");
             textTd.appendChild(text);
@@ -148,8 +150,7 @@ export class ShortcutsDialog extends Dialog {
     }
 
     enterPressed(): void {
-        if (this.checkForDuplicates())
-            return;
+        if (this.checkForDuplicates()) return;
         // clear existing shortcuts
         this.sim.shortcuts.clear();
         // load new ones
@@ -159,14 +160,11 @@ export class ShortcutsDialog extends Dialog {
             if (menuItemIndex >= 0) {
                 const item = this.ui.mainMenuItems[menuItemIndex];
                 item.setShortcut(str);
-                if (str.length > 0)
-                    this.sim.shortcuts.set(str.charCodeAt(0), this.ui.mainMenuItemNames[menuItemIndex]);
+                if (str.length > 0) this.sim.shortcuts.set(str.charCodeAt(0), this.ui.mainMenuItemNames[menuItemIndex]);
             } else if (menuItemIndex === -1) {
-                if (str.length > 0)
-                    this.sim.shortcuts.set(str.charCodeAt(0), CirSim.RUNSTOP_SHORTCUT_ACTION);
+                if (str.length > 0) this.sim.shortcuts.set(str.charCodeAt(0), CirSim.RUNSTOP_SHORTCUT_ACTION);
             } else if (menuItemIndex === -2) {
-                if (str.length > 0)
-                    this.sim.shortcuts.set(str.charCodeAt(0), CirSim.COMMAND_PALETTE_SHORTCUT_ACTION);
+                if (str.length > 0) this.sim.shortcuts.set(str.charCodeAt(0), CirSim.COMMAND_PALETTE_SHORTCUT_ACTION);
             }
         }
         // save to local storage
@@ -192,8 +190,7 @@ export class ShortcutsDialog extends Dialog {
                 box.style.color = "red";
                 other.style.color = "red";
                 result = true;
-            } else
-                box.style.color = "black";
+            } else box.style.color = "black";
 
             boxForShortcut.set(c, box);
         }

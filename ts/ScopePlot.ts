@@ -21,10 +21,7 @@ import { CircuitElm } from "./CircuitElm";
 import { SimulationManager } from "./SimulationManager";
 import { CirSim } from "./CirSim";
 import { Locale } from "./Locale";
-import {
-    UNITS_V, UNITS_A, UNITS_OHMS, UNITS_W, UNITS_C,
-    V_POSITION_STEPS,
-} from "./ScopeConstants";
+import { UNITS_V, UNITS_A, UNITS_OHMS, UNITS_W, UNITS_C, V_POSITION_STEPS } from "./ScopeConstants";
 
 // plot of single value on a scope
 export class ScopePlot {
@@ -48,11 +45,11 @@ export class ScopePlot {
     lastValue: number;
     color: string;
     elm: CircuitElm | null;
-   // Has a manual scale in "/div" format been put in by the user (as opposed to being
-   // inferred from a "MaxValue" format or from an automatically calculated scale)?
-   // Manual scales should be kept to sane values anyway, but this shows if this is a user
-   // intention we should respect, or if we should try and populate reasonable values from
-   // the data we have
+    // Has a manual scale in "/div" format been put in by the user (as opposed to being
+    // inferred from a "MaxValue" format or from an automatically calculated scale)?
+    // Manual scales should be kept to sane values anyway, but this shows if this is a user
+    // intention we should respect, or if we should try and populate reasonable values from
+    // the data we have
     manScaleSet: boolean = false;
     manScale: number = 1.0; // Units per division
     manVPosition: number = 0; // 0 is center of screen. +V_POSITION_STEPS/2 is top of screen
@@ -85,8 +82,7 @@ export class ScopePlot {
             this.manScale = manS;
             // ohms can only be positive, so move the v position to the bottom.
             // power can be negative for caps and inductors, but still move to the bottom (for backward compatibility)
-            if (u === UNITS_OHMS || u === UNITS_W || u === UNITS_C)
-                this.manVPosition = -V_POSITION_STEPS / 2;
+            if (u === UNITS_OHMS || u === UNITS_W || u === UNITS_C) this.manVPosition = -V_POSITION_STEPS / 2;
         }
     }
 
@@ -97,8 +93,7 @@ export class ScopePlot {
     reset(spc: number, sp: number, full: boolean): void {
         let oldSpc = this.scopePointCount;
         this.scopePointCount = spc;
-        if (this.scopePlotSpeed !== sp)
-            oldSpc = 0; // throw away old data
+        if (this.scopePlotSpeed !== sp) oldSpc = 0; // throw away old data
         this.scopePlotSpeed = sp;
         // Adjust the time constant of the AC coupled filter in proportion to the number of samples
         // we are seeing on the scope (if my maths is right). The constant is empirically determined
@@ -114,23 +109,32 @@ export class ScopePlot {
             // preserve old data if possible
             let i;
             for (i = 0; i !== spc && i !== oldSpc; i++) {
-                const i1 = (-i) & (spc - 1);
+                const i1 = -i & (spc - 1);
                 const i2 = (this.ptr - i) & (oldSpc - 1);
                 this.liveMin[i1] = oldMin[i2];
                 this.liveMax[i1] = oldMax[i2];
             }
-        } else
-            this.lastUpdateTime = SimulationManager.theSim!.t;
+        } else this.lastUpdateTime = SimulationManager.theSim!.t;
         this.ptr = 0;
         this.thaw();
     }
 
     // What the display shows: the frozen trigger snapshot if there is one, else live data.
     // Assigning replaces the live buffer (and drops any snapshot).
-    get minValues(): number[] { return this.frozenMin ?? this.liveMin; }
-    set minValues(a: number[]) { this.liveMin = a; this.thaw(); }
-    get maxValues(): number[] { return this.frozenMax ?? this.liveMax; }
-    set maxValues(a: number[]) { this.liveMax = a; this.thaw(); }
+    get minValues(): number[] {
+        return this.frozenMin ?? this.liveMin;
+    }
+    set minValues(a: number[]) {
+        this.liveMin = a;
+        this.thaw();
+    }
+    get maxValues(): number[] {
+        return this.frozenMax ?? this.liveMax;
+    }
+    set maxValues(a: number[]) {
+        this.liveMax = a;
+        this.thaw();
+    }
 
     freeze(): void {
         this.frozenMin = this.liveMin.slice();
@@ -142,25 +146,21 @@ export class ScopePlot {
     }
 
     timeStep(): void {
-        if (this.elm === null)
-            return;
+        if (this.elm === null) return;
         let v = this.elm.getScopeValue(this.value);
-         // AC coupling filter. 1st order IIR high pass, written as y[i] = x[i] - dc[i] where
-         // dc[i] = dc[i-1] + k (x[i]-dc[i-1]).  With k = 1-alpha this is the same as
-         // y[i] = alpha x (y[i-1]+x[i]-x[i-1]).  To avoid a long startup transient, k starts at 1
-         // and decreases as 1/n, so dc is the running average of all samples so far, until it
-         // reaches 1-alpha.
-         // We calculate for all iterations (even DC coupled) to prime the data in case they switch to AC later
+        // AC coupling filter. 1st order IIR high pass, written as y[i] = x[i] - dc[i] where
+        // dc[i] = dc[i-1] + k (x[i]-dc[i-1]).  With k = 1-alpha this is the same as
+        // y[i] = alpha x (y[i-1]+x[i]-x[i-1]).  To avoid a long startup transient, k starts at 1
+        // and decreases as 1/n, so dc is the running average of all samples so far, until it
+        // reaches 1-alpha.
+        // We calculate for all iterations (even DC coupled) to prime the data in case they switch to AC later
         this.acCount++;
         const k = Math.max(1 / this.acCount, 1 - this.acAlpha);
         this.acDc += (v - this.acDc) * k;
         this.lastValue = v;
-        if (this.isAcCoupled())
-            v -= this.acDc;
-        if (v < this.liveMin[this.ptr])
-            this.liveMin[this.ptr] = v;
-        if (v > this.liveMax[this.ptr])
-            this.liveMax[this.ptr] = v;
+        if (this.isAcCoupled()) v -= this.acDc;
+        if (v < this.liveMin[this.ptr]) this.liveMin[this.ptr] = v;
+        if (v > this.liveMax[this.ptr]) this.liveMax[this.ptr] = v;
         const maxTimeStep = SimulationManager.theSim!.maxTimeStep;
         if (SimulationManager.theSim!.t - this.lastUpdateTime >= maxTimeStep * this.scopePlotSpeed) {
             this.ptr = (this.ptr + 1) & (this.scopePointCount - 1);
@@ -171,23 +171,29 @@ export class ScopePlot {
 
     getUnitText(v: number): string {
         switch (this.units) {
-        case UNITS_V:
-            return CircuitElm.getVoltageText(v);
-        case UNITS_A:
-            return CircuitElm.getCurrentText(v);
-        case UNITS_OHMS:
-            return CircuitElm.getUnitText(v, Locale.ohmString);
-        case UNITS_W:
-            return CircuitElm.getUnitText(v, "W");
-        case UNITS_C:
-            return CircuitElm.getUnitText(v, "C");
+            case UNITS_V:
+                return CircuitElm.getVoltageText(v);
+            case UNITS_A:
+                return CircuitElm.getCurrentText(v);
+            case UNITS_OHMS:
+                return CircuitElm.getUnitText(v, Locale.ohmString);
+            case UNITS_W:
+                return CircuitElm.getUnitText(v, "W");
+            case UNITS_C:
+                return CircuitElm.getUnitText(v, "C");
         }
         return "";
     }
 
     static readonly colors: string[] = [
-        "#FF0000", "#FF8000", "#FF00FF", "#7F00FF",
-        "#0000FF", "#0080FF", "#FFFF00", "#00FFFF",
+        "#FF0000",
+        "#FF8000",
+        "#FF00FF",
+        "#7F00FF",
+        "#0000FF",
+        "#0080FF",
+        "#FFFF00",
+        "#00FFFF",
     ];
 
     assignColor(count: number): void {
@@ -196,23 +202,22 @@ export class ScopePlot {
             return;
         }
         switch (this.units) {
-        case UNITS_V:
-            this.color = CircuitElm.positiveColor.getHexValue();
-            break;
-        case UNITS_A:
-            this.color = (CirSim.theApp.isPrintable()) ? "#A0A000" : "#FFFF00";
-            break;
-        default:
-            this.color = (CirSim.theApp.isPrintable()) ? "#000000" : "#FFFFFF";
-            break;
+            case UNITS_V:
+                this.color = CircuitElm.positiveColor.getHexValue();
+                break;
+            case UNITS_A:
+                this.color = CirSim.theApp.isPrintable() ? "#A0A000" : "#FFFF00";
+                break;
+            default:
+                this.color = CirSim.theApp.isPrintable() ? "#000000" : "#FFFFFF";
+                break;
         }
     }
 
     setAcCoupled(b: boolean): void {
         if (this.canAcCouple()) {
             this.acCoupled = b;
-        } else
-            this.acCoupled = false;
+        } else this.acCoupled = false;
     }
 
     canAcCouple(): boolean {
@@ -224,6 +229,6 @@ export class ScopePlot {
     }
 
     getPlotFlags(): number {
-        return (this.acCoupled ? ScopePlot.FLAG_AC : 0);
+        return this.acCoupled ? ScopePlot.FLAG_AC : 0;
     }
 }

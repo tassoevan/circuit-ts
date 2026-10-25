@@ -43,8 +43,7 @@ export class VarRailElm extends RailElm {
         } else {
             super(xa, ya, xb, yb!, f!, st!);
             let text = st!.nextToken();
-            while (st!.hasMoreTokens())
-                text += ' ' + st!.nextToken();
+            while (st!.hasMoreTokens()) text += " " + st!.nextToken();
             this.sliderText = text.replace(/%2[bB]/g, "+");
             this.createSlider();
         }
@@ -58,23 +57,26 @@ export class VarRailElm extends RailElm {
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.sliderText = xml.parseStringAttr("st", this.sliderText);
-        if (this.labelEl != null)
-            this.labelEl.textContent = Locale.LS(this.sliderText);
-        const value = Math.trunc((this.frequency - this.bias) * 100 / (this.maxVoltage - this.bias));
+        if (this.labelEl != null) this.labelEl.textContent = Locale.LS(this.sliderText);
+        const value = Math.trunc(((this.frequency - this.bias) * 100) / (this.maxVoltage - this.bias));
         this.slider?.setValue(value);
     }
 
-    getDumpType(): number { return 172; }
-    isVarRailElm(): boolean { return true; }
+    getDumpType(): number {
+        return 172;
+    }
+    isVarRailElm(): boolean {
+        return true;
+    }
 
     createSlider(): void {
         this.waveform = VoltageElm.WF_VAR;
         const denom = this.maxVoltage - this.bias;
-        const value = denom !== 0 ? Math.trunc((this.frequency - this.bias) * 100 / denom) : 0;
+        const value = denom !== 0 ? Math.trunc(((this.frequency - this.bias) * 100) / denom) : 0;
 
-        const lbl = document.createElement('div');
+        const lbl = document.createElement("div");
         lbl.textContent = Locale.LS(this.sliderText);
-        lbl.className = 'topSpace';
+        lbl.className = "topSpace";
         this.labelEl = lbl;
         CircuitElm.app.addWidgetToVerticalPanel(lbl);
 
@@ -83,23 +85,19 @@ export class VarRailElm extends RailElm {
     }
 
     getVoltage(): number {
-        this.frequency = this.slider!.getValue() * (this.maxVoltage - this.bias) / 100 + this.bias;
+        this.frequency = (this.slider!.getValue() * (this.maxVoltage - this.bias)) / 100 + this.bias;
         return this.frequency;
     }
 
     delete(): void {
-        if (this.labelEl != null)
-            CircuitElm.app.removeWidgetFromVerticalPanel(this.labelEl);
-        if (this.slider != null)
-            CircuitElm.app.removeWidgetFromVerticalPanel(this.slider.element);
+        if (this.labelEl != null) CircuitElm.app.removeWidgetFromVerticalPanel(this.labelEl);
+        if (this.slider != null) CircuitElm.app.removeWidgetFromVerticalPanel(this.slider.element);
         super.delete();
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Min Voltage", this.bias, -20, 20).setUnitStep();
-        if (n === 1)
-            return new EditInfo("Max Voltage", this.maxVoltage, -20, 20).setUnitStep();
+        if (n === 0) return new EditInfo("Min Voltage", this.bias, -20, 20).setUnitStep();
+        if (n === 1) return new EditInfo("Max Voltage", this.maxVoltage, -20, 20).setUnitStep();
         if (n === 2) {
             const ei = new EditInfo("Slider Text", 0, -1, -1);
             ei.text = this.sliderText;
@@ -109,19 +107,18 @@ export class VarRailElm extends RailElm {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.bias = ei.value;
-        if (n === 1)
-            this.maxVoltage = ei.value;
+        if (n === 0) this.bias = ei.value;
+        if (n === 1) this.maxVoltage = ei.value;
         if (n === 2) {
             this.sliderText = ei.textf!.value;
-            if (this.labelEl != null)
-                this.labelEl.textContent = Locale.LS(this.sliderText);
+            if (this.labelEl != null) this.labelEl.textContent = Locale.LS(this.sliderText);
             CircuitElm.app.setiFrameHeight();
         }
     }
 
-    getShortcut(): number { return 0; }
+    getShortcut(): number {
+        return 0;
+    }
 
     setMouseElm(v: boolean): void {
         super.setMouseElm(v);

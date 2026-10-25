@@ -17,7 +17,7 @@
 // via http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b14/java/awt/Polygon.java
 
 export class Polygon {
-//  ArrayList<Point> poly;
+    //  ArrayList<Point> poly;
 
     private static readonly MIN_LENGTH = 4;
     npoints: number = 0;
@@ -25,14 +25,14 @@ export class Polygon {
     ypoints: number[];
 
     constructor() {
-//      poly = new ArrayList<Point>();
+        //      poly = new ArrayList<Point>();
         this.xpoints = new Array(Polygon.MIN_LENGTH).fill(0);
         this.ypoints = new Array(Polygon.MIN_LENGTH).fill(0);
     }
 
-//  addPoint(x: number, y: number): void {
-//      poly.add(new Point(x,y));
-//  }
+    //  addPoint(x: number, y: number): void {
+    //      poly.add(new Point(x,y));
+    //  }
 
     addPoint(x: number, y: number): void {
         if (this.npoints >= this.xpoints.length || this.npoints >= this.ypoints.length) {
@@ -51,15 +51,14 @@ export class Polygon {
         this.xpoints[this.npoints] = x;
         this.ypoints[this.npoints] = y;
         this.npoints++;
-//      if (bounds != null) {
-//          updateBounds(x, y);
-//      }
+        //      if (bounds != null) {
+        //          updateBounds(x, y);
+        //      }
     }
 
     private expand(inp: number[], newlen: number): number[] {
         const out = new Array(newlen).fill(0);
-        for (let i = 0; i < inp.length; i++)
-            out[i] = inp[i];
+        for (let i = 0; i < inp.length; i++) out[i] = inp[i];
         return out;
     }
 }

@@ -31,15 +31,16 @@ import { StringTokenizer } from "./StringTokenizer";
 import { VoltageElm } from "./VoltageElm";
 
 export class OTAElm extends CompositeElm {
-    private static modelString = "RailElm 4\rRailElm 10\rNTransistorElm 1 2 3\rNTransistorElm 3 1 4\rNTransistorElm 3 3 4\rNTransistorElm 5 6 2\rNTransistorElm 7 8 2\rPTransistorElm 9 6 10\rPTransistorElm 9 9 10\rPTransistorElm 6 12 9\rPTransistorElm 11 8 10\rPTransistorElm 11 11 10\rPTransistorElm 8 13 11\rNTransistorElm 14 14 4\rNTransistorElm 14 12 4\rNTransistorElm 12 13 14\rNTransistorElm 15 15 5\rNTransistorElm 15 15 7";
+    private static modelString =
+        "RailElm 4\rRailElm 10\rNTransistorElm 1 2 3\rNTransistorElm 3 1 4\rNTransistorElm 3 3 4\rNTransistorElm 5 6 2\rNTransistorElm 7 8 2\rPTransistorElm 9 6 10\rPTransistorElm 9 9 10\rPTransistorElm 6 12 9\rPTransistorElm 11 8 10\rPTransistorElm 11 11 10\rPTransistorElm 8 13 11\rNTransistorElm 14 14 4\rNTransistorElm 14 12 4\rNTransistorElm 12 13 14\rNTransistorElm 15 15 5\rNTransistorElm 15 15 7";
     private static modelExternalNodes = [7, 5, 15, 1, 13];
 
     arrowPoly1!: Polygon;
     arrowPoly2!: Polygon;
 
-    readonly opheight  = 32;
-    readonly opwidth   = 32;
-    readonly circDiam  = 19;
+    readonly opheight = 32;
+    readonly opwidth = 32;
+    readonly circDiam = 19;
     readonly circOverlap = 8;
     in1p!: Point[];
     in2p!: Point[];
@@ -86,10 +87,12 @@ export class OTAElm extends CompositeElm {
         this.curCount0 = this.curCount1 = this.curCount2 = this.curCount3 = 0;
     }
 
-    getConnection(n1: number, n2: number): boolean { return false; }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
 
     draw(g: Graphics): void {
-        this.setBbox(this.point1, this.point2, 3 * this.opheight / 2);
+        this.setBbox(this.point1, this.point2, (3 * this.opheight) / 2);
         this.setVoltageColor(g, this.nodes[0].v);
         CircuitElm.drawThickLine(g, this.in1p[0], this.in1p[1]);
         this.setVoltageColor(g, this.nodes[1].v);
@@ -140,23 +143,28 @@ export class OTAElm extends CompositeElm {
         this.in2p = this.newPointArray(2);
         this.in3p = this.newPointArray(2);
         this.in4p = this.newPointArray(2);
-        this.textp  = this.newPointArray(2);
-        this.bar1   = this.newPointArray(2);
-        this.bar2   = this.newPointArray(2);
+        this.textp = this.newPointArray(2);
+        this.bar1 = this.newPointArray(2);
+        this.bar2 = this.newPointArray(2);
         this.circCent = this.newPointArray(2);
-        this.interpPoint2(this.point1,  this.point2bis, this.in1p[0], this.in2p[0], 0, hs);
-        this.interpPoint2(this.lead1!,  this.lead2!,   this.in1p[1], this.in2p[1], 0, hs);
-        this.interpPoint2(this.lead1!,  this.lead2!,   this.textp[0], this.textp[1], .1, hs);
+        this.interpPoint2(this.point1, this.point2bis, this.in1p[0], this.in2p[0], 0, hs);
+        this.interpPoint2(this.lead1!, this.lead2!, this.in1p[1], this.in2p[1], 0, hs);
+        this.interpPoint2(this.lead1!, this.lead2!, this.textp[0], this.textp[1], 0.1, hs);
         this.in3p[0] = this.point1;
         this.in3p[1] = this.lead1!;
-        this.in4p[0] = this.interpPoint(this.lead1!, this.lead2!, 1.0 - (16.0 / wtot), 32);
-        this.in4p[1] = this.interpPoint(this.lead1!, this.lead2!, 1.0 - (16.0 / wtot), 8);
+        this.in4p[0] = this.interpPoint(this.lead1!, this.lead2!, 1.0 - 16.0 / wtot, 32);
+        this.in4p[1] = this.interpPoint(this.lead1!, this.lead2!, 1.0 - 16.0 / wtot, 8);
         const tris = this.newPointArray(3);
-        this.interpPoint2(this.lead1!, this.lead2!, tris[0], tris[1], 0, 3 * hs / 2);
+        this.interpPoint2(this.lead1!, this.lead2!, tris[0], tris[1], 0, (3 * hs) / 2);
         tris[2] = this.interpPoint(this.lead1!, this.lead2!, (2.0 * ww) / wtot);
         this.triangle = this.createPolygon(tris[0], tris[1], tris[2]);
-        this.circCent[0] = this.interpPoint(this.lead1!, this.lead2!, 1.0 - (this.circDiam / (2.0 * wtot)), 0);
-        this.circCent[1] = this.interpPoint(this.lead1!, this.lead2!, 1.0 - (3 * this.circDiam / 2.0 - this.circOverlap) / wtot, 0);
+        this.circCent[0] = this.interpPoint(this.lead1!, this.lead2!, 1.0 - this.circDiam / (2.0 * wtot), 0);
+        this.circCent[1] = this.interpPoint(
+            this.lead1!,
+            this.lead2!,
+            1.0 - ((3 * this.circDiam) / 2.0 - this.circOverlap) / wtot,
+            0,
+        );
         let d1 = this.interpPoint(this.in3p[1], this.in1p[1], 0.3333);
         let d2 = this.interpPoint(this.in3p[1], this.in1p[1], 0.6666);
         this.arrowPoly1 = this.calcArrow(d1, d2, 8, 4);
@@ -186,7 +194,9 @@ export class OTAElm extends CompositeElm {
         this.initOTA();
     }
 
-    getDumpType(): number { return 402; }
+    getDumpType(): number {
+        return 402;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "OTA (LM13700 style)";
@@ -194,10 +204,12 @@ export class OTAElm extends CompositeElm {
         arr[2] = "V+ - V- = " + CircuitElm.getVoltageText(this.nodes[0].v - this.nodes[1].v);
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Positive Supply Voltage (5-20V)", this.posVolt, 5, 20).setUnitStep();
-        if (n === 1) return new EditInfo("Negative Supply Voltage (V)",     this.negVolt, -20, -5).setUnitStep();
+        if (n === 1) return new EditInfo("Negative Supply Voltage (V)", this.negVolt, -20, -5).setUnitStep();
         return null;
     }
 
@@ -207,7 +219,10 @@ export class OTAElm extends CompositeElm {
         this.initOTA();
     }
 
-    canFlipX(): boolean { return false; }
-    canFlipY(): boolean { return false; }
-
+    canFlipX(): boolean {
+        return false;
+    }
+    canFlipY(): boolean {
+        return false;
+    }
 }

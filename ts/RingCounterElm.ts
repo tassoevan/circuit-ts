@@ -23,7 +23,7 @@ import { EditInfo } from "./EditInfo";
 import { Checkbox } from "./Checkbox";
 export class RingCounterElm extends ChipElm {
     static readonly FLAG_CLOCK_INHIBIT = 2;
-    static readonly FLAG_RESET_HIGH    = 4;
+    static readonly FLAG_RESET_HIGH = 4;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
@@ -37,17 +37,26 @@ export class RingCounterElm extends ChipElm {
         }
     }
 
-    getChipName(): string { return "ring counter"; }
-    needsBits(): boolean { return true; }
-    defaultBitCount(): number { return 10; }
-    hasClockInhibit(): boolean { return (this.flags & RingCounterElm.FLAG_CLOCK_INHIBIT) !== 0 && this.bits >= 3; }
-    hasInvertReset(): boolean { return (this.flags & RingCounterElm.FLAG_RESET_HIGH) === 0; }
+    getChipName(): string {
+        return "ring counter";
+    }
+    needsBits(): boolean {
+        return true;
+    }
+    defaultBitCount(): number {
+        return 10;
+    }
+    hasClockInhibit(): boolean {
+        return (this.flags & RingCounterElm.FLAG_CLOCK_INHIBIT) !== 0 && this.bits >= 3;
+    }
+    hasInvertReset(): boolean {
+        return (this.flags & RingCounterElm.FLAG_RESET_HIGH) === 0;
+    }
 
     declare clockInhibit: number;
 
     setupPins(): void {
-        if (!this.bits)
-            return;
+        if (!this.bits) return;
         this.sizeX = this.bits > 2 ? this.bits : 2;
         this.sizeY = 2;
         this.pins = new Array(this.getPostCount());
@@ -64,60 +73,57 @@ export class RingCounterElm extends ChipElm {
             this.clockInhibit = this.pins.length - 1;
             this.pins[this.clockInhibit] = new Pin(this, 1, ChipElm.SIDE_S, "CE");
             this.pins[this.clockInhibit].lineOver = true;
-        } else
-            this.clockInhibit = -1;
+        } else this.clockInhibit = -1;
         this.allocNodes();
     }
 
-    getPostCount(): number { return this.hasClockInhibit() ? this.bits + 3 : this.bits + 2; }
-    getVoltageSourceCount(): number { return this.bits; }
+    getPostCount(): number {
+        return this.hasClockInhibit() ? this.bits + 3 : this.bits + 2;
+    }
+    getVoltageSourceCount(): number {
+        return this.bits;
+    }
 
     execute(): void {
         let i: number;
 
         let running = true;
-        if (this.hasClockInhibit() && this.pins[this.clockInhibit].value)
-            running = false;
+        if (this.hasClockInhibit() && this.pins[this.clockInhibit].value) running = false;
 
         // find which output is high
-        for (i = 0; i !== this.bits; i++)
-            if (this.pins[i + 2].value)
-                break;
+        for (i = 0; i !== this.bits; i++) if (this.pins[i + 2].value) break;
 
         if (this.pins[0].value && !this.lastClock && running) {
-            if (i < this.bits)
-                this.pins[i++ + 2].value = false;
+            if (i < this.bits) this.pins[i++ + 2].value = false;
             i %= this.bits;
             this.pins[i + 2].value = true;
         }
 
         // reset if requested, or if all outputs are low
         if (this.pins[1].value !== this.hasInvertReset() || i === this.bits) {
-            for (i = 1; i !== this.bits; i++)
-                this.pins[i + 2].value = false;
+            for (i = 1; i !== this.bits; i++) this.pins[i + 2].value = false;
             this.pins[2].value = true;
         }
         this.lastClock = this.pins[0].value;
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Invert reset pin", this.hasInvertReset());
             return ei;
         }
-        if (n === 1)
-            return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
+        if (n === 1) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         return null;
     }
 
     setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
-            if (ei.checkbox!.getState())
-                this.flags &= ~RingCounterElm.FLAG_RESET_HIGH;
-            else
-                this.flags |= RingCounterElm.FLAG_RESET_HIGH;
+            if (ei.checkbox!.getState()) this.flags &= ~RingCounterElm.FLAG_RESET_HIGH;
+            else this.flags |= RingCounterElm.FLAG_RESET_HIGH;
             this.setupPins();
             this.setPoints();
             return;
@@ -127,10 +133,11 @@ export class RingCounterElm extends ChipElm {
                 this.bits = Math.trunc(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be >= 2");
+            } else ei.setError("must be >= 2");
         }
     }
 
-    getDumpType(): number { return 163; }
+    getDumpType(): number {
+        return 163;
+    }
 }

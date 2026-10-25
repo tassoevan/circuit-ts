@@ -64,15 +64,22 @@ export class SliderDialog extends Dialog {
 
         const applyButton = document.createElement("button");
         applyButton.textContent = "Apply";
-        applyButton.addEventListener("click", () => { this.apply(); });
+        applyButton.addEventListener("click", () => {
+            this.apply();
+        });
 
         const okButton = document.createElement("button");
         okButton.textContent = "OK";
-        okButton.addEventListener("click", () => { this.apply(); this.closeDialog(); });
+        okButton.addEventListener("click", () => {
+            this.apply();
+            this.closeDialog();
+        });
 
         const cancelButton = document.createElement("button");
         cancelButton.textContent = "Cancel";
-        cancelButton.addEventListener("click", () => { this.closeDialog(); });
+        cancelButton.addEventListener("click", () => {
+            this.closeDialog();
+        });
 
         const leftBtns = document.createElement("span");
         leftBtns.appendChild(applyButton);
@@ -88,11 +95,9 @@ export class SliderDialog extends Dialog {
     buildDialog(): void {
         for (let i = 0; ; i++) {
             this.einfos[i] = this.elm.getEditInfo(i);
-            if (this.einfos[i] == null)
-                break;
+            if (this.einfos[i] == null) break;
             const ei = this.einfos[i]!;
-            if (!ei.canCreateAdjustable())
-                continue;
+            if (!ei.canCreateAdjustable()) continue;
             const adj = this.findAdjustable(i);
 
             // remove HTML tags from name
@@ -113,8 +118,7 @@ export class SliderDialog extends Dialog {
             cbLabel.appendChild(cbEl);
             cbLabel.appendChild(document.createTextNode(name));
             // store checkbox element on EditInfo for apply()
-            if (ei.checkbox == null)
-                ei.checkbox = new Checkbox(name, adj != null);
+            if (ei.checkbox == null) ei.checkbox = new Checkbox(name, adj != null);
             ei.checkbox!.element = cbEl;
             row.appendChild(cbLabel);
 
@@ -129,17 +133,14 @@ export class SliderDialog extends Dialog {
                     for (let j = 0; j !== this.sim.adjustables.length; j++) {
                         const adji: Adjustable = this.sim.adjustables[j];
                         // don't share with an object sharing with someone else
-                        if (adji.sharedSlider != null)
-                            break;
+                        if (adji.sharedSlider != null) break;
                         // don't share with ourselves
-                        if (adji === adj)
-                            continue;
+                        if (adji === adj) continue;
                         const opt = document.createElement("option");
                         opt.textContent = "Share Slider: " + adji.sliderText;
                         sel.appendChild(opt);
                         ct++;
-                        if (adji === adj.sharedSlider)
-                            sel.selectedIndex = ct;
+                        if (adji === adj.sharedSlider) sel.selectedIndex = ct;
                     }
                     sel.addEventListener("change", () => this.itemStateChanged(i, "choice", sel));
                     row.appendChild(sel);
@@ -197,7 +198,7 @@ export class SliderDialog extends Dialog {
 
             this.contentDiv.appendChild(row);
         }
-        this.einfocount = this.einfos.findIndex(e => e == null);
+        this.einfocount = this.einfos.findIndex((e) => e == null);
         if (this.einfocount < 0) this.einfocount = this.einfos.length;
     }
 
@@ -216,13 +217,11 @@ export class SliderDialog extends Dialog {
     apply(): boolean {
         for (let i = 0; i !== this.einfocount; i++) {
             const adj = this.findAdjustable(i);
-            if (adj == null)
-                continue;
+            if (adj == null) continue;
             const ei = this.einfos[i]!;
             try {
                 adj.sliderText = ei.labelBox == null ? "" : ei.labelBox.value;
-                if (adj.label != null)
-                    adj.label.textContent = adj.sliderText;
+                if (adj.label != null) adj.label.textContent = adj.sliderText;
                 if (ei.minBox) {
                     const d = EditDialog.parseUnits(ei.minBox.value);
                     adj.minValue = d;
@@ -235,15 +234,15 @@ export class SliderDialog extends Dialog {
                     const d = EditDialog.parseUnits(ei.stepBox.value);
                     adj.sliderStep = d;
                     if (adj.slider != null && adj.maxValue !== adj.minValue)
-                        adj.slider.setStepSize(d * 100 / (adj.maxValue - adj.minValue));
+                        adj.slider.setStepSize((d * 100) / (adj.maxValue - adj.minValue));
                 }
-                if (this.logCheckboxes[i] != null)
-                    adj.logarithmic = this.logCheckboxes[i]!.getState();
+                if (this.logCheckboxes[i] != null) adj.logarithmic = this.logCheckboxes[i]!.getState();
                 // guard: logarithmic requires minValue > 0
-                if (adj.logarithmic && adj.minValue <= 0)
-                    adj.logarithmic = false;
+                if (adj.logarithmic && adj.minValue <= 0) adj.logarithmic = false;
                 adj.setSliderValue(ei.value);
-            } catch (e) { CirSim.console(String(e)); }
+            } catch (e) {
+                CirSim.console(String(e));
+            }
         }
         return true;
     }
@@ -281,10 +280,8 @@ export class SliderDialog extends Dialog {
                     let ct = 0;
                     for (let j = 0; j !== this.sim.adjustables.length; j++) {
                         const adji: Adjustable = this.sim.adjustables[j];
-                        if (adji.sharedSlider != null)
-                            break;
-                        if (adji === adj)
-                            continue;
+                        if (adji.sharedSlider != null) break;
+                        if (adji === adj) continue;
                         if (++ct === sel.selectedIndex) {
                             adj.sharedSlider = adji;
                             adj.deleteSlider(this.sim);
@@ -299,10 +296,8 @@ export class SliderDialog extends Dialog {
     }
 
     clearDialog(): void {
-        while (this.contentDiv.firstChild)
-            this.contentDiv.removeChild(this.contentDiv.firstChild);
-        for (let j = 0; j < this.logCheckboxes.length; j++)
-            this.logCheckboxes[j] = null;
+        while (this.contentDiv.firstChild) this.contentDiv.removeChild(this.contentDiv.firstChild);
+        for (let j = 0; j < this.logCheckboxes.length; j++) this.logCheckboxes[j] = null;
         for (let j = 0; j < this.einfos.length; j++) {
             if (this.einfos[j]) {
                 this.einfos[j]!.minBox = null;

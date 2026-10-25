@@ -83,10 +83,8 @@ export class TestPointElm extends CircuitElm {
         } else {
             super(xxOrXa, yyOrYa, xb, yb!, f!);
             this.meter = parseIntStrict(st!.nextToken());
-            if ((this.flags & TestPointElm.FLAG_LABEL) !== 0)
-                this.label = CustomLogicModel.unescape(st!.nextToken());
-            else
-                this.label = "TP";
+            if ((this.flags & TestPointElm.FLAG_LABEL) !== 0) this.label = CustomLogicModel.unescape(st!.nextToken());
+            else this.label = "TP";
         }
     }
 
@@ -107,8 +105,12 @@ export class TestPointElm extends CircuitElm {
         this.lastStepCount = 0;
     }
 
-    getDumpType(): number { return 368; }
-    getPostCount(): number { return 1; }
+    getDumpType(): number {
+        return 368;
+    }
+    getPostCount(): number {
+        return 1;
+    }
 
     setPoints(): void {
         super.setPoints();
@@ -118,8 +120,7 @@ export class TestPointElm extends CircuitElm {
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "me", this.meter);
-        if (this.label !== "TP")
-            CircuitXMLSerializer.dumpAttr(elem, "lb", this.label);
+        if (this.label !== "TP") CircuitXMLSerializer.dumpAttr(elem, "lb", this.label);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
@@ -130,17 +131,28 @@ export class TestPointElm extends CircuitElm {
 
     getMeter(): string {
         switch (this.meter) {
-        case TestPointElm.TP_VOL: return "V";
-        case TestPointElm.TP_RMS: return "V(rms)";
-        case TestPointElm.TP_AVG: return "V(avg)";
-        case TestPointElm.TP_MAX: return "Vmax";
-        case TestPointElm.TP_MIN: return "Vmin";
-        case TestPointElm.TP_P2P: return "Peak to peak";
-        case TestPointElm.TP_BIN: return "Binary";
-        case TestPointElm.TP_FRQ: return "Frequency";
-        case TestPointElm.TP_PER: return "Period";
-        case TestPointElm.TP_PWI: return "Pulse width";
-        case TestPointElm.TP_DUT: return "Duty cycle";
+            case TestPointElm.TP_VOL:
+                return "V";
+            case TestPointElm.TP_RMS:
+                return "V(rms)";
+            case TestPointElm.TP_AVG:
+                return "V(avg)";
+            case TestPointElm.TP_MAX:
+                return "Vmax";
+            case TestPointElm.TP_MIN:
+                return "Vmin";
+            case TestPointElm.TP_P2P:
+                return "Peak to peak";
+            case TestPointElm.TP_BIN:
+                return "Binary";
+            case TestPointElm.TP_FRQ:
+                return "Frequency";
+            case TestPointElm.TP_PER:
+                return "Period";
+            case TestPointElm.TP_PWI:
+                return "Pulse width";
+            case TestPointElm.TP_DUT:
+                return "Duty cycle";
         }
         return "";
     }
@@ -153,19 +165,17 @@ export class TestPointElm extends CircuitElm {
         const h = Math.floor(g.currentFontSize);
         g.save();
         g.context.textBaseline = "middle";
-        let x = pt2.x, y = pt2.y;
+        let x = pt2.x,
+            y = pt2.y;
         if (pt1.y !== pt2.y) {
             x -= wmax / 2;
             y += CircuitElm.sign(pt2.y - pt1.y) * h;
-            if (pt2.y < pt1.y)
-                y -= spacing - 4;
+            if (pt2.y < pt1.y) y -= spacing - 4;
         } else {
-            if (pt2.x > pt1.x)
-                x += 4;
-            else
-                x -= 4 + wmax;
+            if (pt2.x > pt1.x) x += 4;
+            else x -= 4 + wmax;
         }
-        g.drawString(str,  x + (wmax - w1) / 2, y);
+        g.drawString(str, x + (wmax - w1) / 2, y);
         g.drawString(str2, x + (wmax - w2) / 2, y + spacing);
         this.adjustBbox(x, y - h / 2, x + wmax, y + spacing + h / 2);
         g.restore();
@@ -179,46 +189,67 @@ export class TestPointElm extends CircuitElm {
         g.setColor(selected ? CircuitElm.selectColor : CircuitElm.whiteColor);
 
         let s = this.label;
-        this.interpPoint(this.point1, this.point2, this.lead1!,
-            1 - (Math.floor(g.context.measureText("TP").width) / 2 + 8) / this.dn);
+        this.interpPoint(
+            this.point1,
+            this.point2,
+            this.lead1!,
+            1 - (Math.floor(g.context.measureText("TP").width) / 2 + 8) / this.dn,
+        );
         this.setBbox(this.point1, this.lead1!, 0);
 
         switch (this.meter) {
-            case TestPointElm.TP_VOL: s = CircuitElm.getUnitText(this.nodes[0].v, "V"); break;
-            case TestPointElm.TP_RMS: s = CircuitElm.getUnitText(this.rmsV, "V(rms)"); break;
-            case TestPointElm.TP_AVG: s = CircuitElm.getUnitText(this.avgV, "V(avg)"); break;
-            case TestPointElm.TP_MAX: s = CircuitElm.getUnitText(this.lastMaxV, "Vpk"); break;
-            case TestPointElm.TP_MIN: s = CircuitElm.getUnitText(this.lastMinV, "Vmin"); break;
-            case TestPointElm.TP_P2P: s = CircuitElm.getUnitText(this.lastMaxV - this.lastMinV, "Vp2p"); break;
-            case TestPointElm.TP_BIN: s = this.binaryLevel + ""; break;
-            case TestPointElm.TP_FRQ: s = CircuitElm.getUnitText(this.frequency, "Hz"); break;
-            case TestPointElm.TP_PER: break;
-            case TestPointElm.TP_PWI: s = CircuitElm.getUnitText(this.pulseWidth, "s"); break;
-            case TestPointElm.TP_DUT: s = CircuitElm.showFormat.format(this.dutyCycle); break;
+            case TestPointElm.TP_VOL:
+                s = CircuitElm.getUnitText(this.nodes[0].v, "V");
+                break;
+            case TestPointElm.TP_RMS:
+                s = CircuitElm.getUnitText(this.rmsV, "V(rms)");
+                break;
+            case TestPointElm.TP_AVG:
+                s = CircuitElm.getUnitText(this.avgV, "V(avg)");
+                break;
+            case TestPointElm.TP_MAX:
+                s = CircuitElm.getUnitText(this.lastMaxV, "Vpk");
+                break;
+            case TestPointElm.TP_MIN:
+                s = CircuitElm.getUnitText(this.lastMinV, "Vmin");
+                break;
+            case TestPointElm.TP_P2P:
+                s = CircuitElm.getUnitText(this.lastMaxV - this.lastMinV, "Vp2p");
+                break;
+            case TestPointElm.TP_BIN:
+                s = this.binaryLevel + "";
+                break;
+            case TestPointElm.TP_FRQ:
+                s = CircuitElm.getUnitText(this.frequency, "Hz");
+                break;
+            case TestPointElm.TP_PER:
+                break;
+            case TestPointElm.TP_PWI:
+                s = CircuitElm.getUnitText(this.pulseWidth, "s");
+                break;
+            case TestPointElm.TP_DUT:
+                s = CircuitElm.showFormat.format(this.dutyCycle);
+                break;
         }
         this.drawText(g, this.label, s, this.point1, this.lead1!);
 
         this.setVoltageColor(g, this.nodes[0].v);
-        if (selected)
-            g.setColor(CircuitElm.selectColor);
+        if (selected) g.setColor(CircuitElm.selectColor);
         CircuitElm.drawThickLine(g, this.point1, this.lead1!);
         this.drawPosts(g);
         g.restore();
     }
 
     stepFinished(): void {
-        if (CircuitElm.sim.timeStepCount === this.lastStepCount)
-            return;
+        if (CircuitElm.sim.timeStepCount === this.lastStepCount) return;
         this.lastStepCount = CircuitElm.sim.timeStepCount;
         this.count++;
         this.total += this.nodes[0].v * this.nodes[0].v;
         this.totalV += this.nodes[0].v;
 
         // binary threshold is a fixed 2.5V (assumes ~5V logic levels); not scaled to the circuit's actual voltage range
-        if (this.nodes[0].v < 2.5)
-            this.binaryLevel = 0;
-        else
-            this.binaryLevel = 1;
+        if (this.nodes[0].v < 2.5) this.binaryLevel = 0;
+        else this.binaryLevel = 1;
 
         if (!this.started) {
             // prime max/min tracking with the first sample instead of the stale defaults (0, increasingV==decreasingV==true),
@@ -238,7 +269,7 @@ export class TestPointElm extends CircuitElm {
         if (this.nodes[0].v < this.maxV && this.increasingV) {
             this.lastMaxV = this.maxV;
             this.periodLength = CircuitElm.sim.t - this.periodStart;
-            this.periodStart  = CircuitElm.sim.t;
+            this.periodStart = CircuitElm.sim.t;
             this.period = this.periodLength;
             this.pulseWidth = CircuitElm.sim.t - this.pulseStart;
             this.dutyCycle = this.pulseWidth / this.periodLength;
@@ -247,7 +278,7 @@ export class TestPointElm extends CircuitElm {
             this.decreasingV = true;
 
             this.total = this.total / this.count;
-            this.rmsV  = Math.sqrt(this.total);
+            this.rmsV = Math.sqrt(this.total);
             if (isNaN(this.rmsV)) this.rmsV = 0;
             this.avgV = this.totalV / this.count;
             if (isNaN(this.avgV)) this.avgV = 0;
@@ -262,13 +293,13 @@ export class TestPointElm extends CircuitElm {
         }
         if (this.nodes[0].v > this.minV && this.decreasingV) {
             this.lastMinV = this.minV;
-            this.pulseStart   = CircuitElm.sim.t;
+            this.pulseStart = CircuitElm.sim.t;
             this.maxV = this.nodes[0].v;
             this.increasingV = true;
             this.decreasingV = false;
 
             this.total = this.total / this.count;
-            this.rmsV  = Math.sqrt(this.total);
+            this.rmsV = Math.sqrt(this.total);
             if (isNaN(this.rmsV)) this.rmsV = 0;
             this.avgV = this.totalV / this.count;
             if (isNaN(this.avgV)) this.avgV = 0;
@@ -280,32 +311,58 @@ export class TestPointElm extends CircuitElm {
             this.zerocount++;
             if (this.zerocount > 5) {
                 this.total = 0;
-                this.rmsV  = 0;
-                this.avgV  = 0;
-                this.maxV  = 0;
-                this.minV  = 0;
+                this.rmsV = 0;
+                this.avgV = 0;
+                this.maxV = 0;
+                this.minV = 0;
             }
         } else {
             this.zerocount = 0;
         }
         switch (this.meter) {
-        case TestPointElm.TP_VOL: this.selectedValue = this.nodes[0].v; break;
-        case TestPointElm.TP_RMS: this.selectedValue = this.rmsV; break;
-        case TestPointElm.TP_AVG: this.selectedValue = this.avgV; break;
-        case TestPointElm.TP_MAX: this.selectedValue = this.lastMaxV; break;
-        case TestPointElm.TP_MIN: this.selectedValue = this.lastMinV; break;
-        case TestPointElm.TP_P2P: this.selectedValue = this.lastMaxV - this.lastMinV; break;
-        case TestPointElm.TP_BIN: this.selectedValue = this.binaryLevel; break;
-        case TestPointElm.TP_FRQ: this.selectedValue = this.frequency; break;
-        case TestPointElm.TP_PER: this.selectedValue = this.period; break;
-        case TestPointElm.TP_PWI: this.selectedValue = this.pulseWidth; break;
-        case TestPointElm.TP_DUT: this.selectedValue = this.dutyCycle; break;
+            case TestPointElm.TP_VOL:
+                this.selectedValue = this.nodes[0].v;
+                break;
+            case TestPointElm.TP_RMS:
+                this.selectedValue = this.rmsV;
+                break;
+            case TestPointElm.TP_AVG:
+                this.selectedValue = this.avgV;
+                break;
+            case TestPointElm.TP_MAX:
+                this.selectedValue = this.lastMaxV;
+                break;
+            case TestPointElm.TP_MIN:
+                this.selectedValue = this.lastMinV;
+                break;
+            case TestPointElm.TP_P2P:
+                this.selectedValue = this.lastMaxV - this.lastMinV;
+                break;
+            case TestPointElm.TP_BIN:
+                this.selectedValue = this.binaryLevel;
+                break;
+            case TestPointElm.TP_FRQ:
+                this.selectedValue = this.frequency;
+                break;
+            case TestPointElm.TP_PER:
+                this.selectedValue = this.period;
+                break;
+            case TestPointElm.TP_PWI:
+                this.selectedValue = this.pulseWidth;
+                break;
+            case TestPointElm.TP_DUT:
+                this.selectedValue = this.dutyCycle;
+                break;
         }
     }
 
-    getScopeValue(x: number): number { return this.selectedValue; }
+    getScopeValue(x: number): number {
+        return this.selectedValue;
+    }
 
-    getVoltageDiff(): number { return this.nodes[0].v; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "Test Point";
@@ -327,17 +384,28 @@ export class TestPointElm extends CircuitElm {
 
     getMeterLine(m: number): string {
         switch (m) {
-        case TestPointElm.TP_VOL: return "V = "          + CircuitElm.getUnitText(this.nodes[0].v, "V");
-        case TestPointElm.TP_RMS: return "V(rms) = "     + CircuitElm.getUnitText(this.rmsV, "V");
-        case TestPointElm.TP_AVG: return "V(avg) = "     + CircuitElm.getUnitText(this.avgV, "V");
-        case TestPointElm.TP_MAX: return "Vmax = "        + CircuitElm.getUnitText(this.lastMaxV, "Vpk");
-        case TestPointElm.TP_MIN: return "Vmin = "        + CircuitElm.getUnitText(this.lastMinV, "Vmin");
-        case TestPointElm.TP_P2P: return "Vp2p = "        + CircuitElm.getUnitText(this.lastMaxV - this.lastMinV, "Vp2p");
-        case TestPointElm.TP_BIN: return "Binary:"        + this.binaryLevel;
-        case TestPointElm.TP_FRQ: return "Freq = "        + CircuitElm.getUnitText(this.frequency, "Hz");
-        case TestPointElm.TP_PER: return "Period = "      + CircuitElm.getUnitText(this.period, "s");
-        case TestPointElm.TP_PWI: return "Pulse width = " + CircuitElm.getUnitText(this.pulseWidth, "s");
-        case TestPointElm.TP_DUT: return "Duty cycle = "  + CircuitElm.showFormat.format(this.dutyCycle);
+            case TestPointElm.TP_VOL:
+                return "V = " + CircuitElm.getUnitText(this.nodes[0].v, "V");
+            case TestPointElm.TP_RMS:
+                return "V(rms) = " + CircuitElm.getUnitText(this.rmsV, "V");
+            case TestPointElm.TP_AVG:
+                return "V(avg) = " + CircuitElm.getUnitText(this.avgV, "V");
+            case TestPointElm.TP_MAX:
+                return "Vmax = " + CircuitElm.getUnitText(this.lastMaxV, "Vpk");
+            case TestPointElm.TP_MIN:
+                return "Vmin = " + CircuitElm.getUnitText(this.lastMinV, "Vmin");
+            case TestPointElm.TP_P2P:
+                return "Vp2p = " + CircuitElm.getUnitText(this.lastMaxV - this.lastMinV, "Vp2p");
+            case TestPointElm.TP_BIN:
+                return "Binary:" + this.binaryLevel;
+            case TestPointElm.TP_FRQ:
+                return "Freq = " + CircuitElm.getUnitText(this.frequency, "Hz");
+            case TestPointElm.TP_PER:
+                return "Period = " + CircuitElm.getUnitText(this.period, "s");
+            case TestPointElm.TP_PWI:
+                return "Pulse width = " + CircuitElm.getUnitText(this.pulseWidth, "s");
+            case TestPointElm.TP_DUT:
+                return "Duty cycle = " + CircuitElm.showFormat.format(this.dutyCycle);
         }
         return "";
     }
@@ -367,24 +435,29 @@ export class TestPointElm extends CircuitElm {
     }
 
     meterChoices(): number[] {
-        return [TestPointElm.TP_VOL, TestPointElm.TP_RMS, TestPointElm.TP_AVG, TestPointElm.TP_MAX,
-            TestPointElm.TP_MIN, TestPointElm.TP_P2P, TestPointElm.TP_BIN];
+        return [
+            TestPointElm.TP_VOL,
+            TestPointElm.TP_RMS,
+            TestPointElm.TP_AVG,
+            TestPointElm.TP_MAX,
+            TestPointElm.TP_MIN,
+            TestPointElm.TP_P2P,
+            TestPointElm.TP_BIN,
+        ];
     }
 
     meterChoiceIndex(m: number): number {
         const choices = this.meterChoices();
-        for (let i = 0; i !== choices.length; i++)
-            if (choices[i] === m)
-                return i;
+        for (let i = 0; i !== choices.length; i++) if (choices[i] === m) return i;
         return 0;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.meter = this.meterChoices()[ei.choice.getSelectedIndex()];
-        if (n === 1)
-            this.label = ei.textf ? ei.textf.value : (ei.text ?? "TP");
+        if (n === 0) this.meter = this.meterChoices()[ei.choice.getSelectedIndex()];
+        if (n === 1) this.label = ei.textf ? ei.textf.value : (ei.text ?? "TP");
     }
 
-    isTestPointElm(): boolean { return true; }
+    isTestPointElm(): boolean {
+        return true;
+    }
 }

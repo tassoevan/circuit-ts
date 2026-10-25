@@ -56,7 +56,7 @@ export class CrystalElm extends CompositeElm {
             this.allocNodes();
             this.flags = CrystalElm.FLAG_SHOW_FREQ;
             this.parallelCapacitance = 28.7e-12;
-            this.seriesCapacitance   = 0.1e-12;
+            this.seriesCapacitance = 0.1e-12;
             this.inductance = 2.5e-3;
             this.resistance = 6.4;
             this.initCrystal();
@@ -84,23 +84,27 @@ export class CrystalElm extends CompositeElm {
         (this.compElmList[3] as ResistorElm).setResistance(this.resistance);
     }
 
-    getDumpType(): number { return 412; }
-    getXmlDumpType(): string { return "cr"; }
+    getDumpType(): number {
+        return 412;
+    }
+    getXmlDumpType(): string {
+        return "cr";
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "pc", this.parallelCapacitance);
         CircuitXMLSerializer.dumpAttr(elem, "sc", this.seriesCapacitance);
         CircuitXMLSerializer.dumpAttr(elem, "in", this.inductance);
-        CircuitXMLSerializer.dumpAttr(elem, "r",  this.resistance);
+        CircuitXMLSerializer.dumpAttr(elem, "r", this.resistance);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
-        this.resistance          = xml.parseDoubleAttr("r",  this.resistance);
-        this.inductance          = xml.parseDoubleAttr("in", this.inductance);
+        this.resistance = xml.parseDoubleAttr("r", this.resistance);
+        this.inductance = xml.parseDoubleAttr("in", this.inductance);
         this.parallelCapacitance = xml.parseDoubleAttr("pc", this.parallelCapacitance);
-        this.seriesCapacitance   = xml.parseDoubleAttr("sc", this.seriesCapacitance);
+        this.seriesCapacitance = xml.parseDoubleAttr("sc", this.seriesCapacitance);
         this.initCrystal();
     }
 
@@ -113,12 +117,12 @@ export class CrystalElm extends CompositeElm {
         // calc plates
         this.plate1 = this.newPointArray(2);
         this.plate2 = this.newPointArray(2);
-        this.interpPoint2(this.point1, this.point2, this.plate1[0], this.plate1[1],     f, 8);
+        this.interpPoint2(this.point1, this.point2, this.plate1[0], this.plate1[1], f, 8);
         this.interpPoint2(this.point1, this.point2, this.plate2[0], this.plate2[1], 1 - f, 8);
 
         this.sandwichPoints = this.newPointArray(4);
         const f2 = (this.dn / 2 - 5) / this.dn;
-        this.interpPoint2(this.point1, this.point2, this.sandwichPoints[0], this.sandwichPoints[1],     f2, 10);
+        this.interpPoint2(this.point1, this.point2, this.sandwichPoints[0], this.sandwichPoints[1], f2, 10);
         this.interpPoint2(this.point1, this.point2, this.sandwichPoints[3], this.sandwichPoints[2], 1 - f2, 10);
 
         // need to do this explicitly for CompositeElms
@@ -135,8 +139,7 @@ export class CrystalElm extends CompositeElm {
         CircuitElm.drawThickLine(g, this.point1, this.lead1!);
         this.setPowerColor(g, false);
         CircuitElm.drawThickLine(g, this.plate1[0], this.plate1[1]);
-        if (this.showPower())
-            g.setColor(Color.gray);
+        if (this.showPower()) g.setColor(Color.gray);
 
         // draw second lead and plate
         this.setVoltageColor(g, this.nodes[1].v);
@@ -170,28 +173,32 @@ export class CrystalElm extends CompositeElm {
         arr[0] = "crystal";
         this.getBasicInfo(arr);
         const fs = 1 / (Math.sqrt(this.inductance * this.seriesCapacitance) * Math.PI * 2);
-        const cSer = (this.parallelCapacitance * this.seriesCapacitance) /
-                     (this.parallelCapacitance + this.seriesCapacitance);
+        const cSer =
+            (this.parallelCapacitance * this.seriesCapacitance) / (this.parallelCapacitance + this.seriesCapacitance);
         const fp = 1 / (Math.sqrt(this.inductance * cSer) * Math.PI * 2);
-        const q  = 2 * Math.PI * fs * this.inductance / this.resistance;
+        const q = (2 * Math.PI * fs * this.inductance) / this.resistance;
         arr[3] = "fs = " + CircuitElm.getUnitText(fs, "Hz");
         arr[4] = "fp = " + CircuitElm.getUnitText(fp, "Hz");
-        arr[5] = "Q = "  + CircuitElm.getUnitText(q, "");
-        arr[6] = "P = "  + CircuitElm.getUnitText(this.getPower(), "W");
+        arr[5] = "Q = " + CircuitElm.getUnitText(q, "");
+        arr[6] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    canViewInScope(): boolean { return true; }
+    canViewInScope(): boolean {
+        return true;
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0)
-            return new EditInfo(EditInfo.makeLink("crystal.html", "Parallel Capacitance"), this.parallelCapacitance).setPositive();
-        if (n === 1)
-            return new EditInfo("Series Capacitance (F)", this.seriesCapacitance).setPositive();
-        if (n === 2)
-            return new EditInfo("Inductance (H)", this.inductance, 0, 0).setPositive();
-        if (n === 3)
-            return new EditInfo("Resistance (" + Locale.ohmString + ")", this.resistance, 0, 0).setPositive();
+            return new EditInfo(
+                EditInfo.makeLink("crystal.html", "Parallel Capacitance"),
+                this.parallelCapacitance,
+            ).setPositive();
+        if (n === 1) return new EditInfo("Series Capacitance (F)", this.seriesCapacitance).setPositive();
+        if (n === 2) return new EditInfo("Inductance (H)", this.inductance, 0, 0).setPositive();
+        if (n === 3) return new EditInfo("Resistance (" + Locale.ohmString + ")", this.resistance, 0, 0).setPositive();
         if (n === 4) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Show Frequency", this.hasFlag(CrystalElm.FLAG_SHOW_FREQ));
@@ -202,11 +209,10 @@ export class CrystalElm extends CompositeElm {
 
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) this.parallelCapacitance = ei.value;
-        if (n === 1 && ei.value > 0) this.seriesCapacitance   = ei.value;
+        if (n === 1 && ei.value > 0) this.seriesCapacitance = ei.value;
         if (n === 2 && ei.value > 0) this.inductance = ei.value;
         if (n === 3 && ei.value > 0) this.resistance = ei.value;
-        if (n === 4)
-            this.flags = ei.changeFlag(this.flags, CrystalElm.FLAG_SHOW_FREQ);
+        if (n === 4) this.flags = ei.changeFlag(this.flags, CrystalElm.FLAG_SHOW_FREQ);
         this.initCrystal();
     }
 }

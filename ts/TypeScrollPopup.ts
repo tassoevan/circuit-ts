@@ -25,7 +25,6 @@ import { Locale } from "./Locale";
 // popup for toggling MOSFET/JFET/transistor type on scroll wheel, similar to
 // ScrollValuePopup for R/C/L values
 export class TypeScrollPopup {
-
     private myElm: any;
     private sim: CirSim;
     private originalPnp: number;
@@ -42,10 +41,8 @@ export class TypeScrollPopup {
     };
     private readonly onMouseOut = () => this.close(true);
     private readonly onMouseDown = (e: MouseEvent) => {
-        if (e.button === 0 || e.button === 1)
-            this.close(true);
-        else
-            this.close(false);
+        if (e.button === 0 || e.button === 1) this.close(true);
+        else this.close(false);
     };
 
     constructor(x: number, y: number, dy: number, elm: CircuitElm, sim: CirSim) {
@@ -89,10 +86,8 @@ export class TypeScrollPopup {
     }
 
     private getHeaderText(): string {
-        if (this.myElm.isJfetElm())
-            return Locale.LS("JFET Type");
-        if (this.myElm.isMosfetElm())
-            return Locale.LS("MOSFET Type");
+        if (this.myElm.isJfetElm()) return Locale.LS("JFET Type");
+        if (this.myElm.isMosfetElm()) return Locale.LS("MOSFET Type");
         return Locale.LS("Transistor Type");
     }
 
@@ -129,8 +124,12 @@ export class TypeScrollPopup {
         let text: string;
         if (this.myElm.isMosfetElm()) {
             text = this.myElm.isJfetElm()
-                ? (this.currentPnp === -1 ? Locale.LS("P-Channel JFET") : Locale.LS("N-Channel JFET"))
-                : (this.currentPnp === -1 ? Locale.LS("P-Channel") : Locale.LS("N-Channel"));
+                ? this.currentPnp === -1
+                    ? Locale.LS("P-Channel JFET")
+                    : Locale.LS("N-Channel JFET")
+                : this.currentPnp === -1
+                  ? Locale.LS("P-Channel")
+                  : Locale.LS("N-Channel");
         } else {
             text = this.currentPnp === -1 ? "PNP" : "NPN";
         }
@@ -138,13 +137,11 @@ export class TypeScrollPopup {
     }
 
     close(keepChanges: boolean): void {
-        if (this.closed)
-            return;
+        if (this.closed) return;
         this.closed = true;
         if (!keepChanges) {
             // revert to original state
-            while (this.currentPnp !== this.originalPnp)
-                this.toggle();
+            while (this.currentPnp !== this.originalPnp) this.toggle();
         }
         this.panel.remove();
         CirSim.typeScrollPopup = null;

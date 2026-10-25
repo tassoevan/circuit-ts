@@ -29,7 +29,6 @@ import { parseIntStrict } from "./NumberParse";
 // meet at a point (a junction), they must remain separate.
 
 export class WireConverter {
-
     static convertWires(sim: CirSim): void {
         const elmList = sim.elmList;
 
@@ -45,14 +44,11 @@ export class WireConverter {
         // collect WireElms (but not RoutedWireElms)
         const wires: WireElm[] = [];
         for (const ce of elmList) {
-            if (ce.isRoutedWireElm())
-                continue;
-            if (ce.isWireElm() && (!hasSelection || ce.isSelected()))
-                wires.push(ce as WireElm);
+            if (ce.isRoutedWireElm()) continue;
+            if (ce.isWireElm() && (!hasSelection || ce.isSelected())) wires.push(ce as WireElm);
         }
 
-        if (wires.length === 0)
-            return;
+        if (wires.length === 0) return;
 
         // count how many wire endpoints touch each point
         const pointCount = new Map<string, number>();
@@ -64,8 +60,7 @@ export class WireConverter {
         // non-wire element connections force chain endpoints.
         // add 2 so the point can never be exactly 2 (chain interior).
         for (const ce of elmList) {
-            if (ce.isWireElm())
-                continue;
+            if (ce.isWireElm()) continue;
             for (let i = 0; i < ce.getPostCount(); i++) {
                 const p = ce.getPost(i)!;
                 const k = WireConverter.key(p.x, p.y);
@@ -90,8 +85,7 @@ export class WireConverter {
         const chains: WireElm[][] = [];
 
         for (const w of wires) {
-            if (visited.has(w))
-                continue;
+            if (visited.has(w)) continue;
 
             // try to start a chain from this wire
             const chain: WireElm[] = [];
@@ -109,41 +103,40 @@ export class WireConverter {
                 pts.push(new Point(w.x2, w.y2));
                 const rw = new RoutedWireElm(pts);
                 const idx = elmList.indexOf(w);
-                if (idx >= 0)
-                    elmList.splice(idx, 1);
+                if (idx >= 0) elmList.splice(idx, 1);
                 elmList.push(rw);
                 continue;
             }
 
             // order the chain and find the two endpoints
             const orderedPoints = WireConverter.orderChain(chain, pointCount);
-            if (orderedPoints === null || orderedPoints.length < 3)
-                continue;
+            if (orderedPoints === null || orderedPoints.length < 3) continue;
 
             const rw = new RoutedWireElm(orderedPoints);
 
             // remove old wires, add new routed wire
             for (const w of chain) {
                 const idx = elmList.indexOf(w);
-                if (idx >= 0)
-                    elmList.splice(idx, 1);
+                if (idx >= 0) elmList.splice(idx, 1);
             }
             elmList.push(rw);
         }
     }
 
     // walk along connected wires where interior points have degree 2
-    private static buildChain(start: WireElm, chain: WireElm[],
-                               visited: Set<WireElm>,
-                               pointCount: Map<string, number>,
-                               pointToWires: Map<string, WireElm[]>): void {
+    private static buildChain(
+        start: WireElm,
+        chain: WireElm[],
+        visited: Set<WireElm>,
+        pointCount: Map<string, number>,
+        pointToWires: Map<string, WireElm[]>,
+    ): void {
         const stack: WireElm[] = [];
         stack.push(start);
 
         while (stack.length > 0) {
             const w = stack.pop()!;
-            if (visited.has(w))
-                continue;
+            if (visited.has(w)) continue;
             visited.add(w);
             chain.push(w);
 
@@ -154,14 +147,12 @@ export class WireConverter {
             // only extend through points with exactly degree 2 (chain interior)
             if (pointCount.get(k1) === 2) {
                 for (const neighbor of pointToWires.get(k1)!) {
-                    if (!visited.has(neighbor))
-                        stack.push(neighbor);
+                    if (!visited.has(neighbor)) stack.push(neighbor);
                 }
             }
             if (pointCount.get(k2) === 2) {
                 for (const neighbor of pointToWires.get(k2)!) {
-                    if (!visited.has(neighbor))
-                        stack.push(neighbor);
+                    if (!visited.has(neighbor)) stack.push(neighbor);
                 }
             }
         }
@@ -193,8 +184,7 @@ export class WireConverter {
                 break;
             }
         }
-        if (startWire === null)
-            return null; // closed loop, skip
+        if (startWire === null) return null; // closed loop, skip
 
         // walk the chain in order
         const points: Point[] = [];
@@ -209,7 +199,7 @@ export class WireConverter {
             // find the other endpoint of this wire
             const k1 = WireConverter.key(current.x, current.y);
             const k2 = WireConverter.key(current.x2, current.y2);
-            const otherEnd = (k1 === currentPt) ? k2 : k1;
+            const otherEnd = k1 === currentPt ? k2 : k1;
             points.push(new Point(WireConverter.keyX(otherEnd), WireConverter.keyY(otherEnd)));
 
             // find next wire at otherEnd (if it's a chain interior point)

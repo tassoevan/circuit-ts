@@ -57,17 +57,13 @@ export class GyratorElm extends CircuitElm {
     drag(xx: number, yy: number): void {
         xx = this.snapGrid(xx);
         yy = this.snapGrid(yy);
-        if (Math.abs(xx - this.x) > Math.abs(yy - this.y))
-            this.flags &= ~GyratorElm.FLAG_VERTICAL;
-        else
-            this.flags |= GyratorElm.FLAG_VERTICAL;
-        if (this.hasFlag(GyratorElm.FLAG_VERTICAL))
-            this.width = -Math.max(32, Math.abs(xx - this.x));
-        else
-            this.width = Math.max(32, Math.abs(yy - this.y));
-        if (xx === this.x)
-            yy = this.y;
-        this.x2 = xx; this.y2 = yy;
+        if (Math.abs(xx - this.x) > Math.abs(yy - this.y)) this.flags &= ~GyratorElm.FLAG_VERTICAL;
+        else this.flags |= GyratorElm.FLAG_VERTICAL;
+        if (this.hasFlag(GyratorElm.FLAG_VERTICAL)) this.width = -Math.max(32, Math.abs(xx - this.x));
+        else this.width = Math.max(32, Math.abs(yy - this.y));
+        if (xx === this.x) yy = this.y;
+        this.x2 = xx;
+        this.y2 = yy;
         this.setPoints();
     }
 
@@ -108,10 +104,8 @@ export class GyratorElm extends CircuitElm {
 
     setPoints(): void {
         super.setPoints();
-        if (this.hasFlag(GyratorElm.FLAG_VERTICAL))
-            this.point2.x = this.point1.x;
-        else
-            this.point2.y = this.point1.y;
+        if (this.hasFlag(GyratorElm.FLAG_VERTICAL)) this.point2.x = this.point1.x;
+        else this.point2.y = this.point1.y;
         this.ptEnds = this.newPointArray(4);
         this.ptStub = this.newPointArray(4);
         this.ptEnds[0] = this.point1;
@@ -122,8 +116,8 @@ export class GyratorElm extends CircuitElm {
         // Stubs end 12px in from each terminal toward the center
         const cs = 0.5 - 12 / this.dn;
         for (let i = 0; i !== 4; i += 2) {
-            this.interpPoint(this.ptEnds[i],     this.ptEnds[i + 1], this.ptStub[i],     cs);
-            this.interpPoint(this.ptEnds[i + 1], this.ptEnds[i],     this.ptStub[i + 1], cs);
+            this.interpPoint(this.ptEnds[i], this.ptEnds[i + 1], this.ptStub[i], cs);
+            this.interpPoint(this.ptEnds[i + 1], this.ptEnds[i], this.ptStub[i + 1], cs);
         }
         // Box corners coincide with the stub endpoints
         this.boxTL = this.ptStub[0];
@@ -152,10 +146,8 @@ export class GyratorElm extends CircuitElm {
 
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
-        if (this.hasFlag(GyratorElm.FLAG_VERTICAL))
-            this.width = -Math.max(32, Math.abs(this.x2 - this.x));
-        else
-            this.width = Math.max(32, Math.abs(this.y2 - this.y));
+        if (this.hasFlag(GyratorElm.FLAG_VERTICAL)) this.width = -Math.max(32, Math.abs(this.x2 - this.x));
+        else this.width = Math.max(32, Math.abs(this.y2 - this.y));
         this.gyrResistance = xml.parseDoubleAttr("r", this.gyrResistance);
         this.width = xml.parseIntAttr("wi", this.width);
     }
@@ -164,7 +156,9 @@ export class GyratorElm extends CircuitElm {
         return this.ptEnds[n];
     }
 
-    getPostCount(): number { return 4; }
+    getPostCount(): number {
+        return 4;
+    }
 
     reset(): void {
         this.currents[0] = this.currents[1] = 0;
@@ -180,7 +174,7 @@ export class GyratorElm extends CircuitElm {
     // sources -- no doStep().
     stamp(): void {
         const g = 1.0 / this.gyrResistance;
-        CircuitElm.sim.stampVCCurrentSource(this.nodes[0], this.nodes[2], this.nodes[1], this.nodes[3],  g);
+        CircuitElm.sim.stampVCCurrentSource(this.nodes[0], this.nodes[2], this.nodes[1], this.nodes[3], g);
         CircuitElm.sim.stampVCCurrentSource(this.nodes[1], this.nodes[3], this.nodes[0], this.nodes[2], -g);
     }
 
@@ -188,29 +182,30 @@ export class GyratorElm extends CircuitElm {
         const g = 1.0 / this.gyrResistance;
         const v1 = this.nodes[0].v - this.nodes[2].v;
         const v2 = this.nodes[1].v - this.nodes[3].v;
-        this.currents[0] =  g * v2;
+        this.currents[0] = g * v2;
         this.currents[1] = -g * v1;
     }
 
-    getCurrent(): number { return this.currents[0]; }  // for scope
+    getCurrent(): number {
+        return this.currents[0];
+    } // for scope
 
     getCurrentIntoNode(n: number): number {
-        if (n < 2)
-            return -this.currents[n];
+        if (n < 2) return -this.currents[n];
         return this.currents[n - 2];
     }
 
     // VCCS stamps couple all nodes, so they must all be in the same matrix
-    getMatrixConnection(n1: number, n2: number): boolean { return true; }
+    getMatrixConnection(n1: number, n2: number): boolean {
+        return true;
+    }
 
     getConnection(n1: number, n2: number): boolean {
         // Port-1 terminals connect to each other; port-2 terminals connect
         // to each other; the two ports are coupled only via the VCCS, not
         // galvanically.
-        if (this.comparePair(n1, n2, 0, 2))
-            return true;
-        if (this.comparePair(n1, n2, 1, 3))
-            return true;
+        if (this.comparePair(n1, n2, 0, 2)) return true;
+        if (this.comparePair(n1, n2, 1, 3)) return true;
         return false;
     }
 
@@ -224,25 +219,21 @@ export class GyratorElm extends CircuitElm {
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Gyration Resistance (Ω)", this.gyrResistance, 1, 0);
+        if (n === 0) return new EditInfo("Gyration Resistance (Ω)", this.gyrResistance, 1, 0);
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0 && ei.value > 0)
-            this.gyrResistance = ei.value;
+        if (n === 0 && ei.value > 0) this.gyrResistance = ei.value;
     }
 
     flipX(c2: number, count: number): void {
-        if (this.hasFlag(GyratorElm.FLAG_VERTICAL))
-            this.flags ^= GyratorElm.FLAG_FLIP;
+        if (this.hasFlag(GyratorElm.FLAG_VERTICAL)) this.flags ^= GyratorElm.FLAG_FLIP;
         super.flipX(c2, count);
     }
 
     flipY(c2: number, count: number): void {
-        if (!this.hasFlag(GyratorElm.FLAG_VERTICAL))
-            this.flags ^= GyratorElm.FLAG_FLIP;
+        if (!this.hasFlag(GyratorElm.FLAG_VERTICAL)) this.flags ^= GyratorElm.FLAG_FLIP;
         super.flipY(c2, count);
     }
 

@@ -28,15 +28,12 @@ export class VCVSElm extends VCCSElm {
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
-        if (xb === undefined)
-            super(xa, ya);
-        else
-            super(xa, ya, xb, yb!, f!, st!);
+        if (xb === undefined) super(xa, ya);
+        else super(xa, ya, xb, yb!, f!, st!);
     }
 
     setupPins(): void {
-        if (!this.inputCount)
-	    this.inputCount = 0;
+        if (!this.inputCount) this.inputCount = 0;
         this.sizeX = 2;
         this.sizeY = this.inputCount > 2 ? this.inputCount : 2;
         this.pins = new Array(this.inputCount + 2);
@@ -49,7 +46,9 @@ export class VCVSElm extends VCCSElm {
         this.allocNodes();
     }
 
-    getChipName(): string { return "VCVS"; }
+    getChipName(): string {
+        return "VCVS";
+    }
 
     stamp(): void {
         const sim = SimulationManager.theSim;
@@ -62,14 +61,17 @@ export class VCVSElm extends VCCSElm {
         const sim = SimulationManager.theSim;
 
         // check convergence
-        if (!this.engine.checkConvergence(this.getConvergeLimit()))
-            sim.converged = false;
+        if (!this.engine.checkConvergence(this.getConvergeLimit())) sim.converged = false;
 
         const vn = this.pins[this.inputCount].voltSource!;
         if (this.expr != null) {
             const rs = this.engine.evalAndStamp(false);
             const v0 = this.engine.value;
-            if (Math.abs(this.nodes[this.inputCount].v - this.nodes[this.inputCount + 1].v - v0) > Math.abs(v0) * 0.01 && sim.subIterations < 100)
+            if (
+                Math.abs(this.nodes[this.inputCount].v - this.nodes[this.inputCount + 1].v - v0) >
+                    Math.abs(v0) * 0.01 &&
+                sim.subIterations < 100
+            )
                 sim.converged = false;
             sim.stampRightSideVS(vn, rs);
         }
@@ -93,10 +95,18 @@ export class VCVSElm extends VCCSElm {
         this.exprState.updateLastValues(this.nodes[this.inputCount].v - this.nodes[this.inputCount + 1].v);
     }
 
-    getPostCount(): number { return this.inputCount + 2; }
-    getVoltageSourceCount(): number { return 1; }
-    getDumpType(): number { return 212; }
-    hasCurrentOutput(): boolean { return false; }
+    getPostCount(): number {
+        return this.inputCount + 2;
+    }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    getDumpType(): number {
+        return 212;
+    }
+    hasCurrentOutput(): boolean {
+        return false;
+    }
 
     setVoltageSource(j: number, vs: VoltageSource): void {
         super.setVoltageSource(j, vs);

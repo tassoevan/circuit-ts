@@ -25,7 +25,6 @@ import { StringTokenizer } from "./StringTokenizer";
 import { EditInfo } from "./EditInfo";
 
 export class LineElm extends GraphicElm {
-
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
@@ -42,7 +41,9 @@ export class LineElm extends GraphicElm {
         }
     }
 
-    getDumpType(): number { return 423; }
+    getDumpType(): number {
+        return 423;
+    }
 
     drag(xx: number, yy: number): void {
         this.x2 = xx;
@@ -60,24 +61,25 @@ export class LineElm extends GraphicElm {
         g.drawLine(this.x, this.y, this.x2, this.y2);
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
-    }
+    setEditValue(n: number, ei: EditInfo): void {}
 
-    getInfo(arr: string[]): void {
-    }
+    getInfo(arr: string[]): void {}
 
-    getShortcut(): number { return 0; }
+    getShortcut(): number {
+        return 0;
+    }
 
     getMouseDistance(gx: number, gy: number): number {
         const thresh = 10;
         const d2 = this.lineDistanceSq(this.x, this.y, this.x2, this.y2, gx, gy);
-        if (d2 <= thresh * thresh)
-            return d2;
+        if (d2 <= thresh * thresh) return d2;
         return -1;
     }
 }

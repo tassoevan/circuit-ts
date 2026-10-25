@@ -32,14 +32,15 @@ export class FullAdderElm extends ChipElm {
             this.setupPins();
         } else {
             super(xxOrXa, yyOrYa, xb, yb!, f!, st!);
-            if (!this.needsBits())
-                this.bits = 1;
+            if (!this.needsBits()) this.bits = 1;
             this.setupPins();
         }
     }
     static readonly FLAG_BITS = 2;
 
-    getChipName(): string { return "Adder"; }
+    getChipName(): string {
+        return "Adder";
+    }
     carryIn: number = 0;
     carryOut: number = 0;
 
@@ -49,10 +50,10 @@ export class FullAdderElm extends ChipElm {
         this.sizeY = bitsY * 2 + 1;
         this.pins = new Array(this.getPostCount());
 
-        this.makeBitPins(this.bits, 0,      ChipElm.SIDE_W, 0,           "A", false, false, false);
-        this.makeBitPins(this.bits, bitsY,  ChipElm.SIDE_W, this.bits,   "B", false, false, false);
-        this.makeBitPins(this.bits, 2,      ChipElm.SIDE_E, this.bits*2, "S", true,  false, false);
-        this.carryIn  = this.bits * 3;
+        this.makeBitPins(this.bits, 0, ChipElm.SIDE_W, 0, "A", false, false, false);
+        this.makeBitPins(this.bits, bitsY, ChipElm.SIDE_W, this.bits, "B", false, false, false);
+        this.makeBitPins(this.bits, 2, ChipElm.SIDE_E, this.bits * 2, "S", true, false, false);
+        this.carryIn = this.bits * 3;
         this.carryOut = this.bits * 3 + 1;
         this.pins[this.carryOut] = new Pin(this, 0, ChipElm.SIDE_E, "C");
         this.pins[this.carryOut].output = true;
@@ -62,25 +63,34 @@ export class FullAdderElm extends ChipElm {
     getPostCount(): number {
         return this.bits * 3 + 2;
     }
-    getVoltageSourceCount(): number { return this.bits + 1; }
+    getVoltageSourceCount(): number {
+        return this.bits + 1;
+    }
 
     execute(): void {
         let c = this.pins[this.carryIn].value ? 1 : 0;
         for (let i = 0; i !== this.bits; i++) {
             const v = (this.pins[i].value ? 1 : 0) + (this.pins[i + this.bits].value ? 1 : 0) + c;
-            c = (v > 1) ? 1 : 0;
-            this.writeOutput(i + this.bits * 2, ((v & 1) === 1));
+            c = v > 1 ? 1 : 0;
+            this.writeOutput(i + this.bits * 2, (v & 1) === 1);
         }
-        this.writeOutput(this.carryOut, (c === 1));
+        this.writeOutput(this.carryOut, c === 1);
     }
-    getDumpType(): number { return 196; }
-    needsBits(): boolean { return (this.flags & FullAdderElm.FLAG_BITS) !== 0; }
-    allowBus(): boolean { return this.needsBits(); }
+    getDumpType(): number {
+        return 196;
+    }
+    needsBits(): boolean {
+        return (this.flags & FullAdderElm.FLAG_BITS) !== 0;
+    }
+    allowBus(): boolean {
+        return this.needsBits();
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless().setPositive();
+        if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless().setPositive();
         return super.getChipEditInfo(n);
     }
     setChipEditValue(n: number, ei: EditInfo): void {

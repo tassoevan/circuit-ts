@@ -35,8 +35,8 @@ export class DeMultiplexerElm extends ChipElm {
     //             1 = single input, bus output (bit distributor)
     //             2 = bus input, bus outputs
     static readonly OUTPUT_MODE_INDIVIDUAL = 0;
-    static readonly OUTPUT_MODE_BUS_BIT    = 1;
-    static readonly OUTPUT_MODE_BUS_BUS    = 2;
+    static readonly OUTPUT_MODE_BUS_BIT = 1;
+    static readonly OUTPUT_MODE_BUS_BUS = 2;
 
     selectBitCount: number = 2;
     outputCount: number = 0;
@@ -46,9 +46,15 @@ export class DeMultiplexerElm extends ChipElm {
     selectPin: number = 0;
     outputPin: number = 0;
 
-    hasReset(): boolean { return false; }
-    busSelect(): boolean { return this.hasFlag(DeMultiplexerElm.FLAG_BUS_SELECT); }
-    invertOutputs(): boolean { return this.hasFlag(DeMultiplexerElm.FLAG_INVERT_OUTPUTS); }
+    hasReset(): boolean {
+        return false;
+    }
+    busSelect(): boolean {
+        return this.hasFlag(DeMultiplexerElm.FLAG_BUS_SELECT);
+    }
+    invertOutputs(): boolean {
+        return this.hasFlag(DeMultiplexerElm.FLAG_INVERT_OUTPUTS);
+    }
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
@@ -61,20 +67,20 @@ export class DeMultiplexerElm extends ChipElm {
             try {
                 this.selectBitCount = parseIntStrict(st!.nextToken());
             } catch (e) {}
-	    this.setupPins();
-	    this.allocNodes();
+            this.setupPins();
+            this.allocNodes();
         }
     }
 
-    getChipName(): string { return "Demultiplexer"; }
+    getChipName(): string {
+        return "Demultiplexer";
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "se", this.selectBitCount);
-        if (this.outputMode !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "om", this.outputMode);
-        if (this.dataBusWidth !== 4)
-            CircuitXMLSerializer.dumpAttr(elem, "dw", this.dataBusWidth);
+        if (this.outputMode !== 0) CircuitXMLSerializer.dumpAttr(elem, "om", this.outputMode);
+        if (this.dataBusWidth !== 4) CircuitXMLSerializer.dumpAttr(elem, "dw", this.dataBusWidth);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
@@ -87,14 +93,13 @@ export class DeMultiplexerElm extends ChipElm {
     }
 
     setupPins(): void {
-	if (!this.selectBitCount)
-	    this.selectBitCount = 2;
+        if (!this.selectBitCount) this.selectBitCount = 2;
         this.outputCount = 1 << this.selectBitCount;
         const D = DeMultiplexerElm;
         let i: number, n: number;
 
         if (this.outputMode === D.OUTPUT_MODE_BUS_BUS) {
-            const inputPinCount  = this.dataBusWidth;
+            const inputPinCount = this.dataBusWidth;
             const outputPinCount = this.outputCount * this.dataBusWidth;
 
             this.sizeX = this.selectBitCount + 1;
@@ -133,7 +138,6 @@ export class DeMultiplexerElm extends ChipElm {
                     this.pins[n].busZ = i;
                 }
             }
-
         } else if (this.outputMode === D.OUTPUT_MODE_BUS_BIT) {
             this.sizeX = this.selectBitCount + 1;
             this.sizeY = 3;
@@ -165,7 +169,6 @@ export class DeMultiplexerElm extends ChipElm {
                 this.pins[n].busWidth = this.outputCount;
                 this.pins[n].busZ = i;
             }
-
         } else {
             // mode 0: single input, individual outputs
             this.sizeX = 1 + this.selectBitCount;
@@ -202,24 +205,20 @@ export class DeMultiplexerElm extends ChipElm {
 
     getPostCount(): number {
         const D = DeMultiplexerElm;
-	if (!this.dataBusWidth || !this.selectBitCount || !this.outputCount)
-	    return 0;
+        if (!this.dataBusWidth || !this.selectBitCount || !this.outputCount) return 0;
         if (this.outputMode === D.OUTPUT_MODE_BUS_BUS)
             return this.dataBusWidth + this.selectBitCount + this.outputCount * this.dataBusWidth;
         return 1 + this.selectBitCount + this.outputCount;
     }
 
     getVoltageSourceCount(): number {
-        if (this.outputMode === DeMultiplexerElm.OUTPUT_MODE_BUS_BUS)
-            return this.outputCount * this.dataBusWidth;
+        if (this.outputMode === DeMultiplexerElm.OUTPUT_MODE_BUS_BUS) return this.outputCount * this.dataBusWidth;
         return this.outputCount;
     }
 
     readSelectValue(): number {
         let sel = 0;
-        for (let i = 0; i < this.selectBitCount; i++)
-            if (this.pins[this.selectPin + i].value)
-                sel |= 1 << i;
+        for (let i = 0; i < this.selectBitCount; i++) if (this.pins[this.selectPin + i].value) sel |= 1 << i;
         return sel;
     }
 
@@ -228,22 +227,26 @@ export class DeMultiplexerElm extends ChipElm {
         const selectedValue = this.readSelectValue();
 
         // set inactive outputs to idle level, then copy input (bus) to selected output (group)
-        const width = (this.outputMode === D.OUTPUT_MODE_BUS_BUS) ? this.dataBusWidth : 1;
+        const width = this.outputMode === D.OUTPUT_MODE_BUS_BUS ? this.dataBusWidth : 1;
         const idle = this.invertOutputs();
-        for (let i = 0; i < this.outputCount * width; i++)
-            this.pins[this.outputPin + i].value = idle;
+        for (let i = 0; i < this.outputCount * width; i++) this.pins[this.outputPin + i].value = idle;
         for (let i = 0; i < width; i++)
             this.pins[this.outputPin + selectedValue * width + i].value = this.pins[this.inputPin + i].value;
     }
 
-    getDumpType(): number { return 185; }
-    getXmlDumpType(): string { return "dmux"; }
+    getDumpType(): number {
+        return 185;
+    }
+    getXmlDumpType(): string {
+        return "dmux";
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
         const D = DeMultiplexerElm;
-        if (n === 0)
-            return new EditInfo("# of Select Bits", this.selectBitCount).setDimensionless();
+        if (n === 0) return new EditInfo("# of Select Bits", this.selectBitCount).setDimensionless();
         if (n === 1) {
             const ei = new EditInfo("Output Mode", 0, -1, -1);
             ei.choice = new Choice();
@@ -253,10 +256,8 @@ export class DeMultiplexerElm extends ChipElm {
             ei.choice.select(this.outputMode);
             return ei;
         }
-        if (n === 2)
-            return EditInfo.createCheckbox("Bus Select", this.busSelect());
-        if (n === 3)
-            return EditInfo.createCheckbox("Keep Inactive Outputs High (74139)", this.invertOutputs());
+        if (n === 2) return EditInfo.createCheckbox("Bus Select", this.busSelect());
+        if (n === 3) return EditInfo.createCheckbox("Keep Inactive Outputs High (74139)", this.invertOutputs());
         if (n === 4 && this.outputMode === D.OUTPUT_MODE_BUS_BUS)
             return new EditInfo("Data Bus Width", this.dataBusWidth, 2, 32).setDimensionless();
         return null;
@@ -269,8 +270,7 @@ export class DeMultiplexerElm extends ChipElm {
                 this.selectBitCount = Math.trunc(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be between 1 and 6");
+            } else ei.setError("must be between 1 and 6");
         }
         if (n === 1) {
             this.outputMode = ei.choice!.getSelectedIndex();
@@ -290,8 +290,7 @@ export class DeMultiplexerElm extends ChipElm {
                 this.dataBusWidth = Math.trunc(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be >= 2");
+            } else ei.setError("must be >= 2");
         }
     }
 }

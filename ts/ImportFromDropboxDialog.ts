@@ -45,9 +45,7 @@ export class ImportFromDropboxDialog extends Dialog {
             });
             xhr.open("GET", link, false);
             xhr.send();
-        }
-        catch (err) {
-        }
+        } catch (err) {}
     }
 
     static doImportDropboxLink(link: string, validateIsDropbox: boolean): void {
@@ -93,7 +91,8 @@ export class ImportFromDropboxDialog extends Dialog {
             la.textContent = Locale.LS("To open a shared Dropbox file from a Dropbox link paste the link below...");
         } else {
             const label = document.createElement("div");
-            label.textContent = "This site, or your browser doesn't support the Dropbox chooser so you can't pick a file from your dropbox account.";
+            label.textContent =
+                "This site, or your browser doesn't support the Dropbox chooser so you can't pick a file from your dropbox account.";
             this.dialogEl.appendChild(label);
 
             la = document.createElement("div");

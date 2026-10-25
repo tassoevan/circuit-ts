@@ -26,7 +26,6 @@ import { Graphics } from "./Graphics";
 import { Rectangle } from "./Rectangle";
 
 export class ScopeManager {
-
     sim: CirSim;
 
     scopes: Scope[];
@@ -61,21 +60,17 @@ export class ScopeManager {
     }
 
     scopeMenuIsSelected(s: Scope): boolean {
-        if (this.scopeMenuSelected < 0)
-            return false;
-        if (this.scopeMenuSelected < this.scopeCount)
-            return this.scopes[this.scopeMenuSelected] === s;
+        if (this.scopeMenuSelected < 0) return false;
+        if (this.scopeMenuSelected < this.scopeCount) return this.scopes[this.scopeMenuSelected] === s;
         return this.getNthScopeElm(this.scopeMenuSelected - this.scopeCount)?.elmScope === s;
     }
 
     timeStep(): void {
         let i;
-        for (i = 0; i !== this.scopeCount; i++)
-            this.scopes[i].timeStep();
+        for (i = 0; i !== this.scopeCount; i++) this.scopes[i].timeStep();
         const scopeElmArr = this.sim.scopeElmArr;
         if (scopeElmArr !== null) {
-            for (i = 0; i !== scopeElmArr.length; i++)
-                scopeElmArr[i].stepScope();
+            for (i = 0; i !== scopeElmArr.length; i++) scopeElmArr[i].stepScope();
         }
     }
 
@@ -92,35 +87,29 @@ export class ScopeManager {
             }
             if (this.scopes[i].needToRemove()) {
                 let j;
-                for (j = i; j < this.scopeCount; j++)
-                    this.scopes[j] = this.scopes[j + 1];
+                for (j = i; j < this.scopeCount; j++) this.scopes[j] = this.scopes[j + 1];
                 this.scopeCount--;
                 i--;
                 continue;
             }
-            if (this.scopes[i].position > pos + 1)
-                this.scopes[i].position = pos + 1;
+            if (this.scopes[i].position > pos + 1) this.scopes[i].position = pos + 1;
             pos = this.scopes[i].position;
         }
-        while (this.scopeCount > 0 && this.scopes[this.scopeCount - 1]?.getElm() === null)
-            this.scopeCount--;
+        while (this.scopeCount > 0 && this.scopes[this.scopeCount - 1]?.getElm() === null) this.scopeCount--;
         const ui = this.sim.ui;
         const h = ui.canvasHeight - this.sim.circuitArea.height;
         pos = 0;
-        for (i = 0; i !== this.scopeCount; i++)
-            this.scopeColCount[i] = 0;
+        for (i = 0; i !== this.scopeCount; i++) this.scopeColCount[i] = 0;
         for (i = 0; i !== this.scopeCount; i++) {
             pos = ScopeManager.max(this.scopes[i].position, pos);
             this.scopeColCount[this.scopes[i].position]++;
         }
         const colct = pos + 1;
         let iw = CirSim.infoWidth;
-        if (colct <= 2)
-            iw = Math.trunc(iw * 3 / 2);
+        if (colct <= 2) iw = Math.trunc((iw * 3) / 2);
         let w = Math.trunc((ui.canvasWidth - iw) / colct);
         const marg = 10;
-        if (w < marg * 2)
-            w = marg * 2;
+        if (w < marg * 2) w = marg * 2;
         pos = -1;
         let colh = 0;
         let row = 0;
@@ -139,8 +128,7 @@ export class ScopeManager {
             }
             const r = new Rectangle(pos * w, ui.canvasHeight - h + colh * row, w - marg, colh);
             row++;
-            if (!r.equals(s.rect))
-                s.setRect(r);
+            if (!r.equals(s.rect)) s.setRect(r);
         }
         if (this.oldScopeCount !== this.scopeCount) {
             ui.setCircuitArea();
@@ -152,9 +140,7 @@ export class ScopeManager {
     // scope.  Otherwise we can do it only once per frame.
     canDelayWireProcessing(): boolean {
         let i;
-        for (i = 0; i !== this.scopeCount; i++)
-            if (this.scopes[i].viewingWire())
-                return false;
+        for (i = 0; i !== this.scopeCount; i++) if (this.scopes[i].viewingWire()) return false;
         for (const ce of this.sim.elmList)
             if ((ce as CircuitElm).isScopeElm() && (ce as any).elmScope !== null && (ce as any).elmScope.viewingWire())
                 return false;
@@ -164,8 +150,7 @@ export class ScopeManager {
     countScopeElms(): number {
         let c = 0;
         for (let i = 0; i !== this.sim.elmList.length; i++) {
-            if ((this.sim.elmList[i] as CircuitElm).isScopeElm())
-                c++;
+            if ((this.sim.elmList[i] as CircuitElm).isScopeElm()) c++;
         }
         return c;
     }
@@ -174,20 +159,16 @@ export class ScopeManager {
         for (let i = 0; i !== this.sim.elmList.length; i++) {
             if ((this.sim.elmList[i] as CircuitElm).isScopeElm()) {
                 n--;
-                if (n < 0)
-                    return this.sim.elmList[i] as ScopeElm;
+                if (n < 0) return this.sim.elmList[i] as ScopeElm;
             }
         }
         return null;
     }
 
     canStackScope(s: number): boolean {
-        if (this.scopeCount < 2)
-            return false;
-        if (s === 0)
-            s = 1;
-        if (this.scopes[s].position === this.scopes[s - 1].position)
-            return false;
+        if (this.scopeCount < 2) return false;
+        if (s === 0) s = 1;
+        if (this.scopes[s].position === this.scopes[s - 1].position) return false;
         return true;
     }
 
@@ -196,45 +177,39 @@ export class ScopeManager {
     }
 
     canUnstackScope(s: number): boolean {
-        if (this.scopeCount < 2)
-            return false;
-        if (s === 0)
-            s = 1;
+        if (this.scopeCount < 2) return false;
+        if (s === 0) s = 1;
         if (this.scopes[s].position !== this.scopes[s - 1].position) {
-            if (s + 1 < this.scopeCount && this.scopes[s + 1].position === this.scopes[s].position) // Allow you to unstack by selecting the top scope in the stack
+            if (s + 1 < this.scopeCount && this.scopes[s + 1].position === this.scopes[s].position)
+                // Allow you to unstack by selecting the top scope in the stack
                 return true;
-            else
-                return false;
+            else return false;
         }
         return true;
     }
 
     stackScope(s: number): void {
-        if (!this.canStackScope(s))
-            return;
+        if (!this.canStackScope(s)) return;
         if (s === 0) {
             s = 1;
         }
         this.scopes[s].position = this.scopes[s - 1].position;
-        for (s++; s < this.scopeCount; s++)
-            this.scopes[s].position--;
+        for (s++; s < this.scopeCount; s++) this.scopes[s].position--;
     }
 
     unstackScope(s: number): void {
-        if (!this.canUnstackScope(s))
-            return;
+        if (!this.canUnstackScope(s)) return;
         if (s === 0) {
             s = 1;
         }
-        if (this.scopes[s].position !== this.scopes[s - 1].position) // Allow you to unstack by selecting the top scope in the stack
+        if (this.scopes[s].position !== this.scopes[s - 1].position)
+            // Allow you to unstack by selecting the top scope in the stack
             s++;
-        for (; s < this.scopeCount; s++)
-            this.scopes[s].position++;
+        for (; s < this.scopeCount; s++) this.scopes[s].position++;
     }
 
     combineScope(s: number): void {
-        if (!this.canCombineScope(s))
-            return;
+        if (!this.canCombineScope(s)) return;
         if (s === 0) {
             s = 1;
         }
@@ -270,8 +245,7 @@ export class ScopeManager {
         let i;
         const newscopes: Scope[] = new Array(20);
         let ct = 0;
-        for (i = 0; i < this.scopeCount; i++)
-            ct = this.scopes[i].separate(newscopes, ct);
+        for (i = 0; i < this.scopeCount; i++) ct = this.scopes[i].separate(newscopes, ct);
         this.scopes = newscopes;
         this.scopeCount = ct;
     }
@@ -291,8 +265,7 @@ export class ScopeManager {
     }
 
     addScope(sc: Scope): void {
-        if (sc.position < 0)
-            sc.position = this.scopeCount;
+        if (sc.position < 0) sc.position = this.scopeCount;
         this.scopes[this.scopeCount++] = sc;
     }
 
@@ -301,9 +274,10 @@ export class ScopeManager {
     }
 
     resetGraphs(): void {
-        for (let i = 0; i !== this.scopeCount; i++)
-            this.scopes[i].resetGraphFull(true);
+        for (let i = 0; i !== this.scopeCount; i++) this.scopes[i].resetGraphFull(true);
     }
 
-    static max(a: number, b: number): number { return (a > b) ? a : b; }
+    static max(a: number, b: number): number {
+        return a > b ? a : b;
+    }
 }

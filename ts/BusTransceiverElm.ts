@@ -56,10 +56,18 @@ export class BusTransceiverElm extends ChipElm {
         this.setupPins();
     }
 
-    nonLinear(): boolean { return true; }
-    allowBus(): boolean { return true; }
-    getChipName(): string { return "Bus Transceiver"; }
-    defaultBitCount(): number { return 4; }
+    nonLinear(): boolean {
+        return true;
+    }
+    allowBus(): boolean {
+        return true;
+    }
+    getChipName(): string {
+        return "Bus Transceiver";
+    }
+    defaultBitCount(): number {
+        return 4;
+    }
 
     setupPins(): void {
         if (!this.dataBits) this.dataBits = 4;
@@ -83,13 +91,18 @@ export class BusTransceiverElm extends ChipElm {
         this.allocNodes();
     }
 
-    getPostCount(): number { return 2 + 2 * this.dataBits; }
-    getVoltageSourceCount(): number { return this.dataBits; }
-    getInternalNodeCount(): number { return this.dataBits; }
+    getPostCount(): number {
+        return 2 + 2 * this.dataBits;
+    }
+    getVoltageSourceCount(): number {
+        return this.dataBits;
+    }
+    getInternalNodeCount(): number {
+        return this.dataBits;
+    }
 
     setVoltageSource(j: number, vs: VoltageSource): void {
-        if (!this.vSources || this.vSources.length !== this.dataBits)
-            this.vSources = new Array(this.dataBits);
+        if (!this.vSources || this.vSources.length !== this.dataBits) this.vSources = new Array(this.dataBits);
         this.vSources[j] = vs;
         vs.setNodes(CircuitNode.ground, this.nodes[this.intNodes + j]);
     }
@@ -120,8 +133,12 @@ export class BusTransceiverElm extends ChipElm {
                 ? this.nodes[this.aNodes + i].v > this.getThreshold()
                 : this.nodes[this.bNodes + i].v > this.getThreshold();
 
-            CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[this.intNodes + i],
-                this.vSources[i], srcVal ? this.highVoltage : 0);
+            CircuitElm.sim.updateVoltageSource(
+                CircuitNode.ground,
+                this.nodes[this.intNodes + i],
+                this.vSources[i],
+                srcVal ? this.highVoltage : 0,
+            );
 
             const rDst = outputEnabled ? 1 : 1e10;
             if (dirAtoB) {
@@ -142,8 +159,7 @@ export class BusTransceiverElm extends ChipElm {
     }
 
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Bits", this.dataBits, 1, 1).setDimensionless();
+        if (n === 0) return new EditInfo("# of Bits", this.dataBits, 1, 1).setDimensionless();
         return super.getChipEditInfo(n);
     }
 
@@ -153,8 +169,7 @@ export class BusTransceiverElm extends ChipElm {
                 this.dataBits = Math.trunc(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be between 1 and 16");
+            } else ei.setError("must be between 1 and 16");
         }
     }
 }

@@ -36,7 +36,7 @@ export class CrossSwitchElm extends SwitchElm {
     constructor(xa: number, ya: number, xbOrMm?: number | boolean, yb?: number, f?: number, st?: StringTokenizer) {
         if (st !== undefined) {
             super(xa, ya, xbOrMm as number, yb!, f!, st);
-        } else if (typeof xbOrMm === 'boolean') {
+        } else if (typeof xbOrMm === "boolean") {
             super(xa, ya, xbOrMm);
         } else {
             super(xa, ya, false);
@@ -45,7 +45,9 @@ export class CrossSwitchElm extends SwitchElm {
         this.allocNodes();
     }
 
-    getDumpType(): number { return 430; }
+    getDumpType(): number {
+        return 430;
+    }
 
     readonly openhs = 16;
     readonly posCount = 2;
@@ -73,33 +75,38 @@ export class CrossSwitchElm extends SwitchElm {
         super.setPoints();
         this.calcLeads(32);
         this.ensureArrays();
-        this.throwPosts  = this.newPointArray(2 * this.poleCount);
-        this.throwLeads  = this.newPointArray(4 * this.poleCount);
-        this.poleLeads   = this.newPointArray(this.poleCount);
-        this.polePosts   = this.newPointArray(this.poleCount);
-        this.linePoints  = this.newPointArray(2);
+        this.throwPosts = this.newPointArray(2 * this.poleCount);
+        this.throwLeads = this.newPointArray(4 * this.poleCount);
+        this.poleLeads = this.newPointArray(this.poleCount);
+        this.polePosts = this.newPointArray(this.poleCount);
+        this.linePoints = this.newPointArray(2);
         this.crossPoints = this.newPointArray(6);
         for (let i = 0; i !== this.poleCount; i++) {
             const offset = -i * this.openhs * 3;
-            this.interpPoint(this.point1, this.point2, this.polePosts[i],      0, offset);
-            this.interpPoint(this.lead1!,  this.lead2!,  this.poleLeads[i],     0, offset);
-            this.interpPoint(this.point1, this.point2, this.throwPosts[i*2  ], 1, offset - this.openhs);
-            this.interpPoint(this.lead1!,  this.lead2!,  this.throwLeads[i*4  ], 1, offset - this.openhs);
-            this.interpPoint(this.point1, this.point2, this.throwPosts[i*2+1], 1, offset + this.openhs);
-            this.interpPoint(this.lead1!,  this.lead2!,  this.throwLeads[i*4+1], 1, offset + this.openhs);
-            this.interpPoint(this.lead1!,  this.lead2!,  this.throwLeads[i*4+2], 1, offset + this.openhs * 0.33);
+            this.interpPoint(this.point1, this.point2, this.polePosts[i], 0, offset);
+            this.interpPoint(this.lead1!, this.lead2!, this.poleLeads[i], 0, offset);
+            this.interpPoint(this.point1, this.point2, this.throwPosts[i * 2], 1, offset - this.openhs);
+            this.interpPoint(this.lead1!, this.lead2!, this.throwLeads[i * 4], 1, offset - this.openhs);
+            this.interpPoint(this.point1, this.point2, this.throwPosts[i * 2 + 1], 1, offset + this.openhs);
+            this.interpPoint(this.lead1!, this.lead2!, this.throwLeads[i * 4 + 1], 1, offset + this.openhs);
+            this.interpPoint(this.lead1!, this.lead2!, this.throwLeads[i * 4 + 2], 1, offset + this.openhs * 0.33);
             if (this.useIECSymbol())
-                this.interpPoint(this.lead1!, this.lead2!, this.throwLeads[i*4+3], 1.2, offset - this.openhs * 0.33);
-            else
-                this.interpPoint(this.lead1!, this.lead2!, this.throwLeads[i*4+3], 1, offset - this.openhs);
+                this.interpPoint(
+                    this.lead1!,
+                    this.lead2!,
+                    this.throwLeads[i * 4 + 3],
+                    1.2,
+                    offset - this.openhs * 0.33,
+                );
+            else this.interpPoint(this.lead1!, this.lead2!, this.throwLeads[i * 4 + 3], 1, offset - this.openhs);
         }
         const dp = 16 / this.dn;
-        this.interpPoint(this.point1, this.point2, this.crossPoints[0], 1 + dp,     this.openhs);
-        this.interpPoint(this.point1, this.point2, this.crossPoints[1], 1 + dp*2,   this.openhs);
-        this.interpPoint(this.point1, this.point2, this.crossPoints[2], 1 + dp*3,   this.openhs);
-        this.interpPoint(this.point1, this.point2, this.crossPoints[3], 1 + dp*2,  -this.openhs);
-        this.interpPoint(this.point1, this.point2, this.crossPoints[4], 1 + dp,    -this.openhs * 4);
-        this.interpPoint(this.point1, this.point2, this.crossPoints[5], 1 + dp*3,  -this.openhs * 4);
+        this.interpPoint(this.point1, this.point2, this.crossPoints[0], 1 + dp, this.openhs);
+        this.interpPoint(this.point1, this.point2, this.crossPoints[1], 1 + dp * 2, this.openhs);
+        this.interpPoint(this.point1, this.point2, this.crossPoints[2], 1 + dp * 3, this.openhs);
+        this.interpPoint(this.point1, this.point2, this.crossPoints[3], 1 + dp * 2, -this.openhs);
+        this.interpPoint(this.point1, this.point2, this.crossPoints[4], 1 + dp, -this.openhs * 4);
+        this.interpPoint(this.point1, this.point2, this.crossPoints[5], 1 + dp * 3, -this.openhs * 4);
     }
 
     draw(g: Graphics): void {
@@ -117,35 +124,49 @@ export class CrossSwitchElm extends SwitchElm {
         CircuitElm.drawThickLine(g, this.crossPoints[0], this.crossPoints[4]);
 
         for (let i = 0; i !== this.poleCount; i++) {
-            this.setVoltageColor(g, this.nodes[i*2].v);
+            this.setVoltageColor(g, this.nodes[i * 2].v);
             CircuitElm.drawThickLine(g, this.polePosts[i], this.poleLeads[i]);
-            this.setVoltageColor(g, this.nodes[i*2+1].v);
-            if (this.useIECSymbol())
-                CircuitElm.drawThickLine(g, this.throwLeads[i*4], this.throwLeads[i*4+2]);
-            CircuitElm.drawThickLine(g, this.throwPosts[i*2], this.throwLeads[i*4]);
-            this.setVoltageColor(g, this.nodes[3 - i*2].v);
-            CircuitElm.drawThickLine(g, this.throwPosts[i*2+1], this.throwLeads[i*4+1]);
+            this.setVoltageColor(g, this.nodes[i * 2 + 1].v);
+            if (this.useIECSymbol()) CircuitElm.drawThickLine(g, this.throwLeads[i * 4], this.throwLeads[i * 4 + 2]);
+            CircuitElm.drawThickLine(g, this.throwPosts[i * 2], this.throwLeads[i * 4]);
+            this.setVoltageColor(g, this.nodes[3 - i * 2].v);
+            CircuitElm.drawThickLine(g, this.throwPosts[i * 2 + 1], this.throwLeads[i * 4 + 1]);
 
-            if (!this.needsHighlight())
-                g.setColor(CircuitElm.lightGrayColor);
+            if (!this.needsHighlight()) g.setColor(CircuitElm.lightGrayColor);
 
             if (i < this.poleCount - 1) {
                 const offset = -i * this.openhs * 3;
                 const adj = this.position * -3;
-                this.interpPoint(this.point1, this.point2, this.linePoints[0], 0.5, offset - this.openhs * (0.5 - this.position) + adj);
-                this.interpPoint(this.point1, this.point2, this.linePoints[1], 0.5, offset - this.openhs * 3 - this.openhs * (0.5 - this.position) + 7 + adj);
+                this.interpPoint(
+                    this.point1,
+                    this.point2,
+                    this.linePoints[0],
+                    0.5,
+                    offset - this.openhs * (0.5 - this.position) + adj,
+                );
+                this.interpPoint(
+                    this.point1,
+                    this.point2,
+                    this.linePoints[1],
+                    0.5,
+                    offset - this.openhs * 3 - this.openhs * (0.5 - this.position) + 7 + adj,
+                );
                 g.setLineDash(4, 4);
                 g.drawLine(this.linePoints[0], this.linePoints[1]);
                 g.setLineDash(0, 0);
             }
 
-            if (!this.needsHighlight())
-                g.setColor(CircuitElm.whiteColor);
-            CircuitElm.drawThickLine(g, this.poleLeads[i], this.throwLeads[i*4+3-this.position*2]);
+            if (!this.needsHighlight()) g.setColor(CircuitElm.whiteColor);
+            CircuitElm.drawThickLine(g, this.poleLeads[i], this.throwLeads[i * 4 + 3 - this.position * 2]);
 
             this.curcounts[i] = this.updateDotCountImpl(this.currents[i], this.curcounts[i]);
             this.drawDots(g, this.polePosts[i], this.poleLeads[i], this.curcounts[i]);
-            this.drawDots(g, this.throwLeads[i*4+this.position], this.throwPosts[i*2+this.position], this.curcounts[i]);
+            this.drawDots(
+                g,
+                this.throwLeads[i * 4 + this.position],
+                this.throwPosts[i * 2 + this.position],
+                this.curcounts[i],
+            );
             if (i === 1 && this.position === 0)
                 this.drawDots(g, this.throwPosts[2], this.crossPoints[5], this.curcounts[1]);
             if (i === 0 && this.position === 1) {
@@ -179,7 +200,14 @@ export class CrossSwitchElm extends SwitchElm {
     getSwitchRect(): Rectangle {
         return new Rectangle(this.poleLeads[0].x, this.poleLeads[0].y, 0, 0)
             .union(new Rectangle(this.throwLeads[1].x, this.throwLeads[1].y, 0, 0))
-            .union(new Rectangle(this.throwLeads[this.poleCount*4-4].x, this.throwLeads[this.poleCount*4-4].y, 0, 0));
+            .union(
+                new Rectangle(
+                    this.throwLeads[this.poleCount * 4 - 4].x,
+                    this.throwLeads[this.poleCount * 4 - 4].y,
+                    0,
+                    0,
+                ),
+            );
     }
 
     getPost(n: number): Point {
@@ -188,12 +216,14 @@ export class CrossSwitchElm extends SwitchElm {
         return this.crossPoints[5];
     }
 
-    getPostCount(): number { return 2 * this.poleCount; }
+    getPostCount(): number {
+        return 2 * this.poleCount;
+    }
     calculateCurrent(): void {
         if (this.resistance > 0) {
             for (let i = 0; i !== this.poleCount; i++) {
-                const dst = (this.position === 0) ? i*2+1 : 3-i*2;
-                this.currents[i] = (this.nodes[i*2].v - this.nodes[dst].v) / this.resistance;
+                const dst = this.position === 0 ? i * 2 + 1 : 3 - i * 2;
+                this.currents[i] = (this.nodes[i * 2].v - this.nodes[dst].v) / this.resistance;
             }
         }
     }
@@ -201,7 +231,7 @@ export class CrossSwitchElm extends SwitchElm {
     setVoltageSource(j: number, vs: VoltageSource): void {
         this.ensureArrays();
         this.voltageSources[j] = vs;
-        vs.setNodes(this.nodes[j*2], this.nodes[j*2+1]);
+        vs.setNodes(this.nodes[j * 2], this.nodes[j * 2 + 1]);
     }
 
     stamp(): void {
@@ -209,34 +239,50 @@ export class CrossSwitchElm extends SwitchElm {
         if (this.position === 0) {
             for (let i = 0; i !== this.poleCount; i++) {
                 if (this.resistance > 0)
-                    CircuitElm.sim.stampResistor(this.nodes[i*2], this.nodes[i*2+1], this.resistance);
+                    CircuitElm.sim.stampResistor(this.nodes[i * 2], this.nodes[i * 2 + 1], this.resistance);
                 else
-                    CircuitElm.sim.stampVoltageSource(this.nodes[i*2], this.nodes[i*2+1], this.voltageSources[i], 0);
+                    CircuitElm.sim.stampVoltageSource(
+                        this.nodes[i * 2],
+                        this.nodes[i * 2 + 1],
+                        this.voltageSources[i],
+                        0,
+                    );
             }
         } else {
             for (let i = 0; i !== this.poleCount; i++) {
                 if (this.resistance > 0)
-                    CircuitElm.sim.stampResistor(this.nodes[i*2], this.nodes[3-i*2], this.resistance);
+                    CircuitElm.sim.stampResistor(this.nodes[i * 2], this.nodes[3 - i * 2], this.resistance);
                 else
-                    CircuitElm.sim.stampVoltageSource(this.nodes[i*2], this.nodes[3-i*2], this.voltageSources[i], 0);
+                    CircuitElm.sim.stampVoltageSource(
+                        this.nodes[i * 2],
+                        this.nodes[3 - i * 2],
+                        this.voltageSources[i],
+                        0,
+                    );
             }
         }
     }
 
-    getVoltageSourceCount(): number { return this.resistance > 0 ? 0 : this.poleCount; }
-
-    getConnection(n1: number, n2: number): boolean {
-        if (this.position === 0)
-            return this.comparePair(n1, n2, 0, 1) || this.comparePair(n1, n2, 2, 3);
-        else
-            return this.comparePair(n1, n2, 0, 3) || this.comparePair(n1, n2, 2, 1);
+    getVoltageSourceCount(): number {
+        return this.resistance > 0 ? 0 : this.poleCount;
     }
 
-    isWireEquivalent(): boolean { return this.resistance === 0; }
+    getConnection(n1: number, n2: number): boolean {
+        if (this.position === 0) return this.comparePair(n1, n2, 0, 1) || this.comparePair(n1, n2, 2, 3);
+        else return this.comparePair(n1, n2, 0, 3) || this.comparePair(n1, n2, 2, 1);
+    }
+
+    isWireEquivalent(): boolean {
+        return this.resistance === 0;
+    }
 
     // optimizing out this element is too complicated to be worth it (see #646)
-    isRemovableWire(): boolean { return false; }
-    getElmType(): string { return "cross switch"; }
+    isRemovableWire(): boolean {
+        return false;
+    }
+    getElmType(): string {
+        return "cross switch";
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "cross switch";
@@ -245,20 +291,21 @@ export class CrossSwitchElm extends SwitchElm {
     }
 
     validate(): boolean {
-        if (this.resistance > 0)
-            return true;
+        if (this.resistance > 0) return true;
         for (let i = 0; i !== this.poleCount; i++) {
-            const dst = (this.position === 0) ? i*2+1 : 3-i*2;
-            const fpi = new FindPathInfo(FindPathInfo.VOLTAGE, this, this.getNode(i*2), CircuitElm.sim);
+            const dst = this.position === 0 ? i * 2 + 1 : 3 - i * 2;
+            const fpi = new FindPathInfo(FindPathInfo.VOLTAGE, this, this.getNode(i * 2), CircuitElm.sim);
             if (fpi.findPath(this.getNode(dst))) {
-                this.resistance = .001;
+                this.resistance = 0.001;
                 return false;
             }
         }
         return true;
     }
 
-    getShortcut(): number { return 0; }
+    getShortcut(): number {
+        return 0;
+    }
 
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) return EditInfo.createCheckbox("IEC Symbol", this.useIECSymbol());

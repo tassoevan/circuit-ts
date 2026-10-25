@@ -37,13 +37,27 @@ export class LatchElm extends ChipElm {
     static readonly FLAG_ENABLE_SHIFT = 5;
     static readonly FLAG_RESET_INVERT = 128;
 
-    hasReset(): boolean { return (this.flags & LatchElm.FLAG_RESET) !== 0; }
-    hasSet(): boolean { return (this.flags & LatchElm.FLAG_SET) !== 0; }
-    resetActiveLow(): boolean { return (this.flags & LatchElm.FLAG_RESET_INVERT) !== 0; }
-    enableMode(): number { return (this.flags & LatchElm.FLAG_ENABLE_MASK) >> LatchElm.FLAG_ENABLE_SHIFT; }
-    inputEnableCount(): number { return this.enableMode(); }
-    outputEnableCount(): number { return this.enableMode(); }
-    hasOutputEnable(): boolean { return this.enableMode() > 0; }
+    hasReset(): boolean {
+        return (this.flags & LatchElm.FLAG_RESET) !== 0;
+    }
+    hasSet(): boolean {
+        return (this.flags & LatchElm.FLAG_SET) !== 0;
+    }
+    resetActiveLow(): boolean {
+        return (this.flags & LatchElm.FLAG_RESET_INVERT) !== 0;
+    }
+    enableMode(): number {
+        return (this.flags & LatchElm.FLAG_ENABLE_MASK) >> LatchElm.FLAG_ENABLE_SHIFT;
+    }
+    inputEnableCount(): number {
+        return this.enableMode();
+    }
+    outputEnableCount(): number {
+        return this.enableMode();
+    }
+    hasOutputEnable(): boolean {
+        return this.enableMode() > 0;
+    }
 
     // pin indices, set by setupPins().  "declare" so that no field initializer resets
     // them after super() has already called setupPins()
@@ -75,11 +89,21 @@ export class LatchElm extends ChipElm {
             this.restoreOutputValues();
         }
     }
-    getChipName(): string { return this.isEdgeTriggered() ? "Register" : "Latch"; }
-    needsBits(): boolean { return true; }
-    allowBus(): boolean { return true; }
-    isEdgeTriggered(): boolean { return (this.flags & LatchElm.FLAG_NO_EDGE) === 0; }
-    nonLinear(): boolean { return this.hasOutputEnable(); }
+    getChipName(): string {
+        return this.isEdgeTriggered() ? "Register" : "Latch";
+    }
+    needsBits(): boolean {
+        return true;
+    }
+    allowBus(): boolean {
+        return true;
+    }
+    isEdgeTriggered(): boolean {
+        return (this.flags & LatchElm.FLAG_NO_EDGE) === 0;
+    }
+    nonLinear(): boolean {
+        return this.hasOutputEnable();
+    }
 
     setupPins(): void {
         this.sizeX = 2;
@@ -91,34 +115,47 @@ export class LatchElm extends ChipElm {
         this.sizeY = Math.max(bitsY + 1 + extraLeftPins, bitsY + extraRightPins);
         this.pins = new Array(this.getPostCount());
         this.makeBitPins(this.bits, 0, ChipElm.SIDE_W, 0, "I", false, false, false);
-        this.makeBitPins(this.bits, 0, ChipElm.SIDE_E, this.bits, "O", !this.hasOutputEnable(), (this.flags & LatchElm.FLAG_STATE) !== 0, false);
+        this.makeBitPins(
+            this.bits,
+            0,
+            ChipElm.SIDE_E,
+            this.bits,
+            "O",
+            !this.hasOutputEnable(),
+            (this.flags & LatchElm.FLAG_STATE) !== 0,
+            false,
+        );
         let pinIndex = this.bits * 2;
         let leftPos = bitsY;
         let rightPos = bitsY;
 
-        this.pins[this.loadPin = pinIndex++] = new Pin(this, leftPos++, ChipElm.SIDE_W, this.isEdgeTriggered() ? "" : "Ld");
+        this.pins[(this.loadPin = pinIndex++)] = new Pin(
+            this,
+            leftPos++,
+            ChipElm.SIDE_W,
+            this.isEdgeTriggered() ? "" : "Ld",
+        );
         this.pins[this.loadPin].clock = this.isEdgeTriggered();
         if (this.hasReset()) {
-            this.pins[this.resetPin = pinIndex++] = new Pin(this, leftPos++, ChipElm.SIDE_W, "R");
+            this.pins[(this.resetPin = pinIndex++)] = new Pin(this, leftPos++, ChipElm.SIDE_W, "R");
             this.pins[this.resetPin].lineOver = this.resetActiveLow();
         }
-        if (this.hasSet())
-            this.pins[this.setPin = pinIndex++] = new Pin(this, leftPos++, ChipElm.SIDE_W, "S");
+        if (this.hasSet()) this.pins[(this.setPin = pinIndex++)] = new Pin(this, leftPos++, ChipElm.SIDE_W, "S");
         rightPos = leftPos;
         if (ieCount >= 1) {
-            this.pins[this.ie1Pin = pinIndex++] = new Pin(this, leftPos++, ChipElm.SIDE_W, "IE");
+            this.pins[(this.ie1Pin = pinIndex++)] = new Pin(this, leftPos++, ChipElm.SIDE_W, "IE");
             this.pins[this.ie1Pin].lineOver = true;
         }
         if (ieCount >= 2) {
-            this.pins[this.ie2Pin = pinIndex++] = new Pin(this, leftPos++, ChipElm.SIDE_W, "IE");
+            this.pins[(this.ie2Pin = pinIndex++)] = new Pin(this, leftPos++, ChipElm.SIDE_W, "IE");
             this.pins[this.ie2Pin].lineOver = true;
         }
         if (oeCount >= 1) {
-            this.pins[this.oe1Pin = pinIndex++] = new Pin(this, rightPos++, ChipElm.SIDE_E, "OE");
+            this.pins[(this.oe1Pin = pinIndex++)] = new Pin(this, rightPos++, ChipElm.SIDE_E, "OE");
             this.pins[this.oe1Pin].lineOver = true;
         }
         if (oeCount >= 2) {
-            this.pins[this.oe2Pin = pinIndex++] = new Pin(this, rightPos++, ChipElm.SIDE_E, "OE");
+            this.pins[(this.oe2Pin = pinIndex++)] = new Pin(this, rightPos++, ChipElm.SIDE_E, "OE");
             this.pins[this.oe2Pin].lineOver = true;
         }
         this.intNodes = pinIndex;
@@ -129,15 +166,13 @@ export class LatchElm extends ChipElm {
     outputValues: boolean[] | null = null;
 
     lastOutputValues(): boolean[] {
-        if (this.outputValues === null)
-            this.outputValues = new Array(this.bits).fill(false);
+        if (this.outputValues === null) this.outputValues = new Array(this.bits).fill(false);
         return this.outputValues;
     }
 
     restoreOutputValues(): void {
         const ov = this.lastOutputValues();
-        for (let i = 0; i !== this.bits; i++)
-            ov[i] = this.pins[i + this.bits].value;
+        for (let i = 0; i !== this.bits; i++) ov[i] = this.pins[i + this.bits].value;
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
@@ -154,8 +189,7 @@ export class LatchElm extends ChipElm {
     // when output enable is present, we override doStep() entirely.
     execute(): void {
         this.doLoad();
-        for (let i = 0; i !== this.bits; i++)
-            this.pins[i + this.bits].value = this.lastOutputValues()[i];
+        for (let i = 0; i !== this.bits; i++) this.pins[i + this.bits].value = this.lastOutputValues()[i];
     }
 
     // shared load logic
@@ -163,25 +197,20 @@ export class LatchElm extends ChipElm {
         // (lastOutputValues() recreates the array if reset() cleared it)
         const ov = this.lastOutputValues();
         if (this.hasSet() && this.pins[this.setPin].value) {
-            for (let i = 0; i !== this.bits; i++)
-                ov[i] = true;
+            for (let i = 0; i !== this.bits; i++) ov[i] = true;
             this.lastLoad = this.pins[this.loadPin].value;
             return;
         }
-        if (this.hasReset() && (this.pins[this.resetPin].value !== this.resetActiveLow())) {
-            for (let i = 0; i !== this.bits; i++)
-                ov[i] = false;
+        if (this.hasReset() && this.pins[this.resetPin].value !== this.resetActiveLow()) {
+            for (let i = 0; i !== this.bits; i++) ov[i] = false;
             this.lastLoad = this.pins[this.loadPin].value;
             return;
         }
         let inputEnabled = true;
-        if (this.inputEnableCount() >= 1 && this.pins[this.ie1Pin].value)
-            inputEnabled = false;
-        if (this.inputEnableCount() >= 2 && this.pins[this.ie2Pin].value)
-            inputEnabled = false;
+        if (this.inputEnableCount() >= 1 && this.pins[this.ie1Pin].value) inputEnabled = false;
+        if (this.inputEnableCount() >= 2 && this.pins[this.ie2Pin].value) inputEnabled = false;
         if (inputEnabled && this.pins[this.loadPin].value && (!this.isEdgeTriggered() || !this.lastLoad))
-            for (let i = 0; i !== this.bits; i++)
-                ov[i] = this.pins[i].value;
+            for (let i = 0; i !== this.bits; i++) ov[i] = this.pins[i].value;
         this.lastLoad = this.pins[this.loadPin].value;
     }
 
@@ -192,8 +221,7 @@ export class LatchElm extends ChipElm {
         }
         for (let i = 0; i < this.getPostCount(); i++) {
             const p = this.pins[i];
-            if (!p.output)
-                p.value = this.nodes[i].v > this.getThreshold();
+            if (!p.output) p.value = this.nodes[i].v > this.getThreshold();
         }
         this.doLoad();
     }
@@ -205,18 +233,15 @@ export class LatchElm extends ChipElm {
         }
 
         let outputEnabled = true;
-        if (this.outputEnableCount() >= 1 && this.pins[this.oe1Pin].value)
-            outputEnabled = false;
-        if (this.outputEnableCount() >= 2 && this.pins[this.oe2Pin].value)
-            outputEnabled = false;
+        if (this.outputEnableCount() >= 1 && this.pins[this.oe1Pin].value) outputEnabled = false;
+        if (this.outputEnableCount() >= 2 && this.pins[this.oe2Pin].value) outputEnabled = false;
 
         for (let i = 0; i < this.bits; i++) {
             const v = this.lastOutputValues()[i] ? this.highVoltage : 0;
             CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[this.intNodes + i], this.vSources![i], v);
             if (outputEnabled)
                 CircuitElm.sim.stampResistor(this.nodes[this.intNodes + i], this.nodes[this.bits + i], 1);
-            else
-                CircuitElm.sim.stampResistor(this.nodes[this.bits + i], CircuitNode.ground, 1e8);
+            else CircuitElm.sim.stampResistor(this.nodes[this.bits + i], CircuitNode.ground, 1e8);
         }
     }
 
@@ -232,7 +257,9 @@ export class LatchElm extends ChipElm {
         }
     }
 
-    getVoltageSourceCount(): number { return this.bits; }
+    getVoltageSourceCount(): number {
+        return this.bits;
+    }
 
     getInternalNodeCount(): number {
         return this.hasOutputEnable() ? this.bits : 0;
@@ -240,8 +267,7 @@ export class LatchElm extends ChipElm {
 
     setVoltageSource(j: number, vs: VoltageSource): void {
         if (this.hasOutputEnable()) {
-            if (this.vSources === null || this.vSources.length !== this.bits)
-                this.vSources = new Array(this.bits);
+            if (this.vSources === null || this.vSources.length !== this.bits) this.vSources = new Array(this.bits);
             this.vSources[j] = vs;
             vs.setNodes(CircuitNode.ground, this.nodes[this.intNodes + j]);
         } else {
@@ -252,36 +278,41 @@ export class LatchElm extends ChipElm {
     getMatrixConnection(n1: number, n2: number): boolean {
         if (this.hasOutputEnable()) {
             for (let i = 0; i < this.bits; i++)
-                if (this.comparePair(n1, n2, this.intNodes + i, this.bits + i))
-                    return true;
+                if (this.comparePair(n1, n2, this.intNodes + i, this.bits + i)) return true;
         }
         return false;
     }
 
-    getConnection(n1: number, n2: number): boolean { return false; }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
     hasGroundConnection(n1: number): boolean {
-        if (this.hasOutputEnable())
-            return (n1 >= this.bits && n1 < this.bits * 2);
+        if (this.hasOutputEnable()) return n1 >= this.bits && n1 < this.bits * 2;
         return this.pins[n1].output;
     }
 
     getPostCount(): number {
-        return this.bits * 2 + 1
-            + (this.hasReset() ? 1 : 0) + (this.hasSet() ? 1 : 0)
-            + this.inputEnableCount() + this.outputEnableCount();
+        return (
+            this.bits * 2 +
+            1 +
+            (this.hasReset() ? 1 : 0) +
+            (this.hasSet() ? 1 : 0) +
+            this.inputEnableCount() +
+            this.outputEnableCount()
+        );
     }
-    getDumpType(): number { return 168; }
+    getDumpType(): number {
+        return 168;
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
-        if (n === 1)
-            return EditInfo.createCheckbox("Edge Triggered", this.isEdgeTriggered());
-        if (n === 2)
-            return EditInfo.createCheckbox("Reset Pin", this.hasReset());
-        if (n === 3)
-            return EditInfo.createCheckbox("Set Pin", this.hasSet());
+        if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
+        if (n === 1) return EditInfo.createCheckbox("Edge Triggered", this.isEdgeTriggered());
+        if (n === 2) return EditInfo.createCheckbox("Reset Pin", this.hasReset());
+        if (n === 3) return EditInfo.createCheckbox("Set Pin", this.hasSet());
         if (n === 4) {
             const ei = new EditInfo("Enable Pins", 0);
             ei.choice = new Choice();
@@ -291,8 +322,7 @@ export class LatchElm extends ChipElm {
             ei.choice.select(this.enableMode());
             return ei;
         }
-        if (n === 5 && this.hasReset())
-            return EditInfo.createCheckbox("Invert Reset", this.resetActiveLow());
+        if (n === 5 && this.hasReset()) return EditInfo.createCheckbox("Invert Reset", this.resetActiveLow());
         return null;
     }
 
@@ -302,8 +332,7 @@ export class LatchElm extends ChipElm {
                 this.bits = Math.floor(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else if (ei.value < 2)
-                ei.setError("must be >= 2");
+            } else if (ei.value < 2) ei.setError("must be >= 2");
         }
         if (n === 1) {
             this.flags = ei.changeFlagInverted(this.flags, LatchElm.FLAG_NO_EDGE);

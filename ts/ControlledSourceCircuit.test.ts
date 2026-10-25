@@ -11,24 +11,40 @@ const off = { getState: () => false };
 
 function makeApp(elmList: any[]): any {
     const app: any = {
-        elmList, postDrawList: [], badConnectionList: [],
-        showResistanceInVoltageSources: true, dumpMatrix: false, stopMessage: null,
-        dcAnalysisFlag: false, simRunning: true, minFrameRate: 10,
+        elmList,
+        postDrawList: [],
+        badConnectionList: [],
+        showResistanceInVoltageSources: true,
+        dumpMatrix: false,
+        stopMessage: null,
+        dcAnalysisFlag: false,
+        simRunning: true,
+        minFrameRate: 10,
         menus: {
-            showValuesCheckItem: off, powerCheckItem: off, euroResistorCheckItem: off,
-            showOhmCheckItem: off, smallGridCheckItem: off,
+            showValuesCheckItem: off,
+            powerCheckItem: off,
+            euroResistorCheckItem: off,
+            showOhmCheckItem: off,
+            smallGridCheckItem: off,
         },
         ui: { elmList, steps: 0, lastFrameTime: 0 },
         scopeManager: { canDelayWireProcessing: () => false },
-        setStopElm: () => {}, getIterCount: () => 1, isPrintable: () => false,
+        setStopElm: () => {},
+        getIterCount: () => 1,
+        isPrintable: () => false,
         onTimeStep: () => {},
-        stop: (s: string) => { app.stopMessage = s; },
+        stop: (s: string) => {
+            app.stopMessage = s;
+        },
     };
     return app;
 }
 
 function place(e: any, x1: number, y1: number, x2: number, y2: number) {
-    e.x = x1; e.y = y1; e.x2 = x2; e.y2 = y2;
+    e.x = x1;
+    e.y = y1;
+    e.x2 = x2;
+    e.y2 = y2;
     e.setPoints();
     return e;
 }
@@ -45,13 +61,12 @@ function analyzeAndStep(elms: any[]) {
     for (const m of sim.matrices!) {
         for (let i = 0; i < m.size; i++) m.rightSide[i] = m.origRightSide[i];
         if (m.nonLinear)
-            for (let i = 0; i < m.size; i++)
-                for (let j = 0; j < m.size; j++) m.matrix[i][j] = m.origMatrix[i][j];
+            for (let i = 0; i < m.size; i++) for (let j = 0; j < m.size; j++) m.matrix[i][j] = m.origMatrix[i][j];
     }
     (sim as any).converged = true;
     for (const e of elms) e.doStep();
     // snapshot before factoring: lu_factor overwrites the matrix in place
-    const stamped = sim.matrices!.map(m => m.matrix.map((row: number[]) => row.slice()));
+    const stamped = sim.matrices!.map((m) => m.matrix.map((row: number[]) => row.slice()));
     let factored = true;
     for (const m of sim.matrices!)
         if (!(SimulationManager as any).lu_factor(m.matrix, m.size, m.permute, m)) factored = false;
@@ -73,8 +88,7 @@ function ccsLoop(exprStr: string, grounded: boolean): any[] {
     const ccs: any = place(new ControlledCurrentElm(0, 0), 100, 0, 100, 64);
     ccs.setExpr(exprStr);
     const out: any[] = [ccs, place(new ResistorElm(0, 0), 100, 0, 100, 64)];
-    if (grounded)
-        out.push(place(new GroundElm(0, 0), 100, 64, 100, 96));
+    if (grounded) out.push(place(new GroundElm(0, 0), 100, 64, 100, 96));
     return out;
 }
 
@@ -97,8 +111,8 @@ describe("controlled current source referring to a labeled node", () => {
         const { sim, stamped } = analyzeAndStep(elms);
         const ccs: any = elms[2];
         expect(sim.matrices!.length).toBe(1);
-        const outRow = ccs.nodes[0].row - 1;   // the source's ungrounded terminal
-        const refCol = ccs.nodes[2].row - 1;   // the node v(vcc) resolved to
+        const outRow = ccs.nodes[0].row - 1; // the source's ungrounded terminal
+        const refCol = ccs.nodes[2].row - 1; // the node v(vcc) resolved to
         expect(ccs.nodes[2].index).not.toBe(0);
         // d(output current)/d(v(vcc)) is 2
         expect(stamped[0][outRow][refCol]).toBeCloseTo(2, 9);

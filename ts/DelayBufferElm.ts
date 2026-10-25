@@ -73,16 +73,19 @@ export class DelayBufferElm extends CircuitElm {
         this.highVoltage = xml.parseDoubleAttr("hv", this.highVoltage);
     }
 
-    getDumpType(): number { return 422; }
-    setHighVoltage(hv: number): void { this.highVoltage = hv; }
+    getDumpType(): number {
+        return 422;
+    }
+    setHighVoltage(hv: number): void {
+        this.highVoltage = hv;
+    }
 
     draw(g: Graphics): void {
         this.drawPosts(g);
         this.draw2Leads(g);
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.lightGrayColor);
         CircuitElm.drawThickPolygon(g, this.gatePoly);
-        if (GateElm.useEuroGates())
-            this.drawCenteredText(g, "1", this.center.x, this.center.y - 6, true);
+        if (GateElm.useEuroGates()) this.drawCenteredText(g, "1", this.center.x, this.center.y - 6, true);
         this.curcount = this.updateDotCountImpl(this.current, this.curcount);
         this.drawDots(g, this.lead2!, this.point2, this.curcount);
     }
@@ -91,28 +94,29 @@ export class DelayBufferElm extends CircuitElm {
         super.setPoints();
         const hs = 16;
         let ww = 16 - 2;
-        if (ww > this.dn / 2)
-            ww = Math.floor(this.dn / 2);
-        this.lead1 = this.interpPoint(this.point1, this.point2, .5 - ww / this.dn);
-        this.lead2 = this.interpPoint(this.point1, this.point2, .5 + ww / this.dn);
+        if (ww > this.dn / 2) ww = Math.floor(this.dn / 2);
+        this.lead1 = this.interpPoint(this.point1, this.point2, 0.5 - ww / this.dn);
+        this.lead2 = this.interpPoint(this.point1, this.point2, 0.5 + ww / this.dn);
 
         if (GateElm.useEuroGates()) {
             const pts = this.newPointArray(4);
-            const l2 = this.interpPoint(this.point1, this.point2, .5 + (ww - 5) / this.dn);
+            const l2 = this.interpPoint(this.point1, this.point2, 0.5 + (ww - 5) / this.dn);
             this.interpPoint2(this.lead1!, l2, pts[0], pts[1], 0, hs);
             this.interpPoint2(this.lead1!, l2, pts[3], pts[2], 1, hs);
             this.gatePoly = this.createPolygon(pts);
-            this.center = this.interpPoint(this.lead1!, l2, .5);
+            this.center = this.interpPoint(this.lead1!, l2, 0.5);
         } else {
             const triPoints = this.newPointArray(3);
             this.interpPoint2(this.lead1!, this.lead2!, triPoints[0], triPoints[1], 0, hs);
-            triPoints[2] = this.interpPoint(this.point1, this.point2, .5 + ww / this.dn);
+            triPoints[2] = this.interpPoint(this.point1, this.point2, 0.5 + ww / this.dn);
             this.gatePoly = this.createPolygon(triPoints);
         }
         this.setBbox(this.point1, this.point2, hs);
     }
 
-    getVoltageSourceCount(): number { return 1; }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
 
     stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[1], this.voltSource);
@@ -122,14 +126,19 @@ export class DelayBufferElm extends CircuitElm {
         let inState = this.nodes[0].v > this.threshold;
         let outState = this.nodes[1].v > this.threshold;
         if (inState !== outState) {
-            if (CircuitElm.sim.t >= this.delayEndTime)
-                outState = inState;
-        } else
-            this.delayEndTime = CircuitElm.sim.t + this.delay;
-        CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[1], this.voltSource, outState ? this.highVoltage : 0);
+            if (CircuitElm.sim.t >= this.delayEndTime) outState = inState;
+        } else this.delayEndTime = CircuitElm.sim.t + this.delay;
+        CircuitElm.sim.updateVoltageSource(
+            CircuitNode.ground,
+            this.nodes[1],
+            this.voltSource,
+            outState ? this.highVoltage : 0,
+        );
     }
 
-    getVoltageDiff(): number { return this.nodes[0].v; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = Locale.LS("buffer");
@@ -139,32 +148,29 @@ export class DelayBufferElm extends CircuitElm {
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Delay (s)", this.delay, 0, 0);
-        if (n === 1)
-            return new EditInfo("Threshold (V)", this.threshold, 0, 0);
-        if (n === 2)
-            return new EditInfo("High Logic Voltage", this.highVoltage, 0, 0).setUnitStep();
+        if (n === 0) return new EditInfo("Delay (s)", this.delay, 0, 0);
+        if (n === 1) return new EditInfo("Threshold (V)", this.threshold, 0, 0);
+        if (n === 2) return new EditInfo("High Logic Voltage", this.highVoltage, 0, 0).setUnitStep();
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.delay = ei.value;
-        if (n === 1)
-            this.threshold = ei.value;
-        if (n === 2)
-            this.highVoltage = ei.value;
+        if (n === 0) this.delay = ei.value;
+        if (n === 1) this.threshold = ei.value;
+        if (n === 2) this.highVoltage = ei.value;
     }
 
     // there is no current path through the inverter input, but there
     // is an indirect path through the output to ground.
-    getConnection(n1: number, n2: number): boolean { return false; }
-    hasGroundConnection(n1: number): boolean { return n1 === 1; }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
+    hasGroundConnection(n1: number): boolean {
+        return n1 === 1;
+    }
 
     getCurrentIntoNode(n: number): number {
-        if (n === 1)
-            return this.current;
+        if (n === 1) return this.current;
         return 0;
     }
 }

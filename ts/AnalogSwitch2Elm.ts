@@ -51,12 +51,20 @@ export class AnalogSwitch2Elm extends AnalogSwitchElm {
         this.labelPts = this.newPointArray(2);
         this.interpPoint2(this.lead1!, this.lead2!, this.swpoles[0], this.swpoles[1], 1, this.openhs);
         this.interpPoint2(this.point1, this.point2, this.swposts[0], this.swposts[1], 1, this.openhs);
-        this.interpPoint2(this.point1, this.point2, this.labelPts[0], this.labelPts[1], 1 - 10 / this.dn,
-            this.openhs + (this.openhs > 0 ? 10 : -10));
+        this.interpPoint2(
+            this.point1,
+            this.point2,
+            this.labelPts[0],
+            this.labelPts[1],
+            1 - 10 / this.dn,
+            this.openhs + (this.openhs > 0 ? 10 : -10),
+        );
         this.ctlPoint = this.interpPoint(this.lead1!, this.lead2!, 0.5, this.openhs);
     }
 
-    getPostCount(): number { return 4; }
+    getPostCount(): number {
+        return 4;
+    }
 
     draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.openhs);
@@ -100,8 +108,12 @@ export class AnalogSwitch2Elm extends AnalogSwitchElm {
         return this.swposts[n - 1];
     }
 
-    getDumpType(): number { return 160; }
-    getXmlDumpType(): string { return "as2"; }
+    getDumpType(): number {
+        return 160;
+    }
+    getXmlDumpType(): string {
+        return "as2";
+    }
 
     calculateCurrent(): void {
         this.current = this.open
@@ -121,16 +133,13 @@ export class AnalogSwitch2Elm extends AnalogSwitchElm {
 
     doStep(): void {
         this.open = this.nodes[3].v < this.threshold;
-        if (this.hasFlag(this.FLAG_INVERT))
-            this.open = !this.open;
+        if (this.hasFlag(this.FLAG_INVERT)) this.open = !this.open;
         if (this.open) {
             CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[2], this.r_on);
-            if (!this.needsPulldown())
-                CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.r_off);
+            if (!this.needsPulldown()) CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.r_off);
         } else {
             CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.r_on);
-            if (!this.needsPulldown())
-                CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[2], this.r_off);
+            if (!this.needsPulldown()) CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[2], this.r_off);
         }
     }
 
@@ -164,7 +173,7 @@ export class AnalogSwitch2Elm extends AnalogSwitchElm {
 
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
-            this.flags = ei.checkbox!.getState() ? (this.flags | this.FLAG_INVERT) : (this.flags & ~this.FLAG_INVERT);
+            this.flags = ei.checkbox!.getState() ? this.flags | this.FLAG_INVERT : this.flags & ~this.FLAG_INVERT;
             return;
         }
         super.setEditValue(n, ei);

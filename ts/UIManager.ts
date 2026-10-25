@@ -43,23 +43,31 @@ import { CommandPaletteRegistry } from "./CommandPaletteRegistry";
 
 // GWT KeyCodes equivalents
 const KEY_BACKSPACE = 8;
-const KEY_DELETE    = 46;
-const KEY_ENTER     = 13;
-const KEY_ESCAPE    = 27;
-const KEY_SPACE     = 32;
-const KEY_LEFT      = 37;
-const KEY_RIGHT     = 39;
-const KEY_UP        = 38;
-const KEY_DOWN      = 40;
-const KEY_A = 65, KEY_C = 67, KEY_D = 68, KEY_N = 78;
-const KEY_O = 79, KEY_P = 80, KEY_S = 83, KEY_V = 86;
-const KEY_X = 88, KEY_Y = 89, KEY_Z = 90;
+const KEY_DELETE = 46;
+const KEY_ENTER = 13;
+const KEY_ESCAPE = 27;
+const KEY_SPACE = 32;
+const KEY_LEFT = 37;
+const KEY_RIGHT = 39;
+const KEY_UP = 38;
+const KEY_DOWN = 40;
+const KEY_A = 65,
+    KEY_C = 67,
+    KEY_D = 68,
+    KEY_N = 78;
+const KEY_O = 79,
+    KEY_P = 80,
+    KEY_S = 83,
+    KEY_V = 86;
+const KEY_X = 88,
+    KEY_Y = 89,
+    KEY_Z = 90;
 
 export class Scrollbar {
     static readonly HORIZONTAL = 1;
-    private static readonly HMARGIN    = 2;
+    private static readonly HMARGIN = 2;
     private static readonly SCROLLHEIGHT = 14;
-    private static readonly BARMARGIN  = 3;
+    private static readonly BARMARGIN = 3;
 
     element: HTMLCanvasElement;
     private g: CanvasRenderingContext2D;
@@ -73,35 +81,45 @@ export class Scrollbar {
     attachedElm: any = null;
     private vpw: number;
 
-    constructor(orientation: number, value: number, visible: number, min: number, max: number,
-                cmd?: () => void, elm?: any) {
+    constructor(
+        orientation: number,
+        value: number,
+        visible: number,
+        min: number,
+        max: number,
+        cmd?: () => void,
+        elm?: any,
+    ) {
         this.vpw = UIManager.VERTICALPANELWIDTH;
         this.min = min;
         this.max = max - 1;
         this.val = value;
         if (cmd) this.command = cmd;
-        if (elm)  this.attachedElm = elm;
+        if (elm) this.attachedElm = elm;
 
-        const can = document.createElement('canvas');
-        can.width  = this.vpw;
+        const can = document.createElement("canvas");
+        can.width = this.vpw;
         can.height = Scrollbar.SCROLLHEIGHT;
-        can.style.width   = this.vpw + 'px';
-        can.style.height  = Scrollbar.SCROLLHEIGHT + 'px';
-        can.style.display = 'block';
-        can.style.cursor  = 'default';
+        can.style.width = this.vpw + "px";
+        can.style.height = Scrollbar.SCROLLHEIGHT + "px";
+        can.style.display = "block";
+        can.style.cursor = "default";
         this.element = can;
-        this.g = can.getContext('2d')!;
+        this.g = can.getContext("2d")!;
 
-        can.addEventListener('mousedown', (e) => {
+        can.addEventListener("mousedown", (e) => {
             e.preventDefault();
             this.doMouseDown(e.offsetX, true);
         });
-        can.addEventListener('mousemove', (e) => {
+        can.addEventListener("mousemove", (e) => {
             e.preventDefault();
-            if (this.dragging && e.buttons === 0) { this.dragging = false; return; }
+            if (this.dragging && e.buttons === 0) {
+                this.dragging = false;
+                return;
+            }
             this.doMouseMove(e.offsetX);
         });
-        can.addEventListener('mouseup', (e) => {
+        can.addEventListener("mouseup", (e) => {
             e.preventDefault();
             if (this.enabled && this.dragging) {
                 this.val = this.calcValueFromPos(e.offsetX);
@@ -110,29 +128,35 @@ export class Scrollbar {
                 if (this.command) this.command();
             }
         });
-        can.addEventListener('mouseout', () => {
+        can.addEventListener("mouseout", () => {
             if (this.dragging) return;
-            if (this.enabled && this.attachedElm?.isMouseElm())
-                CirSim.theApp.mouse.setMouseElm(null);
+            if (this.enabled && this.attachedElm?.isMouseElm()) CirSim.theApp.mouse.setMouseElm(null);
         });
-        can.addEventListener('mouseover', () => {
-            if (this.enabled && this.attachedElm)
-                CirSim.theApp.mouse.setMouseElm(this.attachedElm);
+        can.addEventListener("mouseover", () => {
+            if (this.enabled && this.attachedElm) CirSim.theApp.mouse.setMouseElm(this.attachedElm);
         });
-        can.addEventListener('wheel', (e) => this.onMouseWheel(e), { passive: false });
+        can.addEventListener("wheel", (e) => this.onMouseWheel(e), { passive: false });
 
-        can.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            this.dragging = false;
-            const t = e.touches[0];
-            this.doMouseDown(t.clientX - can.getBoundingClientRect().left, false);
-        }, { passive: false });
-        can.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            const t = e.touches[0];
-            this.doMouseMove(t.clientX - can.getBoundingClientRect().left);
-        }, { passive: false });
-        can.addEventListener('touchend', (e) => {
+        can.addEventListener(
+            "touchstart",
+            (e) => {
+                e.preventDefault();
+                this.dragging = false;
+                const t = e.touches[0];
+                this.doMouseDown(t.clientX - can.getBoundingClientRect().left, false);
+            },
+            { passive: false },
+        );
+        can.addEventListener(
+            "touchmove",
+            (e) => {
+                e.preventDefault();
+                const t = e.touches[0];
+                this.doMouseMove(t.clientX - can.getBoundingClientRect().left);
+            },
+            { passive: false },
+        );
+        can.addEventListener("touchend", (e) => {
             e.preventDefault();
             if (this.enabled && this.dragging) {
                 this.dragging = false;
@@ -140,7 +164,7 @@ export class Scrollbar {
                 if (this.command) this.command();
             }
         });
-        can.addEventListener('touchcancel', (e) => {
+        can.addEventListener("touchcancel", (e) => {
             e.preventDefault();
             this.dragging = false;
         });
@@ -179,7 +203,7 @@ export class Scrollbar {
         const hm = Scrollbar.HMARGIN;
         const sh = Scrollbar.SCROLLHEIGHT;
         const bm = Scrollbar.BARMARGIN;
-        let v = this.min + (this.max - this.min) * (x - hm - sh - bm) / (vpw - 2 * (hm + sh + bm));
+        let v = this.min + ((this.max - this.min) * (x - hm - sh - bm)) / (vpw - 2 * (hm + sh + bm));
         v = Math.max(this.min, Math.min(this.max, v));
         return this.snapToStep(Math.round(v));
     }
@@ -192,19 +216,21 @@ export class Scrollbar {
         return Math.round(v);
     }
 
-    setStepSize(step: number): void { this.stepSize = step; }
+    setStepSize(step: number): void {
+        this.stepSize = step;
+    }
 
     draw(): void {
         const g = this.g;
         const vpw = this.vpw;
-        const sh  = Scrollbar.SCROLLHEIGHT;
-        const hm  = Scrollbar.HMARGIN;
-        const bm  = Scrollbar.BARMARGIN;
+        const sh = Scrollbar.SCROLLHEIGHT;
+        const hm = Scrollbar.HMARGIN;
+        const bm = Scrollbar.BARMARGIN;
 
-        g.fillStyle = '#ffffff';
+        g.fillStyle = "#ffffff";
         g.fillRect(0, 0, vpw, sh);
 
-        g.strokeStyle = this.enabled ? '#000000' : 'lightgrey';
+        g.strokeStyle = this.enabled ? "#000000" : "lightgrey";
         g.lineWidth = 1.0;
 
         // left arrow
@@ -220,28 +246,28 @@ export class Scrollbar {
 
         if (this.enabled) {
             // grey track
-            g.strokeStyle = 'grey';
+            g.strokeStyle = "grey";
             g.lineWidth = 5.0;
             g.beginPath();
             g.moveTo(hm + sh + bm, sh / 2);
             g.lineTo(vpw - hm - sh - bm, sh / 2);
             g.stroke();
 
-            const p = hm + sh + bm +
-                (vpw - 2 * (hm + sh + bm)) * (this.val - this.min) / (this.max - this.min);
+            const p = hm + sh + bm + ((vpw - 2 * (hm + sh + bm)) * (this.val - this.min)) / (this.max - this.min);
 
             // red (or highlight) filled portion
-            g.strokeStyle = (this.attachedElm?.needsHighlight())
-                ? (CircuitElm.selectColor?.getHexValue() ?? 'red') : 'red';
+            g.strokeStyle = this.attachedElm?.needsHighlight()
+                ? (CircuitElm.selectColor?.getHexValue() ?? "red")
+                : "red";
             g.beginPath();
             g.moveTo(hm + sh + bm, sh / 2);
             g.lineTo(p, sh / 2);
             g.stroke();
 
             // handle: white fill with black border
-            g.strokeStyle = '#000000';
+            g.strokeStyle = "#000000";
             g.lineWidth = 1.0;
-            g.fillStyle = '#ffffff';
+            g.fillStyle = "#ffffff";
             g.fillRect(p - 2, 2, 5, sh - 4);
             g.strokeRect(p - 2, 2, 5, sh - 4);
         }
@@ -252,7 +278,9 @@ export class Scrollbar {
         if (this.enabled) this.setValue(this.val + Math.round(ScrollValuePopup.normalizeWheelDelta(e) / 3));
     }
 
-    getValue(): number { return this.val; }
+    getValue(): number {
+        return this.val;
+    }
 
     setValue(v: number): void {
         if (v < this.min) v = this.min;
@@ -262,32 +290,43 @@ export class Scrollbar {
         if (this.command) this.command();
     }
 
-    enable():  void { this.enabled = true;  this.draw(); }
-    disable(): void { this.enabled = false; this.dragging = false; this.draw(); }
+    enable(): void {
+        this.enabled = true;
+        this.draw();
+    }
+    disable(): void {
+        this.enabled = false;
+        this.dragging = false;
+        this.draw();
+    }
 
-    addChangeHandler(fn: () => void): void { this.command = fn; }
+    addChangeHandler(fn: () => void): void {
+        this.command = fn;
+    }
 }
 
 class LoadFile {
     element: HTMLInputElement;
-    static isSupported(): boolean { return !!(window.File && window.FileReader); }
+    static isSupported(): boolean {
+        return !!(window.File && window.FileReader);
+    }
 
     constructor(app: CirSim) {
-        this.element = document.createElement('input');
-        this.element.type = 'file';
-        this.element.setAttribute('name', 'Import');
-        this.element.id = 'LoadFileElement';
-        this.element.accept = '.txt,.circuitjs';
-        this.element.className = 'offScreen';
-        this.element.addEventListener('change', () => LoadFile.doLoad(app));
+        this.element = document.createElement("input");
+        this.element.type = "file";
+        this.element.setAttribute("name", "Import");
+        this.element.id = "LoadFileElement";
+        this.element.accept = ".txt,.circuitjs";
+        this.element.className = "offScreen";
+        this.element.addEventListener("change", () => LoadFile.doLoad(app));
     }
 
     static doLoad(app: CirSim): void {
-        const input = document.getElementById('LoadFileElement') as HTMLInputElement;
+        const input = document.getElementById("LoadFileElement") as HTMLInputElement;
         if (!input || !input.files || input.files.length < 1) return;
         const file = input.files[0];
         if (file.size >= 1280000) {
-            alert('File too large!');
+            alert("File too large!");
             return;
         }
         const reader = new FileReader();
@@ -317,27 +356,41 @@ class CheckboxMenuItem {
     private _shortcut: string;
     private _state: boolean = false;
     private _command: (() => void) | null = null;
-    _li: HTMLLIElement | null = null;  // linked DOM element, set by Menu.addCheckboxItem
+    _li: HTMLLIElement | null = null; // linked DOM element, set by Menu.addCheckboxItem
 
     constructor(label: string, shortcut: string = "") {
         this._label = label;
         this._shortcut = shortcut;
     }
 
-    getState(): boolean { return this._state; }
+    getState(): boolean {
+        return this._state;
+    }
     setState(s: boolean): void {
         this._state = s;
         if (this._li) {
-            const mark = this._li.querySelector('.checkMark') as HTMLElement | null;
-            if (mark) mark.style.visibility = s ? 'visible' : 'hidden';
+            const mark = this._li.querySelector(".checkMark") as HTMLElement | null;
+            if (mark) mark.style.visibility = s ? "visible" : "hidden";
         }
     }
-    getShortcut(): string { return this._shortcut; }
-    setShortcut(s: string): void { this._shortcut = s; }
-    setScheduledCommand(cmd: { execute(): void }): void { this._command = () => cmd.execute(); }
-    setCommand(cmd: { execute(): void }): void { this._command = () => cmd.execute(); }
-    execute(): void { if (this._command) this._command(); }
-    getLabel(): string { return this._label; }
+    getShortcut(): string {
+        return this._shortcut;
+    }
+    setShortcut(s: string): void {
+        this._shortcut = s;
+    }
+    setScheduledCommand(cmd: { execute(): void }): void {
+        this._command = () => cmd.execute();
+    }
+    setCommand(cmd: { execute(): void }): void {
+        this._command = () => cmd.execute();
+    }
+    execute(): void {
+        if (this._command) this._command();
+    }
+    getLabel(): string {
+        return this._label;
+    }
 }
 
 class PerfEntry {
@@ -374,8 +427,7 @@ class PerfMonitor {
                 this.rootCtx = this.ctx;
             }
         } else {
-            if (this.ctx.addChild(name, newEntry))
-                this.ctx = newEntry;
+            if (this.ctx.addChild(name, newEntry)) this.ctx = newEntry;
         }
     }
 
@@ -395,20 +447,17 @@ class PerfMonitor {
 
     static buildString(mon: PerfMonitor): { toString(): string } {
         const sb: string[] = [];
-        if (mon.rootCtx != null)
-            PerfMonitor.buildStringInternal(sb, mon.rootCtxName, mon.rootCtx, 0);
+        if (mon.rootCtx != null) PerfMonitor.buildStringInternal(sb, mon.rootCtxName, mon.rootCtx, 0);
         return { toString: () => sb.join("") };
     }
 
     private static buildStringInternal(sb: string[], name: string, entry: PerfEntry, depth: number): void {
-        for (let x = 0; x < depth; x++)
-            sb.push("-");
+        for (let x = 0; x < depth; x++) sb.push("-");
         sb.push(name);
         sb.push(": ");
         sb.push(entry.length.toString());
         sb.push("\n");
-        for (const [key, child] of entry.children)
-            PerfMonitor.buildStringInternal(sb, key, child, depth + 1);
+        for (const [key, child] of entry.children) PerfMonitor.buildStringInternal(sb, key, child, depth + 1);
     }
 
     private static getTime(): number {
@@ -428,12 +477,11 @@ class QueryParameters {
     getBooleanValue(key: string, defaultVal: boolean): boolean {
         const v = this.params.get(key);
         if (v === null) return defaultVal;
-        return v === 'true' || v === '1';
+        return v === "true" || v === "1";
     }
 }
 
 export class UIManager {
-
     static theUI: UIManager;
 
     app: CirSim;
@@ -531,47 +579,46 @@ export class UIManager {
         this.elmList = this.app.elmList;
 
         try {
-            euroRes       = qp.getBooleanValue("euroResistors", false);
-            euroGates     = qp.getBooleanValue("IECGates", this.getOptionFromStorage("euroGates", Locale.weAreInGermany()));
-            usRes         = qp.getBooleanValue("usResistors", false);
-            showOhm       = qp.getBooleanValue("showOhm", this.getOptionFromStorage("showOhm", false));
-            running       = qp.getBooleanValue("running", true);
-            hideSidebar   = qp.getBooleanValue("hideSidebar", false);
+            euroRes = qp.getBooleanValue("euroResistors", false);
+            euroGates = qp.getBooleanValue("IECGates", this.getOptionFromStorage("euroGates", Locale.weAreInGermany()));
+            usRes = qp.getBooleanValue("usResistors", false);
+            showOhm = qp.getBooleanValue("showOhm", this.getOptionFromStorage("showOhm", false));
+            running = qp.getBooleanValue("running", true);
+            hideSidebar = qp.getBooleanValue("hideSidebar", false);
             this.hideMenu = qp.getBooleanValue("hideMenu", false);
-            printable     = qp.getBooleanValue("whiteBackground", this.getOptionFromStorage("whiteBackground", false));
-            convention    = qp.getBooleanValue("conventionalCurrent",
-                               this.getOptionFromStorage("conventionalCurrent", true));
-            noEditing     = !qp.getBooleanValue("editable", true);
+            printable = qp.getBooleanValue("whiteBackground", this.getOptionFromStorage("whiteBackground", false));
+            convention = qp.getBooleanValue(
+                "conventionalCurrent",
+                this.getOptionFromStorage("conventionalCurrent", true),
+            );
+            noEditing = !qp.getBooleanValue("editable", true);
             mouseWheelEdit = qp.getBooleanValue("mouseWheelEdit", this.getOptionFromStorage("mouseWheelEdit", true));
             positiveColor = qp.getValue("positiveColor");
             negativeColor = qp.getValue("negativeColor");
-            neutralColor  = qp.getValue("neutralColor");
-            selectColor   = qp.getValue("selectColor");
-            currentColor  = qp.getValue("currentColor");
-            mouseModeReq  = qp.getValue("mouseMode");
+            neutralColor = qp.getValue("neutralColor");
+            selectColor = qp.getValue("selectColor");
+            currentColor = qp.getValue("currentColor");
+            mouseModeReq = qp.getValue("mouseMode");
             this.hideInfoBox = qp.getBooleanValue("hideInfoBox", false);
         } catch (e) {
             CirSim.console("Exception: " + e);
         }
 
         let euroSetting = false;
-        if (euroRes)
-            euroSetting = true;
-        else if (usRes)
-            euroSetting = false;
-        else
-            euroSetting = this.getOptionFromStorage("euroResistors", !Locale.weAreInUS(true));
+        if (euroRes) euroSetting = true;
+        else if (usRes) euroSetting = false;
+        else euroSetting = this.getOptionFromStorage("euroResistors", !Locale.weAreInUS(true));
 
         // build main layout container
-        this.layoutPanel = document.createElement('div');
-        this.layoutPanel.className = 'layoutPanel';
-        this.layoutPanel.style.cssText = 'position:absolute;inset:0;overflow:hidden;';
+        this.layoutPanel = document.createElement("div");
+        this.layoutPanel.className = "layoutPanel";
+        this.layoutPanel.style.cssText = "position:absolute;inset:0;overflow:hidden;";
 
         this.app.ui = this;
         this.app.menus = this.menus = new Menus(this.app);
         this.menus.init();
         CommandPaletteRegistry.buildStatic(this.app); // after menus so mainMenuItems exist
-        (CirSim as any).dumpTypeMap  = (CirSim as any).dumpTypeMap  || new Map();
+        (CirSim as any).dumpTypeMap = (CirSim as any).dumpTypeMap || new Map();
         (CirSim as any).xmlDumpTypeMap = (CirSim as any).xmlDumpTypeMap || new Map();
         (CirSim as any).dumpTypeMap.set(403, "ScopeElm");
         (CirSim as any).xmlDumpTypeMap.set("Scope", "ScopeElm");
@@ -583,33 +630,33 @@ export class UIManager {
         if (UIManager.VERTICALPANELWIDTH > 166) UIManager.VERTICALPANELWIDTH = 166;
         if (UIManager.VERTICALPANELWIDTH < 128) UIManager.VERTICALPANELWIDTH = 128;
 
-        this.verticalPanel = document.createElement('div');
-        this.verticalPanel.className = 'verticalPanel';
-        this.verticalPanel.id = 'painel';
-        this.verticalPanel.style.cssText =
-            `position:absolute;top:${UIManager.MENUBARHEIGHT}px;right:0;bottom:0;width:${UIManager.VERTICALPANELWIDTH}px;overflow-x:hidden;overflow-y:auto;`;
+        this.verticalPanel = document.createElement("div");
+        this.verticalPanel.className = "verticalPanel";
+        this.verticalPanel.id = "painel";
+        this.verticalPanel.style.cssText = `position:absolute;top:${UIManager.MENUBARHEIGHT}px;right:0;bottom:0;width:${UIManager.VERTICALPANELWIDTH}px;overflow-x:hidden;overflow-y:auto;`;
 
         // mobile hamburger-style checkbox toggles for sidebar and top panel
-        const sidePanelCheckbox = document.createElement('input');
-        sidePanelCheckbox.type = 'checkbox';
-        sidePanelCheckbox.id = 'trigger';
-        sidePanelCheckbox.className = 'trigger';
-        this.sidePanelCheckboxLabel = document.createElement('label');
-        this.sidePanelCheckboxLabel.className = 'triggerLabel';
-        this.sidePanelCheckboxLabel.setAttribute('for', 'trigger');
+        const sidePanelCheckbox = document.createElement("input");
+        sidePanelCheckbox.type = "checkbox";
+        sidePanelCheckbox.id = "trigger";
+        sidePanelCheckbox.className = "trigger";
+        this.sidePanelCheckboxLabel = document.createElement("label");
+        this.sidePanelCheckboxLabel.className = "triggerLabel";
+        this.sidePanelCheckboxLabel.setAttribute("for", "trigger");
 
-        const topPanelCheckbox = document.createElement('input');
-        topPanelCheckbox.type = 'checkbox';
-        topPanelCheckbox.id = 'toptrigger';
-        topPanelCheckbox.className = 'toptrigger';
-        const topPanelCheckboxLabel = document.createElement('label');
-        topPanelCheckboxLabel.className = 'toptriggerlabel';
-        topPanelCheckboxLabel.setAttribute('for', 'toptrigger');
+        const topPanelCheckbox = document.createElement("input");
+        topPanelCheckbox.type = "checkbox";
+        topPanelCheckbox.id = "toptrigger";
+        topPanelCheckbox.className = "toptrigger";
+        const topPanelCheckboxLabel = document.createElement("label");
+        topPanelCheckboxLabel.className = "toptriggerlabel";
+        topPanelCheckboxLabel.setAttribute("for", "toptrigger");
 
         // make buttons side by side if there's room
-        this.buttonPanel = (UIManager.VERTICALPANELWIDTH === 166)
-            ? Object.assign(document.createElement('div'), { style: { display: 'flex', flexDirection: 'row' } })
-            : Object.assign(document.createElement('div'), { style: { display: 'flex', flexDirection: 'column' } });
+        this.buttonPanel =
+            UIManager.VERTICALPANELWIDTH === 166
+                ? Object.assign(document.createElement("div"), { style: { display: "flex", flexDirection: "row" } })
+                : Object.assign(document.createElement("div"), { style: { display: "flex", flexDirection: "column" } });
 
         this.menus.pasteItem.setEnabled(false);
 
@@ -617,32 +664,35 @@ export class UIManager {
         this.menus.voltsCheckItem.setState(true);
         this.menus.showValuesCheckItem.setState(true);
         this.menus.toolbarCheckItem.setState(
-            !this.hideMenu && !noEditing && !hideSidebar &&
-            (this.app as any).startCircuit == null &&
-            (this.app as any).startCircuitText == null &&
-            (this.app as any).startCircuitLink == null);
+            !this.hideMenu &&
+                !noEditing &&
+                !hideSidebar &&
+                (this.app as any).startCircuit == null &&
+                (this.app as any).startCircuitText == null &&
+                (this.app as any).startCircuitLink == null,
+        );
         this.menus.showPropsOnCreateCheckItem.setState(
-            this.getOptionFromStorage("showPropsOnCreate", this.menus.toolbarCheckItem.getState()));
+            this.getOptionFromStorage("showPropsOnCreate", this.menus.toolbarCheckItem.getState()),
+        );
         this.menus.crossHairCheckItem.setState(this.getOptionFromStorage("crossHair", false));
         this.menus.euroResistorCheckItem.setState(euroSetting);
         this.menus.euroResistorCheckItem.setCommand({
             execute: () => {
                 this.setOptionInStorage("euroResistors", this.menus.euroResistorCheckItem.getState());
                 this.toolbar.setEuroResistors(this.menus.euroResistorCheckItem.getState());
-            }
+            },
         });
         this.menus.showOhmCheckItem.setState(showOhm);
         this.menus.showOhmCheckItem.setCommand({
             execute: () => {
                 this.setOptionInStorage("showOhm", this.menus.showOhmCheckItem.getState());
-            }
+            },
         });
         this.menus.euroGatesCheckItem.setCommand({
             execute: () => {
                 this.setOptionInStorage("euroGates", this.menus.euroGatesCheckItem.getState());
-                for (const ce of this.elmList)
-                    ce.setPoints();
-            }
+                for (const ce of this.elmList) ce.setPoints();
+            },
         });
         this.menus.euroGatesCheckItem.setState(euroGates);
         this.menus.printableCheckItem.setCommand({
@@ -650,7 +700,7 @@ export class UIManager {
                 for (let i = 0; i < this.scopeManager.scopeCount; i++)
                     this.scopeManager.scopes[i].setRect(this.scopeManager.scopes[i].rect);
                 this.setOptionInStorage("whiteBackground", this.menus.printableCheckItem.getState());
-            }
+            },
         });
         this.menus.printableCheckItem.setState(printable);
 
@@ -661,7 +711,7 @@ export class UIManager {
                 // change the current color if it hasn't changed from the default
                 if (cc === "#ffff00" || cc === "#00ffff")
                     CircuitElm.currentColor = this.menus.conventionCheckItem.getState() ? Color.yellow : Color.cyan;
-            }
+            },
         });
         this.menus.conventionCheckItem.setState(convention);
         this.menus.noEditCheckItem.setState(noEditing);
@@ -693,34 +743,33 @@ export class UIManager {
         }
 
         // toolbar: left of sidebar, below menu bar
-        this.toolbar.element.style.position = 'absolute';
-        this.toolbar.element.style.left = '0';
-        this.toolbar.element.style.top = mbh + 'px';
-        this.toolbar.element.style.right = vpw + 'px';
-        this.toolbar.element.style.height = UIManager.TOOLBARHEIGHT + 'px';
-        this.toolbar.element.style.overflow = 'hidden';
+        this.toolbar.element.style.position = "absolute";
+        this.toolbar.element.style.left = "0";
+        this.toolbar.element.style.top = mbh + "px";
+        this.toolbar.element.style.right = vpw + "px";
+        this.toolbar.element.style.height = UIManager.TOOLBARHEIGHT + "px";
+        this.toolbar.element.style.overflow = "hidden";
         this.layoutPanel.appendChild(this.toolbar.element);
 
         // canvas wrapper: fills space below toolbar, left of sidebar
-        this.canvasWrapper = document.createElement('div');
-        this.canvasWrapper.className = 'canvasWrapper';
-        this.canvasWrapper.style.cssText =
-            `position:absolute;top:${mbh + UIManager.TOOLBARHEIGHT}px;right:${vpw}px;bottom:0;left:0;overflow:hidden;`;
+        this.canvasWrapper = document.createElement("div");
+        this.canvasWrapper.className = "canvasWrapper";
+        this.canvasWrapper.style.cssText = `position:absolute;top:${mbh + UIManager.TOOLBARHEIGHT}px;right:${vpw}px;bottom:0;left:0;overflow:hidden;`;
         this.layoutPanel.appendChild(this.canvasWrapper);
 
         document.body.appendChild(this.layoutPanel);
 
-        this.cv = document.createElement('canvas');
-        this.cv.style.cssText = 'position:absolute;';
+        this.cv = document.createElement("canvas");
+        this.cv.style.cssText = "position:absolute;";
         this.canvasWrapper.appendChild(this.cv);
 
-        window.addEventListener('resize', () => {
+        window.addEventListener("resize", () => {
             // canvas hasn't been laid out yet, so we can't recenter here
             this.lastResizeTime = Date.now();
             this.repaint();
         });
 
-        this.cvcontext = this.cv.getContext('2d')!;
+        this.cvcontext = this.cv.getContext("2d")!;
         this.app.scopeManager = this.scopeManager = new ScopeManager(this.app);
 
         this.subcircuitBar = new SubcircuitBar();
@@ -729,23 +778,23 @@ export class UIManager {
         this.setToolbar(); // calls setCanvasSize()
         this.verticalPanel.appendChild(this.buttonPanel);
 
-        this.resetButton = document.createElement('button');
+        this.resetButton = document.createElement("button");
         this.resetButton.textContent = Locale.LS("Reset");
-        this.resetButton.className = 'topButton';
-        this.resetButton.addEventListener('click', () => this.resetAction());
+        this.resetButton.className = "topButton";
+        this.resetButton.addEventListener("click", () => this.resetAction());
         this.buttonPanel.appendChild(this.resetButton);
 
-        this.runStopButton = document.createElement('button');
-        this.runStopButton.innerHTML = '<strong>RUN</strong>&nbsp;/&nbsp;Stop';
-        this.runStopButton.className = 'topButton';
-        this.runStopButton.addEventListener('click', () => this.setSimRunning(!this.simIsRunning()));
+        this.runStopButton = document.createElement("button");
+        this.runStopButton.innerHTML = "<strong>RUN</strong>&nbsp;/&nbsp;Stop";
+        this.runStopButton.className = "topButton";
+        this.runStopButton.addEventListener("click", () => this.setSimRunning(!this.simIsRunning()));
         this.buttonPanel.appendChild(this.runStopButton);
 
         // keep Reset and Run/Stop from taking keyboard focus, so a later
         // space/enter keypress doesn't trigger them again
         for (const b of [this.resetButton, this.runStopButton]) {
             b.tabIndex = -1;
-            b.addEventListener('mousedown', (e) => e.preventDefault());
+            b.addEventListener("mousedown", (e) => e.preventDefault());
         }
 
         /*
@@ -761,25 +810,25 @@ export class UIManager {
         }
 
         let l: HTMLElement;
-        l = document.createElement('div');
+        l = document.createElement("div");
         l.textContent = Locale.LS("Simulation Speed");
-        l.className = 'topSpace';
+        l.className = "topSpace";
         this.verticalPanel.appendChild(l);
 
         // was max of 140
         this.speedBar = new Scrollbar(Scrollbar.HORIZONTAL, 3, 1, 0, 260);
         this.verticalPanel.appendChild(this.speedBar.element);
 
-        l = document.createElement('div');
+        l = document.createElement("div");
         l.textContent = Locale.LS("Current Speed");
-        l.className = 'topSpace';
+        l.className = "topSpace";
         this.verticalPanel.appendChild(l);
         this.currentBar = new Scrollbar(Scrollbar.HORIZONTAL, 50, 1, 1, 100);
         this.verticalPanel.appendChild(this.currentBar.element);
 
-        this.powerLabel = document.createElement('div');
+        this.powerLabel = document.createElement("div");
         this.powerLabel.textContent = Locale.LS("Power Brightness");
-        this.powerLabel.className = 'topSpace';
+        this.powerLabel.className = "topSpace";
         this.verticalPanel.appendChild(this.powerLabel);
         this.powerBar = new Scrollbar(Scrollbar.HORIZONTAL, 50, 1, 1, 100);
         this.verticalPanel.appendChild(this.powerBar.element);
@@ -797,20 +846,20 @@ export class UIManager {
         verticalPanel.add(exportImportButton);
         */
 
-        l = document.createElement('div');
+        l = document.createElement("div");
         l.textContent = Locale.LS("Current Circuit:");
-        l.className = 'topSpace';
+        l.className = "topSpace";
         this.verticalPanel.appendChild(l);
 
-        this.titleLabel = document.createElement('div');
+        this.titleLabel = document.createElement("div");
         this.titleLabel.textContent = "Label";
         this.verticalPanel.appendChild(this.titleLabel);
 
-        this.iFrame = document.createElement('iframe');
-        this.iFrame.src = 'iframe.html';
-        this.iFrame.style.width = UIManager.VERTICALPANELWIDTH + 'px';
-        this.iFrame.style.height = '100px';
-        this.iFrame.scrolling = 'no';
+        this.iFrame = document.createElement("iframe");
+        this.iFrame.src = "iframe.html";
+        this.iFrame.style.width = UIManager.VERTICALPANELWIDTH + "px";
+        this.iFrame.style.height = "100px";
+        this.iFrame.scrolling = "no";
         this.verticalPanel.appendChild(this.iFrame);
 
         this.setGrid();
@@ -822,18 +871,16 @@ export class UIManager {
 
         // capture phase: menu items call stopPropagation(), which would otherwise keep this from
         // ever firing (leaving the Draw > Subcircuits menu empty)
-        menuBar.addEventListener('click', () => this.mouse.doMainMenuChecks(), true);
+        menuBar.addEventListener("click", () => this.mouse.doMainMenuChecks(), true);
 
         this.registerKeyHandlers();
 
-        window.addEventListener('beforeunload', (event) => {
-            if (this.app.isModified())
-                event.returnValue = Locale.LS("Are you sure?  There are unsaved changes.");
+        window.addEventListener("beforeunload", (event) => {
+            if (this.app.isModified()) event.returnValue = Locale.LS("Are you sure?  There are unsaved changes.");
         });
 
         this.setColors(positiveColor, negativeColor, neutralColor, selectColor, currentColor);
-        if (!running)
-            this.setSimRunning(false);
+        if (!running) this.setSimRunning(false);
     }
 
     static devicePixelRatio(): number {
@@ -843,71 +890,68 @@ export class UIManager {
     // ---- Canvas/Layout ----
 
     checkCanvasSize(): void {
-        let expectedWidth  = window.innerWidth;
+        let expectedWidth = window.innerWidth;
         let expectedHeight = window.innerHeight;
-        expectedHeight -= (this.hideMenu ? 0 : UIManager.MENUBARHEIGHT);
-        if (!this.app.isMobile(this.sidePanelCheckboxLabel))
-            expectedWidth -= UIManager.VERTICALPANELWIDTH;
-        if (this.menus.toolbarCheckItem.getState())
-            expectedHeight -= UIManager.TOOLBARHEIGHT;
-        expectedWidth  = Math.max(expectedWidth,  0);
+        expectedHeight -= this.hideMenu ? 0 : UIManager.MENUBARHEIGHT;
+        if (!this.app.isMobile(this.sidePanelCheckboxLabel)) expectedWidth -= UIManager.VERTICALPANELWIDTH;
+        if (this.menus.toolbarCheckItem.getState()) expectedHeight -= UIManager.TOOLBARHEIGHT;
+        expectedWidth = Math.max(expectedWidth, 0);
         expectedHeight = Math.max(expectedHeight, 0);
         const dpr = UIManager.devicePixelRatio();
-        if (this.canvasWidth !== expectedWidth || this.canvasHeight !== expectedHeight || this.lastDevicePixelRatio !== dpr)
+        if (
+            this.canvasWidth !== expectedWidth ||
+            this.canvasHeight !== expectedHeight ||
+            this.lastDevicePixelRatio !== dpr
+        )
             this.setCanvasSize();
     }
 
     setCanvasSize(): void {
-        let width  = window.innerWidth;
+        let width = window.innerWidth;
         let height = window.innerHeight;
-        height -= (this.hideMenu ? 0 : UIManager.MENUBARHEIGHT);
+        height -= this.hideMenu ? 0 : UIManager.MENUBARHEIGHT;
 
-        if (!this.app.isMobile(this.sidePanelCheckboxLabel))
-            width -= UIManager.VERTICALPANELWIDTH;
-        if (this.menus.toolbarCheckItem.getState())
-            height -= UIManager.TOOLBARHEIGHT;
+        if (!this.app.isMobile(this.sidePanelCheckboxLabel)) width -= UIManager.VERTICALPANELWIDTH;
+        if (this.menus.toolbarCheckItem.getState()) height -= UIManager.TOOLBARHEIGHT;
 
-        width  = Math.max(width,  0);
+        width = Math.max(width, 0);
         height = Math.max(height, 0);
 
         if (this.cv) {
-            this.cv.style.width  = width  + 'px';
-            this.cv.style.height = height + 'px';
-            this.canvasWidth  = width;
+            this.cv.style.width = width + "px";
+            this.cv.style.height = height + "px";
+            this.canvasWidth = width;
             this.canvasHeight = height;
             const scale = UIManager.devicePixelRatio();
             this.lastDevicePixelRatio = scale;
-            this.cv.width  = Math.round(width  * scale);
+            this.cv.width = Math.round(width * scale);
             this.cv.height = Math.round(height * scale);
         }
 
         this.setCircuitArea();
 
         if (this.subcircuitBar) {
-            const barTop = (this.hideMenu ? 0 : UIManager.MENUBARHEIGHT) +
+            const barTop =
+                (this.hideMenu ? 0 : UIManager.MENUBARHEIGHT) +
                 (this.menus.toolbarCheckItem.getState() ? UIManager.TOOLBARHEIGHT : 0);
             this.subcircuitBar.updatePosition(0, barTop, width);
         }
 
         // center circuit if we have no transform, or if a resize happened in the last second
-        if (this.app.transform[0] === 0 || (Date.now() - this.lastResizeTime < 1000))
-            this.centerCircuit();
+        if (this.app.transform[0] === 0 || Date.now() - this.lastResizeTime < 1000) this.centerCircuit();
     }
 
     setCircuitArea(): void {
         const height = this.canvasHeight;
-        const width  = this.canvasWidth;
+        const width = this.canvasWidth;
         let h: number;
-        if (this.app.scopeManager == null || this.app.scopeManager.scopeCount === 0)
-            h = 0;
-        else
-            h = Math.round(height * this.app.scopeManager.scopeHeightFraction);
+        if (this.app.scopeManager == null || this.app.scopeManager.scopeCount === 0) h = 0;
+        else h = Math.round(height * this.app.scopeManager.scopeHeightFraction);
         this.app.circuitArea = new Rectangle(0, 0, width, height - h);
     }
 
     centerCircuit(): void {
-        if (this.elmList == null)
-            return;
+        if (this.elmList == null) return;
 
         const bounds = this.getCircuitBounds();
         this.setCircuitArea();
@@ -921,8 +965,7 @@ export class UIManager {
         }
 
         if (bounds != null)
-            scale = Math.min(this.app.circuitArea.width / (bounds.width + 140),
-                             cheight / (bounds.height + 100));
+            scale = Math.min(this.app.circuitArea.width / (bounds.width + 140), cheight / (bounds.height + 100));
         scale = Math.min(scale, 1.5);
 
         this.app.transform[0] = this.app.transform[3] = scale;
@@ -934,7 +977,10 @@ export class UIManager {
     }
 
     getCircuitBounds(): Rectangle | null {
-        let minx = 30000, maxx = -30000, miny = 30000, maxy = -30000;
+        let minx = 30000,
+            maxx = -30000,
+            miny = 30000,
+            maxy = -30000;
         for (const ce of this.elmList) {
             if (!ce.isCenteredText()) {
                 minx = UIManager.min(ce.x, UIManager.min(ce.x2, minx));
@@ -954,8 +1000,7 @@ export class UIManager {
                 maxy = UIManager.max(bb.y + bb.height, maxy);
             }
         }
-        if (minx > maxx)
-            return null;
+        if (minx > maxx) return null;
         return new Rectangle(minx, miny, maxx - minx, maxy - miny);
     }
 
@@ -975,16 +1020,15 @@ export class UIManager {
 
     setSimRunning(s: boolean): void {
         if (s) {
-            if (this.app.stopMessage != null)
-                return;
+            if (this.app.stopMessage != null) return;
             this.app.simRunning = true;
-            this.runStopButton.innerHTML = '<strong>RUN</strong>&nbsp;/&nbsp;Stop';
-            this.runStopButton.className = 'topButton';
+            this.runStopButton.innerHTML = "<strong>RUN</strong>&nbsp;/&nbsp;Stop";
+            this.runStopButton.className = "topButton";
             this.app.timer.scheduleRepeating(this.app.FASTTIMER);
         } else {
             this.app.simRunning = false;
-            this.runStopButton.innerHTML = 'Run&nbsp;/&nbsp;<strong>STOP</strong>';
-            this.runStopButton.className = 'topButton-red';
+            this.runStopButton.innerHTML = "Run&nbsp;/&nbsp;<strong>STOP</strong>";
+            this.runStopButton.className = "topButton-red";
             this.app.timer.cancel();
             this.repaint();
         }
@@ -1001,8 +1045,7 @@ export class UIManager {
     // it belongs to a different, currently unopened part of the circuit hierarchy).
     findHighlightElm(target: CircuitElm, list: CircuitElm[] | null): CircuitElm | null {
         let ce: CircuitElm | null = target;
-        while (ce != null && (list == null || !list.includes(ce)))
-            ce = ce.parent;
+        while (ce != null && (list == null || !list.includes(ce))) ce = ce.parent;
         return ce;
     }
 
@@ -1034,7 +1077,8 @@ export class UIManager {
         }
 
         // app.stopElm may be buried inside a subcircuit, so find the top-level element to highlight
-        const stopHighlightElm = this.app.stopElm == null ? null : this.findHighlightElm(this.app.stopElm, this.elmList);
+        const stopHighlightElm =
+            this.app.stopElm == null ? null : this.findHighlightElm(this.app.stopElm, this.elmList);
 
         if (stopHighlightElm != null && stopHighlightElm !== this.mouse.getMouseElm())
             stopHighlightElm.setMouseElm(true);
@@ -1047,19 +1091,18 @@ export class UIManager {
             CircuitElm.whiteColor = Color.black;
             CircuitElm.lightGrayColor = Color.black;
             g.setColor(Color.white);
-            this.cv.style.backgroundColor = '#fff';
+            this.cv.style.backgroundColor = "#fff";
         } else {
             CircuitElm.whiteColor = Color.white;
             CircuitElm.lightGrayColor = Color.lightGray;
             g.setColor(Color.black);
-            this.cv.style.backgroundColor = '#000';
+            this.cv.style.backgroundColor = "#000";
         }
 
         g.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
         if (this.app.simRunning) {
-            if (this.app.sim.needsStamp)
-                CirSim.console("needsStamp while simRunning?");
+            if (this.app.sim.needsStamp) CirSim.console("needsStamp while simRunning?");
 
             perfmon.startContext("runCircuit()");
             try {
@@ -1079,8 +1122,7 @@ export class UIManager {
                 let c = this.currentBar.getValue();
                 c = Math.exp(c / 3.5 - 14.2);
                 CircuitElm.currentMult = 1.7 * inc * c;
-                if (!this.menus.conventionCheckItem.getState())
-                    CircuitElm.currentMult = -CircuitElm.currentMult;
+                if (!this.menus.conventionCheckItem.getState()) CircuitElm.currentMult = -CircuitElm.currentMult;
             }
             this.lastTime = sysTime;
         } else {
@@ -1101,25 +1143,26 @@ export class UIManager {
 
         g.setFont(CircuitElm.unitsFont);
 
-        this.cvcontext.lineCap = 'round';
+        this.cvcontext.lineCap = "round";
 
-        if (this.menus.noEditCheckItem.getState())
-            g.drawLock(20, 30);
+        if (this.menus.noEditCheckItem.getState()) g.drawLock(20, 30);
 
         g.setColor(Color.white);
 
         const scale = UIManager.devicePixelRatio();
         this.cvcontext.setTransform(
-            this.app.transform[0] * scale, 0, 0,
+            this.app.transform[0] * scale,
+            0,
+            0,
             this.app.transform[3] * scale,
             this.app.transform[4] * scale,
-            this.app.transform[5] * scale);
+            this.app.transform[5] * scale,
+        );
 
         perfmon.startContext("elm.draw()");
         try {
             for (const ce of this.elmList) {
-                if (this.menus.powerCheckItem.getState())
-                    g.setColor(Color.gray);
+                if (this.menus.powerCheckItem.getState()) g.setColor(Color.gray);
                 ce.draw(g);
             }
         } catch (e) {
@@ -1131,23 +1174,25 @@ export class UIManager {
         // draw stopHighlightElm on top of everything else so it's always visible
         try {
             if (stopHighlightElm != null) {
-                if (this.menus.powerCheckItem.getState())
-                    g.setColor(Color.gray);
+                if (this.menus.powerCheckItem.getState()) g.setColor(Color.gray);
                 stopHighlightElm.draw(g);
             }
         } catch (e) {}
         perfmon.stopContext();
 
-        if (this.mouse.mouseMode !== MouseManager.MODE_DRAG_ROW &&
-                this.mouse.mouseMode !== MouseManager.MODE_DRAG_COLUMN) {
-            for (let i = 0; i !== this.app.postDrawList.length; i++)
-                CircuitElm.drawPost(g, this.app.postDrawList[i]);
+        if (
+            this.mouse.mouseMode !== MouseManager.MODE_DRAG_ROW &&
+            this.mouse.mouseMode !== MouseManager.MODE_DRAG_COLUMN
+        ) {
+            for (let i = 0; i !== this.app.postDrawList.length; i++) CircuitElm.drawPost(g, this.app.postDrawList[i]);
         }
 
-        if (this.mouse.tempMouseMode === MouseManager.MODE_DRAG_ROW ||
-                this.mouse.tempMouseMode === MouseManager.MODE_DRAG_COLUMN ||
-                this.mouse.tempMouseMode === MouseManager.MODE_DRAG_POST ||
-                this.mouse.tempMouseMode === MouseManager.MODE_DRAG_SELECTED) {
+        if (
+            this.mouse.tempMouseMode === MouseManager.MODE_DRAG_ROW ||
+            this.mouse.tempMouseMode === MouseManager.MODE_DRAG_COLUMN ||
+            this.mouse.tempMouseMode === MouseManager.MODE_DRAG_POST ||
+            this.mouse.tempMouseMode === MouseManager.MODE_DRAG_SELECTED
+        ) {
             for (const ce of this.elmList) {
                 if (ce !== this.mouse.getMouseElm() || this.mouse.tempMouseMode !== MouseManager.MODE_DRAG_POST) {
                     g.setColor(Color.gray);
@@ -1173,9 +1218,10 @@ export class UIManager {
             }
         }
 
-        if (this.mouse.dragElm != null &&
-                (this.mouse.dragElm.x !== this.mouse.dragElm.x2 ||
-                 this.mouse.dragElm.y !== this.mouse.dragElm.y2)) {
+        if (
+            this.mouse.dragElm != null &&
+            (this.mouse.dragElm.x !== this.mouse.dragElm.x2 || this.mouse.dragElm.y !== this.mouse.dragElm.y2)
+        ) {
             this.mouse.dragElm.draw(g);
             this.mouse.dragElm.drawHandles(g, CircuitElm.selectColor);
         }
@@ -1188,17 +1234,29 @@ export class UIManager {
 
         if (this.mouse.selectedArea != null) {
             g.setColor(CircuitElm.selectColor);
-            g.drawRect(this.mouse.selectedArea.x, this.mouse.selectedArea.y,
-                       this.mouse.selectedArea.width, this.mouse.selectedArea.height);
+            g.drawRect(
+                this.mouse.selectedArea.x,
+                this.mouse.selectedArea.y,
+                this.mouse.selectedArea.width,
+                this.mouse.selectedArea.height,
+            );
         }
 
-        if (this.menus.crossHairCheckItem.getState() && this.mouse.mouseCursorX >= 0
-                && this.mouse.mouseCursorX <= this.app.circuitArea.width
-                && this.mouse.mouseCursorY <= this.app.circuitArea.height) {
+        if (
+            this.menus.crossHairCheckItem.getState() &&
+            this.mouse.mouseCursorX >= 0 &&
+            this.mouse.mouseCursorX <= this.app.circuitArea.width &&
+            this.mouse.mouseCursorY <= this.app.circuitArea.height
+        ) {
             g.setColor(Color.gray);
             const x = this.app.snapGrid(this.mouse.inverseTransformX(this.mouse.mouseCursorX));
             const y = this.app.snapGrid(this.mouse.inverseTransformY(this.mouse.mouseCursorY));
-            g.drawLine(x, this.mouse.inverseTransformY(0), x, this.mouse.inverseTransformY(this.app.circuitArea.height));
+            g.drawLine(
+                x,
+                this.mouse.inverseTransformY(0),
+                x,
+                this.mouse.inverseTransformY(this.app.circuitArea.height),
+            );
             g.drawLine(this.mouse.inverseTransformX(0), y, this.mouse.inverseTransformX(this.app.circuitArea.width), y);
         }
 
@@ -1238,23 +1296,26 @@ export class UIManager {
             let height = 15;
             const increment = 15;
             g.drawString("Framerate: " + CircuitElm.showFormat.format(this.framerate), 10, height);
-            g.drawString("Steprate: " + CircuitElm.showFormat.format(this.steprate), 10, height += increment);
-            g.drawString("Steprate/iter: " + CircuitElm.showFormat.format(this.steprate / this.app.getIterCount()), 10, height += increment);
-            g.drawString("iterc: " + CircuitElm.showFormat.format(this.app.getIterCount()), 10, height += increment);
-            g.drawString("Frames: " + this.frames, 10, height += increment);
+            g.drawString("Steprate: " + CircuitElm.showFormat.format(this.steprate), 10, (height += increment));
+            g.drawString(
+                "Steprate/iter: " + CircuitElm.showFormat.format(this.steprate / this.app.getIterCount()),
+                10,
+                (height += increment),
+            );
+            g.drawString("iterc: " + CircuitElm.showFormat.format(this.app.getIterCount()), 10, (height += increment));
+            g.drawString("Frames: " + this.frames, 10, (height += increment));
 
             if (this.mouse.mouseCursorX >= 0) {
                 const cx = this.mouse.inverseTransformX(this.mouse.mouseCursorX);
                 const cy = this.mouse.inverseTransformY(this.mouse.mouseCursorY);
-                g.drawString("Mouse: (" + cx + ", " + cy + ")", 10, height += increment);
+                g.drawString("Mouse: (" + cx + ", " + cy + ")", 10, (height += increment));
             }
 
-            height += (increment * 2);
+            height += increment * 2;
 
             const perfmonResult = PerfMonitor.buildString(perfmon).toString();
             const splits = perfmonResult.split("\n");
-            for (let x = 0; x < splits.length; x++)
-                g.drawString(splits[x], 10, height + (increment * x));
+            for (let x = 0; x < splits.length; x++) g.drawString(splits[x], 10, height + increment * x);
         }
 
         try {
@@ -1280,19 +1341,20 @@ export class UIManager {
         if (this.app.stopMessage == null && this.app.scopeManager.scopeCount === 0) {
             leftX = UIManager.max(this.canvasWidth - CirSim.infoWidth, 0);
             const h0 = Math.round(this.canvasHeight * this.app.scopeManager.scopeHeightFraction);
-            h = (this.mouse.getMouseElm() == null) ? 70 : h0;
-            if (this.hideInfoBox)
-                h = 0;
+            h = this.mouse.getMouseElm() == null ? 70 : h0;
+            if (this.hideInfoBox) h = 0;
         }
-        if (this.app.stopMessage != null && this.app.circuitArea.height > this.canvasHeight - 30)
-            h = 30;
+        if (this.app.stopMessage != null && this.app.circuitArea.height > this.canvasHeight - 30) h = 30;
         g.setColor(this.menus.printableCheckItem.getState() ? "#eee" : "#111");
-        g.fillRect(leftX, this.app.circuitArea.height - h,
-                   this.app.circuitArea.width, this.canvasHeight - this.app.circuitArea.height + h);
+        g.fillRect(
+            leftX,
+            this.app.circuitArea.height - h,
+            this.app.circuitArea.width,
+            this.canvasHeight - this.app.circuitArea.height + h,
+        );
         g.setFont(CircuitElm.unitsFont);
         let ct = this.app.scopeManager.scopeCount;
-        if (this.app.stopMessage != null)
-            ct = 0;
+        if (this.app.stopMessage != null) ct = 0;
         Scope.clearCursorInfo();
         // while dragging the splitter, the mouse sits on the top edge of the scopes;
         // don't treat that as hovering over a plot
@@ -1303,8 +1365,7 @@ export class UIManager {
                 for (let i = 0; i !== this.app.scopeElmArr.length; i++)
                     this.app.scopeElmArr[i].selectScope(this.mouse.mouseCursorX, this.mouse.mouseCursorY);
         }
-        for (let i = 0; i !== ct; i++)
-            this.app.scopeManager.scopes[i].draw(g);
+        for (let i = 0; i !== ct; i++) this.app.scopeManager.scopes[i].draw(g);
         if (this.mouse.mouseWasOverSplitter) {
             g.setColor(CircuitElm.selectColor);
             g.setLineWidth(4.0);
@@ -1321,14 +1382,12 @@ export class UIManager {
                 if (this.mouse.mousePost === -1) {
                     this.mouse.getMouseElm().getInfo(info);
                     info[0] = Locale.LS(info[0]!);
-                    if (info[1] != null)
-                        info[1] = Locale.LS(info[1]);
+                    if (info[1] != null) info[1] = Locale.LS(info[1]);
 
                     if ((this.app as any).developerMode) {
                         // show node numbers for debugging
                         let ni: number;
-                        for (ni = 0; info[ni] != null && ni < info.length - 1; ni++)
-                            ;
+                        for (ni = 0; info[ni] != null && ni < info.length - 1; ni++);
                         try {
                             let nodeStr = "nodes:";
                             for (let nn = 0; nn < this.mouse.getMouseElm().getNodeCount(); nn++)
@@ -1337,7 +1396,8 @@ export class UIManager {
                         } catch (e) {}
                     }
                 } else {
-                    info[0] = "V = " +
+                    info[0] =
+                        "V = " +
                         CircuitElm.getUnitText(this.mouse.getMouseElm().getPostVoltage(this.mouse.mousePost), "V");
                 }
             } else {
@@ -1353,37 +1413,28 @@ export class UIManager {
             }
             if (this.app.hintType !== -1) {
                 let i: number;
-                for (i = 0; info[i] != null; i++)
-                    ;
+                for (i = 0; info[i] != null; i++);
                 const s = this.app.getHint();
-                if (s == null)
-                    this.app.hintType = -1;
-                else
-                    info[i] = s;
+                if (s == null) this.app.hintType = -1;
+                else info[i] = s;
             }
             let x = leftX + 5;
-            if (ct !== 0)
-                x = this.app.scopeManager.scopes[ct - 1].rightEdge() + 20;
+            if (ct !== 0) x = this.app.scopeManager.scopes[ct - 1].rightEdge() + 20;
 
             let i: number;
-            for (i = 0; info[i] != null; i++)
-                ;
+            for (i = 0; info[i] != null; i++);
             const badnodes = this.app.badConnectionList.length;
             if (badnodes > 0)
-                info[i++] = badnodes + (badnodes === 1 ?
-                    Locale.LS(" bad connection") : Locale.LS(" bad connections"));
-            if (this.app.savedFlag)
-                info[i++] = "(saved)";
+                info[i++] = badnodes + (badnodes === 1 ? Locale.LS(" bad connection") : Locale.LS(" bad connections"));
+            if (this.app.savedFlag) info[i++] = "(saved)";
 
             const ybase = this.app.circuitArea.height - h;
-            for (i = 0; info[i] != null; i++)
-                g.drawString(info[i]!, x, ybase + 15 * (i + 1));
+            for (i = 0; info[i] != null; i++) g.drawString(info[i]!, x, ybase + 15 * (i + 1));
         }
     }
 
     getBackgroundColor(): Color {
-        if (this.menus.printableCheckItem.getState())
-            return Color.white;
+        if (this.menus.printableCheckItem.getState()) return Color.white;
         return Color.black;
     }
 
@@ -1391,10 +1442,10 @@ export class UIManager {
 
     setPowerBarEnable(): void {
         if (this.menus.powerCheckItem.getState()) {
-            this.powerLabel.classList.remove('disabled');
+            this.powerLabel.classList.remove("disabled");
             this.powerBar.enable();
         } else {
-            this.powerLabel.classList.add('disabled');
+            this.powerLabel.classList.add("disabled");
             this.powerBar.disable();
         }
     }
@@ -1411,21 +1462,21 @@ export class UIManager {
             this.contextPanel = null;
         }
 
-        content.className = 'elmContextMenu';
-        content.style.position = 'fixed';
-        content.style.left = clientX + 'px';
-        content.style.top  = clientY + 'px';
+        content.className = "elmContextMenu";
+        content.style.position = "fixed";
+        content.style.left = clientX + "px";
+        content.style.top = clientY + "px";
         document.body.appendChild(content);
         this.contextPanel = content;
 
         // clamp to viewport
         const w = content.offsetWidth;
         const h = content.offsetHeight;
-        const clampedX = Math.max(0, Math.min(clientX, window.innerWidth  - w));
+        const clampedX = Math.max(0, Math.min(clientX, window.innerWidth - w));
         const clampedY = Math.max(0, Math.min(clientY, window.innerHeight - h));
         if (clampedX !== clientX || clampedY !== clientY) {
-            content.style.left = clampedX + 'px';
-            content.style.top  = clampedY + 'px';
+            content.style.left = clampedX + "px";
+            content.style.top = clampedY + "px";
         }
 
         // close on outside click
@@ -1433,31 +1484,28 @@ export class UIManager {
             if (!content.contains(evt.target as Node)) {
                 content.remove();
                 this.contextPanel = null;
-                document.removeEventListener('mousedown', close, true);
+                document.removeEventListener("mousedown", close, true);
             }
         };
-        document.addEventListener('mousedown', close, true);
+        document.addEventListener("mousedown", close, true);
     }
 
-    enableItems(): void {
-    }
+    enableItems(): void {}
 
     setToolbar(): void {
         const showing = this.menus.toolbarCheckItem.getState();
-        this.toolbar.element.style.display = showing ? 'flex' : 'none';
+        this.toolbar.element.style.display = showing ? "flex" : "none";
         if (this.canvasWrapper) {
             const mbh = this.hideMenu ? 0 : UIManager.MENUBARHEIGHT;
             const tbh = showing ? UIManager.TOOLBARHEIGHT : 0;
-            this.canvasWrapper.style.top = (mbh + tbh) + 'px';
+            this.canvasWrapper.style.top = mbh + tbh + "px";
         }
         this.setCanvasSize();
     }
 
     updateToolbar(): void {
-        if (this.mouse.dragElm != null)
-            this.toolbar.setModeLabel(Locale.LS("Drag Mouse"));
-        else
-            this.toolbar.setModeLabel(Locale.LS("Mode: ") + (this.app as any).classToLabelMap?.get(this.mouseModeStr));
+        if (this.mouse.dragElm != null) this.toolbar.setModeLabel(Locale.LS("Drag Mouse"));
+        else this.toolbar.setModeLabel(Locale.LS("Mode: ") + (this.app as any).classToLabelMap?.get(this.mouseModeStr));
         this.toolbar.highlightButton(this.mouseModeStr);
     }
 
@@ -1470,11 +1518,9 @@ export class UIManager {
     }
 
     popSubcircuit(): void {
-        if (this.subcircuitStack.length === 0)
-            return;
+        if (this.subcircuitStack.length === 0) return;
         this.subcircuitStack.pop();
-        if (this.subcircuitStack.length === 0)
-            this.elmList = this.app.elmList;
+        if (this.subcircuitStack.length === 0) this.elmList = this.app.elmList;
         else {
             // re-enter the current top of stack
             const cce = this.subcircuitStack[this.subcircuitStack.length - 1];
@@ -1504,21 +1550,18 @@ export class UIManager {
 
     setMouseMode(mode: number): void {
         this.mouse.mouseMode = mode;
-        if (mode === MouseManager.MODE_ADD_ELM)
-            this.setCursorStyle("cursorCross");
-        else
-            this.setCursorStyle("cursorPointer");
+        if (mode === MouseManager.MODE_ADD_ELM) this.setCursorStyle("cursorCross");
+        else this.setCursorStyle("cursorPointer");
     }
 
     setCursorStyle(s: string): void {
-        if (this.lastCursorStyle != null)
-            this.cv.classList.remove(this.lastCursorStyle);
+        if (this.lastCursorStyle != null) this.cv.classList.remove(this.lastCursorStyle);
         this.cv.classList.add(s);
         this.lastCursorStyle = s;
     }
 
     setGrid(): void {
-        this.app.gridSize = (this.menus.smallGridCheckItem.getState()) ? 8 : 16;
+        this.app.gridSize = this.menus.smallGridCheckItem.getState() ? 8 : 16;
         this.app.gridMask = ~(this.app.gridSize - 1);
         this.app.gridRound = this.app.gridSize / 2 - 1;
     }
@@ -1529,8 +1572,7 @@ export class UIManager {
     // keyboard handling, where the property editor still counts: Escape/Enter should keep
     // routing to it, and typing in its fields shouldn't leak out as tool shortcuts.
     dialogIsShowing(): boolean {
-        if (CirSim.editDialog != null && CirSim.editDialog.isShowing())
-            return true;
+        if (CirSim.editDialog != null && CirSim.editDialog.isShowing()) return true;
         return this.modalDialogIsShowing();
     }
 
@@ -1538,31 +1580,23 @@ export class UIManager {
     // non-modal, so canvas/scope mouse handling should keep working while it's open; use
     // this (instead of dialogIsShowing()) at those call sites.
     modalDialogIsShowing(): boolean {
-        if (CirSim.customLogicEditDialog != null && CirSim.customLogicEditDialog.isShowing())
-            return true;
-        if (CirSim.diodeModelEditDialog != null && CirSim.diodeModelEditDialog.isShowing())
-            return true;
-        if (CirSim.dialogShowing != null && CirSim.dialogShowing.isShowing())
-            return true;
-        if (this.contextPanel != null && (this.contextPanel as any).isShowing?.())
-            return true;
-        if (CirSim.scrollValuePopup != null && CirSim.scrollValuePopup.isShowing())
-            return true;
-        if (CirSim.typeScrollPopup != null && CirSim.typeScrollPopup.isShowing())
-            return true;
-        if (CirSim.aboutBox != null && CirSim.aboutBox.isShowing())
-            return true;
-        if (CirSim.commandPalette != null && CirSim.commandPalette.isShowing())
-            return true; // blocks double-tap Shift while palette is open
+        if (CirSim.customLogicEditDialog != null && CirSim.customLogicEditDialog.isShowing()) return true;
+        if (CirSim.diodeModelEditDialog != null && CirSim.diodeModelEditDialog.isShowing()) return true;
+        if (CirSim.dialogShowing != null && CirSim.dialogShowing.isShowing()) return true;
+        if (this.contextPanel != null && (this.contextPanel as any).isShowing?.()) return true;
+        if (CirSim.scrollValuePopup != null && CirSim.scrollValuePopup.isShowing()) return true;
+        if (CirSim.typeScrollPopup != null && CirSim.typeScrollPopup.isShowing()) return true;
+        if (CirSim.aboutBox != null && CirSim.aboutBox.isShowing()) return true;
+        if (CirSim.commandPalette != null && CirSim.commandPalette.isShowing()) return true; // blocks double-tap Shift while palette is open
         return false;
     }
 
     // ---- Keyboard ----
 
     private registerKeyHandlers(): void {
-        document.addEventListener('keydown', (e) => this.onKeyDown(e));
-        document.addEventListener('keyup',   (e) => this.onKeyUp(e));
-        document.addEventListener('keypress', (e) => this.onKeyPress(e));
+        document.addEventListener("keydown", (e) => this.onKeyDown(e));
+        document.addEventListener("keyup", (e) => this.onKeyUp(e));
+        document.addEventListener("keypress", (e) => this.onKeyPress(e));
     }
 
     private onKeyDown(e: KeyboardEvent): void {
@@ -1570,8 +1604,7 @@ export class UIManager {
 
         // Handle a press-and-drag gesture started on a toolbar icon, which may end up
         // anywhere on the page (not just over the canvas), so it needs to be tracked here.
-        if (this.mouse.isToolbarDragPending() && code === KEY_ESCAPE)
-            this.mouse.cancelToolbarDrag();
+        if (this.mouse.isToolbarDragPending() && code === KEY_ESCAPE) this.mouse.cancelToolbarDrag();
 
         // Handle Shift key for net highlighting (works regardless of dialog state)
         if (code === 16) {
@@ -1583,8 +1616,12 @@ export class UIManager {
 
                 const now = Date.now();
                 // Second Shift within 400 ms, with no other key in between, opens the palette.
-                if (this.lastShiftKeyUpMs > 0 && now - this.lastShiftKeyUpMs < 400 &&
-                        !this.keyPressedSinceShiftUp && !this.dialogIsShowing()) {
+                if (
+                    this.lastShiftKeyUpMs > 0 &&
+                    now - this.lastShiftKeyUpMs < 400 &&
+                    !this.keyPressedSinceShiftUp &&
+                    !this.dialogIsShowing()
+                ) {
                     this.app.commands.menuPerformed("key", "commandpalette");
                     e.preventDefault();
                     this.lastShiftKeyUpMs = 0;
@@ -1596,16 +1633,12 @@ export class UIManager {
 
         if (this.dialogIsShowing()) {
             if (CirSim.scrollValuePopup != null && CirSim.scrollValuePopup.isShowing()) {
-                if (code === KEY_ESCAPE || code === KEY_SPACE)
-                    CirSim.scrollValuePopup.close(false);
-                if (code === KEY_ENTER)
-                    CirSim.scrollValuePopup.close(true);
+                if (code === KEY_ESCAPE || code === KEY_SPACE) CirSim.scrollValuePopup.close(false);
+                if (code === KEY_ENTER) CirSim.scrollValuePopup.close(true);
             }
             if (CirSim.typeScrollPopup != null && CirSim.typeScrollPopup.isShowing()) {
-                if (code === KEY_ESCAPE || code === KEY_SPACE)
-                    CirSim.typeScrollPopup.close(false);
-                if (code === KEY_ENTER)
-                    CirSim.typeScrollPopup.close(true);
+                if (code === KEY_ESCAPE || code === KEY_SPACE) CirSim.typeScrollPopup.close(false);
+                if (code === KEY_ENTER) CirSim.typeScrollPopup.close(true);
             }
 
             let dlg = CirSim.editDialog;
@@ -1614,7 +1647,7 @@ export class UIManager {
             if (CirSim.dialogShowing != null) dlg = CirSim.dialogShowing;
             if (dlg != null && dlg.isShowing()) {
                 if (code === KEY_ESCAPE) dlg.closeDialog();
-                if (code === KEY_ENTER)  dlg.enterPressed();
+                if (code === KEY_ENTER) dlg.enterPressed();
             }
 
             // Palette arrow/enter/esc handled here (not in the filter box) so selection
@@ -1670,20 +1703,23 @@ export class UIManager {
         }
 
         if (code === KEY_LEFT || code === KEY_RIGHT || code === KEY_UP || code === KEY_DOWN) {
-            let dx = 0, dy = 0;
-            if (code === KEY_LEFT)  dx = -this.app.gridSize;
+            let dx = 0,
+                dy = 0;
+            if (code === KEY_LEFT) dx = -this.app.gridSize;
             if (code === KEY_RIGHT) dx = this.app.gridSize;
-            if (code === KEY_UP)    dy = -this.app.gridSize;
-            if (code === KEY_DOWN)  dy = this.app.gridSize;
+            if (code === KEY_UP) dy = -this.app.gridSize;
+            if (code === KEY_DOWN) dy = this.app.gridSize;
             let hasSel = false;
             for (let i = 0; i !== this.elmList.length; i++)
-                if (this.elmList[i].isSelected()) { hasSel = true; break; }
+                if (this.elmList[i].isSelected()) {
+                    hasSel = true;
+                    break;
+                }
             if (hasSel) {
                 this.app.undoManager.pushUndo();
                 for (let i = 0; i !== this.elmList.length; i++) {
                     const ce = this.elmList[i];
-                    if (ce.isSelected())
-                        ce.move(dx, dy);
+                    if (ce.isSelected()) ce.move(dx, dy);
                 }
                 this.app.needAnalyze();
                 e.preventDefault();
@@ -1714,16 +1750,46 @@ export class UIManager {
         }
 
         if (!customShortcutHandled && (e.ctrlKey || e.metaKey)) {
-            if (code === KEY_C) { this.app.commands.menuPerformed("key", "copy");              e.preventDefault(); }
-            if (code === KEY_X) { this.app.commands.menuPerformed("key", "cut");               e.preventDefault(); }
-            if (code === KEY_V) { this.app.commands.menuPerformed("key", "paste");             e.preventDefault(); }
-            if (code === KEY_Z) { this.app.commands.menuPerformed("key", "undo");              e.preventDefault(); }
-            if (code === KEY_Y) { this.app.commands.menuPerformed("key", "redo");              e.preventDefault(); }
-            if (code === KEY_D) { this.app.commands.menuPerformed("key", "duplicate");         e.preventDefault(); }
-            if (code === KEY_A) { this.app.commands.menuPerformed("key", "selectAll");         e.preventDefault(); }
-            if (code === KEY_P) { this.app.commands.menuPerformed("key", "print");             e.preventDefault(); }
-            if (code === KEY_S) { this.app.commands.menuPerformed("key", "exportaslocalfile"); e.preventDefault(); }
-            if (code === KEY_O) { this.app.commands.menuPerformed("key", "importfromlocalfile"); e.preventDefault(); }
+            if (code === KEY_C) {
+                this.app.commands.menuPerformed("key", "copy");
+                e.preventDefault();
+            }
+            if (code === KEY_X) {
+                this.app.commands.menuPerformed("key", "cut");
+                e.preventDefault();
+            }
+            if (code === KEY_V) {
+                this.app.commands.menuPerformed("key", "paste");
+                e.preventDefault();
+            }
+            if (code === KEY_Z) {
+                this.app.commands.menuPerformed("key", "undo");
+                e.preventDefault();
+            }
+            if (code === KEY_Y) {
+                this.app.commands.menuPerformed("key", "redo");
+                e.preventDefault();
+            }
+            if (code === KEY_D) {
+                this.app.commands.menuPerformed("key", "duplicate");
+                e.preventDefault();
+            }
+            if (code === KEY_A) {
+                this.app.commands.menuPerformed("key", "selectAll");
+                e.preventDefault();
+            }
+            if (code === KEY_P) {
+                this.app.commands.menuPerformed("key", "print");
+                e.preventDefault();
+            }
+            if (code === KEY_S) {
+                this.app.commands.menuPerformed("key", "exportaslocalfile");
+                e.preventDefault();
+            }
+            if (code === KEY_O) {
+                this.app.commands.menuPerformed("key", "importfromlocalfile");
+                e.preventDefault();
+            }
         }
     }
 
@@ -1741,11 +1807,9 @@ export class UIManager {
             this.keyPressedSinceShiftUp = false;
         }
 
-        if (this.dialogIsShowing())
-            return;
+        if (this.dialogIsShowing()) return;
 
-        if (this.isReadOnly())
-            return;
+        if (this.isReadOnly()) return;
 
         // handle momentary switches with keyboard shortcuts
         const keyStr = String.fromCharCode(code).toLowerCase();
@@ -1770,8 +1834,7 @@ export class UIManager {
     private onKeyPress(e: KeyboardEvent): void {
         const cc = e.charCode;
 
-        if (this.dialogIsShowing())
-            return;
+        if (this.dialogIsShowing()) return;
 
         if (cc === 45 /* '-' */) {
             this.app.commands.menuPerformed("key", "zoomout");
@@ -1790,8 +1853,7 @@ export class UIManager {
             e.preventDefault();
         }
 
-        if (this.isReadOnly())
-            return;
+        if (this.isReadOnly()) return;
 
         // check if any switches have a keyboard shortcut matching this key
         // (cc==32 for spacebar is included so it can be assigned as a shortcut too;
@@ -1806,8 +1868,7 @@ export class UIManager {
                         const se = ce as SwitchElm;
                         if (se.keyShortcut != null && se.keyShortcut === keyStr) {
                             se.toggle();
-                            if (!se.isLogicInputElm())
-                                this.app.needAnalyze();
+                            if (!se.isLogicInputElm()) this.app.needAnalyze();
                             toggled = true;
                         }
                     }
@@ -1832,8 +1893,7 @@ export class UIManager {
     // returns false if no shortcut is assigned to it.
     doToolShortcut(cc: number): boolean {
         const c = this.app.shortcuts.get(cc);
-        if (c == null)
-            return false;
+        if (c == null) return false;
         if (c.startsWith("cmd:")) {
             const parts = c.split(":");
             this.app.commands.menuPerformed(parts[1], parts[2]);
@@ -1860,8 +1920,7 @@ export class UIManager {
     }
 
     addWidgetToVerticalPanel(w: HTMLElement): void {
-        if (this.verticalPanel == null)
-            return;
+        if (this.verticalPanel == null) return;
         if (this.iFrame != null) {
             this.verticalPanel.insertBefore(w, this.iFrame);
             this.setiFrameHeight();
@@ -1871,12 +1930,9 @@ export class UIManager {
     }
 
     removeWidgetFromVerticalPanel(w: HTMLElement): void {
-        if (this.verticalPanel == null)
-            return;
-        if (w.parentNode === this.verticalPanel)
-            this.verticalPanel.removeChild(w);
-        if (this.iFrame != null)
-            this.setiFrameHeight();
+        if (this.verticalPanel == null) return;
+        if (w.parentNode === this.verticalPanel) this.verticalPanel.removeChild(w);
+        if (this.iFrame != null) this.setiFrameHeight();
     }
 
     // ---- Other ----
@@ -1895,37 +1951,29 @@ export class UIManager {
 
     setCircuitTitle(s: string | null): void {
         this.titleLabel.textContent = s == null ? null : s.replace(/_/g, "_​");
-        if (s != null && s.length > 0)
-            document.title = s + " - " + CirSim.baseTitle;
-        else
-            document.title = CirSim.baseTitle;
+        if (s != null && s.length > 0) document.title = s + " - " + CirSim.baseTitle;
+        else document.title = CirSim.baseTitle;
     }
 
     isSelection(): boolean {
-        for (const ce of this.elmList)
-            if (ce.isSelected())
-                return true;
+        for (const ce of this.elmList) if (ce.isSelected()) return true;
         return false;
     }
 
     resetAction(): void {
         this.app.consoleExceptionOccurred = false;
         this.app.analyzeFlag = true;
-        if (this.app.autoDCOnReset)
-            this.app.dcAnalysisFlag = true;
-        if (this.app.sim.t === 0)
-            this.setSimRunning(true);
+        if (this.app.autoDCOnReset) this.app.dcAnalysisFlag = true;
+        if (this.app.sim.t === 0) this.setSimRunning(true);
         this.app.sim.resetTime();
         this.app.sim.resetNodes();
-        for (const ce of this.elmList)
-            ce.reset();
+        for (const ce of this.elmList) ce.reset();
         this.app.scopeManager.resetGraphs();
         this.repaint();
     }
 
     composeSubcircuitMenu(): void {
-        if (this.menus.subcircuitMenuBar == null)
-            return;
+        if (this.menus.subcircuitMenuBar == null) return;
 
         for (let mi = 0; mi !== 2; mi++) {
             const menu = this.menus.subcircuitMenuBar[mi];
@@ -1942,8 +1990,7 @@ export class UIManager {
     }
 
     getClassCheckItem(s: string, t: string): CheckboxMenuItem {
-        if ((this.app as any).classToLabelMap == null)
-            (this.app as any).classToLabelMap = new Map<string, string>();
+        if ((this.app as any).classToLabelMap == null) (this.app as any).classToLabelMap = new Map<string, string>();
         (this.app as any).classToLabelMap.set(t, s);
 
         let shortcut = "";
@@ -1955,22 +2002,21 @@ export class UIManager {
         }
 
         this.app.register(t, elm);
-        if (elm == null && t.indexOf("Elm") >= 0)
-            this.app.console("can't create class: " + t);
+        if (elm == null && t.indexOf("Elm") >= 0) this.app.console("can't create class: " + t);
         if (elm != null) {
             if (elm.needsShortcut()) {
                 shortcut += String.fromCharCode(elm.getShortcut());
-                if (this.app.shortcuts.get(elm.getShortcut()) != null &&
-                        this.app.shortcuts.get(elm.getShortcut()) !== t)
+                if (
+                    this.app.shortcuts.get(elm.getShortcut()) != null &&
+                    this.app.shortcuts.get(elm.getShortcut()) !== t
+                )
                     this.app.console("already have shortcut for " + String.fromCharCode(elm.getShortcut()) + " " + elm);
                 this.app.shortcuts.set(elm.getShortcut(), t);
             }
             elm.delete();
         }
 
-        const mi = (shortcut === "")
-            ? new CheckboxMenuItem(s)
-            : new CheckboxMenuItem(s, shortcut);
+        const mi = shortcut === "" ? new CheckboxMenuItem(s) : new CheckboxMenuItem(s, shortcut);
         mi.setScheduledCommand(new MyCommand("main", t));
         this.mainMenuItems.push(mi);
         this.mainMenuItemNames.push(t);
@@ -1978,64 +2024,50 @@ export class UIManager {
     }
 
     setiFrameHeight(): void {
-        if (this.iFrame == null)
-            return;
+        if (this.iFrame == null) return;
         let cumheight = 0;
         const children = Array.from(this.verticalPanel.children) as HTMLElement[];
         for (const child of children) {
             if (child === this.iFrame) break;
             if (this.loadFileInput && child === this.loadFileInput.element) continue;
             cumheight += child.offsetHeight;
-            if (child.className.includes('topSpace'))
-                cumheight += 12;
+            if (child.className.includes("topSpace")) cumheight += 12;
         }
         let ih = window.innerHeight - (this.hideMenu ? 0 : UIManager.MENUBARHEIGHT) - cumheight;
         if (ih < 0) ih = 0;
-        this.iFrame.style.height = ih + 'px';
+        this.iFrame.style.height = ih + "px";
     }
 
-    setColors(positiveColor: string | null, negativeColor: string | null,
-              neutralColor: string | null, selectColor: string | null,
-              currentColor: string | null): void {
+    setColors(
+        positiveColor: string | null,
+        negativeColor: string | null,
+        neutralColor: string | null,
+        selectColor: string | null,
+        currentColor: string | null,
+    ): void {
         try {
-            if (positiveColor == null)
-                positiveColor = localStorage.getItem("positiveColor");
-            if (negativeColor == null)
-                negativeColor = localStorage.getItem("negativeColor");
-            if (neutralColor == null)
-                neutralColor = localStorage.getItem("neutralColor");
-            if (selectColor == null)
-                selectColor = localStorage.getItem("selectColor");
-            if (currentColor == null)
-                currentColor = localStorage.getItem("currentColor");
+            if (positiveColor == null) positiveColor = localStorage.getItem("positiveColor");
+            if (negativeColor == null) negativeColor = localStorage.getItem("negativeColor");
+            if (neutralColor == null) neutralColor = localStorage.getItem("neutralColor");
+            if (selectColor == null) selectColor = localStorage.getItem("selectColor");
+            if (currentColor == null) currentColor = localStorage.getItem("currentColor");
         } catch (e) {}
 
-        if (positiveColor != null)
-            CircuitElm.positiveColor = new Color(decodeURIComponent(positiveColor));
-        else if (this.getOptionFromStorage("alternativeColor", false))
-            CircuitElm.positiveColor = Color.blue;
-        else
-            CircuitElm.positiveColor = Color.green;
+        if (positiveColor != null) CircuitElm.positiveColor = new Color(decodeURIComponent(positiveColor));
+        else if (this.getOptionFromStorage("alternativeColor", false)) CircuitElm.positiveColor = Color.blue;
+        else CircuitElm.positiveColor = Color.green;
 
-        if (negativeColor != null)
-            CircuitElm.negativeColor = new Color(decodeURIComponent(negativeColor));
-        else
-            CircuitElm.negativeColor = Color.red;
+        if (negativeColor != null) CircuitElm.negativeColor = new Color(decodeURIComponent(negativeColor));
+        else CircuitElm.negativeColor = Color.red;
 
-        if (neutralColor != null)
-            CircuitElm.neutralColor = new Color(decodeURIComponent(neutralColor));
-        else
-            CircuitElm.neutralColor = Color.gray;
+        if (neutralColor != null) CircuitElm.neutralColor = new Color(decodeURIComponent(neutralColor));
+        else CircuitElm.neutralColor = Color.gray;
 
-        if (selectColor != null)
-            CircuitElm.selectColor = new Color(decodeURIComponent(selectColor));
-        else
-            CircuitElm.selectColor = Color.cyan;
+        if (selectColor != null) CircuitElm.selectColor = new Color(decodeURIComponent(selectColor));
+        else CircuitElm.selectColor = Color.cyan;
 
-        if (currentColor != null)
-            CircuitElm.currentColor = new Color(decodeURIComponent(currentColor));
-        else
-            CircuitElm.currentColor = this.menus.conventionCheckItem.getState() ? Color.yellow : Color.cyan;
+        if (currentColor != null) CircuitElm.currentColor = new Color(decodeURIComponent(currentColor));
+        else CircuitElm.currentColor = this.menus.conventionCheckItem.getState() ? Color.yellow : Color.cyan;
 
         CircuitElm.setColorScale();
     }
@@ -2044,8 +2076,7 @@ export class UIManager {
         this.mouse.wheelSensitivity = 1;
         try {
             const s = localStorage.getItem("wheelSensitivity");
-            if (s != null)
-                this.mouse.wheelSensitivity = parseFloatStrict(s);
+            if (s != null) this.mouse.wheelSensitivity = parseFloatStrict(s);
         } catch (e) {}
     }
 
@@ -2068,8 +2099,7 @@ export class UIManager {
     saveShortcuts(): void {
         try {
             let str = "1";
-            for (const [key, sh] of this.app.shortcuts)
-                str += ";" + key + "=" + sh;
+            for (const [key, sh] of this.app.shortcuts) str += ";" + key + "=" + sh;
             localStorage.setItem("shortcuts", str);
         } catch (e) {}
     }
@@ -2112,6 +2142,10 @@ export class UIManager {
         return (this.app as any).classToLabelMap?.get(cls);
     }
 
-    static min(a: number, b: number): number { return (a < b) ? a : b; }
-    static max(a: number, b: number): number { return (a > b) ? a : b; }
+    static min(a: number, b: number): number {
+        return a < b ? a : b;
+    }
+    static max(a: number, b: number): number {
+        return a > b ? a : b;
+    }
 }

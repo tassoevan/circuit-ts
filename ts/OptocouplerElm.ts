@@ -73,14 +73,12 @@ export class OptocouplerElm extends CompositeElm {
 
     dumpXmlModel(doc: Document): void {
         const model = this.diode.model;
-        if (!(model.builtIn || model.dumped))
-            model.dumpXml(doc);
+        if (!(model.builtIn || model.dumped)) model.dumpXml(doc);
     }
 
     dumpXml(doc: Document, elem: Element): void {
         const model = this.diode.model;
-        if (!(model.builtIn || model.dumped))
-            model.dumpXml(doc);
+        if (!(model.builtIn || model.dumped)) model.dumpXml(doc);
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ctr", this.ctr);
         CircuitXMLSerializer.dumpAttr(elem, "dmo", this.diode.modelName);
@@ -91,7 +89,7 @@ export class OptocouplerElm extends CompositeElm {
         this.ctr = xml.parseDoubleAttr("ctr", this.ctr);
         // "ix" is set on state-restore calls (from CompositeElm.dumpXmlState); absent on
         // definition/top-level loads where a missing "dmo" should fall back to "default"
-        const defaultDmo = (xml.parseStringAttr("ix", null) != null) ? this.diode.modelName : "default";
+        const defaultDmo = xml.parseStringAttr("ix", null) != null ? this.diode.modelName : "default";
         this.diode.modelName = xml.parseStringAttr("dmo", defaultDmo) ?? this.diode.modelName;
         this.initOptocoupler();
         this.diode.setup();
@@ -99,15 +97,18 @@ export class OptocouplerElm extends CompositeElm {
 
     private initOptocoupler(): void {
         this.csize = 2;
-        this.cspc  = 8 * 2;
+        this.cspc = 8 * 2;
         this.cspc2 = this.cspc * 2;
-        this.diode      = this.compElmList[0] as DiodeElm;
-        const cccs: any  = this.compElmList[1]; // CCCSElm (not yet fully typed)
+        this.diode = this.compElmList[0] as DiodeElm;
+        const cccs: any = this.compElmList[1]; // CCCSElm (not yet fully typed)
         this.transistor = this.compElmList[2] as TransistorElm;
 
         // from http://www.cel.com/pdf/appnotes/an3017.pdf
         // base expression models a ~100% CTR device; scaled by ctr
-        cccs?.setExpr(this.ctr + "*max(0,min(.0001, select(i-.003, (-80000000000*(i)^5+800000000*(i)^4-3000000*(i)^3+5177.2*(i)^2+.2453*(i)-.00005)*1.04/700, (9000000*(i)^5-998113*(i)^4+42174*(i)^3-861.32*(i)^2+9.0836*(i)-.0078)*.945/700)))");
+        cccs?.setExpr(
+            this.ctr +
+                "*max(0,min(.0001, select(i-.003, (-80000000000*(i)^5+800000000*(i)^4-3000000*(i)^3+5177.2*(i)^2+.2453*(i)-.00005)*1.04/700, (9000000*(i)^5-998113*(i)^4+42174*(i)^3-861.32*(i)^2+9.0836*(i)-.0078)*.945/700)))",
+        );
 
         this.transistor.setBeta(700);
         this.curCounts = new Array(4).fill(0);
@@ -174,32 +175,41 @@ export class OptocouplerElm extends CompositeElm {
 
         this.setPin(0, x0, y0, 0, 1, -1, 0, 0, 0);
         this.setPin(1, x0, y0, 0, 1, -1, 0, 0, 0);
-        this.setPin(2, x0, y0, 0, 1,  1, 0, xs - this.cspc2, 0);
-        this.setPin(3, x0, y0, 0, 1,  1, 0, xs - this.cspc2, 0);
+        this.setPin(2, x0, y0, 0, 1, 1, 0, xs - this.cspc2, 0);
+        this.setPin(3, x0, y0, 0, 1, 1, 0, xs - this.cspc2, 0);
 
         const dflip = this.isFlippedX() ? -1 : 1;
-        this.diode.setPosition(this.posts[0].x + 32 * dflip, this.posts[0].y,
-                               this.posts[1].x + 32 * dflip, this.posts[1].y);
+        this.diode.setPosition(
+            this.posts[0].x + 32 * dflip,
+            this.posts[0].y,
+            this.posts[1].x + 32 * dflip,
+            this.posts[1].y,
+        );
         this.stubs[0] = this.diode.getPost(0);
         this.stubs[1] = this.diode.getPost(1);
 
         const midp = Math.trunc((this.posts[2].y + this.posts[3].y) / 2);
         this.transistor.setFlipped(this.isFlippedY());
-        this.transistor.setPosition(this.posts[2].x - 40 * dflip, midp,
-                                    this.posts[2].x - 24 * dflip, midp);
+        this.transistor.setPosition(this.posts[2].x - 40 * dflip, midp, this.posts[2].x - 24 * dflip, midp);
         this.stubs[2] = this.transistor.getPost(1);
         this.stubs[3] = this.transistor.getPost(2);
     }
 
-    isFlippedX(): boolean { return (this.flags & ChipElm.FLAG_FLIP_X) !== 0; }
-    isFlippedY(): boolean { return (this.flags & ChipElm.FLAG_FLIP_Y) !== 0; }
-    canFlipXY():  boolean { return false; }
+    isFlippedX(): boolean {
+        return (this.flags & ChipElm.FLAG_FLIP_X) !== 0;
+    }
+    isFlippedY(): boolean {
+        return (this.flags & ChipElm.FLAG_FLIP_Y) !== 0;
+    }
+    canFlipXY(): boolean {
+        return false;
+    }
 
     flipX(center2: number, count: number): void {
         this.flags ^= ChipElm.FLAG_FLIP_X;
         if (count !== 1) {
             const xs = 3 * this.cspc2;
-            this.x  = center2 - this.x - xs;
+            this.x = center2 - this.x - xs;
             this.x2 = center2 - this.x2;
         }
         this.setPoints();
@@ -209,37 +219,58 @@ export class OptocouplerElm extends CompositeElm {
         this.flags ^= ChipElm.FLAG_FLIP_Y;
         if (count !== 1) {
             const ys = 1 * this.cspc2;
-            this.y  = center2 - this.y - ys;
+            this.y = center2 - this.y - ys;
             this.y2 = center2 - this.y2;
         }
         this.setPoints();
     }
 
-    private setPin(n: number, px: number, py: number,
-                   ddx: number, ddy: number, dax: number, day: number,
-                   sx: number, sy: number): void {
+    private setPin(
+        n: number,
+        px: number,
+        py: number,
+        ddx: number,
+        ddy: number,
+        dax: number,
+        day: number,
+        sx: number,
+        sy: number,
+    ): void {
         const pos = n % 2;
-        if (this.isFlippedX()) { ddx = -ddx; dax = -dax; px += this.cspc2; sx = -sx; }
-        if (this.isFlippedY()) { ddy = -ddy; day = -day; py += this.cspc2; sy = -sy; }
+        if (this.isFlippedX()) {
+            ddx = -ddx;
+            dax = -dax;
+            px += this.cspc2;
+            sx = -sx;
+        }
+        if (this.isFlippedY()) {
+            ddy = -ddy;
+            day = -day;
+            py += this.cspc2;
+            sy = -sy;
+        }
         const xa = px + this.cspc2 * ddx * pos + sx;
         const ya = py + this.cspc2 * ddy * pos + sy;
         this.setPost(n, new Point(xa + dax * this.cspc2, ya + day * this.cspc2));
-        this.stubs[n]  = new Point(xa + dax * this.cspc,  ya + day * this.cspc);
+        this.stubs[n] = new Point(xa + dax * this.cspc, ya + day * this.cspc);
     }
 
-    getDumpType(): number { return 407; }
+    getDumpType(): number {
+        return 407;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "optocoupler";
         arr[1] = "CTR Scale = " + CircuitElm.showFormat.format(this.ctr);
-        arr[2] = "Iin = "  + CircuitElm.getCurrentText(this.getCurrentIntoNode(0));
+        arr[2] = "Iin = " + CircuitElm.getCurrentText(this.getCurrentIntoNode(0));
         arr[3] = "Iout = " + CircuitElm.getCurrentText(this.getCurrentIntoNode(2));
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("CTR Scale", this.ctr, 0, 0).setDimensionless();
+        if (n === 0) return new EditInfo("CTR Scale", this.ctr, 0, 0).setDimensionless();
         if (n === 1) {
             const ei = new EditInfo("LED Model", 0, -1, -1);
             this.models = DiodeModel.getModelList(false);
@@ -247,8 +278,7 @@ export class OptocouplerElm extends CompositeElm {
             for (let i = 0; i !== this.models.length; i++) {
                 const dm = this.models[i];
                 ei.choice.add(dm.getDescription());
-                if (dm === this.diode.model)
-                    ei.choice.select(i);
+                if (dm === this.diode.model) ei.choice.select(i);
             }
             return ei;
         }

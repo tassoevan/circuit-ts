@@ -33,7 +33,9 @@ export class PhaseCompElm extends ChipElm {
         }
     }
 
-    getChipName(): string { return "phase comparator"; }
+    getChipName(): string {
+        return "phase comparator";
+    }
 
     setupPins(): void {
         this.sizeX = 2;
@@ -45,7 +47,9 @@ export class PhaseCompElm extends ChipElm {
         this.pins[2].output = true;
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     stamp(): void {
         CircuitElm.sim.stampNonLinearVS(this.pins[2].voltSource!);
@@ -59,18 +63,15 @@ export class PhaseCompElm extends ChipElm {
     startIteration(): void {
         const v1 = this.nodes[0].v > this.getThreshold();
         const v2 = this.nodes[1].v > this.getThreshold();
-        if (v1 && !this.pins[0].value)
-            this.ff1 = true;
-        if (v2 && !this.pins[1].value)
-            this.ff2 = true;
-        if (this.ff1 && this.ff2)
-            this.ff1 = this.ff2 = false;
+        if (v1 && !this.pins[0].value) this.ff1 = true;
+        if (v2 && !this.pins[1].value) this.ff2 = true;
+        if (this.ff1 && this.ff2) this.ff1 = this.ff2 = false;
         this.pins[0].value = v1;
         this.pins[1].value = v2;
     }
 
     doStep(): void {
-        const out = (this.ff1) ? this.highVoltage : (this.ff2) ? 0 : -1;
+        const out = this.ff1 ? this.highVoltage : this.ff2 ? 0 : -1;
         if (out !== -1)
             CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[2], this.pins[2].voltSource, out);
         else {
@@ -79,9 +80,19 @@ export class PhaseCompElm extends ChipElm {
         }
     }
 
-    getPostCount(): number { return 3; }
-    getVoltageSourceCount(): number { return 1; }
-    showPropertiesOnCreate(): boolean { return false; }
-    getDumpType(): number { return 161; }
-    getMatrixConnection(n1: number, n2: number): boolean { return true; }
+    getPostCount(): number {
+        return 3;
+    }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
+    getDumpType(): number {
+        return 161;
+    }
+    getMatrixConnection(n1: number, n2: number): boolean {
+        return true;
+    }
 }

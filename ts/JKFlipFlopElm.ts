@@ -22,13 +22,19 @@ import { StringTokenizer } from "./StringTokenizer";
 import { EditInfo } from "./EditInfo";
 import { Checkbox } from "./Checkbox";
 export class JKFlipFlopElm extends ChipElm {
-    static readonly FLAG_RESET         = 2;
+    static readonly FLAG_RESET = 2;
     static readonly FLAG_POSITIVE_EDGE = 4;
-    static readonly FLAG_INVERT_RESET  = 8;
+    static readonly FLAG_INVERT_RESET = 8;
 
-    hasReset():           boolean { return (this.flags & JKFlipFlopElm.FLAG_RESET        ) !== 0; }
-    positiveEdgeTriggered(): boolean { return (this.flags & JKFlipFlopElm.FLAG_POSITIVE_EDGE) !== 0; }
-    invertReset():        boolean { return (this.flags & JKFlipFlopElm.FLAG_INVERT_RESET ) !== 0; }
+    hasReset(): boolean {
+        return (this.flags & JKFlipFlopElm.FLAG_RESET) !== 0;
+    }
+    positiveEdgeTriggered(): boolean {
+        return (this.flags & JKFlipFlopElm.FLAG_POSITIVE_EDGE) !== 0;
+    }
+    invertReset(): boolean {
+        return (this.flags & JKFlipFlopElm.FLAG_INVERT_RESET) !== 0;
+    }
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
@@ -41,7 +47,9 @@ export class JKFlipFlopElm extends ChipElm {
         }
     }
 
-    getChipName(): string { return "JK flip-flop"; }
+    getChipName(): string {
+        return "JK flip-flop";
+    }
 
     setupPins(): void {
         this.sizeX = 2;
@@ -49,13 +57,13 @@ export class JKFlipFlopElm extends ChipElm {
         this.pins = new Array(this.getPostCount());
         this.pins[0] = new Pin(this, 0, ChipElm.SIDE_W, "J");
         this.pins[1] = new Pin(this, 1, ChipElm.SIDE_W, "");
-        this.pins[1].clock  = true;
+        this.pins[1].clock = true;
         this.pins[1].bubble = !this.positiveEdgeTriggered();
         this.pins[2] = new Pin(this, 2, ChipElm.SIDE_W, "K");
         this.pins[3] = new Pin(this, 0, ChipElm.SIDE_E, "Q");
         this.pins[3].output = this.pins[3].state = true;
         this.pins[4] = new Pin(this, 2, ChipElm.SIDE_E, "Q");
-        this.pins[4].output   = true;
+        this.pins[4].output = true;
         this.pins[4].lineOver = true;
         if (this.hasReset()) {
             this.pins[5] = new Pin(this, 1, ChipElm.SIDE_E, "R");
@@ -63,41 +71,44 @@ export class JKFlipFlopElm extends ChipElm {
         }
     }
 
-    getPostCount():        number { return 5 + (this.hasReset() ? 1 : 0); }
-    getVoltageSourceCount(): number { return 2; }
+    getPostCount(): number {
+        return 5 + (this.hasReset() ? 1 : 0);
+    }
+    getVoltageSourceCount(): number {
+        return 2;
+    }
 
     execute(): void {
         const transition = this.positiveEdgeTriggered()
-            ?  this.pins[1].value && !this.lastClock
-            : !this.pins[1].value &&  this.lastClock;
+            ? this.pins[1].value && !this.lastClock
+            : !this.pins[1].value && this.lastClock;
 
         if (transition) {
             let q = this.pins[3].value;
             if (this.pins[0].value) {
                 if (this.pins[2].value) q = !q;
-                else                    q = true;
-            } else if (this.pins[2].value)
-                q = false;
+                else q = true;
+            } else if (this.pins[2].value) q = false;
             this.writeOutput(3, q);
         }
         this.lastClock = this.pins[1].value;
 
-        if (this.hasReset() && this.pins[5].value !== this.invertReset())
-            this.writeOutput(3, false);
+        if (this.hasReset() && this.pins[5].value !== this.invertReset()) this.writeOutput(3, false);
 
         this.writeOutput(4, !this.pins[3].value);
     }
 
-    getDumpType(): number { return 156; }
+    getDumpType(): number {
+        return 156;
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return EditInfo.createCheckbox("Reset Pin", this.hasReset());
-        if (n === 1)
-            return EditInfo.createCheckbox("Positive Edge Triggered", this.positiveEdgeTriggered());
-        if (n === 2)
-            return EditInfo.createCheckbox("Invert Reset", this.invertReset());
+        if (n === 0) return EditInfo.createCheckbox("Reset Pin", this.hasReset());
+        if (n === 1) return EditInfo.createCheckbox("Positive Edge Triggered", this.positiveEdgeTriggered());
+        if (n === 2) return EditInfo.createCheckbox("Invert Reset", this.invertReset());
         return super.getChipEditInfo(n);
     }
 

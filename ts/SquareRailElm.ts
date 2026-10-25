@@ -21,7 +21,13 @@ import { RailElm } from "./RailElm";
 import { VoltageElm } from "./VoltageElm";
 
 export class SquareRailElm extends RailElm {
-    constructor(xx: number, yy: number) { super(xx, yy, VoltageElm.WF_SQUARE); }
-    getDumpClass(): Function { return RailElm; }
-    getShortcut(): number { return 0; }
+    constructor(xx: number, yy: number) {
+        super(xx, yy, VoltageElm.WF_SQUARE);
+    }
+    getDumpClass(): Function {
+        return RailElm;
+    }
+    getShortcut(): number {
+        return 0;
+    }
 }

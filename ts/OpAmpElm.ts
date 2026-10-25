@@ -36,7 +36,7 @@ export class OpAmpElm extends CircuitElm {
     opaddtext: number;
     maxOut: number;
     minOut: number;
-    gain: number = 100000;  // (an old text-format op-amp with FLAG_GAIN but no gain value gets the default)
+    gain: number = 100000; // (an old text-format op-amp with FLAG_GAIN but no gain value gets the default)
     gbw: number;
     readonly FLAG_SWAP = 1;
     readonly FLAG_SMALL = 2;
@@ -79,12 +79,11 @@ export class OpAmpElm extends CircuitElm {
     }
 
     setGain(): void {
-        if ((this.flags & this.FLAG_GAIN) !== 0)
-            return;
+        if ((this.flags & this.FLAG_GAIN) !== 0) return;
 
         // gain of 100000 breaks e-amp-dfdx.txt
         // gain was 1000, but it broke amp-schmitt.txt
-        this.gain = ((this.flags & this.FLAG_LOWGAIN) !== 0) ? 1000 : 100000;
+        this.gain = (this.flags & this.FLAG_LOWGAIN) !== 0 ? 1000 : 100000;
     }
 
     dumpXml(doc: Document, elem: Element): void {
@@ -105,7 +104,9 @@ export class OpAmpElm extends CircuitElm {
         this.setSize((this.flags & this.FLAG_SMALL) !== 0 ? 1 : 2);
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.opheight * 2);
@@ -126,7 +127,9 @@ export class OpAmpElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    getPower(): number { return this.nodes[2].v * this.current; }
+    getPower(): number {
+        return this.nodes[2].v * this.current;
+    }
 
     in1p: Point[];
     in2p: Point[];
@@ -138,38 +141,40 @@ export class OpAmpElm extends CircuitElm {
         this.opsize = s;
         this.opheight = 8 * s;
         this.opwidth = 13 * s;
-        this.flags = (this.flags & ~this.FLAG_SMALL) | ((s === 1) ? this.FLAG_SMALL : 0);
+        this.flags = (this.flags & ~this.FLAG_SMALL) | (s === 1 ? this.FLAG_SMALL : 0);
     }
 
     setPoints(): void {
         super.setPoints();
-        if (this.dn > 150 && this.isCreating())
-            this.setSize(2);
+        if (this.dn > 150 && this.isCreating()) this.setSize(2);
         let ww = this.opwidth;
-        if (ww > this.dn / 2)
-            ww = Math.floor(this.dn / 2);
+        if (ww > this.dn / 2) ww = Math.floor(this.dn / 2);
         this.calcLeads(ww * 2);
         const hs = this.opheight * this.dsign;
-        const hsSwapped = ((this.flags & this.FLAG_SWAP) !== 0) ? -hs : hs;
+        const hsSwapped = (this.flags & this.FLAG_SWAP) !== 0 ? -hs : hs;
         this.in1p = this.newPointArray(2);
         this.in2p = this.newPointArray(2);
         this.textp = this.newPointArray(2);
-        this.interpPoint2(this.point1, this.point2, this.in1p[0],  this.in2p[0],  0, hsSwapped);
-        this.interpPoint2(this.lead1!, this.lead2!, this.in1p[1],  this.in2p[1],  0, hsSwapped);
-        this.interpPoint2(this.lead1!, this.lead2!, this.textp[0], this.textp[1], .2, hsSwapped);
+        this.interpPoint2(this.point1, this.point2, this.in1p[0], this.in2p[0], 0, hsSwapped);
+        this.interpPoint2(this.lead1!, this.lead2!, this.in1p[1], this.in2p[1], 0, hsSwapped);
+        this.interpPoint2(this.lead1!, this.lead2!, this.textp[0], this.textp[1], 0.2, hsSwapped);
         const tris = this.newPointArray(2);
         this.interpPoint2(this.lead1!, this.lead2!, tris[0], tris[1], 0, hsSwapped * 2);
         this.triangle = this.createPolygon(tris[0], tris[1], this.lead2!);
         this.plusFont = new Font("SansSerif", 0, this.opsize === 2 ? 14 : 10);
     }
 
-    getPostCount(): number { return 3; }
-
-    getPost(n: number): Point {
-        return (n === 0) ? this.in1p[0] : (n === 1) ? this.in2p[0] : this.point2;
+    getPostCount(): number {
+        return 3;
     }
 
-    getVoltageSourceCount(): number { return 1; }
+    getPost(n: number): Point {
+        return n === 0 ? this.in1p[0] : n === 1 ? this.in2p[0] : this.point2;
+    }
+
+    getVoltageSourceCount(): number {
+        return 1;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "op-amp";
@@ -180,8 +185,7 @@ export class OpAmpElm extends CircuitElm {
         const vo = Math.max(Math.min(this.nodes[2].v, this.maxOut), this.minOut);
         arr[3] = "Vout = " + CircuitElm.getVoltageText(vo);
         arr[4] = "Iout = " + CircuitElm.getCurrentText(-this.current);
-        arr[5] = "range = " + CircuitElm.getVoltageText(this.minOut) + " to " +
-            CircuitElm.getVoltageText(this.maxOut);
+        arr[5] = "range = " + CircuitElm.getVoltageText(this.minOut) + " to " + CircuitElm.getVoltageText(this.maxOut);
     }
 
     lastvd: number = 0;
@@ -196,10 +200,9 @@ export class OpAmpElm extends CircuitElm {
     doStep(): void {
         const vd = this.justLoaded ? this.savedVd : this.nodes[1].v - this.nodes[0].v;
         this.justLoaded = false;
-        const midpoint = (this.maxOut + this.minOut) * .5;
-        if (Math.abs(this.lastvd - vd) > .1)
-            CircuitElm.sim.converged = false;
-        else if (this.nodes[2].v > this.maxOut + .1 || this.nodes[2].v < this.minOut - .1)
+        const midpoint = (this.maxOut + this.minOut) * 0.5;
+        if (Math.abs(this.lastvd - vd) > 0.1) CircuitElm.sim.converged = false;
+        else if (this.nodes[2].v > this.maxOut + 0.1 || this.nodes[2].v < this.minOut - 0.1)
             CircuitElm.sim.converged = false;
         let x = 0;
         let dx = 0;
@@ -207,10 +210,10 @@ export class OpAmpElm extends CircuitElm {
         const minAdj = this.minOut - midpoint;
         if (vd >= maxAdj / this.gain && (this.lastvd >= 0 || CircuitElm.app.getrand(4) === 1)) {
             dx = 1e-4;
-            x = this.maxOut - dx * maxAdj / this.gain;
+            x = this.maxOut - (dx * maxAdj) / this.gain;
         } else if (vd <= minAdj / this.gain && (this.lastvd <= 0 || CircuitElm.app.getrand(4) === 1)) {
             dx = 1e-4;
-            x = this.minOut - dx * minAdj / this.gain;
+            x = this.minOut - (dx * minAdj) / this.gain;
         } else {
             dx = this.gain;
             x = midpoint;
@@ -228,50 +231,57 @@ export class OpAmpElm extends CircuitElm {
 
     // there is no current path through the op-amp inputs, but there
     // is an indirect path through the output to ground.
-    validate(): boolean { return this.validateRailNode(2); }
-    getConnection(n1: number, n2: number): boolean { return false; }
-    getMatrixConnection(n1: number, n2: number): boolean { return true; }
-    hasGroundConnection(n1: number): boolean { return (n1 === 2); }
-    getVoltageDiff(): number { return this.nodes[2].v - this.nodes[1].v; }
-    getDumpType(): number { return 'a'.charCodeAt(0); }
+    validate(): boolean {
+        return this.validateRailNode(2);
+    }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
+    getMatrixConnection(n1: number, n2: number): boolean {
+        return true;
+    }
+    hasGroundConnection(n1: number): boolean {
+        return n1 === 2;
+    }
+    getVoltageDiff(): number {
+        return this.nodes[2].v - this.nodes[1].v;
+    }
+    getDumpType(): number {
+        return "a".charCodeAt(0);
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Max Output (V)", this.maxOut, 1, 20);
-        if (n === 1)
-            return new EditInfo("Min Output (V)", this.minOut, -20, 0);
-        if (n === 2)
-            return new EditInfo("Gain", this.gain, 10, 1000000).setPositive();
+        if (n === 0) return new EditInfo("Max Output (V)", this.maxOut, 1, 20);
+        if (n === 1) return new EditInfo("Min Output (V)", this.minOut, -20, 0);
+        if (n === 2) return new EditInfo("Gain", this.gain, 10, 1000000).setPositive();
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.maxOut = ei.value;
-        if (n === 1)
-            this.minOut = ei.value;
-        if (n === 2)
-            this.gain = ei.value;
+        if (n === 0) this.maxOut = ei.value;
+        if (n === 1) this.minOut = ei.value;
+        if (n === 2) this.gain = ei.value;
     }
 
-    getShortcut(): number { return 'a'.charCodeAt(0); }
+    getShortcut(): number {
+        return "a".charCodeAt(0);
+    }
 
     getCurrentIntoNode(n: number): number {
-        if (n === 2)
-            return -this.current;
+        if (n === 2) return -this.current;
         return 0;
     }
 
     flipX(c2: number, count: number): void {
-        if (this.dx === 0)
-            this.flags ^= this.FLAG_SWAP;
+        if (this.dx === 0) this.flags ^= this.FLAG_SWAP;
         super.flipX(c2, count);
     }
 
     flipY(c2: number, count: number): void {
-        if (this.dy === 0)
-            this.flags ^= this.FLAG_SWAP;
+        if (this.dy === 0) this.flags ^= this.FLAG_SWAP;
         super.flipY(c2, count);
     }
 
@@ -280,5 +290,7 @@ export class OpAmpElm extends CircuitElm {
         super.flipXY(xmy, count);
     }
 
-    addRoutingObstacle(router: WireRouter): void { this.addRoutingObstacleWithLeads(router, this.opwidth); }
+    addRoutingObstacle(router: WireRouter): void {
+        this.addRoutingObstacleWithLeads(router, this.opwidth);
+    }
 }

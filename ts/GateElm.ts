@@ -31,19 +31,21 @@ import { CirSim } from "./CirSim";
 import { parseIntStrict, parseFloatStrict } from "./NumberParse";
 
 export abstract class GateElm extends CircuitElm {
-    static readonly FLAG_SMALL = 1<<0;
-    static readonly FLAG_SCHMITT = 1<<1;
-    static readonly FLAG_INVERT_INPUTS = 1<<2;
-    static readonly FLAG_DEMORGAN = 1<<3;
+    static readonly FLAG_SMALL = 1 << 0;
+    static readonly FLAG_SCHMITT = 1 << 1;
+    static readonly FLAG_INVERT_INPUTS = 1 << 2;
+    static readonly FLAG_DEMORGAN = 1 << 3;
     inputCount: number = 2;
     lastOutput: boolean = false;
     justLoaded: boolean = false;
     highVoltage: number;
     propagationDelay: number = 0; // seconds; 0 = instant (default)
-    delayEndTime: number = 0;     // time at which pending output change takes effect
+    delayEndTime: number = 0; // time at which pending output change takes effect
     static lastHighVoltage: number = 5;
     static lastSchmitt: boolean = false;
-    getDragLength(): number { return 96; }
+    getDragLength(): number {
+        return 96;
+    }
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
@@ -55,8 +57,7 @@ export abstract class GateElm extends CircuitElm {
             this.allocNodes();
             this.setupVolts();
             this.highVoltage = GateElm.lastHighVoltage;
-            if (GateElm.lastSchmitt)
-                this.flags |= GateElm.FLAG_SCHMITT;
+            if (GateElm.lastSchmitt) this.flags |= GateElm.FLAG_SCHMITT;
             this.setSize(this.useSmallGrid() ? 1 : 2);
         } else {
             super(xa, ya, xb, yb!, f!);
@@ -67,15 +68,19 @@ export abstract class GateElm extends CircuitElm {
             try {
                 this.highVoltage = parseFloatStrict(st!.nextToken());
             } catch (e) {}
-            this.lastOutput = lastOutputVoltage > this.highVoltage * .5;
+            this.lastOutput = lastOutputVoltage > this.highVoltage * 0.5;
             this.setSize((f! & GateElm.FLAG_SMALL) !== 0 ? 1 : 2);
             this.allocNodes();
             this.setupVolts();
         }
     }
 
-    isInverting(): boolean { return false; }
-    isXorGateElm(): boolean { return false; }
+    isInverting(): boolean {
+        return false;
+    }
+    isXorGateElm(): boolean {
+        return false;
+    }
 
     gsize: number = 0;
     gwidth: number = 0;
@@ -85,21 +90,18 @@ export abstract class GateElm extends CircuitElm {
 
     setSize(s: number): void {
         this.gsize = s;
-        this.gwidth = 7*s;
-        this.gwidth2 = 14*s;
-        this.gheight = 8*s;
+        this.gwidth = 7 * s;
+        this.gwidth2 = 14 * s;
+        this.gheight = 8 * s;
         this.flags &= ~GateElm.FLAG_SMALL;
-        this.flags |= (s === 1) ? GateElm.FLAG_SMALL : 0;
+        this.flags |= s === 1 ? GateElm.FLAG_SMALL : 0;
     }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
-        if (this.highVoltage !== 5)
-            CircuitXMLSerializer.dumpAttr(elem, "hi", this.highVoltage);
-        if (this.inputCount !== 2)
-            CircuitXMLSerializer.dumpAttr(elem, "in", this.inputCount);
-        if (this.propagationDelay !== 0)
-            CircuitXMLSerializer.dumpAttr(elem, "pd", this.propagationDelay);
+        if (this.highVoltage !== 5) CircuitXMLSerializer.dumpAttr(elem, "hi", this.highVoltage);
+        if (this.inputCount !== 2) CircuitXMLSerializer.dumpAttr(elem, "in", this.inputCount);
+        if (this.propagationDelay !== 0) CircuitXMLSerializer.dumpAttr(elem, "pd", this.propagationDelay);
     }
 
     dumpXmlState(doc: Document, elem: Element): void {
@@ -114,14 +116,13 @@ export abstract class GateElm extends CircuitElm {
         // zeroing flags here would wipe FLAG_SCHMITT/FLAG_INVERT_INPUTS/FLAG_SMALL instead
         // of restoring them.
         const stateRestore = xml.parseStringAttr("ix", null) != null;
-        if (!stateRestore)
-            this.flags = 0; // SMALL might have gotten set
+        if (!stateRestore) this.flags = 0; // SMALL might have gotten set
         super.undumpXml(xml);
         this.highVoltage = xml.parseDoubleAttr("hi", this.highVoltage);
         this.inputCount = xml.parseIntAttr("in", this.inputCount);
         this.propagationDelay = xml.parseDoubleAttr("pd", this.propagationDelay);
         const lastOutputVoltage = xml.parseDoubleAttr("o", 0);
-        this.lastOutput = lastOutputVoltage > this.highVoltage * .5;
+        this.lastOutput = lastOutputVoltage > this.highVoltage * 0.5;
         this.setSize((this.flags & GateElm.FLAG_SMALL) !== 0 ? 1 : 2);
         this.allocNodes();
         this.setupVolts();
@@ -135,13 +136,15 @@ export abstract class GateElm extends CircuitElm {
         router.addWire(this.lead2!.x, this.lead2!.y, this.point2.x, this.point2.y);
 
         const leadDist = CircuitElm.distance(this.lead1!, this.lead2!);
-        const hs2 = this.gwidth * (this.inputCount/2 + 1);
-        const pa = this.interpPoint(this.lead1!, this.lead2!, -8/leadDist, hs2) as Point;
+        const hs2 = this.gwidth * (this.inputCount / 2 + 1);
+        const pa = this.interpPoint(this.lead1!, this.lead2!, -8 / leadDist, hs2) as Point;
         const pb = this.interpPoint(this.lead1!, this.lead2!, 1, -hs2) as Point;
         router.addObstacle(pa.x, pa.y, pb.x, pb.y);
     }
 
-    getXmlDumpType(): string { return this.getClassName().replace("GateElm", ""); }
+    getXmlDumpType(): string {
+        return this.getClassName().replace("GateElm", "");
+    }
 
     inPosts: Point[];
     inGates: Point[];
@@ -151,31 +154,26 @@ export abstract class GateElm extends CircuitElm {
     setPoints(): void {
         super.setPoints();
         this.inputStates = new Array(this.inputCount).fill(false);
-        if (this.dn > 150 && this.isCreating())
-            this.setSize(2);
+        if (this.dn > 150 && this.isCreating()) this.setSize(2);
         const hs = this.gheight;
         this.ww = this.gwidth2;
-        if (this.ww > this.dn/2)
-            this.ww = Math.trunc(this.dn/2);
-        if (this.isInverting() && this.ww + 8 > this.dn/2)
-            this.ww = Math.trunc(this.dn/2 - 8);
-        this.calcLeads(this.ww*2);
+        if (this.ww > this.dn / 2) this.ww = Math.trunc(this.dn / 2);
+        if (this.isInverting() && this.ww + 8 > this.dn / 2) this.ww = Math.trunc(this.dn / 2 - 8);
+        this.calcLeads(this.ww * 2);
         this.inPosts = this.newPointArray(this.inputCount);
         this.inGates = this.newPointArray(this.inputCount);
-        let i0 = -Math.trunc(this.inputCount/2);
+        let i0 = -Math.trunc(this.inputCount / 2);
         if (this.hasFlag(GateElm.FLAG_INVERT_INPUTS) || this.hasFlag(GateElm.FLAG_DEMORGAN))
             this.icircles = this.newPointArray(this.inputCount);
-        else
-            this.icircles = null;
+        else this.icircles = null;
         // moved up from after the loop below -- backCurveX() (OR-shaped bodies
         // only) needs the current hs2, not last time's value
-        this.hs2 = this.gwidth * (Math.trunc(this.inputCount/2) + 1);
+        this.hs2 = this.gwidth * (Math.trunc(this.inputCount / 2) + 1);
         const andShaped = this.drawAsAndGate();
         for (let i = 0; i !== this.inputCount; i++, i0++) {
-            if (i0 === 0 && (this.inputCount & 1) === 0)
-                i0++;
+            if (i0 === 0 && (this.inputCount & 1) === 0) i0++;
             const adj = this.getLeadAdjustment(i);
-            this.interpPoint(this.point1, this.point2, this.inPosts[i], 0, hs*i0);
+            this.interpPoint(this.point1, this.point2, this.inPosts[i], 0, hs * i0);
             // bx = true x-offset (from lead1) of the body's back surface at this
             // input's height: always 0 for AND (flat back), or the concave back
             // curve's real position for OR (see backCurveX) -- a flat fraction-0
@@ -184,16 +182,14 @@ export abstract class GateElm extends CircuitElm {
             // flat-back lead always reaches exactly fraction 0. A bubble sits
             // back from bx using the exact same clearance the original AND
             // bubble already used (-4 bubble-center, -8 wire-end).
-            const bx = andShaped ? 0 : GateElm.backCurveX(hs*i0, this.hs2, this.ww*2.);
+            const bx = andShaped ? 0 : GateElm.backCurveX(hs * i0, this.hs2, this.ww * 2);
             const inGateOff = this.icircles !== null ? bx - 8 : bx;
-            this.interpPoint(this.lead1!, this.lead2!, this.inGates[i],
-                inGateOff/(this.ww*2.) + adj, hs*i0);
+            this.interpPoint(this.lead1!, this.lead2!, this.inGates[i], inGateOff / (this.ww * 2) + adj, hs * i0);
             if (this.icircles !== null)
-                this.interpPoint(this.lead1!, this.lead2!, this.icircles[i], (bx-4)/(this.ww*2.), hs*i0);
+                this.interpPoint(this.lead1!, this.lead2!, this.icircles[i], (bx - 4) / (this.ww * 2), hs * i0);
         }
         this.setBbox(this.point1, this.point2, this.hs2);
-        if (this.hasSchmittInputs())
-            this.schmittPoly = this.getSchmittPolygon(this.gsize, .47);
+        if (this.hasSchmittInputs()) this.schmittPoly = this.getSchmittPolygon(this.gsize, 0.47);
 
         if (GateElm.useEuroGates()) {
             this.createEuroGatePolygon();
@@ -205,7 +201,7 @@ export abstract class GateElm extends CircuitElm {
 
             if (this.drawAsAndGate()) {
                 this.interpPoint2(this.lead1!, this.lead2!, triPoints[0], triPoints[6], 0, this.hs2);
-                this.interpPoint2(this.lead1!, this.lead2!, triPoints[1], triPoints[5], .5, this.hs2);
+                this.interpPoint2(this.lead1!, this.lead2!, triPoints[1], triPoints[5], 0.5, this.hs2);
                 this.interpPoint2(this.lead1!, this.lead2!, triPoints[2], triPoints[4], 1, this.hs2);
                 this.interpPoint(this.lead1!, this.lead2!, triPoints[3], 1);
             } else {
@@ -217,22 +213,22 @@ export abstract class GateElm extends CircuitElm {
                 // ~11% of h; these get both curves down to ~2.4% of h,
                 // matching the AND gate's fidelity.
                 this.interpPoint2(this.lead1!, this.lead2!, triPoints[0], triPoints[6], 0, this.hs2);
-                this.interpPoint2(this.lead1!, this.lead2!, triPoints[1], triPoints[5], .134, this.hs2);
+                this.interpPoint2(this.lead1!, this.lead2!, triPoints[1], triPoints[5], 0.134, this.hs2);
                 triPoints[3] = this.lead2!;
-                this.interpPoint2(this.lead1!, this.lead2!, triPoints[2], triPoints[4], .664, this.hs2*.8372);
+                this.interpPoint2(this.lead1!, this.lead2!, triPoints[2], triPoints[4], 0.664, this.hs2 * 0.8372);
                 this.interpPoint(this.lead1!, this.lead2!, triPoints[7], GateElm.orBackCtrlFrac); // was .105 (originally .15)
             }
             if (this.isXorGateElm()) {
-                const ww2 = (this.ww === 0) ? this.dn*2 : this.ww*2;
-                this.interpPoint2(this.lead1!, this.lead2!, triPoints[8], triPoints[9], -.05-8/ww2, this.hs2);
-                this.interpPoint(this.lead1!, this.lead2!, triPoints[10], .1-8/ww2);
+                const ww2 = this.ww === 0 ? this.dn * 2 : this.ww * 2;
+                this.interpPoint2(this.lead1!, this.lead2!, triPoints[8], triPoints[9], -0.05 - 8 / ww2, this.hs2);
+                this.interpPoint(this.lead1!, this.lead2!, triPoints[10], 0.1 - 8 / ww2);
             }
             this.gatePoly = this.createPolygon(triPoints);
         }
 
         if (this.isInverting() !== this.hasFlag(GateElm.FLAG_DEMORGAN)) {
-            this.pcircle = this.interpPoint(this.point1, this.point2, .5+(this.ww+4)/this.dn) as Point;
-            this.lead2 = this.interpPoint(this.point1, this.point2, .5+(this.ww+8)/this.dn);
+            this.pcircle = this.interpPoint(this.point1, this.point2, 0.5 + (this.ww + 4) / this.dn) as Point;
+            this.lead2 = this.interpPoint(this.point1, this.point2, 0.5 + (this.ww + 8) / this.dn);
         }
     }
 
@@ -240,18 +236,20 @@ export abstract class GateElm extends CircuitElm {
         this.justLoaded = true;
     }
 
-    getLeadAdjustment(ix: number): number { return 0; }
+    getLeadAdjustment(ix: number): number {
+        return 0;
+    }
 
     // Back-control fraction for the OR gate's concave back curve (the
     // triPoints[6]->[7]->[0] bezierCurveTo built in setPoints() / drawn in
     // drawGatePolygon()) -- named so backCurveX() below always matches
     // whatever the body curve actually draws.
-    static readonly orBackCtrlFrac = .195;
+    static readonly orBackCtrlFrac = 0.195;
 
     // Real (signed) cube root. Math.pow of a negative base to a non-integer
     // exponent is NaN, so we do the sign handling ourselves.
     static cbrt(x: number): number {
-        return (x < 0) ? -Math.pow(-x, 1./3.) : Math.pow(x, 1./3.);
+        return x < 0 ? -Math.pow(-x, 1 / 3) : Math.pow(x, 1 / 3);
     }
 
     // True x-offset (from lead1, same units as ww/len) of the OR gate's
@@ -264,11 +262,11 @@ export abstract class GateElm extends CircuitElm {
     // y(t) is monotonic in t over [0,1], so there's always exactly one real
     // solution.
     static backCurveX(target: number, hs2: number, len: number): number {
-        const k = target/hs2;
-        const disc = Math.sqrt(4*k*k+1);
-        const s = GateElm.cbrt(2*k+disc) + GateElm.cbrt(2*k-disc);
-        const t = (s+1)/2;
-        return 3*t*(1-t)*GateElm.orBackCtrlFrac*len;
+        const k = target / hs2;
+        const disc = Math.sqrt(4 * k * k + 1);
+        const s = GateElm.cbrt(2 * k + disc) + GateElm.cbrt(2 * k - disc);
+        const t = (s + 1) / 2;
+        return 3 * t * (1 - t) * GateElm.orBackCtrlFrac * len;
     }
 
     createEuroGatePolygon(): void {
@@ -278,8 +276,12 @@ export abstract class GateElm extends CircuitElm {
         this.gatePoly = this.createPolygon(pts);
     }
 
-    getGateText(): string | null { return null; }
-    static useEuroGates(): boolean { return CircuitElm.app.menus.euroGatesCheckItem.getState(); }
+    getGateText(): string | null {
+        return null;
+    }
+    static useEuroGates(): boolean {
+        return CircuitElm.app.menus.euroGatesCheckItem.getState();
+    }
 
     drawGatePolygon(g: Graphics): void {
         g.setLineWidth(3.0);
@@ -288,39 +290,63 @@ export abstract class GateElm extends CircuitElm {
             g.context.moveTo(this.gatePoly.xpoints[0], this.gatePoly.ypoints[0]);
             g.context.lineTo(this.gatePoly.xpoints[1], this.gatePoly.ypoints[1]);
             g.context.bezierCurveTo(
-                this.gatePoly.xpoints[1], this.gatePoly.ypoints[1],
-                this.gatePoly.xpoints[2], this.gatePoly.ypoints[2],
-                this.gatePoly.xpoints[3], this.gatePoly.ypoints[3]);
+                this.gatePoly.xpoints[1],
+                this.gatePoly.ypoints[1],
+                this.gatePoly.xpoints[2],
+                this.gatePoly.ypoints[2],
+                this.gatePoly.xpoints[3],
+                this.gatePoly.ypoints[3],
+            );
             g.context.bezierCurveTo(
-                this.gatePoly.xpoints[3], this.gatePoly.ypoints[3],
-                this.gatePoly.xpoints[4], this.gatePoly.ypoints[4],
-                this.gatePoly.xpoints[5], this.gatePoly.ypoints[5]);
+                this.gatePoly.xpoints[3],
+                this.gatePoly.ypoints[3],
+                this.gatePoly.xpoints[4],
+                this.gatePoly.ypoints[4],
+                this.gatePoly.xpoints[5],
+                this.gatePoly.ypoints[5],
+            );
             g.context.lineTo(this.gatePoly.xpoints[6], this.gatePoly.ypoints[6]);
         } else {
             g.context.moveTo(this.gatePoly.xpoints[0], this.gatePoly.ypoints[0]);
             g.context.lineTo(this.gatePoly.xpoints[1], this.gatePoly.ypoints[1]);
             g.context.bezierCurveTo(
-                this.gatePoly.xpoints[2], this.gatePoly.ypoints[2],
-                this.gatePoly.xpoints[2], this.gatePoly.ypoints[2],
-                this.gatePoly.xpoints[3], this.gatePoly.ypoints[3]);
+                this.gatePoly.xpoints[2],
+                this.gatePoly.ypoints[2],
+                this.gatePoly.xpoints[2],
+                this.gatePoly.ypoints[2],
+                this.gatePoly.xpoints[3],
+                this.gatePoly.ypoints[3],
+            );
             g.context.bezierCurveTo(
-                this.gatePoly.xpoints[4], this.gatePoly.ypoints[4],
-                this.gatePoly.xpoints[4], this.gatePoly.ypoints[4],
-                this.gatePoly.xpoints[5], this.gatePoly.ypoints[5]);
+                this.gatePoly.xpoints[4],
+                this.gatePoly.ypoints[4],
+                this.gatePoly.xpoints[4],
+                this.gatePoly.ypoints[4],
+                this.gatePoly.xpoints[5],
+                this.gatePoly.ypoints[5],
+            );
             g.context.lineTo(this.gatePoly.xpoints[6], this.gatePoly.ypoints[6]);
             g.context.bezierCurveTo(
-                this.gatePoly.xpoints[7], this.gatePoly.ypoints[7],
-                this.gatePoly.xpoints[7], this.gatePoly.ypoints[7],
-                this.gatePoly.xpoints[0], this.gatePoly.ypoints[0]);
+                this.gatePoly.xpoints[7],
+                this.gatePoly.ypoints[7],
+                this.gatePoly.xpoints[7],
+                this.gatePoly.ypoints[7],
+                this.gatePoly.xpoints[0],
+                this.gatePoly.ypoints[0],
+            );
         }
         g.context.closePath();
 
         if (this.isXorGateElm()) {
             g.context.moveTo(this.gatePoly.xpoints[8], this.gatePoly.ypoints[8]);
             g.context.bezierCurveTo(
-                this.gatePoly.xpoints[10], this.gatePoly.ypoints[10],
-                this.gatePoly.xpoints[10], this.gatePoly.ypoints[10],
-                this.gatePoly.xpoints[9], this.gatePoly.ypoints[9]);
+                this.gatePoly.xpoints[10],
+                this.gatePoly.ypoints[10],
+                this.gatePoly.xpoints[10],
+                this.gatePoly.ypoints[10],
+                this.gatePoly.xpoints[9],
+                this.gatePoly.ypoints[9],
+            );
         }
 
         g.context.stroke();
@@ -337,17 +363,15 @@ export abstract class GateElm extends CircuitElm {
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.lightGrayColor);
         if (GateElm.useEuroGates()) {
             CircuitElm.drawThickPolygon(g, this.gatePoly);
-            const center = this.interpPoint(this.point1, this.point2, .5) as Point;
-            this.drawCenteredText(g, this.getGateText()!, center.x, center.y - 6*this.gsize, true);
-        } else
-            this.drawGatePolygon(g);
+            const center = this.interpPoint(this.point1, this.point2, 0.5) as Point;
+            this.drawCenteredText(g, this.getGateText()!, center.x, center.y - 6 * this.gsize, true);
+        } else this.drawGatePolygon(g);
         g.setLineWidth(2);
-        if (this.hasSchmittInputs())
-            CircuitElm.drawPolygon(g, this.schmittPoly);
+        if (this.hasSchmittInputs()) CircuitElm.drawPolygon(g, this.schmittPoly);
         g.setLineWidth(1);
         if (this.linePoints !== null)
             for (let i = 0; i !== this.linePoints!.length - 1; i++)
-                CircuitElm.drawThickLine(g, this.linePoints![i], this.linePoints![i+1]);
+                CircuitElm.drawThickLine(g, this.linePoints![i], this.linePoints![i + 1]);
         if (this.pcircle !== null && this.isInverting() !== this.hasFlag(GateElm.FLAG_DEMORGAN))
             CircuitElm.drawThickCircle(g, this.pcircle.x, this.pcircle.y, 3);
         if (this.icircles !== null)
@@ -364,13 +388,16 @@ export abstract class GateElm extends CircuitElm {
     linePoints: Point[] | null = null;
     icircles: Point[] | null = null;
 
-    getPostCount(): number { return this.inputCount + 1; }
+    getPostCount(): number {
+        return this.inputCount + 1;
+    }
     getPost(n: number): Point | null {
-        if (n === this.inputCount)
-            return this.point2;
+        if (n === this.inputCount) return this.point2;
         return this.inPosts[n];
     }
-    getVoltageSourceCount(): number { return 1; }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
 
     abstract getGateName(): string;
     abstract calcFunction(): boolean;
@@ -380,27 +407,29 @@ export abstract class GateElm extends CircuitElm {
         arr[0] = this.getGateName();
         arr[1] = "Vout = " + CircuitElm.getVoltageText(this.nodes[this.inputCount].v);
         arr[2] = "Iout = " + CircuitElm.getCurrentText(this.getCurrent());
-        if (this.propagationDelay > 0)
-            arr[3] = "delay = " + CircuitElm.getUnitText(this.propagationDelay, "s");
+        if (this.propagationDelay > 0) arr[3] = "delay = " + CircuitElm.getUnitText(this.propagationDelay, "s");
     }
 
-    setHighVoltage(hv: number): void { this.highVoltage = hv; }
+    setHighVoltage(hv: number): void {
+        this.highVoltage = hv;
+    }
 
     stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[this.inputCount], this.voltSource);
     }
 
-    hasSchmittInputs(): boolean { return (this.flags & GateElm.FLAG_SCHMITT) !== 0; }
+    hasSchmittInputs(): boolean {
+        return (this.flags & GateElm.FLAG_SCHMITT) !== 0;
+    }
 
     getInput(x: number): boolean {
         const high = !this.hasFlag(GateElm.FLAG_INVERT_INPUTS);
-        if (!this.hasSchmittInputs())
-            return (this.nodes[x].v > this.highVoltage * .5) ? high : !high;
+        if (!this.hasSchmittInputs()) return this.nodes[x].v > this.highVoltage * 0.5 ? high : !high;
         // inputStates is normally allocated in setPoints(), but elements inside a
         // CompositeElm/subcircuit never get setPoints() called, so allocate lazily here too.
         if (this.inputStates == null || this.inputStates.length !== this.inputCount)
             this.inputStates = new Array(this.inputCount).fill(false);
-        const res = this.nodes[x].v > this.highVoltage * (this.inputStates[x] ? .35 : .55);
+        const res = this.nodes[x].v > this.highVoltage * (this.inputStates[x] ? 0.35 : 0.55);
         this.inputStates[x] = res;
         return res ? high : !high;
     }
@@ -411,14 +440,17 @@ export abstract class GateElm extends CircuitElm {
     doStep(): void {
         if (this.justLoaded) {
             this.justLoaded = false;
-            CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[this.inputCount], this.voltSource,
-                this.lastOutput ? this.highVoltage : 0);
+            CircuitElm.sim.updateVoltageSource(
+                CircuitNode.ground,
+                this.nodes[this.inputCount],
+                this.voltSource,
+                this.lastOutput ? this.highVoltage : 0,
+            );
             return;
         }
 
         let f = this.calcFunction();
-        if (this.isInverting())
-            f = !f;
+        if (this.isInverting()) f = !f;
 
         if (this.propagationDelay === 0 && this.lastTime !== CircuitElm.sim.t) {
             // detect oscillation (using same strategy as Atanua)
@@ -426,11 +458,9 @@ export abstract class GateElm extends CircuitElm {
                 if (this.oscillationCount++ > 50) {
                     // output is oscillating too much, randomly leave output the same
                     this.oscillationCount = 0;
-                    if (CircuitElm.app.getrand(10) > 5)
-                        f = this.lastOutput;
+                    if (CircuitElm.app.getrand(10) > 5) f = this.lastOutput;
                 }
-            } else
-                this.oscillationCount = 0;
+            } else this.oscillationCount = 0;
 
             this.lastTime = CircuitElm.sim.t;
         }
@@ -459,20 +489,16 @@ export abstract class GateElm extends CircuitElm {
         CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[this.inputCount], this.voltSource, res);
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Inputs", this.inputCount, 1, 8).setDimensionless();
-        if (n === 1)
-            return new EditInfo("High Logic Voltage", this.highVoltage, 1, 10).setUnitStep();
-        if (n === 2)
-            return EditInfo.createCheckbox("Schmitt Inputs", this.hasSchmittInputs());
-        if (n === 3)
-            return EditInfo.createCheckbox("Invert Inputs", this.hasFlag(GateElm.FLAG_INVERT_INPUTS));
-        if (n === 4)
-            return new EditInfo("Propagation Delay (s)", this.propagationDelay, 0, 0);
-        if (n === 5)
-            return EditInfo.createCheckbox("DeMorgan's Symbol", this.hasFlag(GateElm.FLAG_DEMORGAN));
+        if (n === 0) return new EditInfo("# of Inputs", this.inputCount, 1, 8).setDimensionless();
+        if (n === 1) return new EditInfo("High Logic Voltage", this.highVoltage, 1, 10).setUnitStep();
+        if (n === 2) return EditInfo.createCheckbox("Schmitt Inputs", this.hasSchmittInputs());
+        if (n === 3) return EditInfo.createCheckbox("Invert Inputs", this.hasFlag(GateElm.FLAG_INVERT_INPUTS));
+        if (n === 4) return new EditInfo("Propagation Delay (s)", this.propagationDelay, 0, 0);
+        if (n === 5) return EditInfo.createCheckbox("DeMorgan's Symbol", this.hasFlag(GateElm.FLAG_DEMORGAN));
         return null;
     }
 
@@ -483,16 +509,12 @@ export abstract class GateElm extends CircuitElm {
                 this.allocNodes();
                 this.setupVolts();
                 this.setPoints();
-            } else
-                ei.setError("must be >= 1");
+            } else ei.setError("must be >= 1");
         }
-        if (n === 1)
-            this.highVoltage = GateElm.lastHighVoltage = ei.value;
+        if (n === 1) this.highVoltage = GateElm.lastHighVoltage = ei.value;
         if (n === 2) {
-            if (ei.checkbox.getState())
-                this.flags |= GateElm.FLAG_SCHMITT;
-            else
-                this.flags &= ~GateElm.FLAG_SCHMITT;
+            if (ei.checkbox.getState()) this.flags |= GateElm.FLAG_SCHMITT;
+            else this.flags &= ~GateElm.FLAG_SCHMITT;
             GateElm.lastSchmitt = this.hasSchmittInputs();
             this.setPoints();
         }
@@ -501,33 +523,33 @@ export abstract class GateElm extends CircuitElm {
             if (ei.checkbox!.getState()) {
                 this.flags |= GateElm.FLAG_INVERT_INPUTS;
                 this.flags &= ~GateElm.FLAG_DEMORGAN;
-            } else
-                this.flags &= ~GateElm.FLAG_INVERT_INPUTS;
+            } else this.flags &= ~GateElm.FLAG_INVERT_INPUTS;
             this.setPoints();
-            if (CirSim.editDialog != null)
-                CirSim.editDialog.resetDialog();
+            if (CirSim.editDialog != null) CirSim.editDialog.resetDialog();
         }
-        if (n === 4)
-            this.propagationDelay = ei.value;
+        if (n === 4) this.propagationDelay = ei.value;
         if (n === 5) {
             if (ei.checkbox!.getState()) {
                 this.flags |= GateElm.FLAG_DEMORGAN;
                 this.flags &= ~GateElm.FLAG_INVERT_INPUTS;
-            } else
-                this.flags &= ~GateElm.FLAG_DEMORGAN;
+            } else this.flags &= ~GateElm.FLAG_DEMORGAN;
             this.setPoints();
-            if (CirSim.editDialog != null)
-                CirSim.editDialog.resetDialog();
+            if (CirSim.editDialog != null) CirSim.editDialog.resetDialog();
         }
     }
 
-    validate(): boolean { return this.validateRailNode(this.inputCount); }
-    getConnection(n1: number, n2: number): boolean { return false; }
-    hasGroundConnection(n1: number): boolean { return (n1 === this.inputCount); }
+    validate(): boolean {
+        return this.validateRailNode(this.inputCount);
+    }
+    getConnection(n1: number, n2: number): boolean {
+        return false;
+    }
+    hasGroundConnection(n1: number): boolean {
+        return n1 === this.inputCount;
+    }
 
     getCurrentIntoNode(n: number): number {
-        if (n === this.inputCount)
-            return this.current;
+        if (n === this.inputCount) return this.current;
         return 0;
     }
 }
@@ -540,24 +562,30 @@ export class AndGateElm extends GateElm {
         else super(xa, ya, xb, yb!, f!, st!);
     }
 
-    getGateText(): string { return "&"; }
+    getGateText(): string {
+        return "&";
+    }
 
     getGateName(): string {
-        if (this.hasFlag(GateElm.FLAG_INVERT_INPUTS))
-            return "NOR gate";
+        if (this.hasFlag(GateElm.FLAG_INVERT_INPUTS)) return "NOR gate";
         return "AND gate";
     }
     calcFunction(): boolean {
         let f = true;
-        for (let i = 0; i !== this.inputCount; i++)
-            f = f && this.getInput(i);
+        for (let i = 0; i !== this.inputCount; i++) f = f && this.getInput(i);
         return f;
     }
-    getDumpType(): number { return 150; }
-    getShortcut(): number { return '2'.charCodeAt(0); }
+    getDumpType(): number {
+        return 150;
+    }
+    getShortcut(): number {
+        return "2".charCodeAt(0);
+    }
     // false = drawn as OR, true = drawn as AND; FLAG_DEMORGAN and FLAG_INVERT_INPUTS
     // cannot be set at the same time from the Edit popup
-    drawAsAndGate(): boolean { return !this.hasFlag(GateElm.FLAG_DEMORGAN); }
+    drawAsAndGate(): boolean {
+        return !this.hasFlag(GateElm.FLAG_DEMORGAN);
+    }
 }
 
 export class NandGateElm extends AndGateElm {
@@ -567,15 +595,22 @@ export class NandGateElm extends AndGateElm {
         if (xb === undefined) super(xa, ya);
         else super(xa, ya, xb, yb!, f!, st!);
     }
-    isInverting(): boolean { return true; }
+    isInverting(): boolean {
+        return true;
+    }
     getGateName(): string {
-        if (this.hasFlag(GateElm.FLAG_INVERT_INPUTS))
-            return "OR gate";
+        if (this.hasFlag(GateElm.FLAG_INVERT_INPUTS)) return "OR gate";
         return "NAND gate";
     }
-    getDumpType(): number { return 151; }
-    getShortcut(): number { return '@'.charCodeAt(0); }
-    drawAsAndGate(): boolean { return !this.hasFlag(GateElm.FLAG_DEMORGAN); }
+    getDumpType(): number {
+        return 151;
+    }
+    getShortcut(): number {
+        return "@".charCodeAt(0);
+    }
+    drawAsAndGate(): boolean {
+        return !this.hasFlag(GateElm.FLAG_DEMORGAN);
+    }
 }
 
 export class OrGateElm extends GateElm {
@@ -587,8 +622,7 @@ export class OrGateElm extends GateElm {
     }
 
     getGateName(): string {
-        if (this.hasFlag(GateElm.FLAG_INVERT_INPUTS))
-            return "NAND gate";
+        if (this.hasFlag(GateElm.FLAG_INVERT_INPUTS)) return "NAND gate";
         return "OR gate";
     }
 
@@ -604,19 +638,26 @@ export class OrGateElm extends GateElm {
     // redundant on top of it, so it's removed rather than patched to also
     // move the bubble -- large gates now touch flush, same as small ones.
 
-    getGateText(): string { return "≥1"; }
+    getGateText(): string {
+        return "≥1";
+    }
 
     calcFunction(): boolean {
         let f = false;
-        for (let i = 0; i !== this.inputCount; i++)
-            f = f || this.getInput(i);
+        for (let i = 0; i !== this.inputCount; i++) f = f || this.getInput(i);
         return f;
     }
-    getDumpType(): number { return 152; }
-    getShortcut(): number { return '3'.charCodeAt(0); }
+    getDumpType(): number {
+        return 152;
+    }
+    getShortcut(): number {
+        return "3".charCodeAt(0);
+    }
     // false = drawn as OR, true = drawn as AND; FLAG_DEMORGAN and FLAG_INVERT_INPUTS
     // cannot be set at the same time from the Edit popup
-    drawAsAndGate(): boolean { return this.hasFlag(GateElm.FLAG_DEMORGAN); }
+    drawAsAndGate(): boolean {
+        return this.hasFlag(GateElm.FLAG_DEMORGAN);
+    }
 }
 
 export class NorGateElm extends OrGateElm {
@@ -627,14 +668,21 @@ export class NorGateElm extends OrGateElm {
         else super(xa, ya, xb, yb!, f!, st!);
     }
     getGateName(): string {
-        if (this.hasFlag(GateElm.FLAG_INVERT_INPUTS))
-            return "AND gate";
+        if (this.hasFlag(GateElm.FLAG_INVERT_INPUTS)) return "AND gate";
         return "NOR gate";
     }
-    isInverting(): boolean { return true; }
-    getDumpType(): number { return 153; }
-    getShortcut(): number { return '#'.charCodeAt(0); }
-    drawAsAndGate(): boolean { return this.hasFlag(GateElm.FLAG_DEMORGAN); }
+    isInverting(): boolean {
+        return true;
+    }
+    getDumpType(): number {
+        return 153;
+    }
+    getShortcut(): number {
+        return "#".charCodeAt(0);
+    }
+    drawAsAndGate(): boolean {
+        return this.hasFlag(GateElm.FLAG_DEMORGAN);
+    }
 }
 
 export class XorGateElm extends OrGateElm {
@@ -644,13 +692,18 @@ export class XorGateElm extends OrGateElm {
         if (xb === undefined) super(xa, ya);
         else super(xa, ya, xb, yb!, f!, st!);
     }
-    getGateName(): string { return "XOR gate"; }
-    getGateText(): string { return "=1"; }
-    isXorGateElm(): boolean { return true; }
+    getGateName(): string {
+        return "XOR gate";
+    }
+    getGateText(): string {
+        return "=1";
+    }
+    isXorGateElm(): boolean {
+        return true;
+    }
     calcFunction(): boolean {
         let f = false;
-        for (let i = 0; i !== this.inputCount; i++)
-            f = f !== this.getInput(i);
+        for (let i = 0; i !== this.inputCount; i++) f = f !== this.getInput(i);
         return f;
     }
     // skip "Invert Inputs" (index 3 in GateElm); shift higher indices down
@@ -662,9 +715,15 @@ export class XorGateElm extends OrGateElm {
         if (n >= 3) super.setEditValue(n + 1, ei);
         else super.setEditValue(n, ei);
     }
-    getDumpType(): number { return 154; }
-    getShortcut(): number { return '4'.charCodeAt(0); }
-    drawAsAndGate(): boolean { return false; }
+    getDumpType(): number {
+        return 154;
+    }
+    getShortcut(): number {
+        return "4".charCodeAt(0);
+    }
+    drawAsAndGate(): boolean {
+        return false;
+    }
 }
 
 export class XnorGateElm extends XorGateElm {
@@ -674,9 +733,19 @@ export class XnorGateElm extends XorGateElm {
         if (xb === undefined) super(xa, ya);
         else super(xa, ya, xb, yb!, f!, st!);
     }
-    getGateName(): string { return "XNOR gate"; }
-    isInverting(): boolean { return true; }
-    getDumpType(): number { return 431; }
-    getShortcut(): number { return '$'.charCodeAt(0); }
-    drawAsAndGate(): boolean { return false; }
+    getGateName(): string {
+        return "XNOR gate";
+    }
+    isInverting(): boolean {
+        return true;
+    }
+    getDumpType(): number {
+        return 431;
+    }
+    getShortcut(): number {
+        return "$".charCodeAt(0);
+    }
+    drawAsAndGate(): boolean {
+        return false;
+    }
 }

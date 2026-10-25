@@ -68,20 +68,20 @@ export class Graphics {
     }
 
     fillRect(x: number, y: number, width: number, height: number): void {
-      //  context.beginPath();
+        //  context.beginPath();
         this.context.fillRect(x, y, width, height);
-      //  context.closePath();
+        //  context.closePath();
     }
 
     drawRect(x: number, y: number, width: number, height: number): void {
-      //  context.beginPath();
+        //  context.beginPath();
         this.context.strokeRect(x, y, width, height);
-      //  context.closePath();
+        //  context.closePath();
     }
 
     fillOval(x: number, y: number, width: number, height: number): void {
         this.context.beginPath();
-        this.context.arc(x + width/2, y + width/2, width/2, 0, 2.0*3.14159);
+        this.context.arc(x + width / 2, y + width / 2, width / 2, 0, 2.0 * 3.14159);
         this.context.closePath();
         this.context.fill();
     }
@@ -109,17 +109,15 @@ export class Graphics {
             this.context.moveTo(x1 as number, y1 as number);
             this.context.lineTo(x2!, y2!);
             this.context.stroke();
-        //    context.closePath();
+            //    context.closePath();
         }
     }
 
     drawPolyline(xpoints: number[], ypoints: number[], n: number): void {
         this.context.beginPath();
         for (let i = 0; i < n; i++) {
-            if (i === 0)
-                this.context.moveTo(xpoints[i], ypoints[i]);
-            else
-                this.context.lineTo(xpoints[i], ypoints[i]);
+            if (i === 0) this.context.moveTo(xpoints[i], ypoints[i]);
+            else this.context.lineTo(xpoints[i], ypoints[i]);
         }
         this.context.closePath();
         this.context.stroke();
@@ -128,10 +126,8 @@ export class Graphics {
     fillPolygon(p: Polygon): void {
         this.context.beginPath();
         for (let i = 0; i < p.npoints; i++) {
-            if (i === 0)
-                this.context.moveTo(p.xpoints[i], p.ypoints[i]);
-            else
-                this.context.lineTo(p.xpoints[i], p.ypoints[i]);
+            if (i === 0) this.context.moveTo(p.xpoints[i], p.ypoints[i]);
+            else this.context.lineTo(p.xpoints[i], p.ypoints[i]);
         }
         this.context.closePath();
         this.context.fill();
@@ -144,10 +140,10 @@ export class Graphics {
         }
     }
 
-//  getFont(): Font {
-//      // this may return wrong font if g.save/restore() is used.  just use that instead
-//      return currentFont;
-//  }
+    //  getFont(): Font {
+    //      // this may return wrong font if g.save/restore() is used.  just use that instead
+    //      return currentFont;
+    //  }
 
     drawLock(x: number, y: number): void {
         this.context.save();
@@ -155,10 +151,10 @@ export class Graphics {
         this.context.lineWidth = 3;
         this.fillRect(x, y, 30, 20);
         this.context.beginPath();
-        this.context.moveTo(x+15-10, y);
-        this.context.lineTo(x+15-10, y-4);
-        this.context.arc(x+15, y-4, 10, -3.1415, 0);
-        this.context.lineTo(x+15+10, y);
+        this.context.moveTo(x + 15 - 10, y);
+        this.context.lineTo(x + 15 - 10, y - 4);
+        this.context.arc(x + 15, y - 4, 10, -3.1415, 0);
+        this.context.lineTo(x + 15 + 10, y);
         this.context.stroke();
         this.context.restore();
     }
@@ -166,16 +162,13 @@ export class Graphics {
     static distanceSq(x1: number, y1: number, x2: number, y2: number): number {
         x2 -= x1;
         y2 -= y1;
-        return x2*x2 + y2*y2;
+        return x2 * x2 + y2 * y2;
     }
 
     setLineDash(a: number, b: number): void {
-        if (typeof this.context.setLineDash !== "function")
-            return;
-        if (a === 0)
-            this.context.setLineDash([]);
-        else
-            this.context.setLineDash([a, b]);
+        if (typeof this.context.setLineDash !== "function") return;
+        if (a === 0) this.context.setLineDash([]);
+        else this.context.setLineDash([a, b]);
     }
 
     static viewFullScreen(): void {

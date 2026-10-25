@@ -37,8 +37,8 @@ export class TextElm extends GraphicElm {
     size: number;
     color: string | null = null;
     editTextArea: any = null;
-//    final int FLAG_CENTER = 1;
-    static readonly FLAG_BAR    = 2;
+    //    final int FLAG_CENTER = 1;
+    static readonly FLAG_BAR = 2;
     static readonly FLAG_ESCAPE = 4;
 
     constructor(xx: number, yy: number);
@@ -55,8 +55,7 @@ export class TextElm extends GraphicElm {
             this.text = st!.nextToken();
             if ((this.flags & TextElm.FLAG_ESCAPE) === 0) {
                 // old-style dump before escape/unescape
-                while (st!.hasMoreTokens())
-                    this.text += ' ' + st!.nextToken();
+                while (st!.hasMoreTokens()) this.text += " " + st!.nextToken();
                 this.text = this.text.replace(/%2[bB]/g, "+");
             } else {
                 // new-style dump
@@ -72,8 +71,7 @@ export class TextElm extends GraphicElm {
         let s = this.text;
         while (true) {
             const i = s.search(/\\n/);
-            if (i === -1)
-                break;
+            if (i === -1) break;
             this.lines.push(s.substring(0, i));
             s = s.substring(i + 2);
         }
@@ -84,8 +82,7 @@ export class TextElm extends GraphicElm {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "si", this.size);
         CircuitXMLSerializer.dumpAttr(elem, "te", this.text);
-        if (this.color != null)
-            CircuitXMLSerializer.dumpAttr(elem, "co", this.color);
+        if (this.color != null) CircuitXMLSerializer.dumpAttr(elem, "co", this.color);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
@@ -96,7 +93,9 @@ export class TextElm extends GraphicElm {
         this.split();
     }
 
-    getDumpType(): number { return 'x'.charCodeAt(0); }
+    getDumpType(): number {
+        return "x".charCodeAt(0);
+    }
 
     drag(xx: number, yy: number): void {
         this.x = xx;
@@ -107,14 +106,19 @@ export class TextElm extends GraphicElm {
 
     draw(g: Graphics): void {
         g.save();
-        g.setColor(this.needsHighlight() ? CircuitElm.selectColor : (this.color != null ? new Color(this.color) : CircuitElm.lightGrayColor));
+        g.setColor(
+            this.needsHighlight()
+                ? CircuitElm.selectColor
+                : this.color != null
+                  ? new Color(this.color)
+                  : CircuitElm.lightGrayColor,
+        );
         const f = new Font("SansSerif", 0, this.size);
         g.setFont(f);
         let maxw = -1;
         for (let i = 0; i !== this.lines.length; i++) {
             const w = Math.trunc(g.context.measureText(this.lines[i]).width);
-            if (w > maxw)
-                maxw = w;
+            if (w > maxw) maxw = w;
         }
         let cury = this.y;
         this.setBbox(this.x, this.y, this.x, this.y);
@@ -141,15 +145,17 @@ export class TextElm extends GraphicElm {
             this.editTextArea = ei.textArea;
             return ei;
         }
-        if (n === 1)
-            return new EditInfo("Size", this.size, 5, 100);
+        if (n === 1) return new EditInfo("Size", this.size, 5, 100);
         if (n === 2) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Draw Bar On Top", (this.flags & TextElm.FLAG_BAR) !== 0);
             return ei;
         }
         if (n === 3)
-            return new EditInfo("Color", this.color != null ? this.color : CircuitElm.lightGrayColor.getHexValue()).setIsColor();
+            return new EditInfo(
+                "Color",
+                this.color != null ? this.color : CircuitElm.lightGrayColor.getHexValue(),
+            ).setIsColor();
         return null;
     }
 
@@ -158,13 +164,10 @@ export class TextElm extends GraphicElm {
             this.text = (this.editTextArea.element as HTMLTextAreaElement).value.replace(/\n/g, "\\n");
             this.split();
         }
-        if (n === 1)
-            this.size = Math.trunc(ei.value);
+        if (n === 1) this.size = Math.trunc(ei.value);
         if (n === 2) {
-            if (ei.checkbox!.getState())
-                this.flags |= TextElm.FLAG_BAR;
-            else
-                this.flags &= ~TextElm.FLAG_BAR;
+            if (ei.checkbox!.getState()) this.flags |= TextElm.FLAG_BAR;
+            else this.flags &= ~TextElm.FLAG_BAR;
         }
         if (n === 3) {
             const c = (ei.textf as HTMLInputElement).value;
@@ -172,9 +175,17 @@ export class TextElm extends GraphicElm {
         }
     }
 
-//    isCenteredText(): boolean { return (this.flags & FLAG_CENTER) !== 0; }
-    getElmType(): string { return "text"; }
-    getInfo(arr: string[]): void { arr[0] = this.text; }
-    getShortcut(): number { return 't'.charCodeAt(0); }
-    canViewInScope(): boolean { return false; }
+    //    isCenteredText(): boolean { return (this.flags & FLAG_CENTER) !== 0; }
+    getElmType(): string {
+        return "text";
+    }
+    getInfo(arr: string[]): void {
+        arr[0] = this.text;
+    }
+    getShortcut(): number {
+        return "t".charCodeAt(0);
+    }
+    canViewInScope(): boolean {
+        return false;
+    }
 }

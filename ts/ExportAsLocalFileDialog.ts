@@ -33,8 +33,7 @@ export class ExportAsLocalFileDialog extends Dialog {
 
     static getBlobUrl(data: string): string {
         const oldBlob = (document as any).exportBlob;
-        if (oldBlob)
-            URL.revokeObjectURL(oldBlob);
+        if (oldBlob) URL.revokeObjectURL(oldBlob);
         const blob = new Blob([data], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         (document as any).exportBlob = url;
@@ -44,10 +43,8 @@ export class ExportAsLocalFileDialog extends Dialog {
     static setLastFileName(s: string | null): void {
         // remember filename for use when saving a new file.
         // if s is null or automatically generated then just clear out old filename.
-        if (s == null || s.startsWith("circuitjs-"))
-            ExportAsLocalFileDialog.lastFileName = null;
-        else
-            ExportAsLocalFileDialog.lastFileName = s;
+        if (s == null || s.startsWith("circuitjs-")) ExportAsLocalFileDialog.lastFileName = null;
+        else ExportAsLocalFileDialog.lastFileName = s;
     }
 
     // fileName/title are given when exporting something other than the circuit (e.g. subcircuits)
@@ -82,13 +79,14 @@ export class ExportAsLocalFileDialog extends Dialog {
         } else {
             const now = new Date();
             const pad = (n: number) => String(n).padStart(2, "0");
-            const ts = now.getFullYear().toString()
-                + pad(now.getMonth() + 1)
-                + pad(now.getDate())
-                + "-"
-                + pad(now.getHours())
-                + pad(now.getMinutes())
-                + pad(now.getSeconds());
+            const ts =
+                now.getFullYear().toString() +
+                pad(now.getMonth() + 1) +
+                pad(now.getDate()) +
+                "-" +
+                pad(now.getHours()) +
+                pad(now.getMinutes()) +
+                pad(now.getSeconds());
             fname = "circuitjs-" + ts + ".txt";
         }
         tb.value = fname;
@@ -115,10 +113,8 @@ export class ExportAsLocalFileDialog extends Dialog {
 
     apply(): boolean {
         let fname = this.textBox.value;
-        if (!fname.includes("."))
-            fname += ".txt";
-        if (this.rememberName)
-            ExportAsLocalFileDialog.setLastFileName(fname);
+        if (!fname.includes(".")) fname += ".txt";
+        if (this.rememberName) ExportAsLocalFileDialog.setLastFileName(fname);
         const a = document.createElement("a");
         a.href = this.blobUrl;
         a.setAttribute("download", fname);

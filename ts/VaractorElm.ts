@@ -49,13 +49,17 @@ export class VaractorElm extends DiodeElm {
             this.baseCapacitance = 4e-12;
         } else {
             super(xxOrXa, yyOrYa, xb, yb!, f!, st!);
-            this.capvoltdiff      = parseFloatStrict(st!.nextToken());
-            this.baseCapacitance  = parseFloatStrict(st!.nextToken());
+            this.capvoltdiff = parseFloatStrict(st!.nextToken());
+            this.baseCapacitance = parseFloatStrict(st!.nextToken());
         }
     }
 
-    getDumpType(): number { return 176; }
-    getElmType(): string { return "varactor"; }
+    getDumpType(): number {
+        return 176;
+    }
+    getElmType(): string {
+        return "varactor";
+    }
 
     getInfo(arr: string[]): void {
         super.getInfo(arr);
@@ -85,13 +89,13 @@ export class VaractorElm extends DiodeElm {
 
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
-        this.capvoltdiff     = xml.parseDoubleAttr("ca", this.capvoltdiff);
+        this.capvoltdiff = xml.parseDoubleAttr("ca", this.capvoltdiff);
         this.baseCapacitance = xml.parseDoubleAttr("ba", this.baseCapacitance);
     }
 
     setPoints(): void {
         super.setPoints();
-        const platef = .6;
+        const platef = 0.6;
         const pa = this.newPointArray(2);
         this.interpPoint2(this.lead1!, this.lead2!, pa[0], pa[1], 0, this.hs);
         this.interpPoint2(this.lead1!, this.lead2!, this.cathode[0], this.cathode[1], platef, this.hs);
@@ -112,8 +116,7 @@ export class VaractorElm extends DiodeElm {
         this.setVoltageColor(g, this.nodes[0].v);
         this.setPowerColor(g, false);
         CircuitElm.drawThickLine(g, this.plate1[0], this.plate1[1]);
-        if (this.showPower())
-            g.setColor("#888888");
+        if (this.showPower()) g.setColor("#888888");
 
         // draw second plate
         this.setVoltageColor(g, this.nodes[1].v);
@@ -141,10 +144,8 @@ export class VaractorElm extends DiodeElm {
         // (Thevenin equivalent) consists of a voltage source in
         // series with a resistor
         const c0 = this.baseCapacitance;
-        if (this.capvoltdiff > 0)
-            this.capacitance = c0;
-        else
-            this.capacitance = c0 / Math.pow(1 - this.capvoltdiff / this.model.fwdrop, .5);
+        if (this.capvoltdiff > 0) this.capacitance = c0;
+        else this.capacitance = c0 / Math.pow(1 - this.capvoltdiff / this.model.fwdrop, 0.5);
         this.compResistance = CircuitElm.sim.timeStep / (2 * this.capacitance);
         this.voltSourceValue = -this.capvoltdiff - this.capCurrent * this.compResistance;
     }
@@ -155,10 +156,11 @@ export class VaractorElm extends DiodeElm {
         CircuitElm.sim.updateVoltageSource(this.nodes[0], this.nodes[2], this.voltSource, this.voltSourceValue);
     }
 
-    showPropertiesOnCreate(): boolean { return true; }
+    showPropertiesOnCreate(): boolean {
+        return true;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 1)
-            return new EditInfo("Capacitance @ 0V (F)", this.baseCapacitance, 10, 1000);
+        if (n === 1) return new EditInfo("Capacitance @ 0V (F)", this.baseCapacitance, 10, 1000);
         return super.getEditInfo(n);
     }
 
@@ -170,9 +172,16 @@ export class VaractorElm extends DiodeElm {
         super.setEditValue(n, ei);
     }
 
-    getShortcut(): number { return 0; }
-    setCurrent(vs: VoltageSource, c: number): void { this.capCurrent = c; }
-    getVoltageSourceCount(): number { return 1; }
-    getInternalNodeCount(): number { return 1; }
-
+    getShortcut(): number {
+        return 0;
+    }
+    setCurrent(vs: VoltageSource, c: number): void {
+        this.capCurrent = c;
+    }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    getInternalNodeCount(): number {
+        return 1;
+    }
 }

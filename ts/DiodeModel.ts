@@ -29,7 +29,6 @@ import { Locale } from "./Locale";
 import { parseIntStrict, parseFloatStrict } from "./NumberParse";
 
 export class DiodeModel implements Editable, Comparable<DiodeModel> {
-
     static modelMap: Map<string, DiodeModel>;
 
     flags: number = 0;
@@ -95,8 +94,7 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
     static getModelWithName(name: string): DiodeModel {
         DiodeModel.createModelMap();
         let lm = DiodeModel.modelMap.get(name);
-        if (lm != null)
-            return lm;
+        if (lm != null) return lm;
         lm = new DiodeModel();
         lm.name = name;
         DiodeModel.modelMap.set(name, lm);
@@ -106,13 +104,12 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
     static getModelWithNameOrCopy(name: string, oldmodel: DiodeModel | null): DiodeModel {
         DiodeModel.createModelMap();
         const lm = DiodeModel.modelMap.get(name);
-        if (lm != null)
-            return lm;
+        if (lm != null) return lm;
         if (oldmodel == null) {
             CirSim.console("model not found: " + name);
             return DiodeModel.getDefaultModel();
         }
-//	CirSim.console("copying to " + name);
+        //	CirSim.console("copying to " + name);
         const copy = new DiodeModel(oldmodel);
         copy.name = name;
         DiodeModel.modelMap.set(name, copy);
@@ -120,20 +117,22 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
     }
 
     static createModelMap(): void {
-        if (DiodeModel.modelMap != null)
-            return;
+        if (DiodeModel.modelMap != null) return;
         DiodeModel.modelMap = new Map<string, DiodeModel>();
         DiodeModel.addDefaultModel("spice-default", new DiodeModel(1e-14, 0, 1, 0, null));
         DiodeModel.addDefaultModel("default", new DiodeModel(1.7143528192808883e-7, 0, 2, 0, null));
         DiodeModel.addDefaultModel("default-zener", new DiodeModel(1.7143528192808883e-7, 0, 2, 5.6, null));
 
         // old default LED with saturation current that is way too small (causes numerical errors)
-        DiodeModel.addDefaultModel("old-default-led", new DiodeModel(2.2349907006671927e-18, 0, 2, 0, null).setInternal());
+        DiodeModel.addDefaultModel(
+            "old-default-led",
+            new DiodeModel(2.2349907006671927e-18, 0, 2, 0, null).setInternal(),
+        );
 
         // default for newly created LEDs, https://www.diyaudio.com/forums/software-tools/25884-spice-models-led.html
-        DiodeModel.addDefaultModel("default-led", new DiodeModel(93.2e-12, .042, 3.73, 0, null));
+        DiodeModel.addDefaultModel("default-led", new DiodeModel(93.2e-12, 0.042, 3.73, 0, null));
 
-        DiodeModel.addDefaultModel("default-optocoupler-led", new DiodeModel(1.714e-7, 0., 4.077, 0., null));
+        DiodeModel.addDefaultModel("default-optocoupler-led", new DiodeModel(1.714e-7, 0, 4.077, 0, null));
 
         // https://www.allaboutcircuits.com/textbook/semiconductors/chpt-3/spice-models/
         DiodeModel.addDefaultModel("1N5711", new DiodeModel(315e-9, 2.8, 2.03, 70, "Schottky"));
@@ -148,7 +147,7 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
         DiodeModel.addDefaultModel("1N4004", new DiodeModel(18.8e-9, 28.6e-3, 2, 400, "general purpose"));
 
         // http://users.skynet.be/hugocoolens/spice/diodes/1n4148.htm
-        DiodeModel.addDefaultModel("1N4148", new DiodeModel(4.352e-9, .6458, 1.906, 75, "switching"));
+        DiodeModel.addDefaultModel("1N4148", new DiodeModel(4.352e-9, 0.6458, 1.906, 75, "switching"));
         DiodeModel.addDefaultModel("x2n2646-emitter", new DiodeModel(2.13e-11, 0, 1.8, 0, null).setInternal());
 
         // for TL431
@@ -179,7 +178,12 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
 
         // look for existing model with same parameters
         for (const [, dm] of DiodeModel.modelMap) {
-            if (Math.abs(dm.fwdrop - fwdrop) < 1e-8 && dm.seriesResistance === 0 && Math.abs(dm.breakdownVoltage - zvoltage) < 1e-8 && dm.emissionCoefficient === emcoef)
+            if (
+                Math.abs(dm.fwdrop - fwdrop) < 1e-8 &&
+                dm.seriesResistance === 0 &&
+                Math.abs(dm.breakdownVoltage - zvoltage) < 1e-8 &&
+                dm.emissionCoefficient === emcoef
+            )
                 return dm;
         }
 
@@ -188,10 +192,9 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
         const vdcoef = 1 / vscale;
         const leakage = 1 / (Math.exp(fwdrop * vdcoef) - 1);
         let name = "fwdrop=" + fwdrop;
-        if (zvoltage !== 0)
-            name = name + " zvoltage=" + zvoltage;
+        if (zvoltage !== 0) name = name + " zvoltage=" + zvoltage;
         const dm = DiodeModel.getModelWithName(name);
-//	CirSim.console("got model with name " + name);
+        //	CirSim.console("got model with name " + name);
         dm.saturationCurrent = leakage;
         dm.emissionCoefficient = emcoef;
         dm.breakdownVoltage = zvoltage;
@@ -211,21 +214,16 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
     }
 
     static clearDumpedFlags(): void {
-        if (DiodeModel.modelMap == null)
-            return;
-        for (const [, dm] of DiodeModel.modelMap)
-            dm.dumped = false;
+        if (DiodeModel.modelMap == null) return;
+        for (const [, dm] of DiodeModel.modelMap) dm.dumped = false;
     }
 
     static getModelList(zener: boolean): DiodeModel[] {
         const vector: DiodeModel[] = [];
         for (const [, dm] of DiodeModel.modelMap) {
-            if (dm.internal)
-                continue;
-            if (zener && dm.breakdownVoltage === 0)
-                continue;
-            if (!vector.includes(dm))
-                vector.push(dm);
+            if (dm.internal) continue;
+            if (zener && dm.breakdownVoltage === 0) continue;
+            if (!vector.includes(dm)) vector.push(dm);
         }
         vector.sort((a, b) => a.compareTo(b));
         return vector;
@@ -236,8 +234,7 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
     }
 
     getDescription(): string {
-        if (this.description == null)
-            return this.name;
+        if (this.description == null) return this.name;
         return this.name + " (" + Locale.LS(this.description) + ")";
     }
 
@@ -277,7 +274,9 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
         this.updateModel();
     }
 
-    getEditTitle(): string { return "Edit Diode Model"; }
+    getEditTitle(): string {
+        return "Edit Diode Model";
+    }
 
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
@@ -285,46 +284,39 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
             ei.text = this.name == null ? "" : this.name;
             return ei;
         }
-        if (n === 1)
-            return new EditInfo("Saturation Current", this.saturationCurrent, -1, -1);
+        if (n === 1) return new EditInfo("Saturation Current", this.saturationCurrent, -1, -1);
         if (this.isSimple()) {
-            if (n === 2)
-                return new EditInfo("Forward Voltage", this.forwardVoltage, -1, -1);
-            if (n === 3)
-                return new EditInfo("Current At Above Voltage (A)", this.forwardCurrent, -1, -1);
+            if (n === 2) return new EditInfo("Forward Voltage", this.forwardVoltage, -1, -1);
+            if (n === 3) return new EditInfo("Current At Above Voltage (A)", this.forwardCurrent, -1, -1);
         } else {
-            if (n === 2)
-                return new EditInfo("Series Resistance", this.seriesResistance, -1, -1);
+            if (n === 2) return new EditInfo("Series Resistance", this.seriesResistance, -1, -1);
             if (n === 3)
-                return new EditInfo(EditInfo.makeLink("diodecalc.html", "Emission Coefficient"), this.emissionCoefficient, -1, -1);
+                return new EditInfo(
+                    EditInfo.makeLink("diodecalc.html", "Emission Coefficient"),
+                    this.emissionCoefficient,
+                    -1,
+                    -1,
+                );
         }
-        if (n === 4)
-            return new EditInfo("Breakdown Voltage", this.breakdownVoltage, -1, -1);
+        if (n === 4) return new EditInfo("Breakdown Voltage", this.breakdownVoltage, -1, -1);
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.name = ei.textf.value;
-            if (this.name.length > 0)
-                DiodeModel.modelMap.set(this.name, this);
+            if (this.name.length > 0) DiodeModel.modelMap.set(this.name, this);
         }
-        if (n === 1)
-            this.saturationCurrent = ei.value;
+        if (n === 1) this.saturationCurrent = ei.value;
         if (this.isSimple()) {
-            if (n === 2)
-                this.forwardVoltage = ei.value;
-            if (n === 3)
-                this.forwardCurrent = ei.value;
+            if (n === 2) this.forwardVoltage = ei.value;
+            if (n === 3) this.forwardCurrent = ei.value;
             this.setEmissionCoefficient();
         } else {
-            if (n === 2)
-                this.seriesResistance = ei.value;
-            if (n === 3)
-                this.emissionCoefficient = ei.value;
+            if (n === 2) this.seriesResistance = ei.value;
+            if (n === 3) this.emissionCoefficient = ei.value;
         }
-        if (n === 4)
-            this.breakdownVoltage = Math.abs(ei.value);
+        if (n === 4) this.breakdownVoltage = Math.abs(ei.value);
         this.updateModel();
         CircuitElm.app.updateModels();
     }
@@ -332,15 +324,16 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
     // set emission coefficient for simple mode if we have enough data
     setEmissionCoefficient(): void {
         if (this.forwardCurrent > 0 && this.forwardVoltage > 0)
-            this.emissionCoefficient = (this.forwardVoltage / Math.log(this.forwardCurrent / this.saturationCurrent + 1)) / DiodeModel.vt;
+            this.emissionCoefficient =
+                this.forwardVoltage / Math.log(this.forwardCurrent / this.saturationCurrent + 1) / DiodeModel.vt;
 
         this.seriesResistance = 0;
     }
 
     setForwardVoltage(): void {
-        if (this.forwardCurrent === 0)
-            this.forwardCurrent = 1;
-        this.forwardVoltage = this.emissionCoefficient * DiodeModel.vt * Math.log(this.forwardCurrent / this.saturationCurrent + 1);
+        if (this.forwardCurrent === 0) this.forwardCurrent = 1;
+        this.forwardVoltage =
+            this.emissionCoefficient * DiodeModel.vt * Math.log(this.forwardCurrent / this.saturationCurrent + 1);
     }
 
     updateModel(): void {
@@ -358,8 +351,7 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
         CircuitXMLSerializer.dumpAttr(elem, "rs", this.seriesResistance);
         CircuitXMLSerializer.dumpAttr(elem, "n", this.emissionCoefficient);
         CircuitXMLSerializer.dumpAttr(elem, "bv", this.breakdownVoltage);
-        if (this.forwardCurrent > 0)
-            CircuitXMLSerializer.dumpAttr(elem, "fi", this.forwardCurrent);
+        if (this.forwardCurrent > 0) CircuitXMLSerializer.dumpAttr(elem, "fi", this.forwardCurrent);
         doc.documentElement.appendChild(elem);
     }
 
@@ -374,13 +366,11 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
     pickName(): void {
         if (this.breakdownVoltage > 0 && this.breakdownVoltage < 20)
             this.name = "zener-" + CircuitElm.showFormat.format(this.breakdownVoltage);
-        else if (this.isSimple())
-            this.name = "fwdrop=" + CircuitElm.showFormat.format(this.forwardVoltage);
-        else
-            this.name = "diodemodel";
+        else if (this.isSimple()) this.name = "fwdrop=" + CircuitElm.showFormat.format(this.forwardVoltage);
+        else this.name = "diodemodel";
         if (DiodeModel.modelMap.get(this.name) != null) {
             let num = 2;
-            for (;; num++) {
+            for (; ; num++) {
                 const n = this.name + "-" + num;
                 if (DiodeModel.modelMap.get(n) == null) {
                     this.name = n;

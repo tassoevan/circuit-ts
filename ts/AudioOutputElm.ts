@@ -86,22 +86,27 @@ export class AudioOutputElm extends CircuitElm {
     // get next unused labelNum value
     getNextLabelNum(): number {
         let num = 1;
-        if (CircuitElm.sim.elmList == null)
-            return 0;
+        if (CircuitElm.sim.elmList == null) return 0;
         for (const ce of CircuitElm.sim.elmList) {
-            if (!(ce instanceof AudioOutputElm))
-                continue;
+            if (!(ce instanceof AudioOutputElm)) continue;
             const ln = (ce as AudioOutputElm).labelNum;
-            if (ln >= num)
-                num = ln + 1;
+            if (ln >= num) num = ln + 1;
         }
         return num;
     }
 
-    getDumpType(): number { return 211; }
-    getXmlDumpType(): string { return "aout"; }
-    isAudioOutputElm(): boolean { return true; }
-    getPostCount(): number { return 1; }
+    getDumpType(): number {
+        return 211;
+    }
+    getXmlDumpType(): string {
+        return "aout";
+    }
+    isAudioOutputElm(): boolean {
+        return true;
+    }
+    getPostCount(): number {
+        return 1;
+    }
 
     reset(): void {
         this.dataPtr = 0;
@@ -116,32 +121,34 @@ export class AudioOutputElm extends CircuitElm {
     }
     draw(g: Graphics): void {
         g.save();
-        const selected = (this.needsHighlight());
+        const selected = this.needsHighlight();
         const fontSize = 14;
         const s = this.labelNum > 1 ? "Audio " + this.labelNum : "Audio Out";
         g.context.font = (selected ? "bold " : "") + fontSize + "px SansSerif";
         const textWidth = Math.floor(g.context.measureText(s).width);
         g.setColor(Color.darkGray);
-        const pct = this.dataFull ? textWidth : Math.floor(textWidth * this.dataPtr / this.dataCount);
+        const pct = this.dataFull ? textWidth : Math.floor((textWidth * this.dataPtr) / this.dataCount);
         g.fillRect(this.x2 - Math.floor(textWidth / 2), this.y2 - 10, pct, 20);
         g.setColor(selected ? CircuitElm.selectColor : CircuitElm.whiteColor);
-        this.interpPoint(this.point1, this.point2, this.lead1, 1 - (textWidth / 2. + 8) / this.dn);
+        this.interpPoint(this.point1, this.point2, this.lead1, 1 - (textWidth / 2 + 8) / this.dn);
         this.setBbox(this.point1, this.lead1, 0);
         this.drawCenteredText(g, s, this.x2, this.y2, true);
         this.setVoltageColor(g, this.nodes[0].v);
-        if (selected)
-            g.setColor(CircuitElm.selectColor);
+        if (selected) g.setColor(CircuitElm.selectColor);
         CircuitElm.drawThickLine(g, this.point1, this.lead1!);
         this.drawPosts(g);
         g.restore();
     }
-    getVoltageDiff(): number { return this.nodes[0].v; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
     getInfo(arr: string[]): void {
         arr[0] = "audio output";
         arr[1] = "V = " + CircuitElm.getVoltageText(this.nodes[0].v);
         const ct = this.dataFull ? this.dataCount : this.dataPtr;
         const dur = this.sampleStep * ct;
-        arr[2] = "start = " + CircuitElm.getUnitText(this.dataFull ? CircuitElm.sim.t - this.duration : this.dataStart, "s");
+        arr[2] =
+            "start = " + CircuitElm.getUnitText(this.dataFull ? CircuitElm.sim.t - this.duration : this.dataStart, "s");
         arr[3] = "dur = " + CircuitElm.getUnitText(dur, "s");
         arr[4] = "samples = " + ct + (this.dataFull ? "" : "/" + this.dataCount);
     }
@@ -171,13 +178,15 @@ export class AudioOutputElm extends CircuitElm {
         this.dataStart = CircuitElm.sim.t;
         this.dataPtr = 0;
         this.dataFull = false;
-        this.sampleStep = 1. / this.samplingRate;
+        this.sampleStep = 1 / this.samplingRate;
         this.nextDataSample = CircuitElm.sim.t + this.sampleStep;
     }
 
     readonly samplingRateChoices = [8000, 11025, 16000, 22050, 44100, 48000];
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             return new EditInfo("Duration (s)", this.duration, 0, 5).setPositive();
@@ -187,21 +196,25 @@ export class AudioOutputElm extends CircuitElm {
             ei.choice = new Choice();
             for (let i = 0; i !== this.samplingRateChoices.length; i++) {
                 ei.choice.add(this.samplingRateChoices[i] + "");
-                if (this.samplingRateChoices[i] === this.samplingRate)
-                    ei.choice.select(i);
+                if (this.samplingRateChoices[i] === this.samplingRate) ei.choice.select(i);
             }
             return ei;
         }
         if (n === 2) {
             const ei = new EditInfo("", 0, -1, -1);
             const url = AudioOutputElm.getLastBlob();
-            if (url === null)
-                return null;
+            if (url === null) return null;
             const now = new Date();
             const pad = (x: number) => x.toString().padStart(2, "0");
-            const fname = "audio-" + now.getFullYear() +
-                pad(now.getMonth() + 1) + pad(now.getDate()) + "-" +
-                pad(now.getHours()) + pad(now.getMinutes()) + ".circuitjs.wav";
+            const fname =
+                "audio-" +
+                now.getFullYear() +
+                pad(now.getMonth() + 1) +
+                pad(now.getDate()) +
+                "-" +
+                pad(now.getHours()) +
+                pad(now.getMinutes()) +
+                ".circuitjs.wav";
             const a = document.createElement("a");
             a.textContent = Locale.LS("Download last played audio");
             a.href = url;
@@ -243,10 +256,13 @@ export class AudioOutputElm extends CircuitElm {
         }
         */
 
-//      int frac = (int)Math.round(Math.max(sampleStep*33000, 1));
+        //      int frac = (int)Math.round(Math.max(sampleStep*33000, 1));
         const target = this.sampleStep / 8;
         if (CircuitElm.sim.maxTimeStep !== target) {
-            if (AudioOutputElm.okToChangeTimeStep || window.confirm(Locale.LS("Adjust timestep for best audio quality and performance?"))) {
+            if (
+                AudioOutputElm.okToChangeTimeStep ||
+                window.confirm(Locale.LS("Adjust timestep for best audio quality and performance?"))
+            ) {
                 CircuitElm.sim.maxTimeStep = target;
                 AudioOutputElm.okToChangeTimeStep = true;
             }
@@ -259,20 +275,19 @@ export class AudioOutputElm extends CircuitElm {
         CircuitElm.app.addWidgetToVerticalPanel(btn);
         this.button = btn;
         this.setButtonLabel();
-        btn.addEventListener("click", () => { this.play(); });
+        btn.addEventListener("click", () => {
+            this.play();
+        });
     }
 
     setButtonLabel(): void {
         let label = "&#9654; " + Locale.LS("Play Audio");
-        if (this.labelNum > 1)
-            label += " " + this.labelNum;
-        if (this.button)
-            this.button.innerHTML = label;
+        if (this.labelNum > 1) label += " " + this.labelNum;
+        if (this.button) this.button.innerHTML = label;
     }
 
     delete(): void {
-        if (this.button)
-            CircuitElm.app.removeWidgetFromVerticalPanel(this.button);
+        if (this.button) CircuitElm.app.removeWidgetFromVerticalPanel(this.button);
         super.delete();
     }
 
@@ -282,22 +297,23 @@ export class AudioOutputElm extends CircuitElm {
         const numSamples = intSamples.length;
         const buffer = new ArrayBuffer(44 + numSamples * 2);
         const view = new DataView(buffer);
-        const writeStr = (off: number, s: string) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
+        const writeStr = (off: number, s: string) => {
+            for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i));
+        };
         writeStr(0, "RIFF");
         view.setUint32(4, 36 + numSamples * 2, true);
         writeStr(8, "WAVE");
         writeStr(12, "fmt ");
         view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true);  // PCM
-        view.setUint16(22, 1, true);  // mono
+        view.setUint16(20, 1, true); // PCM
+        view.setUint16(22, 1, true); // mono
         view.setUint32(24, sampleRate, true);
         view.setUint32(28, sampleRate * 2, true);
         view.setUint16(32, 2, true);
         view.setUint16(34, 16, true);
         writeStr(36, "data");
         view.setUint32(40, numSamples * 2, true);
-        for (let i = 0; i < numSamples; i++)
-            view.setInt16(44 + i * 2, intSamples[i], true);
+        for (let i = 0; i < numSamples; i++) view.setInt16(44 + i * 2, intSamples[i], true);
 
         const d = document as any;
         if (d.audioBlob) {
@@ -325,8 +341,10 @@ export class AudioOutputElm extends CircuitElm {
             ct = this.dataCount;
             base = this.dataPtr;
         }
-        if (ct * this.sampleStep < .05) {
-            window.alert(Locale.LS("Audio data is not ready yet.  Increase simulation speed to make data ready sooner."));
+        if (ct * this.sampleStep < 0.05) {
+            window.alert(
+                Locale.LS("Audio data is not ready yet.  Increase simulation speed to make data ready sooner."),
+            );
             return;
         }
 
@@ -339,7 +357,7 @@ export class AudioOutputElm extends CircuitElm {
         }
 
         const adj = -(max + min) / 2;
-        const mult = (.25 * 32766) / (max + adj);
+        const mult = (0.25 * 32766) / (max + adj);
 
         // fade in over 1/20 sec
         const fadeLen = Math.floor(this.samplingRate / 20);
@@ -348,7 +366,7 @@ export class AudioOutputElm extends CircuitElm {
         const fadeMult = mult / fadeLen;
         const arr: number[] = [];
         for (let i = 0; i !== ct; i++) {
-            const fade = (i < fadeLen) ? i * fadeMult : (i > fadeOut) ? (ct - i) * fadeMult : mult;
+            const fade = i < fadeLen ? i * fadeMult : i > fadeOut ? (ct - i) * fadeMult : mult;
             const s = Math.floor((this.data[(i + base) % this.dataCount] + adj) * fade);
             arr.push(s);
         }

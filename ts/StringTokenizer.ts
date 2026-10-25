@@ -110,8 +110,7 @@ export class StringTokenizer {
      */
     hasMoreTokens(): boolean {
         if (!this.retDelims) {
-            while (this.pos < this.len && this.delim.indexOf(this.str.charAt(this.pos)) >= 0)
-                this.pos++;
+            while (this.pos < this.len && this.delim.indexOf(this.str.charAt(this.pos)) >= 0) this.pos++;
         }
         return this.pos < this.len;
     }
@@ -125,18 +124,14 @@ export class StringTokenizer {
      * @return the next token with respect to the new delimiter characters
      */
     nextToken(delim?: string): string {
-        if (delim !== undefined)
-            this.delim = delim;
+        if (delim !== undefined) this.delim = delim;
         if (this.pos < this.len && this.delim.indexOf(this.str.charAt(this.pos)) >= 0) {
-            if (this.retDelims)
-                return this.str.substring(this.pos, ++this.pos);
-            while (++this.pos < this.len && this.delim.indexOf(this.str.charAt(this.pos)) >= 0)
-                ;
+            if (this.retDelims) return this.str.substring(this.pos, ++this.pos);
+            while (++this.pos < this.len && this.delim.indexOf(this.str.charAt(this.pos)) >= 0);
         }
         if (this.pos < this.len) {
             const start = this.pos;
-            while (++this.pos < this.len && this.delim.indexOf(this.str.charAt(this.pos)) < 0)
-                ;
+            while (++this.pos < this.len && this.delim.indexOf(this.str.charAt(this.pos)) < 0);
             return this.str.substring(start, this.pos);
         }
         throw new Error("NoSuchElementException");
@@ -188,14 +183,12 @@ export class StringTokenizer {
             } else {
                 tokenFound = true;
                 // Get to the end of the token
-                while (tmpPos < this.len && this.delim.indexOf(this.str.charAt(tmpPos)) < 0)
-                    ++tmpPos;
+                while (tmpPos < this.len && this.delim.indexOf(this.str.charAt(tmpPos)) < 0) ++tmpPos;
             }
         }
 
         // Make sure to count the last token
-        if (tokenFound)
-            count++;
+        if (tokenFound) count++;
 
         // if counting delmiters add them into the token count
         return this.retDelims ? count + delimiterCount : count;

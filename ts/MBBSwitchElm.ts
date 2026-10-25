@@ -56,7 +56,9 @@ export class MBBSwitchElm extends SwitchElm {
         this.allocNodes();
     }
 
-    getDumpType(): number { return 416; }
+    getDumpType(): number {
+        return 416;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -97,12 +99,9 @@ export class MBBSwitchElm extends SwitchElm {
             CircuitElm.drawThickLine(g, this.swpoles[i], this.swposts[i]);
         }
 
-        if (!this.needsHighlight())
-            g.setColor(CircuitElm.whiteColor);
-        if (this.both || this.position === 0)
-            CircuitElm.drawThickLine(g, this.lead1!, this.swpoles[0]);
-        if (this.both || this.position === 2)
-            CircuitElm.drawThickLine(g, this.lead1!, this.swpoles[1]);
+        if (!this.needsHighlight()) g.setColor(CircuitElm.whiteColor);
+        if (this.both || this.position === 0) CircuitElm.drawThickLine(g, this.lead1!, this.swpoles[0]);
+        if (this.both || this.position === 2) CircuitElm.drawThickLine(g, this.lead1!, this.swpoles[1]);
 
         for (let i = 0; i !== 2; i++) {
             this.curcounts[i] = this.updateDotCountImpl(this.currents[i], this.curcounts[i]);
@@ -128,34 +127,32 @@ export class MBBSwitchElm extends SwitchElm {
         return n === 0 ? this.point1 : this.swposts[n - 1];
     }
 
-    getPostCount(): number { return 3; }
+    getPostCount(): number {
+        return 3;
+    }
 
     setCurrent(vs: VoltageSource, c: number): void {
-        if (vs === this.voltSources[0])
-            this.currents[this.both ? 0 : Math.trunc(this.position / 2)] = c;
-        else if (vs === this.voltSources[1])
-            this.currents[1] = c;
+        if (vs === this.voltSources[0]) this.currents[this.both ? 0 : Math.trunc(this.position / 2)] = c;
+        else if (vs === this.voltSources[1]) this.currents[1] = c;
     }
 
     calculateCurrent(): void {
         if (this.resistance > 0) {
-            this.currents[0] = (this.both || this.position === 0) ? (this.nodes[0].v - this.nodes[1].v) / this.resistance : 0;
-            this.currents[1] = (this.both || this.position === 2) ? (this.nodes[0].v - this.nodes[2].v) / this.resistance : 0;
+            this.currents[0] =
+                this.both || this.position === 0 ? (this.nodes[0].v - this.nodes[1].v) / this.resistance : 0;
+            this.currents[1] =
+                this.both || this.position === 2 ? (this.nodes[0].v - this.nodes[2].v) / this.resistance : 0;
             return;
         }
         // make sure current of unconnected pole is zero
-        if (!this.both)
-            this.currents[1 - Math.trunc(this.position / 2)] = 0;
+        if (!this.both) this.currents[1 - Math.trunc(this.position / 2)] = 0;
     }
 
     setVoltageSource(n: number, v: VoltageSource): void {
         this.voltSources[n] = v;
-        if (this.both)
-            v.setNodes(this.nodes[0], this.nodes[n + 1]);
-        else if (this.position === 0)
-            v.setNodes(this.nodes[0], this.nodes[1]);
-        else
-            v.setNodes(this.nodes[0], this.nodes[2]);
+        if (this.both) v.setNodes(this.nodes[0], this.nodes[n + 1]);
+        else if (this.position === 0) v.setNodes(this.nodes[0], this.nodes[1]);
+        else v.setNodes(this.nodes[0], this.nodes[2]);
     }
 
     stamp(): void {
@@ -167,18 +164,15 @@ export class MBBSwitchElm extends SwitchElm {
             return;
         }
         let vs = 0;
-        if (this.both || this.position === 0)
-            CircuitElm.sim.stampVoltageSourceVS(this.voltSources[vs++], 0);
-        if (this.both || this.position === 2)
-            CircuitElm.sim.stampVoltageSourceVS(this.voltSources[vs++], 0);
+        if (this.both || this.position === 0) CircuitElm.sim.stampVoltageSourceVS(this.voltSources[vs++], 0);
+        if (this.both || this.position === 2) CircuitElm.sim.stampVoltageSourceVS(this.voltSources[vs++], 0);
     }
 
     // connection is implemented by voltage source with voltage = 0.
     // need two for both loads connected, otherwise one.
     getVoltageSourceCount(): number {
-        this.both = (this.position === 1 || this.position === 3);
-        if (this.resistance > 0)
-            return 0;
+        this.both = this.position === 1 || this.position === 3;
+        if (this.resistance > 0) return 0;
         return this.both ? 2 : 1;
     }
 
@@ -199,10 +193,16 @@ export class MBBSwitchElm extends SwitchElm {
 
     // do not optimize out, even though isWireEquivalent() is true (because it may have 3 nodes to merge
     // and calcWireClosure() doesn't handle that case)
-    isRemovableWire(): boolean { return false; }
-    isWireEquivalent(): boolean { return this.resistance === 0; }
+    isRemovableWire(): boolean {
+        return false;
+    }
+    isWireEquivalent(): boolean {
+        return this.resistance === 0;
+    }
 
-    getElmType(): string { return "switch (SPDT, MBB)"; }
+    getElmType(): string {
+        return "switch (SPDT, MBB)";
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "switch (" + (this.link === 0 ? "S" : "D") + "PDT, MBB)";
@@ -229,25 +229,26 @@ export class MBBSwitchElm extends SwitchElm {
     }
 
     validate(): boolean {
-        if (this.resistance > 0)
-            return true;
-        const b = (this.position === 1 || this.position === 3);
+        if (this.resistance > 0) return true;
+        const b = this.position === 1 || this.position === 3;
         if (b || this.position === 0) {
             const fpi = new FindPathInfo(FindPathInfo.VOLTAGE, this, this.getNode(0), CircuitElm.sim);
             if (fpi.findPath(this.getNode(1))) {
-                this.resistance = .001;
+                this.resistance = 0.001;
                 return false;
             }
         }
         if (b || this.position === 2) {
             const fpi = new FindPathInfo(FindPathInfo.VOLTAGE, this, this.getNode(0), CircuitElm.sim);
             if (fpi.findPath(this.getNode(2))) {
-                this.resistance = .001;
+                this.resistance = 0.001;
                 return false;
             }
         }
         return true;
     }
 
-    getShortcut(): number { return 0; }
+    getShortcut(): number {
+        return 0;
+    }
 }

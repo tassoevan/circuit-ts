@@ -43,23 +43,41 @@ export class AntennaElm extends RailElm {
 
     getVoltage(): number {
         const fm = 3 * Math.sin(this.fmphase);
-        return Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 3000) * (1.3 + Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 12)) * 3 +
-               Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 2710) * (1.3 + Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 13)) * 3 +
-               Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 2433) * (1.3 + Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 14)) * 3 + fm;
+        return (
+            Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 3000) *
+                (1.3 + Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 12)) *
+                3 +
+            Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 2710) *
+                (1.3 + Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 13)) *
+                3 +
+            Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 2433) *
+                (1.3 + Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 14)) *
+                3 +
+            fm
+        );
     }
 
     stepFinished(): void {
-        this.fmphase += 2 * CircuitElm.pi * (2200 + Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 13) * 100) * CircuitElm.sim.timeStep;
+        this.fmphase +=
+            2 *
+            CircuitElm.pi *
+            (2200 + Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 13) * 100) *
+            CircuitElm.sim.timeStep;
     }
 
-    getDumpType(): number { return 'A'.charCodeAt(0); }
-    getShortcut(): number { return 0; }
+    getDumpType(): number {
+        return "A".charCodeAt(0);
+    }
+    getShortcut(): number {
+        return 0;
+    }
 
     getInfo(arr: string[]): void {
         super.getInfo(arr);
         arr[0] = "Antenna (amplified)";
     }
 
-    getEditInfo(n: number): null { return null; }
-
+    getEditInfo(n: number): null {
+        return null;
+    }
 }

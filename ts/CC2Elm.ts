@@ -37,7 +37,7 @@ export class CC2Elm extends ChipElm {
             this.gain = parseFloatStrict(st.nextToken());
         } else {
             super(xa, ya);
-            this.gain = (xbOrG !== undefined) ? xbOrG : 1;
+            this.gain = xbOrG !== undefined ? xbOrG : 1;
         }
     }
 
@@ -51,7 +51,9 @@ export class CC2Elm extends ChipElm {
         this.gain = xml.parseDoubleAttr("ga", this.gain);
     }
 
-    getChipName(): string { return "CC2"; }
+    getChipName(): string {
+        return "CC2";
+    }
 
     setupPins(): void {
         this.sizeX = 2;
@@ -63,16 +65,20 @@ export class CC2Elm extends ChipElm {
         this.pins[2] = new Pin(this, 1, ChipElm.SIDE_E, "Z");
     }
 
-    getElmType(): string { return "CCII"; }
+    getElmType(): string {
+        return "CCII";
+    }
 
     getInfo(arr: string[]): void {
-        arr[0] = (this.gain === 1) ? "CCII+~" : "CCII-~"; // ~ is for localization
+        arr[0] = this.gain === 1 ? "CCII+~" : "CCII-~"; // ~ is for localization
         arr[1] = "X,Y = " + CircuitElm.getVoltageText(this.nodes[0].v);
         arr[2] = "Z = " + CircuitElm.getVoltageText(this.nodes[2].v);
         arr[3] = "I = " + CircuitElm.getCurrentText(this.pins[0].current);
     }
 
-    isDigitalChip(): boolean { return false; }
+    isDigitalChip(): boolean {
+        return false;
+    }
 
     stamp(): void {
         // X voltage = Y voltage
@@ -91,9 +97,19 @@ export class CC2Elm extends ChipElm {
         this.drawChip(g);
     }
 
-    getPostCount(): number { return 3; }
-    getVoltageSourceCount(): number { return 1; }
-    showPropertiesOnCreate(): boolean { return false; }
-    getDumpType(): number { return 179; }
-    getMatrixConnection(n1: number, n2: number): boolean { return true; }
+    getPostCount(): number {
+        return 3;
+    }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
+    getDumpType(): number {
+        return 179;
+    }
+    getMatrixConnection(n1: number, n2: number): boolean {
+        return true;
+    }
 }

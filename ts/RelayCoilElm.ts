@@ -64,7 +64,11 @@ export class RelayCoilElm extends CircuitElm {
     type: number = 0;
 
     static isLatchingType(t: number): boolean {
-        return t === RelayCoilElm.TYPE_LATCHING || t === RelayCoilElm.TYPE_LATCHING_ON || t === RelayCoilElm.TYPE_LATCHING_OFF;
+        return (
+            t === RelayCoilElm.TYPE_LATCHING ||
+            t === RelayCoilElm.TYPE_LATCHING_ON ||
+            t === RelayCoilElm.TYPE_LATCHING_OFF
+        );
     }
 
     readonly nCoil1 = 0;
@@ -108,7 +112,9 @@ export class RelayCoilElm extends CircuitElm {
         this.outline = this.newPointArray(4);
     }
 
-    getDumpType(): number { return 425; }
+    getDumpType(): number {
+        return 425;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -158,19 +164,26 @@ export class RelayCoilElm extends CircuitElm {
         CircuitElm.drawThickLine(g, this.outline[3], this.outline[0]);
 
         if (RelayCoilElm.isLatchingType(this.type)) {
-            for (let i = 0; i !== 3; i++)
-                CircuitElm.drawThickLine(g, this.extraPoints[i], this.extraPoints[i+1]);
+            for (let i = 0; i !== 3; i++) CircuitElm.drawThickLine(g, this.extraPoints[i], this.extraPoints[i + 1]);
             if (this.type === RelayCoilElm.TYPE_LATCHING_ON || this.type === RelayCoilElm.TYPE_LATCHING_OFF) {
                 g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.whiteColor);
-                g.drawString(this.type === RelayCoilElm.TYPE_LATCHING_ON ? "S" : "R", this.extraPoints[0].x+3, this.extraPoints[0].y+9);
+                g.drawString(
+                    this.type === RelayCoilElm.TYPE_LATCHING_ON ? "S" : "R",
+                    this.extraPoints[0].x + 3,
+                    this.extraPoints[0].y + 9,
+                );
             }
         } else if (this.type === RelayCoilElm.TYPE_ON_DELAY) {
             CircuitElm.drawThickLine(g, this.extraPoints[1], this.extraPoints[2]);
             CircuitElm.drawThickLine(g, this.extraPoints[0], this.extraPoints[2]);
             CircuitElm.drawThickLine(g, this.extraPoints[1], this.extraPoints[3]);
         } else if (this.type === RelayCoilElm.TYPE_OFF_DELAY) {
-            g.fillRect(this.extraPoints[0].x, this.extraPoints[0].y,
-                this.extraPoints[2].x - this.extraPoints[0].x, this.extraPoints[2].y - this.extraPoints[0].y);
+            g.fillRect(
+                this.extraPoints[0].x,
+                this.extraPoints[0].y,
+                this.extraPoints[2].x - this.extraPoints[0].x,
+                this.extraPoints[2].y - this.extraPoints[0].y,
+            );
         }
 
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.whiteColor);
@@ -186,7 +199,12 @@ export class RelayCoilElm extends CircuitElm {
         this.coilCurCount = this.updateDotCountImpl(this.coilCurrent, this.coilCurCount);
         if (this.coilCurCount !== 0) {
             this.drawDots(g, this.coilPosts[0], this.coilLeads[0], this.coilCurCount);
-            this.drawDots(g, this.coilLeads[1], this.coilPosts[1], this.addCurCount(this.coilCurCount, this.currentOffset2));
+            this.drawDots(
+                g,
+                this.coilLeads[1],
+                this.coilPosts[1],
+                this.addCurCount(this.coilCurCount, this.currentOffset2),
+            );
         }
 
         this.drawPosts(g);
@@ -230,9 +248,15 @@ export class RelayCoilElm extends CircuitElm {
         }
     }
 
-    getPost(n: number): Point { return this.coilPosts[n]; }
-    getPostCount(): number { return 2; }
-    getInternalNodeCount(): number { return 1; }
+    getPost(n: number): Point {
+        return this.coilPosts[n];
+    }
+    getPostCount(): number {
+        return 2;
+    }
+    getInternalNodeCount(): number {
+        return 1;
+    }
 
     reset(): void {
         super.reset();
@@ -261,7 +285,9 @@ export class RelayCoilElm extends CircuitElm {
             this.toggleSwitchPositions();
     }
 
-    get nCoil3(): number { return 2; }
+    get nCoil3(): number {
+        return 2;
+    }
 
     startIteration(): void {
         this.ind.startIteration(this.nodes[this.nCoil1].v - this.nodes[this.nCoil3].v);
@@ -270,7 +296,10 @@ export class RelayCoilElm extends CircuitElm {
         this.avgCurrent = a * this.avgCurrent + (1 - a) * absCurrent;
         const oldSwitchPosition = this.switchPosition;
         if (this.state === 0) {
-            if (this.avgCurrent > this.onCurrent) { this.lastTransition = CircuitElm.sim.t; this.state = 1; }
+            if (this.avgCurrent > this.onCurrent) {
+                this.lastTransition = CircuitElm.sim.t;
+                this.state = 1;
+            }
         } else if (this.state === 1) {
             if (this.avgCurrent < this.offCurrent) this.state = 0;
             else if (CircuitElm.sim.t - this.lastTransition > this.switchingTimeOn) {
@@ -290,7 +319,10 @@ export class RelayCoilElm extends CircuitElm {
                 }
             }
         } else if (this.state === 2) {
-            if (this.avgCurrent < this.offCurrent) { this.lastTransition = CircuitElm.sim.t; this.state = 3; }
+            if (this.avgCurrent < this.offCurrent) {
+                this.lastTransition = CircuitElm.sim.t;
+                this.state = 3;
+            }
         } else if (this.state === 3) {
             if (this.avgCurrent > this.onCurrent) this.state = 2;
             else if (CircuitElm.sim.t - this.lastTransition > this.switchingTimeOff) {
@@ -298,11 +330,17 @@ export class RelayCoilElm extends CircuitElm {
                 if (!RelayCoilElm.isLatchingType(this.type)) this.switchPosition = 0;
             }
         }
-        if (this.type !== RelayCoilElm.TYPE_LATCHING_ON && this.type !== RelayCoilElm.TYPE_LATCHING_OFF && oldSwitchPosition !== this.switchPosition)
+        if (
+            this.type !== RelayCoilElm.TYPE_LATCHING_ON &&
+            this.type !== RelayCoilElm.TYPE_LATCHING_OFF &&
+            oldSwitchPosition !== this.switchPosition
+        )
             this.toggleSwitchPositions();
     }
 
-    setParentList(list: CircuitElm[]): void { this.elmList = list; }
+    setParentList(list: CircuitElm[]): void {
+        this.elmList = list;
+    }
 
     toggleSwitchPositions(): void {
         for (const ce of this.elmList) {
@@ -329,14 +367,19 @@ export class RelayCoilElm extends CircuitElm {
         this.coilCurrent = this.ind.calculateCurrent(this.nodes[this.nCoil1].v - this.nodes[this.nCoil3].v);
     }
 
-    getElmType(): string { return "relay"; }
+    getElmType(): string {
+        return "relay";
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = Locale.LS("relay");
         if (this.i_position === 0) arr[0] += " (" + Locale.LS("off") + ")";
         else if (this.i_position === 1) arr[0] += " (" + Locale.LS("on") + ")";
         arr[1] = Locale.LS("coil I") + " = " + CircuitElm.getCurrentDText(this.coilCurrent);
-        arr[2] = Locale.LS("coil Vd") + " = " + CircuitElm.getVoltageDText(this.nodes[this.nCoil1].v - this.nodes[this.nCoil2].v);
+        arr[2] =
+            Locale.LS("coil Vd") +
+            " = " +
+            CircuitElm.getVoltageDText(this.nodes[this.nCoil1].v - this.nodes[this.nCoil2].v);
     }
 
     getEditInfo(n: number): EditInfo | null {
@@ -362,8 +405,14 @@ export class RelayCoilElm extends CircuitElm {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0) { this.type = ei.choice!.getSelectedIndex(); this.setPoints(); }
-        if (n === 1 && ei.value > 0) { this.inductance = ei.value; this.ind.setup(this.inductance, this.coilCurrent, Inductor.FLAG_BACK_EULER); }
+        if (n === 0) {
+            this.type = ei.choice!.getSelectedIndex();
+            this.setPoints();
+        }
+        if (n === 1 && ei.value > 0) {
+            this.inductance = ei.value;
+            this.ind.setup(this.inductance, this.coilCurrent, Inductor.FLAG_BACK_EULER);
+        }
         if (n === 2 && ei.value > 0) this.onCurrent = ei.value;
         if (n === 3 && ei.value > 0) this.offCurrent = ei.value;
         if (n === 4 && ei.value > 0) this.coilR = ei.value;
@@ -371,5 +420,7 @@ export class RelayCoilElm extends CircuitElm {
         if (n === 6) this.label = ei.textf!.value;
     }
 
-    getConnection(n1: number, n2: number): boolean { return true; }
+    getConnection(n1: number, n2: number): boolean {
+        return true;
+    }
 }

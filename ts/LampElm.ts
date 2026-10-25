@@ -42,19 +42,18 @@ export class LampElm extends CircuitElm {
     constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
         if (xb === undefined) {
             super(xxOrXa, yyOrYa);
-            this.temp     = this.roomTemp;
-            this.nom_pow  = 100;
-            this.nom_v    = 120;
-            this.warmTime = .4;
-            this.coolTime = .4;
+            this.temp = this.roomTemp;
+            this.nom_pow = 100;
+            this.nom_v = 120;
+            this.warmTime = 0.4;
+            this.coolTime = 0.4;
             this.updateResistance();
         } else {
             super(xxOrXa, yyOrYa, xb, yb!, f!);
-            this.temp     = parseFloatStrict(st!.nextToken());
-            if (isNaN(this.temp))
-                this.temp = this.roomTemp;
-            this.nom_pow  = parseFloatStrict(st!.nextToken());
-            this.nom_v    = parseFloatStrict(st!.nextToken());
+            this.temp = parseFloatStrict(st!.nextToken());
+            if (isNaN(this.temp)) this.temp = this.roomTemp;
+            this.nom_pow = parseFloatStrict(st!.nextToken());
+            this.nom_v = parseFloatStrict(st!.nextToken());
             this.warmTime = parseFloatStrict(st!.nextToken());
             this.coolTime = parseFloatStrict(st!.nextToken());
             this.updateResistance();
@@ -72,14 +71,16 @@ export class LampElm extends CircuitElm {
 
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
-        this.temp     = xml.parseDoubleAttr("te", this.temp);
-        this.nom_pow  = xml.parseDoubleAttr("np", this.nom_pow);
-        this.nom_v    = xml.parseDoubleAttr("nv", this.nom_v);
+        this.temp = xml.parseDoubleAttr("te", this.temp);
+        this.nom_pow = xml.parseDoubleAttr("np", this.nom_pow);
+        this.nom_v = xml.parseDoubleAttr("nv", this.nom_v);
         this.warmTime = xml.parseDoubleAttr("wa", this.warmTime);
         this.coolTime = xml.parseDoubleAttr("co", this.coolTime);
     }
 
-    getDumpType(): number { return 181; }
+    getDumpType(): number {
+        return 181;
+    }
 
     bulbLead!: Point[];
     filament!: Point[];
@@ -106,23 +107,23 @@ export class LampElm extends CircuitElm {
         const br = this.filament_len - Math.sqrt(this.bulbR * this.bulbR - llen * llen);
         this.bulbLead[0] = this.interpPoint(this.lead1!, this.lead2!, 0, br);
         this.bulbLead[1] = this.interpPoint(this.lead1!, this.lead2!, 1, br);
-        this.bulb = this.interpPoint(this.filament[0], this.filament[1], .5);
+        this.bulb = this.interpPoint(this.filament[0], this.filament[1], 0.5);
     }
 
     getTempColor(): string {
         const t = this.temp;
         if (t < 1200) {
-            let x = Math.floor(255 * (t - 800) / 400);
+            let x = Math.floor((255 * (t - 800)) / 400);
             if (x < 0) x = 0;
             return `rgb(${x},0,0)`;
         }
         if (t < 1700) {
-            let x = Math.floor(255 * (t - 1200) / 500);
+            let x = Math.floor((255 * (t - 1200)) / 500);
             if (x < 0) x = 0;
             return `rgb(255,${x},0)`;
         }
         if (t < 2400) {
-            let x = Math.floor(255 * (t - 1700) / 700);
+            let x = Math.floor((255 * (t - 1700)) / 700);
             if (x < 0) x = 0;
             return `rgb(255,255,${x})`;
         }
@@ -133,8 +134,12 @@ export class LampElm extends CircuitElm {
         const v1 = this.nodes[0].v;
         const v2 = this.nodes[1].v;
         this.setBbox(this.point1, this.point2, 4);
-        this.adjustBbox(this.bulb.x - this.bulbR, this.bulb.y - this.bulbR,
-                        this.bulb.x + this.bulbR, this.bulb.y + this.bulbR);
+        this.adjustBbox(
+            this.bulb.x - this.bulbR,
+            this.bulb.y - this.bulbR,
+            this.bulb.x + this.bulbR,
+            this.bulb.y + this.bulbR,
+        );
         this.draw2Leads(g);
         this.setPowerColor(g, true);
         g.setColor(this.getTempColor());
@@ -145,7 +150,7 @@ export class LampElm extends CircuitElm {
         CircuitElm.drawThickLine(g, this.lead1!, this.filament[0]);
         this.setVoltageColor(g, v2);
         CircuitElm.drawThickLine(g, this.lead2!, this.filament[1]);
-        this.setVoltageColor(g, (v1 + v2) * .5);
+        this.setVoltageColor(g, (v1 + v2) * 0.5);
         CircuitElm.drawThickLine(g, this.filament[0], this.filament[1]);
         this.updateDotCount();
         if (!this.isCreating()) {
@@ -164,8 +169,7 @@ export class LampElm extends CircuitElm {
 
     calculateCurrent(): void {
         this.current = (this.nodes[0].v - this.nodes[1].v) / this.resistance;
-        if (this.resistance === 0)
-            this.current = 0;
+        if (this.resistance === 0) this.current = 0;
     }
 
     stamp(): void {
@@ -173,26 +177,26 @@ export class LampElm extends CircuitElm {
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     updateResistance(): void {
         // based on http://www.intusoft.com/nlpdf/nl11.pdf
-        const nom_r = this.nom_v * this.nom_v / this.nom_pow;
+        const nom_r = (this.nom_v * this.nom_v) / this.nom_pow;
         // this formula doesn't work for values over 5390
-        const tp = (this.temp > 5390) ? 5390 : this.temp;
-        this.resistance = nom_r * (1.26104 -
-            4.90662 * Math.sqrt(17.1839 / tp - 0.00318794) -
-            7.8569 / (tp - 187.56));
+        const tp = this.temp > 5390 ? 5390 : this.temp;
+        this.resistance = nom_r * (1.26104 - 4.90662 * Math.sqrt(17.1839 / tp - 0.00318794) - 7.8569 / (tp - 187.56));
     }
 
     startIteration(): void {
         this.updateResistance();
-        const cap  = 1.57e-4 * this.nom_pow;
-        const capw = cap * this.warmTime / .4;
-        const capc = cap * this.coolTime / .4;
-        this.temp += this.getPower() * CircuitElm.sim.timeStep / capw;
+        const cap = 1.57e-4 * this.nom_pow;
+        const capw = (cap * this.warmTime) / 0.4;
+        const capc = (cap * this.coolTime) / 0.4;
+        this.temp += (this.getPower() * CircuitElm.sim.timeStep) / capw;
         const cr = 2600 / this.nom_pow;
-        this.temp -= CircuitElm.sim.timeStep * (this.temp - this.roomTemp) / (capc * cr);
+        this.temp -= (CircuitElm.sim.timeStep * (this.temp - this.roomTemp)) / (capc * cr);
     }
 
     doStep(): void {
@@ -208,30 +212,29 @@ export class LampElm extends CircuitElm {
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0) return new EditInfo("Nominal Power",        this.nom_pow,  0, 0).setPositive();
-        if (n === 1) return new EditInfo("Nominal Voltage",      this.nom_v,    0, 0).setPositive().setUnitStep();
-        if (n === 2) return new EditInfo("Warmup Time (s)",      this.warmTime, 0, 0).setPositive();
-        if (n === 3) return new EditInfo("Cooldown Time (s)",    this.coolTime, 0, 0).setPositive();
+        if (n === 0) return new EditInfo("Nominal Power", this.nom_pow, 0, 0).setPositive();
+        if (n === 1) return new EditInfo("Nominal Voltage", this.nom_v, 0, 0).setPositive().setUnitStep();
+        if (n === 2) return new EditInfo("Warmup Time (s)", this.warmTime, 0, 0).setPositive();
+        if (n === 3) return new EditInfo("Cooldown Time (s)", this.coolTime, 0, 0).setPositive();
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0 && ei.value > 0) this.nom_pow  = ei.value;
-        if (n === 1 && ei.value > 0) this.nom_v    = ei.value;
+        if (n === 0 && ei.value > 0) this.nom_pow = ei.value;
+        if (n === 1 && ei.value > 0) this.nom_v = ei.value;
         if (n === 2 && ei.value > 0) this.warmTime = ei.value;
         if (n === 3 && ei.value > 0) this.coolTime = ei.value;
     }
 
     getScopeValue(x: number): number {
-        return (x === VAL_R) ? this.resistance : super.getScopeValue(x);
+        return x === VAL_R ? this.resistance : super.getScopeValue(x);
     }
 
     getScopeUnits(x: number): number {
-        return (x === VAL_R) ? UNITS_OHMS : super.getScopeUnits(x);
+        return x === VAL_R ? UNITS_OHMS : super.getScopeUnits(x);
     }
 
     canShowValueInScope(x: number): boolean {
         return x === VAL_R;
     }
-
 }

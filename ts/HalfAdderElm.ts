@@ -21,7 +21,9 @@ import { ChipElm, Pin } from "./ChipElm";
 import { StringTokenizer } from "./StringTokenizer";
 
 export class HalfAdderElm extends ChipElm {
-    hasReset(): boolean { return false; }
+    hasReset(): boolean {
+        return false;
+    }
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
@@ -31,7 +33,9 @@ export class HalfAdderElm extends ChipElm {
             super(xxOrXa, yyOrYa, xb, yb!, f!, st!);
         }
     }
-    getChipName(): string { return "Half Adder"; }
+    getChipName(): string {
+        return "Half Adder";
+    }
 
     setupPins(): void {
         this.sizeX = 2;
@@ -48,12 +52,18 @@ export class HalfAdderElm extends ChipElm {
     getPostCount(): number {
         return 4;
     }
-    getVoltageSourceCount(): number { return 2; }
+    getVoltageSourceCount(): number {
+        return 2;
+    }
 
     execute(): void {
         this.pins[0].value = this.pins[2].value !== this.pins[3].value;
         this.pins[1].value = this.pins[2].value && this.pins[3].value;
     }
-    showPropertiesOnCreate(): boolean { return false; }
-    getDumpType(): number { return 195; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
+    getDumpType(): number {
+        return 195;
+    }
 }

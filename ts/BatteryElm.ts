@@ -48,28 +48,30 @@ export class BatteryElm extends CircuitElm {
     static readonly BT_CUSTOM = -1;
     static readonly batteryTypeNames = ["Alkaline 1.5V", "Lithium-Ion", "NiMH 1.2V", "NiCd 1.2V", "Lead-Acid"];
     static readonly batteryTypeTables = [
-        "0=0.8\n10=0.95\n20=1.05\n40=1.18\n60=1.28\n80=1.38\n90=1.43\n100=1.55\n",           // alkaline
+        "0=0.8\n10=0.95\n20=1.05\n40=1.18\n60=1.28\n80=1.38\n90=1.43\n100=1.55\n", // alkaline
         "0=3.00\n5=3.30\n10=3.45\n20=3.55\n30=3.62\n40=3.68\n50=3.73\n60=3.79\n70=3.87\n80=3.97\n90=4.08\n95=4.15\n100=4.20\n", // lithium-ion
-        "0=1.00\n10=1.15\n20=1.20\n50=1.25\n80=1.30\n90=1.33\n100=1.40\n",                  // NiMH
-        "0=1.00\n10=1.15\n20=1.20\n50=1.22\n80=1.25\n90=1.28\n100=1.35\n",                  // NiCd
-        "0=1.75\n10=1.90\n20=1.95\n50=2.05\n80=2.10\n90=2.12\n100=2.15\n",                  // lead-acid
+        "0=1.00\n10=1.15\n20=1.20\n50=1.25\n80=1.30\n90=1.33\n100=1.40\n", // NiMH
+        "0=1.00\n10=1.15\n20=1.20\n50=1.22\n80=1.25\n90=1.28\n100=1.35\n", // NiCd
+        "0=1.75\n10=1.90\n20=1.95\n50=2.05\n80=2.10\n90=2.12\n100=2.15\n", // lead-acid
     ];
 
     // default capacity (Ah), R0 (ohms), R1 (ohms), C1 (F) for each preset battery type,
     // applied when the user switches to that type in the edit dialog
     static readonly batteryTypeDefaults = [
-        [2.5,  .15,   .25,  1500],  // alkaline (AA)
-        [3.0,  .025,  .020, 2000],  // lithium-ion (18650)
-        [2.0,  .030,  .040, 1800],  // NiMH (AA)
-        [1.0,  .020,  .025, 1200],  // NiCd (AA)
-        [10,   .008,  .012, 5000],  // lead-acid (2V)
+        [2.5, 0.15, 0.25, 1500], // alkaline (AA)
+        [3.0, 0.025, 0.02, 2000], // lithium-ion (18650)
+        [2.0, 0.03, 0.04, 1800], // NiMH (AA)
+        [1.0, 0.02, 0.025, 1200], // NiCd (AA)
+        [10, 0.008, 0.012, 5000], // lead-acid (2V)
     ];
 
     batteryType: number;
-    r0: number; r1: number; c1: number;
+    r0: number;
+    r1: number;
+    c1: number;
     capacityAh: number;
-    initialSoc: number;    // 0 to 1, used when resetting
-    soc: number = 0;       // 0 to 1, current state of charge
+    initialSoc: number; // 0 to 1, used when resetting
+    soc: number = 0; // 0 to 1, current state of charge
 
     // internal node indices: nodes[0] = (-) terminal, nodes[1] = (+) terminal,
     // nodes[2] = node between Vsrc and R0, nodes[3] = node between R0 and R1/C1
@@ -83,8 +85,8 @@ export class BatteryElm extends CircuitElm {
 
     constructor(xx: number, yy: number) {
         super(xx, yy);
-        this.r0 = .01;
-        this.r1 = .02;
+        this.r0 = 0.01;
+        this.r1 = 0.02;
         this.c1 = 2000;
         this.capacityAh = 2;
         this.initialSoc = 1;
@@ -95,10 +97,18 @@ export class BatteryElm extends CircuitElm {
         this.reset();
     }
 
-    getInternalNodeCount(): number { return 2; }
-    getVoltageSourceCount(): number { return 1; }
-    getDragVertical(requestedVertical: boolean): boolean { return true; }
-    isBatteryElm(): boolean { return true; }
+    getInternalNodeCount(): number {
+        return 2;
+    }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    getDragVertical(requestedVertical: boolean): boolean {
+        return true;
+    }
+    isBatteryElm(): boolean {
+        return true;
+    }
 
     // point 2, not point 1, should track the mouse during toolbar drag-and-drop
     dragPlace(xa: number, ya: number, vertical: boolean): void {
@@ -114,7 +124,11 @@ export class BatteryElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "cap", this.capacityAh);
         CircuitXMLSerializer.dumpAttr(elem, "isoc", this.initialSoc);
         CircuitXMLSerializer.dumpAttr(elem, "bt", this.batteryType);
-        if (this.batteryType === BatteryElm.BT_CUSTOM && this.socVoltageTable != null && this.socVoltageTable.length > 0)
+        if (
+            this.batteryType === BatteryElm.BT_CUSTOM &&
+            this.socVoltageTable != null &&
+            this.socVoltageTable.length > 0
+        )
             elem.appendChild(doc.createTextNode(this.socVoltageTable));
     }
 
@@ -124,8 +138,8 @@ export class BatteryElm extends CircuitElm {
 
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
-        this.r0 = xml.parseDoubleAttr("r0", .01);
-        this.r1 = xml.parseDoubleAttr("r1", .02);
+        this.r0 = xml.parseDoubleAttr("r0", 0.01);
+        this.r1 = xml.parseDoubleAttr("r1", 0.02);
         this.c1 = xml.parseDoubleAttr("c1", 2000);
         this.capacityAh = xml.parseDoubleAttr("cap", 2);
         this.initialSoc = BatteryElm.clampSoc(xml.parseDoubleAttr("isoc", 1));
@@ -142,8 +156,10 @@ export class BatteryElm extends CircuitElm {
             if (this.socVoltageTable == null || this.socVoltageTable.length === 0)
                 this.socVoltageTable = BatteryElm.batteryTypeTables[BatteryElm.BT_LITHIUM];
         } else
-            this.socVoltageTable = (this.batteryType >= 0 && this.batteryType < BatteryElm.batteryTypeTables.length) ?
-                BatteryElm.batteryTypeTables[this.batteryType] : BatteryElm.batteryTypeTables[BatteryElm.BT_LITHIUM];
+            this.socVoltageTable =
+                this.batteryType >= 0 && this.batteryType < BatteryElm.batteryTypeTables.length
+                    ? BatteryElm.batteryTypeTables[this.batteryType]
+                    : BatteryElm.batteryTypeTables[BatteryElm.BT_LITHIUM];
         this.parseSocTable(null);
     }
 
@@ -161,28 +177,23 @@ export class BatteryElm extends CircuitElm {
 
     parseSocTable(ei: EditInfo | null): void {
         this.socTable = [];
-        if (this.socVoltageTable == null || this.socVoltageTable.length === 0)
-            return;
+        if (this.socVoltageTable == null || this.socVoltageTable.length === 0) return;
         const lines = this.socVoltageTable.split("\n");
         for (let i = 0; i !== lines.length; i++) {
             const line = lines[i].trim();
-            if (line.length === 0)
-                continue;
-            const eq = line.indexOf('=');
+            if (line.length === 0) continue;
+            const eq = line.indexOf("=");
             if (eq < 0) {
-                if (ei != null)
-                    ei.setError("missing =: " + line);
+                if (ei != null) ei.setError("missing =: " + line);
                 continue;
             }
             try {
                 const socPct = parseFloatStrict(line.substring(0, eq).trim());
                 const v = parseFloatStrict(line.substring(eq + 1).trim());
-                if (isNaN(socPct) || isNaN(v))
-                    throw new Error("bad number");
+                if (isNaN(socPct) || isNaN(v)) throw new Error("bad number");
                 this.socTable.push([socPct, v]);
             } catch (e) {
-                if (ei != null)
-                    ei.setError("bad line: " + line);
+                if (ei != null) ei.setError("bad line: " + line);
             }
         }
         // insertion sort by SOC percent (tables are tiny, simplicity over speed)
@@ -210,21 +221,16 @@ export class BatteryElm extends CircuitElm {
     }
 
     interpSocTable(socPct: number): number {
-        if (this.socTable == null || this.socTable.length === 0)
-            return 3.7;
-        if (this.socTable.length === 1)
-            return this.socTable[0][1];
-        if (socPct <= this.socTable[0][0])
-            return this.socTable[0][1];
+        if (this.socTable == null || this.socTable.length === 0) return 3.7;
+        if (this.socTable.length === 1) return this.socTable[0][1];
+        if (socPct <= this.socTable[0][0]) return this.socTable[0][1];
         const n = this.socTable.length;
-        if (socPct >= this.socTable[n - 1][0])
-            return this.socTable[n - 1][1];
+        if (socPct >= this.socTable[n - 1][0]) return this.socTable[n - 1][1];
         for (let i = 0; i < n - 1; i++) {
             const a = this.socTable[i];
             const b = this.socTable[i + 1];
             if (socPct >= a[0] && socPct <= b[0]) {
-                if (b[0] === a[0])
-                    return a[1];
+                if (b[0] === a[0]) return a[1];
                 const frac = (socPct - a[0]) / (b[0] - a[0]);
                 return a[1] + frac * (b[1] - a[1]);
             }
@@ -256,30 +262,31 @@ export class BatteryElm extends CircuitElm {
     }
 
     startIteration(): void {
-        if (this.doDcAnalysis())
-            this.curSourceValue = 0;
-        else
-            this.curSourceValue = -this.capVoltDiff / this.compResistance - this.capCurrent;
+        if (this.doDcAnalysis()) this.curSourceValue = 0;
+        else this.curSourceValue = -this.capVoltDiff / this.compResistance - this.capCurrent;
     }
 
     doStep(): void {
-        CircuitElm.sim.updateVoltageSource(this.nodes[0], this.nodes[2], this.voltSource, this.getVoltageForSoc(this.soc));
+        CircuitElm.sim.updateVoltageSource(
+            this.nodes[0],
+            this.nodes[2],
+            this.voltSource,
+            this.getVoltageForSoc(this.soc),
+        );
         CircuitElm.sim.stampCurrentSource(this.nodes[3], this.nodes[1], this.curSourceValue);
     }
 
     stepFinished(): void {
         this.capVoltDiff = this.nodes[3].v - this.nodes[1].v;
-        if (this.compResistance > 0)
-            this.capCurrent = this.capVoltDiff / this.compResistance + this.curSourceValue;
+        if (this.compResistance > 0) this.capCurrent = this.capVoltDiff / this.compResistance + this.curSourceValue;
 
         // coulomb counting: "current" (set from the internal voltage source's solved
         // current) is positive when the battery is discharging, per CircuitElm's
         // getCurrentIntoNode() convention for post 1 (the + terminal).
         if (this.capacityAh > 0 && !this.doDcAnalysis()) {
-            this.soc -= this.current * CircuitElm.sim.timeStep / (3600 * this.capacityAh);
+            this.soc -= (this.current * CircuitElm.sim.timeStep) / (3600 * this.capacityAh);
             // no lower clamp: below 0% the voltage table is extrapolated (see getVoltageForSoc)
-            if (this.soc > 1)
-                this.soc = 1;
+            if (this.soc > 1) this.soc = 1;
         }
     }
 
@@ -309,31 +316,36 @@ export class BatteryElm extends CircuitElm {
             let s: string | null = null;
             if (showV && showSoc)
                 s = CircuitElm.getShortUnitText(this.getVoltageForSoc(this.soc), "V") + " " + this.getSocText();
-            else if (showV)
-                s = CircuitElm.getShortUnitText(this.getVoltageForSoc(this.soc), "V");
-            else if (showSoc)
-                s = this.getSocText();
-            if (s != null)
-                this.drawValues(g, s, hs);
+            else if (showV) s = CircuitElm.getShortUnitText(this.getVoltageForSoc(this.soc), "V");
+            else if (showSoc) s = this.getSocText();
+            if (s != null) this.drawValues(g, s, hs);
         }
         this.updateDotCount();
-        if (!this.isCreating())
-            this.drawDots(g, this.point1, this.point2, this.curcount);
+        if (!this.isCreating()) this.drawDots(g, this.point1, this.point2, this.curcount);
         this.drawPosts(g);
     }
 
-    addRoutingObstacle(wr: WireRouter): void { this.addRoutingObstacleWithLeads(wr, 16); }
+    addRoutingObstacle(wr: WireRouter): void {
+        this.addRoutingObstacleWithLeads(wr, 16);
+    }
 
-    getPower(): number { return -this.getVoltageDiff() * this.current; }
-    getVoltageDiff(): number { return this.nodes[1].v - this.nodes[0].v; }
+    getPower(): number {
+        return -this.getVoltageDiff() * this.current;
+    }
+    getVoltageDiff(): number {
+        return this.nodes[1].v - this.nodes[0].v;
+    }
 
     // SOC is always shown as a whole percentage; getShortUnitText()/getUnitText() would
     // apply metric prefixes or decimal places that don't make sense for a percentage.
-    getSocText(): string { return Math.round(this.soc * 100) + "%"; }
+    getSocText(): string {
+        return Math.round(this.soc * 100) + "%";
+    }
 
     getBatteryTypeName(): string {
-        return (this.batteryType >= 0 && this.batteryType < BatteryElm.batteryTypeNames.length) ?
-            BatteryElm.batteryTypeNames[this.batteryType] : "Custom";
+        return this.batteryType >= 0 && this.batteryType < BatteryElm.batteryTypeNames.length
+            ? BatteryElm.batteryTypeNames[this.batteryType]
+            : "Custom";
     }
 
     getInfo(arr: string[]): void {
@@ -352,19 +364,17 @@ export class BatteryElm extends CircuitElm {
                 ei.choice.add(BatteryElm.batteryTypeNames[i]);
             ei.choice.add("Custom");
             // "Custom" is the entry after all the presets, since BT_CUSTOM isn't a valid array index
-            ei.choice.select(this.batteryType === BatteryElm.BT_CUSTOM ? BatteryElm.batteryTypeNames.length : this.batteryType);
+            ei.choice.select(
+                this.batteryType === BatteryElm.BT_CUSTOM ? BatteryElm.batteryTypeNames.length : this.batteryType,
+            );
             return ei;
         }
-        if (n === 1)
-            return new EditInfo("Capacity (Ah)", this.capacityAh).setPositive();
+        if (n === 1) return new EditInfo("Capacity (Ah)", this.capacityAh).setPositive();
         if (n === 2)
             return new EditInfo("Initial State of Charge (%)", this.initialSoc * 100, 0, 100).setDimensionless();
-        if (n === 3)
-            return new EditInfo("R0, Ohmic Resistance (ohms)", this.r0).setPositive();
-        if (n === 4)
-            return new EditInfo("R1, Polarization Resistance (ohms)", this.r1).setPositive();
-        if (n === 5)
-            return new EditInfo("C1, Polarization Capacitance (F)", this.c1).setPositive();
+        if (n === 3) return new EditInfo("R0, Ohmic Resistance (ohms)", this.r0).setPositive();
+        if (n === 4) return new EditInfo("R1, Polarization Resistance (ohms)", this.r1).setPositive();
+        if (n === 5) return new EditInfo("C1, Polarization Capacitance (F)", this.c1).setPositive();
         if (n === 6) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Show Voltage", (this.flags & BatteryElm.FLAG_SHOW_VOLTAGE) !== 0);
@@ -387,7 +397,7 @@ export class BatteryElm extends CircuitElm {
         if (n === 0 && ei.choice != null) {
             const oldType = this.batteryType;
             const sel = ei.choice.getSelectedIndex();
-            this.batteryType = (sel >= BatteryElm.batteryTypeNames.length) ? BatteryElm.BT_CUSTOM : sel;
+            this.batteryType = sel >= BatteryElm.batteryTypeNames.length ? BatteryElm.BT_CUSTOM : sel;
             if (this.batteryType !== BatteryElm.BT_CUSTOM) {
                 this.socVoltageTable = BatteryElm.batteryTypeTables[this.batteryType];
                 if (this.batteryType !== oldType) {
@@ -397,30 +407,22 @@ export class BatteryElm extends CircuitElm {
                     this.r1 = d[2];
                     this.c1 = d[3];
                 }
-            } else if (oldType !== BatteryElm.BT_CUSTOM)
-                this.socVoltageTable = BatteryElm.batteryTypeTables[oldType];
+            } else if (oldType !== BatteryElm.BT_CUSTOM) this.socVoltageTable = BatteryElm.batteryTypeTables[oldType];
             this.parseSocTable(null);
-            if (this.batteryType !== oldType)
-                ei.newDialog = true;
+            if (this.batteryType !== oldType) ei.newDialog = true;
         }
-        if (n === 1)
-            this.capacityAh = ei.value;
+        if (n === 1) this.capacityAh = ei.value;
         if (n === 2) {
             let v = ei.value;
             if (v < 0) v = 0;
             if (v > 100) v = 100;
-            this.initialSoc = v * .01;
+            this.initialSoc = v * 0.01;
         }
-        if (n === 3)
-            this.r0 = ei.value;
-        if (n === 4)
-            this.r1 = ei.value;
-        if (n === 5)
-            this.c1 = ei.value;
-        if (n === 6 && ei.checkbox != null)
-            this.flags = ei.changeFlag(this.flags, BatteryElm.FLAG_SHOW_VOLTAGE);
-        if (n === 7 && ei.checkbox != null)
-            this.flags = ei.changeFlag(this.flags, BatteryElm.FLAG_SHOW_SOC);
+        if (n === 3) this.r0 = ei.value;
+        if (n === 4) this.r1 = ei.value;
+        if (n === 5) this.c1 = ei.value;
+        if (n === 6 && ei.checkbox != null) this.flags = ei.changeFlag(this.flags, BatteryElm.FLAG_SHOW_VOLTAGE);
+        if (n === 7 && ei.checkbox != null) this.flags = ei.changeFlag(this.flags, BatteryElm.FLAG_SHOW_SOC);
         if (n === 8) {
             this.socVoltageTable = ei.textArea.element ? ei.textArea.element.value : ei.textArea.value;
             this.parseSocTable(ei);

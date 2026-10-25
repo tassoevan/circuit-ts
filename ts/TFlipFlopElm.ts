@@ -25,8 +25,12 @@ import { Checkbox } from "./Checkbox";
 export class TFlipFlopElm extends ChipElm {
     static readonly FLAG_RESET = 2;
     static readonly FLAG_SET = 4;
-    hasReset(): boolean { return (this.flags & TFlipFlopElm.FLAG_RESET) !== 0 || this.hasSet(); }
-    hasSet(): boolean { return (this.flags & TFlipFlopElm.FLAG_SET) !== 0; }
+    hasReset(): boolean {
+        return (this.flags & TFlipFlopElm.FLAG_RESET) !== 0 || this.hasSet();
+    }
+    hasSet(): boolean {
+        return (this.flags & TFlipFlopElm.FLAG_SET) !== 0;
+    }
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
@@ -37,7 +41,9 @@ export class TFlipFlopElm extends ChipElm {
             this.pins[2].value = !this.pins[1].value;
         }
     }
-    getChipName(): string { return "T flip-flop"; }
+    getChipName(): string {
+        return "T flip-flop";
+    }
     setupPins(): void {
         this.sizeX = 2;
         this.sizeY = 3;
@@ -51,8 +57,7 @@ export class TFlipFlopElm extends ChipElm {
         this.pins[3] = new Pin(this, 1, ChipElm.SIDE_W, "");
         this.pins[3].clock = true;
         if (!this.hasSet()) {
-            if (this.hasReset())
-                this.pins[4] = new Pin(this, 2, ChipElm.SIDE_W, "R");
+            if (this.hasReset()) this.pins[4] = new Pin(this, 2, ChipElm.SIDE_W, "R");
         } else {
             this.pins[5] = new Pin(this, 2, ChipElm.SIDE_W, "S");
             this.pins[4] = new Pin(this, 2, ChipElm.SIDE_E, "R");
@@ -61,7 +66,9 @@ export class TFlipFlopElm extends ChipElm {
     getPostCount(): number {
         return 4 + (this.hasReset() ? 1 : 0) + (this.hasSet() ? 1 : 0);
     }
-    getVoltageSourceCount(): number { return 2; }
+    getVoltageSourceCount(): number {
+        return 2;
+    }
     reset(): void {
         super.reset();
         this.pins[2].value = true;
@@ -83,8 +90,12 @@ export class TFlipFlopElm extends ChipElm {
         this.pins[2].value = !this.pins[1].value;
         this.lastClock = this.pins[3].value;
     }
-    getDumpType(): number { return 193; }
-    showPropertiesOnCreate(): boolean { return false; }
+    getDumpType(): number {
+        return 193;
+    }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
@@ -100,19 +111,15 @@ export class TFlipFlopElm extends ChipElm {
     }
     setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
-            if (ei.checkbox!.getState())
-                this.flags |= TFlipFlopElm.FLAG_RESET;
-            else
-                this.flags &= ~TFlipFlopElm.FLAG_RESET | TFlipFlopElm.FLAG_SET;
+            if (ei.checkbox!.getState()) this.flags |= TFlipFlopElm.FLAG_RESET;
+            else this.flags &= ~TFlipFlopElm.FLAG_RESET | TFlipFlopElm.FLAG_SET;
             this.setupPins();
             this.allocNodes();
             this.setPoints();
         }
         if (n === 1) {
-            if (ei.checkbox!.getState())
-                this.flags |= TFlipFlopElm.FLAG_SET;
-            else
-                this.flags &= ~TFlipFlopElm.FLAG_SET;
+            if (ei.checkbox!.getState()) this.flags |= TFlipFlopElm.FLAG_SET;
+            else this.flags &= ~TFlipFlopElm.FLAG_SET;
             this.setupPins();
             this.allocNodes();
             this.setPoints();

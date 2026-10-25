@@ -53,8 +53,12 @@ export class ThermistorNTCElm extends CircuitElm {
         this.createSlider();
     }
 
-    getPostCount(): number { return 2; }
-    getDumpType(): number { return 350; }
+    getPostCount(): number {
+        return 2;
+    }
+    getDumpType(): number {
+        return 350;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -135,21 +139,26 @@ export class ThermistorNTCElm extends CircuitElm {
         ctx.save();
         ctx.lineWidth = 3.0;
         ctx.transform(
-            (this.lead2!.x - this.lead1!.x) / len, (this.lead2!.y - this.lead1!.y) / len,
-            -(this.lead2!.y - this.lead1!.y) / len, (this.lead2!.x - this.lead1!.x) / len,
-            this.lead1!.x, this.lead1!.y
+            (this.lead2!.x - this.lead1!.x) / len,
+            (this.lead2!.y - this.lead1!.y) / len,
+            -(this.lead2!.y - this.lead1!.y) / len,
+            (this.lead2!.x - this.lead1!.x) / len,
+            this.lead1!.x,
+            this.lead1!.y,
         );
         const grad = ctx.createLinearGradient(0, 0, len, 0);
         grad.addColorStop(0, this.getVoltageColor(g, this.nodes[0].v).getHexValue());
         grad.addColorStop(1, this.getVoltageColor(g, this.nodes[1].v).getHexValue());
         ctx.strokeStyle = grad;
         if (!this.showEuroResistors()) {
-            ctx.beginPath(); ctx.moveTo(0, 0);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
             for (let i = 0; i < 4; i++) {
-                ctx.lineTo((1 + 4*i) * len / 16, hs);
-                ctx.lineTo((3 + 4*i) * len / 16, -hs);
+                ctx.lineTo(((1 + 4 * i) * len) / 16, hs);
+                ctx.lineTo(((3 + 4 * i) * len) / 16, -hs);
             }
-            ctx.lineTo(len, 0); ctx.stroke();
+            ctx.lineTo(len, 0);
+            ctx.stroke();
         } else {
             ctx.strokeRect(0, -hs, len, 2.0 * hs);
         }
@@ -188,7 +197,9 @@ export class ThermistorNTCElm extends CircuitElm {
         arr[5] = "T = " + CircuitElm.getUnitText(this.temperature, "°C");
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("R at 25°C", this.r25, this.r50 + 100, 100000);
         if (n === 1) return new EditInfo("R at 50°C", this.r50, 100, this.r25 - 100);
@@ -219,7 +230,7 @@ export class ThermistorNTCElm extends CircuitElm {
     }
 
     calcResistance(tempr: number): number {
-        return Math.round(this.r25 * Math.exp(this.b25100 * ((1 / (tempr + this.t0)) - (1 / this.t25))));
+        return Math.round(this.r25 * Math.exp(this.b25100 * (1 / (tempr + this.t0) - 1 / this.t25)));
     }
 
     temprFromSliderPos(): number {
@@ -227,6 +238,6 @@ export class ThermistorNTCElm extends CircuitElm {
     }
 
     calcB25100(): number {
-        return (Math.log(this.r25) - Math.log(this.r50)) / ((1 / (this.t0 + 25)) - (1 / (this.t0 + 50)));
+        return (Math.log(this.r25) - Math.log(this.r50)) / (1 / (this.t0 + 25) - 1 / (this.t0 + 50));
     }
 }

@@ -27,46 +27,45 @@ import { CircuitXMLDeserializer } from "./CircuitXMLDeserializer";
 import { parseIntStrict } from "./NumberParse";
 
 export class SevenSegDecoderElm extends ChipElm {
-
     private static readonly symbols: boolean[][] = [
-        [true,true,true,true,true,true,false],     //0
-        [false,true,true,false,false,false,false],  //1
-        [true,true,false,true,true,false,true],     //2
-        [true,true,true,true,false,false,true],     //3
-        [false,true,true,false,false,true,true],    //4
-        [true,false,true,true,false,true,true],     //5
-        [true,false,true,true,true,true,true],      //6
-        [true,true,true,false,false,false,false],   //7
-        [true,true,true,true,true,true,true],       //8
-        [true,true,true,true,false,true,true],      //9
-        [true,true,true,false,true,true,true],      //A
-        [false,false,true,true,true,true,true],     //B
-        [true,false,false,true,true,true,false],    //C
-        [false,true,true,true,true,false,true],     //D
-        [true,false,false,true,true,true,true],     //E
-        [true,false,false,false,true,true,true],    //F
+        [true, true, true, true, true, true, false], //0
+        [false, true, true, false, false, false, false], //1
+        [true, true, false, true, true, false, true], //2
+        [true, true, true, true, false, false, true], //3
+        [false, true, true, false, false, true, true], //4
+        [true, false, true, true, false, true, true], //5
+        [true, false, true, true, true, true, true], //6
+        [true, true, true, false, false, false, false], //7
+        [true, true, true, true, true, true, true], //8
+        [true, true, true, true, false, true, true], //9
+        [true, true, true, false, true, true, true], //A
+        [false, false, true, true, true, true, true], //B
+        [true, false, false, true, true, true, false], //C
+        [false, true, true, true, true, false, true], //D
+        [true, false, false, true, true, true, true], //E
+        [true, false, false, false, true, true, true], //F
     ];
 
     // 14-segment encoding: a=top, b=upper-right, c=lower-right, d=bottom, e=lower-left, f=upper-left,
     // g=diag UL-center, h=vert upper, i=diag UR-center, j=horiz right-center,
     // k=diag center-LR, l=vert lower, m=diag center-LL, n=horiz left-center
     private static readonly symbols14: boolean[][] = [
-        [true,true,true,true,true,true, false,false,true,false,false,false,true,false],     //0
-        [false,true,true,false,false,false, false,false,true,false,false,false,false,false], //1
-        [true,true,false,true,true,false, false,false,false,true,false,false,false,true],    //2
-        [true,true,true,true,false,false, false,false,false,true,false,false,false,true],    //3
-        [false,true,true,false,false,true, false,false,false,true,false,false,false,true],   //4
-        [true,false,true,true,false,true, false,false,false,true,false,false,false,true],    //5
-        [true,false,true,true,true,true, false,false,false,true,false,false,false,true],     //6
-        [true,false,false,false,false,false, false,false,true,false,false,true,false,false], //7
-        [true,true,true,true,true,true, false,false,false,true,false,false,false,true],      //8
-        [true,true,true,true,false,true, false,false,false,true,false,false,false,true],     //9
-        [true,true,true,false,true,true, false,false,false,true,false,false,false,true],     //A
-        [true,true,true,true,false,false, false,true,false,true,false,true,false,false],     //B
-        [true,false,false,true,true,true, false,false,false,false,false,false,false,false],  //C
-        [true,true,true,true,false,false, false,true,false,false,false,true,false,false],    //D
-        [true,false,false,true,true,true, false,false,false,true,false,false,false,true],    //E
-        [true,false,false,false,true,true, false,false,false,true,false,false,false,true],   //F
+        [true, true, true, true, true, true, false, false, true, false, false, false, true, false], //0
+        [false, true, true, false, false, false, false, false, true, false, false, false, false, false], //1
+        [true, true, false, true, true, false, false, false, false, true, false, false, false, true], //2
+        [true, true, true, true, false, false, false, false, false, true, false, false, false, true], //3
+        [false, true, true, false, false, true, false, false, false, true, false, false, false, true], //4
+        [true, false, true, true, false, true, false, false, false, true, false, false, false, true], //5
+        [true, false, true, true, true, true, false, false, false, true, false, false, false, true], //6
+        [true, false, false, false, false, false, false, false, true, false, false, true, false, false], //7
+        [true, true, true, true, true, true, false, false, false, true, false, false, false, true], //8
+        [true, true, true, true, false, true, false, false, false, true, false, false, false, true], //9
+        [true, true, true, false, true, true, false, false, false, true, false, false, false, true], //A
+        [true, true, true, true, false, false, false, true, false, true, false, true, false, false], //B
+        [true, false, false, true, true, true, false, false, false, false, false, false, false, false], //C
+        [true, true, true, true, false, false, false, true, false, false, false, true, false, false], //D
+        [true, false, false, true, true, true, false, false, false, true, false, false, false, true], //E
+        [true, false, false, false, true, true, false, false, false, true, false, false, false, true], //F
     ];
 
     // 16-segment encoding: a=top-left, b=top-right, c=upper-right, d=lower-right,
@@ -74,27 +73,27 @@ export class SevenSegDecoderElm extends ChipElm {
     // i=diag UL-center, j=vert upper, k=diag UR-center, l=horiz right,
     // m=diag center-LR, n=vert lower, o=diag center-LL, p=horiz left
     private static readonly symbols16: boolean[][] = [
-        [true,true,true,true,true,true,true,true, false,false,true,false,false,false,true,false],     //0
-        [false,false,true,true,false,false,false,false, false,false,true,false,false,false,false,false], //1
-        [true,true,true,false,true,true,true,false, false,false,false,true,false,false,false,true],    //2
-        [true,true,true,true,true,true,false,false, false,false,false,true,false,false,false,true],    //3
-        [false,false,true,true,false,false,false,true, false,false,false,true,false,false,false,true], //4
-        [true,true,false,true,true,true,false,true, false,false,false,true,false,false,false,true],    //5
-        [true,true,false,true,true,true,true,true, false,false,false,true,false,false,false,true],     //6
-        [true,true,false,false,false,false,false,false, false,false,true,false,false,true,false,false],//7
-        [true,true,true,true,true,true,true,true, false,false,false,true,false,false,false,true],      //8
-        [true,true,true,true,true,true,false,true, false,false,false,true,false,false,false,true],     //9
-        [true,true,true,true,false,false,true,true, false,false,false,true,false,false,false,true],    //A
-        [true,true,true,true,true,true,false,false, false,true,false,true,false,true,false,false],     //B
-        [true,true,false,false,true,true,true,true, false,false,false,false,false,false,false,false],  //C
-        [true,true,true,true,true,true,false,false, false,true,false,false,false,true,false,false],    //D
-        [true,true,false,false,true,true,true,true, false,false,false,true,false,false,false,true],    //E
-        [true,true,false,false,false,false,true,true, false,false,false,true,false,false,false,true],  //F
+        [true, true, true, true, true, true, true, true, false, false, true, false, false, false, true, false], //0
+        [false, false, true, true, false, false, false, false, false, false, true, false, false, false, false, false], //1
+        [true, true, true, false, true, true, true, false, false, false, false, true, false, false, false, true], //2
+        [true, true, true, true, true, true, false, false, false, false, false, true, false, false, false, true], //3
+        [false, false, true, true, false, false, false, true, false, false, false, true, false, false, false, true], //4
+        [true, true, false, true, true, true, false, true, false, false, false, true, false, false, false, true], //5
+        [true, true, false, true, true, true, true, true, false, false, false, true, false, false, false, true], //6
+        [true, true, false, false, false, false, false, false, false, false, true, false, false, true, false, false], //7
+        [true, true, true, true, true, true, true, true, false, false, false, true, false, false, false, true], //8
+        [true, true, true, true, true, true, false, true, false, false, false, true, false, false, false, true], //9
+        [true, true, true, true, false, false, true, true, false, false, false, true, false, false, false, true], //A
+        [true, true, true, true, true, true, false, false, false, true, false, true, false, true, false, false], //B
+        [true, true, false, false, true, true, true, true, false, false, false, false, false, false, false, false], //C
+        [true, true, true, true, true, true, false, false, false, true, false, false, false, true, false, false], //D
+        [true, true, false, false, true, true, true, true, false, false, false, true, false, false, false, true], //E
+        [true, true, false, false, false, false, true, true, false, false, false, true, false, false, false, true], //F
     ];
 
-    static readonly FLAG_ENABLE = (1 << 1);
-    static readonly FLAG_BLANK_F = (1 << 2);
-    static readonly FLAG_148_FONT = (1 << 3);
+    static readonly FLAG_ENABLE = 1 << 1;
+    static readonly FLAG_BLANK_F = 1 << 2;
+    static readonly FLAG_148_FONT = 1 << 3;
 
     segmentType: number = 0; // 0=7-seg, 1=14-seg, 2=16-seg
 
@@ -130,11 +129,15 @@ export class SevenSegDecoderElm extends ChipElm {
         return 7;
     }
 
-    needsBits(): boolean { return false; }
-    allowBus(): boolean { return true; }
+    needsBits(): boolean {
+        return false;
+    }
+    allowBus(): boolean {
+        return true;
+    }
 
     getChipName(): string {
-        if (this.getSegmentCount() === 7)  return "7-Segment Decoder";
+        if (this.getSegmentCount() === 7) return "7-Segment Decoder";
         if (this.getSegmentCount() === 14) return "14-Segment Decoder";
         return "16-Segment Decoder";
     }
@@ -154,7 +157,7 @@ export class SevenSegDecoderElm extends ChipElm {
             this.makeBitPins(segCount, 0, ChipElm.SIDE_E, 0, "seg", true, false, false);
         } else {
             for (let i = 0; i < segCount; i++) {
-                this.pins[i] = new Pin(this, i, ChipElm.SIDE_E, String.fromCharCode('a'.charCodeAt(0) + i));
+                this.pins[i] = new Pin(this, i, ChipElm.SIDE_E, String.fromCharCode("a".charCodeAt(0) + i));
                 this.pins[i].output = true;
             }
         }
@@ -166,9 +169,15 @@ export class SevenSegDecoderElm extends ChipElm {
         this.allocNodes();
     }
 
-    hasBlank(): boolean { return (this.flags & SevenSegDecoderElm.FLAG_ENABLE) !== 0; }
-    blankOnF(): boolean { return (this.flags & SevenSegDecoderElm.FLAG_BLANK_F) !== 0; }
-    use148Font(): boolean { return (this.flags & SevenSegDecoderElm.FLAG_148_FONT) !== 0; }
+    hasBlank(): boolean {
+        return (this.flags & SevenSegDecoderElm.FLAG_ENABLE) !== 0;
+    }
+    blankOnF(): boolean {
+        return (this.flags & SevenSegDecoderElm.FLAG_BLANK_F) !== 0;
+    }
+    use148Font(): boolean {
+        return (this.flags & SevenSegDecoderElm.FLAG_148_FONT) !== 0;
+    }
 
     /** 7-segment mode only: by default 6 has a "hat" (top segment) and 9 has its bottom
      * segment filled in, matching the symbols table above. The '148 Font option (named for
@@ -186,7 +195,9 @@ export class SevenSegDecoderElm extends ChipElm {
         return segCount + 4 + (this.hasBlank() ? 1 : 0);
     }
 
-    getVoltageSourceCount(): number { return this.getSegmentCount(); }
+    getVoltageSourceCount(): number {
+        return this.getSegmentCount();
+    }
 
     execute(): void {
         const segCount = this.getSegmentCount();
@@ -196,21 +207,23 @@ export class SevenSegDecoderElm extends ChipElm {
         if (this.pins[segCount + 2].value) input += 2;
         if (this.pins[segCount + 3].value) input += 1;
         let en = true;
-        if (this.hasBlank() && !this.pins[segCount + 4].value)
-            en = false;
+        if (this.hasBlank() && !this.pins[segCount + 4].value) en = false;
         if (!en || (input === 15 && this.blankOnF())) {
-            for (let i = 0; i !== segCount; i++)
-                this.writeOutput(i, false);
+            for (let i = 0; i !== segCount; i++) this.writeOutput(i, false);
         } else {
-            const sym = (segCount === 14) ? SevenSegDecoderElm.symbols14 :
-                        (segCount === 16) ? SevenSegDecoderElm.symbols16 :
-                                            SevenSegDecoderElm.symbols;
-            for (let i = 0; i < segCount; i++)
-                this.writeOutput(i, this.segVal(segCount, sym, input, i));
+            const sym =
+                segCount === 14
+                    ? SevenSegDecoderElm.symbols14
+                    : segCount === 16
+                      ? SevenSegDecoderElm.symbols16
+                      : SevenSegDecoderElm.symbols;
+            for (let i = 0; i < segCount; i++) this.writeOutput(i, this.segVal(segCount, sym, input, i));
         }
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Segments", 0, -1, -1);
@@ -252,12 +265,12 @@ export class SevenSegDecoderElm extends ChipElm {
             this.setPoints();
             return;
         }
-        if (n === 2)
-            this.flags = ei.changeFlag(this.flags, SevenSegDecoderElm.FLAG_BLANK_F);
-        if (n === 3)
-            this.flags = ei.changeFlag(this.flags, SevenSegDecoderElm.FLAG_148_FONT);
+        if (n === 2) this.flags = ei.changeFlag(this.flags, SevenSegDecoderElm.FLAG_BLANK_F);
+        if (n === 3) this.flags = ei.changeFlag(this.flags, SevenSegDecoderElm.FLAG_148_FONT);
         super.setChipEditValue(n, ei);
     }
 
-    getDumpType(): number { return 197; }
+    getDumpType(): number {
+        return 197;
+    }
 }

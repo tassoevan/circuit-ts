@@ -64,7 +64,9 @@ export class EditSubcircuitModelDialog extends Dialog {
         this.closeOnEnter = true;
     }
 
-    setModel(m: SubcircuitModel): void { this.model = m; }
+    setModel(m: SubcircuitModel): void {
+        this.model = m;
+    }
 
     createModel(): boolean {
         const nodeSet = new Set<number>();
@@ -89,15 +91,14 @@ export class EditSubcircuitModelDialog extends Dialog {
             nodeSet.add(pin.node);
         }
 
-        const xOffsetLeft  = sideCounts[ChipElm.SIDE_W] > 0 ? 1 : 0;
+        const xOffsetLeft = sideCounts[ChipElm.SIDE_W] > 0 ? 1 : 0;
         const xOffsetRight = sideCounts[ChipElm.SIDE_E] > 0 ? 1 : 0;
         for (let i = 0; i < postCount; i++) {
             const pin = this.model.extList[i];
-            if (pin.side === ChipElm.SIDE_N || pin.side === ChipElm.SIDE_S)
-                pin.pos += xOffsetLeft;
+            if (pin.side === ChipElm.SIDE_N || pin.side === ChipElm.SIDE_S) pin.pos += xOffsetLeft;
         }
 
-        const minHeight = (sideCounts[ChipElm.SIDE_N] > 0 && sideCounts[ChipElm.SIDE_S] > 0) ? 2 : 1;
+        const minHeight = sideCounts[ChipElm.SIDE_N] > 0 && sideCounts[ChipElm.SIDE_S] > 0 ? 2 : 1;
         const pinsNS = Math.max(sideCounts[ChipElm.SIDE_N], sideCounts[ChipElm.SIDE_S]);
         const pinsWE = Math.max(sideCounts[ChipElm.SIDE_W], sideCounts[ChipElm.SIDE_E]);
         this.model.sizeX = Math.max(2, pinsNS + xOffsetLeft + xOffsetRight);
@@ -115,7 +116,9 @@ export class EditSubcircuitModelDialog extends Dialog {
         this.dialogEl.appendChild(title);
 
         this.dialogEl.appendChild(
-            Object.assign(document.createElement("div"), { textContent: Locale.LS("Drag the pins to the desired position") })
+            Object.assign(document.createElement("div"), {
+                textContent: Locale.LS("Drag the pins to the desired position"),
+            }),
         );
 
         this.canvas = document.createElement("canvas");
@@ -128,11 +131,11 @@ export class EditSubcircuitModelDialog extends Dialog {
         this.context = this.canvas.getContext("2d")!;
 
         // mouse/touch events
-        this.canvas.addEventListener("mousedown",  e => this.onMouseDown(e));
-        this.canvas.addEventListener("mouseup",    e => this.onMouseUp(e));
-        this.canvas.addEventListener("mousemove",  e => this.onMouseMove(e));
-        this.canvas.addEventListener("mouseout",   () => {});
-        this.canvas.addEventListener("mouseover",  () => {});
+        this.canvas.addEventListener("mousedown", (e) => this.onMouseDown(e));
+        this.canvas.addEventListener("mouseup", (e) => this.onMouseUp(e));
+        this.canvas.addEventListener("mousemove", (e) => this.onMouseMove(e));
+        this.canvas.addEventListener("mouseout", () => {});
+        this.canvas.addEventListener("mouseover", () => {});
 
         this.chip = new SubcircuitChipElm(50, 50);
         this.chip.x2 = 200;
@@ -141,7 +144,9 @@ export class EditSubcircuitModelDialog extends Dialog {
         this.createPinsFromModel();
 
         if (this.model.name === null || this.model.name === "") {
-            this.dialogEl.appendChild(Object.assign(document.createElement("label"), { textContent: Locale.LS("Model Name") }));
+            this.dialogEl.appendChild(
+                Object.assign(document.createElement("label"), { textContent: Locale.LS("Model Name") }),
+            );
             this.modelNameInput = document.createElement("input");
             this.modelNameInput.type = "text";
             this.modelNameInput.style.display = "block";
@@ -162,9 +167,13 @@ export class EditSubcircuitModelDialog extends Dialog {
             hp.appendChild(b);
         };
         hp.appendChild(Object.assign(document.createElement("span"), { textContent: Locale.LS("Width") + " " }));
-        addBtn("+", 1, 0); addBtn("-", -1, 0);
-        hp.appendChild(Object.assign(document.createElement("span"), { textContent: "  " + Locale.LS("Height") + " " }));
-        addBtn("+", 0, 1); addBtn("-", 0, -1);
+        addBtn("+", 1, 0);
+        addBtn("-", -1, 0);
+        hp.appendChild(
+            Object.assign(document.createElement("span"), { textContent: "  " + Locale.LS("Height") + " " }),
+        );
+        addBtn("+", 0, 1);
+        addBtn("-", 0, -1);
         this.dialogEl.appendChild(hp);
 
         // Label checkbox
@@ -186,13 +195,13 @@ export class EditSubcircuitModelDialog extends Dialog {
         scopeRow.appendChild(Object.assign(document.createElement("span"), { textContent: Locale.LS("Scope:") + " " }));
         this.scopeSelect = document.createElement("select");
         const scopes = [Locale.LS("This Circuit"), Locale.LS("This Session"), Locale.LS("Save Across Sessions")];
-        scopes.forEach(s => this.scopeSelect!.appendChild(Object.assign(document.createElement("option"), { textContent: s })));
-        if (this.model.isSaved())
-            this.scopeSelect.value = scopes[EditSubcircuitModelDialog.SCOPE_SAVE_ACROSS_SESSIONS];
+        scopes.forEach((s) =>
+            this.scopeSelect!.appendChild(Object.assign(document.createElement("option"), { textContent: s })),
+        );
+        if (this.model.isSaved()) this.scopeSelect.value = scopes[EditSubcircuitModelDialog.SCOPE_SAVE_ACROSS_SESSIONS];
         else if (this.model.name && SubcircuitModel.globalModelMap.has(this.model.name))
             this.scopeSelect.selectedIndex = EditSubcircuitModelDialog.SCOPE_THIS_SESSION;
-        else
-            this.scopeSelect.selectedIndex = EditSubcircuitModelDialog.SCOPE_THIS_CIRCUIT;
+        else this.scopeSelect.selectedIndex = EditSubcircuitModelDialog.SCOPE_THIS_CIRCUIT;
         scopeRow.appendChild(this.scopeSelect);
         this.dialogEl.appendChild(scopeRow);
 
@@ -237,7 +246,7 @@ export class EditSubcircuitModelDialog extends Dialog {
                 return;
             }
             SubcircuitElm.lastModelName = name;
-        this.model.setName(name);
+            this.model.setName(name);
         }
         const scope = this.scopeSelect!.selectedIndex;
         SubcircuitModel.localModelMap.delete(this.model.name);
@@ -272,8 +281,7 @@ export class EditSubcircuitModelDialog extends Dialog {
 
     closeDialog(): void {
         // a newly created model that was never named (cancelled) is discarded
-        if (this.model && this.model.name === "")
-            this.model.remove();
+        if (this.model && this.model.name === "") this.model.remove();
         super.closeDialog();
     }
 
@@ -285,7 +293,7 @@ export class EditSubcircuitModelDialog extends Dialog {
     drawChip(): void {
         if (!this.context || !this.chip.boundingBox) return;
         const g = new Graphics(this.context);
-        const scalew = this.canvas!.width  / (this.chip.boundingBox.width  + this.chip.boundingBox.x * 2);
+        const scalew = this.canvas!.width / (this.chip.boundingBox.width + this.chip.boundingBox.x * 2);
         const scaleh = this.canvas!.height / (this.chip.boundingBox.height + this.chip.boundingBox.y * 2);
         this.scale = 1 / Math.min(scalew, scaleh);
         this.context.fillStyle = CirSim.theApp.getBackgroundColor().getHexValue();
@@ -293,7 +301,9 @@ export class EditSubcircuitModelDialog extends Dialog {
         this.context.fillRect(0, 0, this.canvas!.width, this.canvas!.height);
         this.context.setTransform(1 / this.scale, 0, 0, 1 / this.scale, 0, 0);
         const labelName = this.labelCheck?.checked
-            ? (this.modelNameInput ? this.modelNameInput.value : this.model.name)
+            ? this.modelNameInput
+                ? this.modelNameInput.value
+                : this.model.name
             : null;
         this.chip.setLabel(labelName);
         this.chip.draw(g);
@@ -304,8 +314,7 @@ export class EditSubcircuitModelDialog extends Dialog {
             for (let i = 0; i < this.postCount; i++) {
                 const p = this.chip.pins[i];
                 if (p.busZ > 0) continue;
-                if ((p.side === ChipElm.SIDE_N || p.side === ChipElm.SIDE_S) && p.pos >= this.chip.sizeX + dx)
-                    return;
+                if ((p.side === ChipElm.SIDE_N || p.side === ChipElm.SIDE_S) && p.pos >= this.chip.sizeX + dx) return;
             }
         }
         if (dy < 0) {
@@ -314,7 +323,8 @@ export class EditSubcircuitModelDialog extends Dialog {
                 const p = this.chip.pins[i];
                 if (p.busZ > 0) continue;
                 if ((p.side === ChipElm.SIDE_E || p.side === ChipElm.SIDE_W) && p.pos >= this.chip.sizeY + dy) {
-                    needShift = true; break;
+                    needShift = true;
+                    break;
                 }
             }
             if (needShift) {
@@ -345,21 +355,23 @@ export class EditSubcircuitModelDialog extends Dialog {
             const dx = x * this.scale - p.textloc.x;
             const dy = y * this.scale - p.textloc.y;
             const dist = Math.hypot(dx, dy);
-            if (dist < bestDist) { bestDist = dist; best = i; }
+            if (dist < bestDist) {
+                bestDist = dist;
+                best = i;
+            }
         }
         return best;
     }
 
     updatePinHighlight(): void {
-        for (let i = 0; i < this.postCount; i++)
-            this.chip.pins[i].selected = this.selectedPins.has(i);
+        for (let i = 0; i < this.postCount; i++) this.chip.pins[i].selected = this.selectedPins.has(i);
     }
 
     drawRubberBand(): void {
         const x1 = Math.min(this.rubberBandX1, this.rubberBandX2);
         const y1 = Math.min(this.rubberBandY1, this.rubberBandY2);
-        const w  = Math.abs(this.rubberBandX2 - this.rubberBandX1);
-        const h  = Math.abs(this.rubberBandY2 - this.rubberBandY1);
+        const w = Math.abs(this.rubberBandX2 - this.rubberBandX1);
+        const h = Math.abs(this.rubberBandY2 - this.rubberBandY1);
         this.context.save();
         this.context.setTransform(1, 0, 0, 1, 0, 0);
         this.context.fillStyle = "rgba(68,136,255,0.15)";
@@ -376,12 +388,13 @@ export class EditSubcircuitModelDialog extends Dialog {
             const x2 = Math.max(this.rubberBandX1, this.rubberBandX2);
             const y1 = Math.min(this.rubberBandY1, this.rubberBandY2);
             const y2 = Math.max(this.rubberBandY1, this.rubberBandY2);
-            const firstSel = this.selectedPins.size > 0 ? this.model.extList[this.selectedPins.values().next().value].side : -1;
+            const firstSel =
+                this.selectedPins.size > 0 ? this.model.extList[this.selectedPins.values().next().value].side : -1;
             let selSide = firstSel;
             for (let i = 0; i < this.postCount; i++) {
                 if (this.chip.pins[i].busZ > 0) continue;
-                const px = this.chip.pins[i].textloc.x / this.scale | 0;
-                const py = this.chip.pins[i].textloc.y / this.scale | 0;
+                const px = (this.chip.pins[i].textloc.x / this.scale) | 0;
+                const py = (this.chip.pins[i].textloc.y / this.scale) | 0;
                 if (px >= x1 && px <= x2 && py >= y1 && py <= y2) {
                     if (selSide === -1) selSide = this.model.extList[i].side;
                     if (this.model.extList[i].side === selSide) this.selectedPins.add(i);
@@ -406,20 +419,24 @@ export class EditSubcircuitModelDialog extends Dialog {
             const x2 = Math.max(this.rubberBandX1, this.rubberBandX2);
             const y1 = Math.min(this.rubberBandY1, this.rubberBandY2);
             const y2 = Math.max(this.rubberBandY1, this.rubberBandY2);
-            let selSide2 = this.selectedPins.size > 0 ? this.model.extList[this.selectedPins.values().next().value].side : -1;
+            let selSide2 =
+                this.selectedPins.size > 0 ? this.model.extList[this.selectedPins.values().next().value].side : -1;
             if (selSide2 === -1) {
                 for (let i = 0; i < this.postCount; i++) {
                     if (this.chip.pins[i].busZ > 0) continue;
-                    const px = this.chip.pins[i].textloc.x / this.scale | 0;
-                    const py = this.chip.pins[i].textloc.y / this.scale | 0;
-                    if (px >= x1 && px <= x2 && py >= y1 && py <= y2) { selSide2 = this.model.extList[i].side; break; }
+                    const px = (this.chip.pins[i].textloc.x / this.scale) | 0;
+                    const py = (this.chip.pins[i].textloc.y / this.scale) | 0;
+                    if (px >= x1 && px <= x2 && py >= y1 && py <= y2) {
+                        selSide2 = this.model.extList[i].side;
+                        break;
+                    }
                 }
             }
             for (let i = 0; i < this.postCount; i++) {
                 this.chip.pins[i].selected = this.selectedPins.has(i);
                 if (this.chip.pins[i].busZ > 0) continue;
-                const px = this.chip.pins[i].textloc.x / this.scale | 0;
-                const py = this.chip.pins[i].textloc.y / this.scale | 0;
+                const px = (this.chip.pins[i].textloc.x / this.scale) | 0;
+                const py = (this.chip.pins[i].textloc.y / this.scale) | 0;
                 if (px >= x1 && px <= x2 && py >= y1 && py <= y2 && this.model.extList[i].side === selSide2)
                     this.chip.pins[i].selected = true;
             }
@@ -430,18 +447,19 @@ export class EditSubcircuitModelDialog extends Dialog {
         if (this.dragging) {
             if (this.selectedPin < 0) return;
             const pos: number[] = [0, 0];
-            if (!this.chip.getPinPos(x * this.scale | 0, y * this.scale | 0, this.dragCurrentSide, pos)) return;
+            if (!this.chip.getPinPos((x * this.scale) | 0, (y * this.scale) | 0, this.dragCurrentSide, pos)) return;
             this.dragCurrentSide = pos[1];
 
             // Reset to drag-start snapshot so each call is idempotent
             for (let i = 0; i < this.postCount; i++) {
-                this.model.extList[i].pos  = this.dragStartPosArr[i];
+                this.model.extList[i].pos = this.dragStartPosArr[i];
                 this.model.extList[i].side = this.dragStartSideArr[i];
             }
             const newSide = pos[1];
-            let maxNewPos = (newSide === ChipElm.SIDE_N || newSide === ChipElm.SIDE_S)
-                    ? this.chip.sizeX - 1 : this.chip.sizeY - 1;
-            let minOff = Number.MAX_SAFE_INTEGER, maxOff = Number.MIN_SAFE_INTEGER;
+            let maxNewPos =
+                newSide === ChipElm.SIDE_N || newSide === ChipElm.SIDE_S ? this.chip.sizeX - 1 : this.chip.sizeY - 1;
+            let minOff = Number.MAX_SAFE_INTEGER,
+                maxOff = Number.MIN_SAFE_INTEGER;
             let sameSideCount = 0;
             for (const idx of this.selectedPins) {
                 if (this.dragStartSideArr[idx] !== this.dragStartSide) continue;
@@ -455,13 +473,15 @@ export class EditSubcircuitModelDialog extends Dialog {
             let effectiveMaxPos = maxNewPos;
             if (groupSize > maxNewPos + 1) {
                 effectiveSide = this.dragStartSide;
-                effectiveMaxPos = (effectiveSide === ChipElm.SIDE_N || effectiveSide === ChipElm.SIDE_S)
-                    ? this.chip.sizeX - 1 : this.chip.sizeY - 1;
+                effectiveMaxPos =
+                    effectiveSide === ChipElm.SIDE_N || effectiveSide === ChipElm.SIDE_S
+                        ? this.chip.sizeX - 1
+                        : this.chip.sizeY - 1;
             }
             const anchor = Math.max(-minOff, Math.min(effectiveMaxPos - maxOff, pos[0]));
             const delta = anchor - this.dragStartPos;
-            const sameSide = (effectiveSide === this.dragStartSide);
-            const contiguous = (groupSize === sameSideCount);
+            const sameSide = effectiveSide === this.dragStartSide;
+            const contiguous = groupSize === sameSideCount;
 
             const updateBusGroup = (pj: ExtListEntry, newPos: number, newSideVal?: number) => {
                 pj.pos = newPos;
@@ -482,9 +502,15 @@ export class EditSubcircuitModelDialog extends Dialog {
                     const origPos = this.dragStartPosArr[i];
                     let newPos: number;
                     if (delta >= 0)
-                        newPos = (origPos >= this.dragStartPos + maxOff + 1 && origPos <= anchor + maxOff) ? origPos - groupSize : origPos;
+                        newPos =
+                            origPos >= this.dragStartPos + maxOff + 1 && origPos <= anchor + maxOff
+                                ? origPos - groupSize
+                                : origPos;
                     else
-                        newPos = (origPos >= anchor + minOff && origPos <= this.dragStartPos + minOff - 1) ? origPos + groupSize : origPos;
+                        newPos =
+                            origPos >= anchor + minOff && origPos <= this.dragStartPos + minOff - 1
+                                ? origPos + groupSize
+                                : origPos;
                     if (newPos !== origPos) updateBusGroup(this.model.extList[i], newPos);
                 }
             } else {
@@ -543,7 +569,8 @@ export class EditSubcircuitModelDialog extends Dialog {
     }
 
     onMouseDown(event: MouseEvent): void {
-        const x = event.offsetX, y = event.offsetY;
+        const x = event.offsetX,
+            y = event.offsetY;
         const hoveredPin = this.findNearestPin(x, y);
 
         if (hoveredPin < 0) {
@@ -563,7 +590,7 @@ export class EditSubcircuitModelDialog extends Dialog {
             } else {
                 const hSide = this.model.extList[hoveredPin].side;
                 let ok = this.selectedPins.size === 0;
-                if (!ok) ok = (this.model.extList[this.selectedPins.values().next().value].side === hSide);
+                if (!ok) ok = this.model.extList[this.selectedPins.values().next().value].side === hSide;
                 if (ok) this.selectedPins.add(hoveredPin);
             }
         } else {
@@ -574,15 +601,15 @@ export class EditSubcircuitModelDialog extends Dialog {
         }
         this.selectedPin = hoveredPin;
 
-        this.dragStartPosArr  = new Array(this.postCount);
+        this.dragStartPosArr = new Array(this.postCount);
         this.dragStartSideArr = new Array(this.postCount);
         for (let i = 0; i < this.postCount; i++) {
             const pe = this.model.extList[i];
-            this.dragStartPosArr[i]  = pe.pos;
+            this.dragStartPosArr[i] = pe.pos;
             this.dragStartSideArr[i] = pe.side;
         }
         const sp = this.model.extList[this.selectedPin];
-        this.dragStartPos  = sp.pos;
+        this.dragStartPos = sp.pos;
         this.dragStartSide = this.dragCurrentSide = sp.side;
 
         this.updatePinHighlight();
@@ -623,7 +650,7 @@ export class EditSubcircuitModelDialog extends Dialog {
             const ent = newModel.extList[i];
             if (ent.busZ !== 0) continue;
             const side = ent.side;
-            const ns = (side === ChipElm.SIDE_N || side === ChipElm.SIDE_S);
+            const ns = side === ChipElm.SIDE_N || side === ChipElm.SIDE_S;
             let foundPos = -1;
             for (let expansion = 0; expansion <= n && foundPos < 0; expansion++) {
                 const curSizeX = newModel.sizeX + (ns ? expansion : 0);
@@ -647,7 +674,9 @@ export class EditSubcircuitModelDialog extends Dialog {
             if (ent.busZ === 0) continue;
             for (const anchor of newModel.extList) {
                 if (anchor.busZ === 0 && anchor.name === ent.name) {
-                    ent.pos = anchor.pos; ent.side = anchor.side; break;
+                    ent.pos = anchor.pos;
+                    ent.side = anchor.side;
+                    break;
                 }
             }
         }
@@ -670,4 +699,3 @@ export class EditSubcircuitModelDialog extends Dialog {
         return false;
     }
 }
-

@@ -51,11 +51,14 @@ export class Counter2Elm extends ChipElm {
         this.modulus = xml.parseIntAttr("mo", this.modulus);
     }
 
-    needsBits(): boolean { return true; }
-    allowBus(): boolean { return true; }
+    needsBits(): boolean {
+        return true;
+    }
+    allowBus(): boolean {
+        return true;
+    }
     getChipName(): string {
-        if (this.modulus === 0)
-            return "Counter";
+        if (this.modulus === 0) return "Counter";
         return Locale.LS("Counter") + Locale.LS(" (mod ") + this.modulus + ")";
     }
 
@@ -73,15 +76,15 @@ export class Counter2Elm extends ChipElm {
         const bitsY = this.useBus() ? 1 : this.bits;
         this.sizeY = bitsY + 3;
         this.pins = new Array(this.getPostCount());
-        this.makeBitPins(this.bits, 1, ChipElm.SIDE_E, 0,         "Q", true,  true,  true);
+        this.makeBitPins(this.bits, 1, ChipElm.SIDE_E, 0, "Q", true, true, true);
         this.makeBitPins(this.bits, 1, ChipElm.SIDE_W, this.bits, "I", false, false, true);
         const p = this.bits * 2;
-        this.clk  = p;
-        this.clr  = p + 1;
-        this.enp  = p + 2;
-        this.rco  = p + 3;
+        this.clk = p;
+        this.clr = p + 1;
+        this.enp = p + 2;
+        this.rco = p + 3;
         this.load = p + 4;
-        this.ent  = p + 5;
+        this.ent = p + 5;
         this.pins[this.clk] = new Pin(this, 0, ChipElm.SIDE_W, "");
         this.pins[this.clk].clock = true;
         this.pins[this.clr] = new Pin(this, bitsY + 1, ChipElm.SIDE_W, "CLR");
@@ -96,12 +99,12 @@ export class Counter2Elm extends ChipElm {
     getPostCount(): number {
         return this.bits * 2 + 6;
     }
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
-        if (n === 1)
-            return new EditInfo("Modulus", this.modulus, 1, 1).setDimensionless();
+        if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
+        if (n === 1) return new EditInfo("Modulus", this.modulus, 1, 1).setDimensionless();
         return null;
     }
     setChipEditValue(n: number, ei: EditInfo): void {
@@ -111,13 +114,13 @@ export class Counter2Elm extends ChipElm {
                 this.setupPins();
                 this.setPoints();
                 this.allocNodes();
-            } else
-                ei.setError("must be >= 2");
+            } else ei.setError("must be >= 2");
         }
-        if (n === 1)
-            this.modulus = Math.floor(ei.value);
+        if (n === 1) this.modulus = Math.floor(ei.value);
     }
-    getVoltageSourceCount(): number { return this.bits + 1; }
+    getVoltageSourceCount(): number {
+        return this.bits + 1;
+    }
 
     carry: boolean = false;
 
@@ -128,48 +131,45 @@ export class Counter2Elm extends ChipElm {
 
                 // get current value
                 const lastBit = this.bits - 1;
-                for (let i = 0; i !== this.bits; i++)
-                    if (this.pins[lastBit - i].value)
-                        value |= 1 << i;
+                for (let i = 0; i !== this.bits; i++) if (this.pins[lastBit - i].value) value |= 1 << i;
 
                 // update value
                 value++;
-                const realmod = (this.modulus === 0) ? (1 << this.bits) : this.modulus;
+                const realmod = this.modulus === 0 ? 1 << this.bits : this.modulus;
                 value %= realmod;
 
                 // convert value to binary
-                for (let i = 0; i !== this.bits; i++)
-                    this.writeOutput(lastBit - i, (value & (1 << i)) !== 0);
+                for (let i = 0; i !== this.bits; i++) this.writeOutput(lastBit - i, (value & (1 << i)) !== 0);
 
-                this.carry = (value === realmod - 1);
+                this.carry = value === realmod - 1;
             }
 
             if (!this.pins[this.load].value) {
-                for (let i = 0; i !== this.bits; i++)
-                    this.writeOutput(i, this.pins[i + this.bits].value);
+                for (let i = 0; i !== this.bits; i++) this.writeOutput(i, this.pins[i + this.bits].value);
 
                 let value = 0;
 
                 // get current value
                 const lastBit = this.bits - 1;
-                for (let i = 0; i !== this.bits; i++)
-                    if (this.pins[lastBit - i].value)
-                        value |= 1 << i;
+                for (let i = 0; i !== this.bits; i++) if (this.pins[lastBit - i].value) value |= 1 << i;
 
-                const realmod = (this.modulus === 0) ? (1 << this.bits) : this.modulus;
+                const realmod = this.modulus === 0 ? 1 << this.bits : this.modulus;
 
-                this.carry = (value === realmod - 1);
+                this.carry = value === realmod - 1;
             }
         }
         if (!this.pins[this.clr].value) {
-            for (let i = 0; i !== this.bits; i++)
-                this.writeOutput(i, false);
+            for (let i = 0; i !== this.bits; i++) this.writeOutput(i, false);
             this.carry = false;
         }
 
         this.lastClock = this.pins[this.clk].value;
         this.writeOutput(this.rco, this.carry && this.pins[this.ent].value);
     }
-    getDumpType(): number { return 421; }
-    getXmlDumpType(): string { return "ctr2"; }
+    getDumpType(): number {
+        return 421;
+    }
+    getXmlDumpType(): string {
+        return "ctr2";
+    }
 }

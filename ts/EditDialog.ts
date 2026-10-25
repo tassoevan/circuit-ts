@@ -27,15 +27,14 @@ import { EditInfo } from "./EditInfo";
 import { Locale } from "./Locale";
 import { parseFloatStrict } from "./NumberParse";
 
-const ROOT2 = 1.41421356237309504880;
+const ROOT2 = 1.4142135623730950488;
 
 // NumberFormat.getFormat("####.##########") — no thousands separators, up to 10 decimal places
 function noCommaFormat(v: number): string {
     // strip trailing zeros after decimal point
     let s = v.toPrecision(10).replace(/\.?0+$/, "");
     // toPrecision can produce scientific notation for very large/small values; fall back to toString
-    if (s.includes("e") || s.includes("E"))
-        s = String(v);
+    if (s.includes("e") || s.includes("E")) s = String(v);
     return s;
 }
 
@@ -47,8 +46,8 @@ export class EditDialog extends Dialog {
 
     private mainPanel: HTMLDivElement;
     private errorLabel: HTMLDivElement;
-    private colsRow: HTMLDivElement;       // holds the column panels
-    private activeCol: HTMLDivElement;     // current column being filled
+    private colsRow: HTMLDivElement; // holds the column panels
+    private activeCol: HTMLDivElement; // current column being filled
     private activeColCount: number = 0;
     private firstInput: HTMLInputElement | HTMLTextAreaElement | null = null;
     private firstInputNumeric: boolean = false;
@@ -62,12 +61,10 @@ export class EditDialog extends Dialog {
 
         // Title
         let title = "Edit Component";
-        if (ce.getEditTitle)
-            title = ce.getEditTitle();
+        if (ce.getEditTitle) title = ce.getEditTitle();
         else if (ce instanceof CircuitElm) {
             const name = (ce as CircuitElm).getElmType();
-            if (name)
-                title = "Edit " + name.charAt(0).toUpperCase() + name.slice(1);
+            if (name) title = "Edit " + name.charAt(0).toUpperCase() + name.slice(1);
         }
 
         this.dialogEl.innerHTML = "";
@@ -110,7 +107,9 @@ export class EditDialog extends Dialog {
 
         const okBtn = document.createElement("button");
         okBtn.textContent = Locale.LS("OK");
-        okBtn.onclick = () => { if (this.apply()) this.closeDialog(); };
+        okBtn.onclick = () => {
+            if (this.apply()) this.closeDialog();
+        };
         btnRow.appendChild(okBtn);
 
         const cancelBtn = document.createElement("button");
@@ -121,11 +120,13 @@ export class EditDialog extends Dialog {
         // Focus first text input after the dialog opens
         if (this.firstInput !== null) {
             const inp = this.firstInput;
-            requestAnimationFrame(() => { inp.focus(); inp.select(); });
+            requestAnimationFrame(() => {
+                inp.focus();
+                inp.select();
+            });
         }
 
-        if (this.firstInputNumeric && ce instanceof CircuitElm)
-            this.passShortcutsThrough();
+        if (this.firstInputNumeric && ce instanceof CircuitElm) this.passShortcutsThrough();
     }
 
     // The editor pops up with its first field focused whenever an element is created, so you
@@ -135,15 +136,15 @@ export class EditDialog extends Dialog {
     private passShortcutsThrough(): void {
         const inp = this.firstInput as HTMLInputElement;
         let untouched = true;
-        this.dialogEl.addEventListener("mousedown", () => { untouched = false; });
+        this.dialogEl.addEventListener("mousedown", () => {
+            untouched = false;
+        });
         inp.addEventListener("keydown", (e: KeyboardEvent) => {
             const wasUntouched = untouched;
             untouched = false;
-            if (!wasUntouched || e.ctrlKey || e.metaKey || e.altKey || !/^[a-zA-Z]$/.test(e.key))
-                return;
+            if (!wasUntouched || e.ctrlKey || e.metaKey || e.altKey || !/^[a-zA-Z]$/.test(e.key)) return;
             const cc = e.key.charCodeAt(0);
-            if (this.cframe.shortcuts.get(cc) == null)
-                return;
+            if (this.cframe.shortcuts.get(cc) == null) return;
             e.preventDefault();
             e.stopPropagation();
             this.closeDialog();
@@ -173,12 +174,9 @@ export class EditDialog extends Dialog {
 
             const name = Locale.LS(ei.name);
             const label = document.createElement("label");
-            if (ei.name.startsWith("<"))
-                label.innerHTML = name;
-            else
-                label.textContent = name;
-            if (this.activeColCount > 0)
-                label.style.marginTop = "6px";
+            if (ei.name.startsWith("<")) label.innerHTML = name;
+            else label.textContent = name;
+            if (this.activeColCount > 0) label.style.marginTop = "6px";
             this.activeCol.appendChild(label);
             this.activeColCount++;
 
@@ -194,7 +192,6 @@ export class EditDialog extends Dialog {
                 ei.choice.element = sel;
                 sel.onchange = () => this.itemStateChanged(idx);
                 this.activeCol.appendChild(sel);
-
             } else if (ei.checkbox !== null) {
                 const cb = document.createElement("input");
                 cb.type = "checkbox";
@@ -206,27 +203,22 @@ export class EditDialog extends Dialog {
                 cbLabel.appendChild(document.createTextNode(ei.checkbox.name));
                 cb.onchange = () => this.itemStateChanged(idx);
                 this.activeCol.appendChild(cbLabel);
-
             } else if (ei.button !== null) {
                 const btn = document.createElement("button");
                 btn.textContent = ei.button.label ?? ei.button.textContent ?? String(ei.button);
                 btn.onclick = () => this.itemStateChanged(idx);
                 this.activeCol.appendChild(btn);
-
             } else if (ei.textArea !== null) {
                 const ta = document.createElement("textarea");
                 ta.value = ei.textArea.value ?? "";
                 ta.rows = 4;
                 ta.cols = 40;
                 ei.textArea.element = ta;
-                if (this.firstInput === null)
-                    this.firstInput = ta;
+                if (this.firstInput === null) this.firstInput = ta;
                 this.activeCol.appendChild(ta);
                 this.closeOnEnter = false;
-
             } else if (ei.widget !== null) {
                 this.activeCol.appendChild(ei.widget as HTMLElement);
-
             } else {
                 // Plain text input
                 const inp = document.createElement("input");
@@ -235,12 +227,11 @@ export class EditDialog extends Dialog {
                 ei.textf = inp;
                 if (this.firstInput === null) {
                     this.firstInput = inp;
-                    this.firstInputNumeric = (ei.text === null);
+                    this.firstInputNumeric = ei.text === null;
                 }
                 if (ei.text !== null) {
                     inp.value = ei.text;
-                    if (ei.isColor)
-                        inp.type = "color";
+                    if (ei.isColor) inp.type = "color";
                     this.activeCol.appendChild(inp);
                 } else {
                     inp.value = this.unitString(ei);
@@ -297,8 +288,14 @@ export class EditDialog extends Dialog {
         let repeatTimer: ReturnType<typeof setInterval> | null = null;
         let startRepeatTimer: ReturnType<typeof setTimeout> | null = null;
         const stop = () => {
-            if (startRepeatTimer !== null) { clearTimeout(startRepeatTimer); startRepeatTimer = null; }
-            if (repeatTimer !== null) { clearInterval(repeatTimer); repeatTimer = null; }
+            if (startRepeatTimer !== null) {
+                clearTimeout(startRepeatTimer);
+                startRepeatTimer = null;
+            }
+            if (repeatTimer !== null) {
+                clearInterval(repeatTimer);
+                repeatTimer = null;
+            }
         };
         button.addEventListener("mousedown", () => {
             this.stepValue(ei, dir);
@@ -314,13 +311,17 @@ export class EditDialog extends Dialog {
         // chance to run while the finger is actually held down. Handle real touch events
         // directly instead, and preventDefault() on touchstart so the browser doesn't also
         // fire the (now redundant, badly-timed) synthetic mouse events afterward.
-        button.addEventListener("touchstart", (e: TouchEvent) => {
-            e.preventDefault();
-            this.stepValue(ei, dir);
-            startRepeatTimer = setTimeout(() => {
-                repeatTimer = setInterval(() => this.stepValue(ei, dir), 120);
-            }, 400);
-        }, { passive: false });
+        button.addEventListener(
+            "touchstart",
+            (e: TouchEvent) => {
+                e.preventDefault();
+                this.stepValue(ei, dir);
+                startRepeatTimer = setTimeout(() => {
+                    repeatTimer = setInterval(() => this.stepValue(ei, dir), 120);
+                }, 400);
+            },
+            { passive: false },
+        );
         button.addEventListener("touchend", stop);
         button.addEventListener("touchcancel", stop);
     }
@@ -343,15 +344,13 @@ export class EditDialog extends Dialog {
     // which repeats every decade; preserves sign, and treats 0 as just below the first step
     static stepE12(value: number, dir: number): number {
         const e12 = EditDialog.E12;
-        if (value === 0)
-            return dir > 0 ? e12[0] : -e12[0];
+        if (value === 0) return dir > 0 ? e12[0] : -e12[0];
         const sign = value < 0 ? -1 : 1;
         const av = Math.abs(value);
         let decade = Math.floor(Math.log10(av));
         let idx = 0;
         for (let i = 0; i < e12.length; i++) {
-            if (e12[i] * Math.pow(10, decade) <= av * 1.0000001)
-                idx = i;
+            if (e12[i] * Math.pow(10, decade) <= av * 1.0000001) idx = i;
         }
         idx += dir;
         if (idx < 0) {
@@ -376,17 +375,17 @@ export class EditDialog extends Dialog {
     static unitStringVal(ei: EditInfo | null, v: number): string {
         const va = Math.abs(v);
         if (ei !== null && ei.dimensionless) return noCommaFormat(v);
-        if (!isFinite(va))                   return noCommaFormat(v);
+        if (!isFinite(va)) return noCommaFormat(v);
         if (v === 0) return "0";
         if (va < 1e-12) return noCommaFormat(v * 1e15) + "f";
-        if (va < 1e-9)  return noCommaFormat(v * 1e12) + "p";
-        if (va < 1e-6)  return noCommaFormat(v * 1e9)  + "n";
-        if (va < 1e-3)  return noCommaFormat(v * 1e6)  + "u";
-        if (va < 1)     return noCommaFormat(v * 1e3)  + "m";
-        if (va < 1e3)   return noCommaFormat(v);
-        if (va < 1e6)   return noCommaFormat(v * 1e-3) + "k";
-        if (va < 1e9)   return noCommaFormat(v * 1e-6) + "M";
-        return                  noCommaFormat(v * 1e-9) + "G";
+        if (va < 1e-9) return noCommaFormat(v * 1e12) + "p";
+        if (va < 1e-6) return noCommaFormat(v * 1e9) + "n";
+        if (va < 1e-3) return noCommaFormat(v * 1e6) + "u";
+        if (va < 1) return noCommaFormat(v * 1e3) + "m";
+        if (va < 1e3) return noCommaFormat(v);
+        if (va < 1e6) return noCommaFormat(v * 1e-3) + "k";
+        if (va < 1e9) return noCommaFormat(v * 1e-6) + "M";
+        return noCommaFormat(v * 1e-9) + "G";
     }
 
     parseUnitsEi(ei: EditInfo): number {
@@ -394,8 +393,7 @@ export class EditDialog extends Dialog {
         if (this.elm instanceof VoltageElm && s.endsWith("rms")) {
             s = s.slice(0, -3).trim();
             const rmsMult = (this.elm as VoltageElm).getRmsMultiplier();
-            if (rmsMult > 0)
-                return EditDialog.parseUnits(s) / rmsMult;
+            if (rmsMult > 0) return EditDialog.parseUnits(s) / rmsMult;
         }
         return EditDialog.parseUnits(s);
     }
@@ -413,23 +411,43 @@ export class EditDialog extends Dialog {
         s = s.replace(/[mM][eE][gG]$/, "M");
 
         // handle scientific notation before checking unit suffixes
-        if (/^-?[0-9]*\.?[0-9]+[eE][+-]?[0-9]+$/.test(s))
-            return parseFloatStrict(s) * rmsMult;
+        if (/^-?[0-9]*\.?[0-9]+[eE][+-]?[0-9]+$/.test(s)) return parseFloatStrict(s) * rmsMult;
 
         const uc = s.charAt(s.length - 1);
         let mult = 1;
         switch (uc) {
-            case 'f': case 'F': mult = 1e-15; break;
-            case 'p': case 'P': mult = 1e-12; break;
-            case 'n': case 'N': mult = 1e-9;  break;
-            case 'u': case 'U': mult = 1e-6;  break;
-            case 'm':           mult = 1e-3;  break;
-            case 'k': case 'K': mult = 1e3;   break;
-            case 'M':           mult = 1e6;   break;
-            case 'G': case 'g': mult = 1e9;   break;
+            case "f":
+            case "F":
+                mult = 1e-15;
+                break;
+            case "p":
+            case "P":
+                mult = 1e-12;
+                break;
+            case "n":
+            case "N":
+                mult = 1e-9;
+                break;
+            case "u":
+            case "U":
+                mult = 1e-6;
+                break;
+            case "m":
+                mult = 1e-3;
+                break;
+            case "k":
+            case "K":
+                mult = 1e3;
+                break;
+            case "M":
+                mult = 1e6;
+                break;
+            case "G":
+            case "g":
+                mult = 1e9;
+                break;
         }
-        if (mult !== 1)
-            s = s.slice(0, -1).trim();
+        if (mult !== 1) s = s.slice(0, -1).trim();
         return parseFloatStrict(s) * mult * rmsMult;
     }
 
@@ -440,20 +458,18 @@ export class EditDialog extends Dialog {
             if (ei.textf !== null && ei.text === null) {
                 try {
                     ei.value = this.parseUnitsEi(ei);
-                } catch (ex) { /* ignored */ }
+                } catch (ex) {
+                    /* ignored */
+                }
             }
-            if (ei.positive && ei.value <= 0)
-                ei.setError("must be > 0");
-            if (ei.nonNegative && ei.value < 0)
-                ei.setError("must be >= 0");
+            if (ei.positive && ei.value <= 0) ei.setError("must be > 0");
+            if (ei.nonNegative && ei.value < 0) ei.setError("must be >= 0");
             // choices and buttons are handled via itemStateChanged, not apply
-            if (ei.button !== null || ei.choice !== null)
-                continue;
-            if (ei.error === null)
-                this.elm.setEditValue(i, ei);
+            if (ei.button !== null || ei.choice !== null) continue;
+            if (ei.error === null) this.elm.setEditValue(i, ei);
             if (ei.error !== null) {
                 const field = ei.errorFieldName ?? ei.name;
-                const msg   = (field && field.length > 0) ? field + ": " + ei.error : ei.error;
+                const msg = field && field.length > 0 ? field + ": " + ei.error : ei.error;
                 this.errorLabel.textContent = msg;
                 this.errorLabel.style.display = "";
                 return false;
@@ -461,8 +477,7 @@ export class EditDialog extends Dialog {
             // update slider if any
             if (this.elm instanceof CircuitElm) {
                 const adj = this.cframe.findAdjustable(this.elm, i);
-                if (adj !== null)
-                    adj.setSliderValue(ei.value);
+                if (adj !== null) adj.setSliderValue(ei.value);
             }
         }
         this.errorLabel.style.display = "none";
@@ -482,8 +497,7 @@ export class EditDialog extends Dialog {
         }
 
         this.elm.setEditValue(idx, ei);
-        if (ei.newDialog)
-            changed = true;
+        if (ei.newDialog) changed = true;
         this.cframe.needAnalyze();
 
         if (changed) {
@@ -522,15 +536,13 @@ export class EditDialog extends Dialog {
         this.dialogEl.style.top = topOffset + "px";
         this.dialogEl.style.left = "auto";
         // dock to the left of the element-picker sidebar, not on top of it
-        this.dialogEl.style.right = (UIManager.VERTICALPANELWIDTH + 16) + "px";
+        this.dialogEl.style.right = UIManager.VERTICALPANELWIDTH + 16 + "px";
         this.dialogEl.show();
     }
 
     closeDialog(): void {
         super.closeDialog();
-        if (CirSim.editDialog === this)
-            CirSim.editDialog = null;
-        if (CirSim.customLogicEditDialog === this)
-            CirSim.customLogicEditDialog = null;
+        if (CirSim.editDialog === this) CirSim.editDialog = null;
+        if (CirSim.customLogicEditDialog === this) CirSim.customLogicEditDialog = null;
     }
 }

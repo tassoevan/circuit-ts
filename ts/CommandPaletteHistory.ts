@@ -22,20 +22,16 @@ import { CommandPaletteRegistry } from "./CommandPaletteRegistry";
 // Persists the last few palette command ids (CommandPaletteRegistry.PaletteCommand.id)
 // in localStorage. CommandPalette shows them under "Recent" when the filter is empty.
 export class CommandPaletteHistory {
-
     static readonly MAX = 10;
     static readonly KEY = "commandPaletteHistory";
 
     static record(id: string | null | undefined): void {
-        if (id == null || id.length === 0)
-            return;
+        if (id == null || id.length === 0) return;
         const ids = CommandPaletteHistory.load();
         const existing = ids.indexOf(id);
-        if (existing >= 0)
-            ids.splice(existing, 1);
+        if (existing >= 0) ids.splice(existing, 1);
         ids.unshift(id);
-        while (ids.length > CommandPaletteHistory.MAX)
-            ids.pop();
+        while (ids.length > CommandPaletteHistory.MAX) ids.pop();
         CommandPaletteHistory.save(ids);
     }
 
@@ -54,8 +50,7 @@ export class CommandPaletteHistory {
                 changed = true;
             }
         }
-        if (changed)
-            CommandPaletteHistory.save(ids);
+        if (changed) CommandPaletteHistory.save(ids);
     }
 
     static save(ids: string[]): void {
@@ -67,9 +62,8 @@ export class CommandPaletteHistory {
     static load(): string[] {
         try {
             const s = localStorage.getItem(CommandPaletteHistory.KEY);
-            if (s == null || s.length === 0)
-                return [];
-            return s.split("\n").filter(p => p.length > 0);
+            if (s == null || s.length === 0) return [];
+            return s.split("\n").filter((p) => p.length > 0);
         } catch (e) {
             return [];
         }

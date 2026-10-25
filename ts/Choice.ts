@@ -22,9 +22,19 @@ export class Choice {
     selectedIndex: number = 0;
     element: HTMLSelectElement | null = null;
 
-    add(item: string): void { this.items.push(item); }
-    select(index: number): void { this.selectedIndex = index; }
-    getSelectedIndex(): number { return this.element ? this.element.selectedIndex : this.selectedIndex; }
-    getItemCount(): number { return this.items.length; }
-    getItem(index: number): string { return this.items[index]; }
+    add(item: string): void {
+        this.items.push(item);
+    }
+    select(index: number): void {
+        this.selectedIndex = index;
+    }
+    getSelectedIndex(): number {
+        return this.element ? this.element.selectedIndex : this.selectedIndex;
+    }
+    getItemCount(): number {
+        return this.items.length;
+    }
+    getItem(index: number): string {
+        return this.items[index];
+    }
 }

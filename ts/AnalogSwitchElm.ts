@@ -30,11 +30,11 @@ import { SimulationManager } from "./SimulationManager";
 import { parseFloatStrict } from "./NumberParse";
 
 export class AnalogSwitchElm extends CircuitElm {
-    readonly FLAG_INVERT   = 1;
+    readonly FLAG_INVERT = 1;
     readonly FLAG_PULLDOWN = 2;
     readonly FLAG_FLIPPED_X = 4;
     readonly FLAG_FLIPPED_Y = 8;
-    readonly FLAG_FLIPPED   = 16;
+    readonly FLAG_FLIPPED = 16;
 
     resistance: number = 0;
     r_on: number = 20;
@@ -65,9 +65,9 @@ export class AnalogSwitchElm extends CircuitElm {
             this.threshold = 2.5;
             this.noDiagonal = true;
             try {
-                this.r_on       = parseFloatStrict(st!.nextToken());
-                this.r_off      = parseFloatStrict(st!.nextToken());
-                this.threshold  = parseFloatStrict(st!.nextToken());
+                this.r_on = parseFloatStrict(st!.nextToken());
+                this.r_off = parseFloatStrict(st!.nextToken());
+                this.threshold = parseFloatStrict(st!.nextToken());
             } catch (_e) {}
         }
     }
@@ -81,17 +81,27 @@ export class AnalogSwitchElm extends CircuitElm {
 
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
-        this.r_on      = xml.parseDoubleAttr("ron", this.r_on);
-        this.r_off     = xml.parseDoubleAttr("roff", this.r_off);
+        this.r_on = xml.parseDoubleAttr("ron", this.r_on);
+        this.r_off = xml.parseDoubleAttr("roff", this.r_off);
         this.threshold = xml.parseDoubleAttr("th", this.threshold);
     }
 
-    getDumpType(): number { return 159; }
-    getXmlDumpType(): string { return "as"; }
+    getDumpType(): number {
+        return 159;
+    }
+    getXmlDumpType(): string {
+        return "as";
+    }
 
-    isFlippedX(): boolean { return this.hasFlag(this.FLAG_FLIPPED_X); }
-    isFlippedY(): boolean { return this.hasFlag(this.FLAG_FLIPPED_Y); }
-    isFlipped():  boolean { return this.hasFlag(this.FLAG_FLIPPED); }
+    isFlippedX(): boolean {
+        return this.hasFlag(this.FLAG_FLIPPED_X);
+    }
+    isFlippedY(): boolean {
+        return this.hasFlag(this.FLAG_FLIPPED_Y);
+    }
+    isFlipped(): boolean {
+        return this.hasFlag(this.FLAG_FLIPPED);
+    }
 
     flipX(c2: number, count: number): void {
         this.flags ^= this.FLAG_FLIPPED_X;
@@ -116,7 +126,7 @@ export class AnalogSwitchElm extends CircuitElm {
         this.ps1 = new Point();
         this.openhs = (this.isFlippedX() !== this.isFlippedY()) !== this.isFlipped() ? -16 : 16;
         this.point3 = this.interpPoint(this.lead1!, this.lead2!, 0.5, -this.openhs);
-        this.lead3  = this.interpPoint(this.lead1!, this.lead2!, 0.5, -this.openhs / 2);
+        this.lead3 = this.interpPoint(this.lead1!, this.lead2!, 0.5, -this.openhs / 2);
     }
 
     draw(g: Graphics): void {
@@ -128,29 +138,29 @@ export class AnalogSwitchElm extends CircuitElm {
 
         g.setColor(CircuitElm.lightGrayColor);
         this.interpPoint(this.lead1!, this.lead2!, this.ps1, 0, hs1);
-        this.interpPoint(this.lead1!, this.lead2!, this.ps,  1, hs2);
+        this.interpPoint(this.lead1!, this.lead2!, this.ps, 1, hs2);
         CircuitElm.drawThickLine(g, this.ps1, this.ps);
 
         this.setVoltageColor(g, this.nodes[2].v);
         CircuitElm.drawThickLine(g, this.point3, this.lead3);
 
-        if (!this.open)
-            this.doDots(g);
+        if (!this.open) this.doDots(g);
         this.drawPosts(g);
     }
 
     calculateCurrent(): void {
-        if (this.resistance === 0)
-            return;
-        if (this.needsPulldown() && this.open)
-            this.current = 0;
-        else
-            this.current = (this.nodes[0].v - this.nodes[1].v) / this.resistance;
+        if (this.resistance === 0) return;
+        if (this.needsPulldown() && this.open) this.current = 0;
+        else this.current = (this.nodes[0].v - this.nodes[1].v) / this.resistance;
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
-    needsPulldown(): boolean { return this.hasFlag(this.FLAG_PULLDOWN); }
+    needsPulldown(): boolean {
+        return this.hasFlag(this.FLAG_PULLDOWN);
+    }
 
     stamp(): void {
         const sim = SimulationManager.theSim;
@@ -164,26 +174,27 @@ export class AnalogSwitchElm extends CircuitElm {
 
     doStep(): void {
         const sim = SimulationManager.theSim;
-        this.open = (this.nodes[2].v < this.threshold);
-        if (this.hasFlag(this.FLAG_INVERT))
-            this.open = !this.open;
+        this.open = this.nodes[2].v < this.threshold;
+        if (this.hasFlag(this.FLAG_INVERT)) this.open = !this.open;
         if (!(this.needsPulldown() && this.open)) {
             this.resistance = this.open ? this.r_off : this.r_on;
             sim.stampResistor(this.nodes[0], this.nodes[1], this.resistance);
         }
     }
 
-    getPostCount(): number { return 3; }
+    getPostCount(): number {
+        return 3;
+    }
 
     getPost(n: number): Point {
-        return (n === 0) ? this.point1 : (n === 1) ? this.point2 : this.point3;
+        return n === 0 ? this.point1 : n === 1 ? this.point2 : this.point3;
     }
 
     getInfo(arr: string[]): void {
         arr[0] = "analog switch";
         arr[1] = this.open ? "open" : "closed";
         arr[2] = "Vd = " + CircuitElm.getVoltageDText(this.getVoltageDiff());
-        arr[3] = "I = "  + CircuitElm.getCurrentDText(this.getCurrent());
+        arr[3] = "I = " + CircuitElm.getCurrentDText(this.getCurrent());
         arr[4] = "Vc = " + CircuitElm.getVoltageText(this.nodes[2].v);
     }
 
@@ -193,10 +204,12 @@ export class AnalogSwitchElm extends CircuitElm {
     }
 
     hasGroundConnection(n1: number): boolean {
-        return this.needsPulldown() && (n1 < 2);
+        return this.needsPulldown() && n1 < 2;
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
@@ -212,9 +225,9 @@ export class AnalogSwitchElm extends CircuitElm {
 
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 0)
-            this.flags = ei.checkbox!.getState() ? (this.flags | this.FLAG_INVERT) : (this.flags & ~this.FLAG_INVERT);
-        if (n === 1 && ei.value > 0) this.r_on  = ei.value;
-        if (n === 2 && ei.value > 0) this.r_off  = ei.value;
+            this.flags = ei.checkbox!.getState() ? this.flags | this.FLAG_INVERT : this.flags & ~this.FLAG_INVERT;
+        if (n === 1 && ei.value > 0) this.r_on = ei.value;
+        if (n === 2 && ei.value > 0) this.r_off = ei.value;
         if (n === 3) this.flags = ei.changeFlag(this.flags, this.FLAG_PULLDOWN);
         if (n === 4) this.threshold = ei.value;
     }

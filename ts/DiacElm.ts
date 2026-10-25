@@ -46,15 +46,15 @@ export class DiacElm extends CircuitElm {
         if (xb === undefined) {
             super(xxOrXa, yyOrYa);
             this.offresistance = 1e8;
-            this.onresistance  = 500;
-            this.breakdown     = 30;
-            this.holdcurrent   = .01;
+            this.onresistance = 500;
+            this.breakdown = 30;
+            this.holdcurrent = 0.01;
         } else {
             super(xxOrXa, yyOrYa, xb, yb!, f!);
-            this.onresistance  = parseFloatStrict(st!.nextToken());
+            this.onresistance = parseFloatStrict(st!.nextToken());
             this.offresistance = parseFloatStrict(st!.nextToken());
-            this.breakdown     = parseFloatStrict(st!.nextToken());
-            this.holdcurrent   = parseFloatStrict(st!.nextToken());
+            this.breakdown = parseFloatStrict(st!.nextToken());
+            this.holdcurrent = parseFloatStrict(st!.nextToken());
         }
         this.createDiodes();
     }
@@ -66,23 +66,27 @@ export class DiacElm extends CircuitElm {
         this.diode2.setupForDefaultModel();
     }
 
-    nonLinear(): boolean { return true; }
-    getDumpType(): number { return 203; }
+    nonLinear(): boolean {
+        return true;
+    }
+    getDumpType(): number {
+        return 203;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
-        CircuitXMLSerializer.dumpAttr(elem, "ron",  this.onresistance);
+        CircuitXMLSerializer.dumpAttr(elem, "ron", this.onresistance);
         CircuitXMLSerializer.dumpAttr(elem, "roff", this.offresistance);
-        CircuitXMLSerializer.dumpAttr(elem, "bd",   this.breakdown);
-        CircuitXMLSerializer.dumpAttr(elem, "hc",   this.holdcurrent);
+        CircuitXMLSerializer.dumpAttr(elem, "bd", this.breakdown);
+        CircuitXMLSerializer.dumpAttr(elem, "hc", this.holdcurrent);
     }
 
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
-        this.onresistance  = xml.parseDoubleAttr("ron",  this.onresistance);
+        this.onresistance = xml.parseDoubleAttr("ron", this.onresistance);
         this.offresistance = xml.parseDoubleAttr("roff", this.offresistance);
-        this.breakdown     = xml.parseDoubleAttr("bd",   this.breakdown);
-        this.holdcurrent   = xml.parseDoubleAttr("hc",   this.holdcurrent);
+        this.breakdown = xml.parseDoubleAttr("bd", this.breakdown);
+        this.holdcurrent = xml.parseDoubleAttr("hc", this.holdcurrent);
     }
 
     arrows!: Polygon[];
@@ -101,9 +105,9 @@ export class DiacElm extends CircuitElm {
         this.arrows = new Array(2);
         for (let i = 0; i !== 2; i++) {
             const sgn = -1 + i * 2;
-            const p1 = this.interpPoint(this.lead1!, this.lead2!, i,     8 * sgn);
+            const p1 = this.interpPoint(this.lead1!, this.lead2!, i, 8 * sgn);
             const p2 = this.interpPoint(this.lead1!, this.lead2!, 1 - i, 16 * sgn);
-            const p3 = this.interpPoint(this.lead1!, this.lead2!, 1 - i,  0 * sgn);
+            const p3 = this.interpPoint(this.lead1!, this.lead2!, 1 - i, 0 * sgn);
             this.arrows[i] = this.createPolygon(p1, p2, p3);
         }
     }
@@ -154,33 +158,36 @@ export class DiacElm extends CircuitElm {
         this.diode2.stamp(this.nodes[1], this.nodes[3]);
     }
 
-    getInternalNodeCount(): number { return 2; }
+    getInternalNodeCount(): number {
+        return 2;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "DIAC";
         this.getBasicInfo(arr);
         arr[3] = this.state ? "on" : "off";
-        arr[4] = "Ron = "    + CircuitElm.getUnitText(this.onresistance,  Locale.ohmString);
-        arr[5] = "Roff = "   + CircuitElm.getUnitText(this.offresistance, Locale.ohmString);
+        arr[4] = "Ron = " + CircuitElm.getUnitText(this.onresistance, Locale.ohmString);
+        arr[5] = "Roff = " + CircuitElm.getUnitText(this.offresistance, Locale.ohmString);
         arr[6] = "Vbrkdn = " + CircuitElm.getUnitText(this.breakdown, "V");
-        arr[7] = "Ihold = "  + CircuitElm.getUnitText(this.holdcurrent, "A");
-        arr[8] = "P = "      + CircuitElm.getUnitText(this.getPower(), "W");
+        arr[7] = "Ihold = " + CircuitElm.getUnitText(this.holdcurrent, "A");
+        arr[8] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0) return new EditInfo("On resistance (ohms)",      this.onresistance,  0, 0);
-        if (n === 1) return new EditInfo("Off resistance (ohms)",     this.offresistance, 0, 0);
-        if (n === 2) return new EditInfo("Breakdown voltage (volts)", this.breakdown,     0, 0);
-        if (n === 3) return new EditInfo("Hold current (amps)",       this.holdcurrent,   0, 0);
+        if (n === 0) return new EditInfo("On resistance (ohms)", this.onresistance, 0, 0);
+        if (n === 1) return new EditInfo("Off resistance (ohms)", this.offresistance, 0, 0);
+        if (n === 2) return new EditInfo("Breakdown voltage (volts)", this.breakdown, 0, 0);
+        if (n === 3) return new EditInfo("Hold current (amps)", this.holdcurrent, 0, 0);
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (ei.value > 0 && n === 0) this.onresistance  = ei.value;
+        if (ei.value > 0 && n === 0) this.onresistance = ei.value;
         if (ei.value > 0 && n === 1) this.offresistance = ei.value;
-        if (ei.value > 0 && n === 2) this.breakdown     = ei.value;
-        if (ei.value > 0 && n === 3) this.holdcurrent   = ei.value;
+        if (ei.value > 0 && n === 2) this.breakdown = ei.value;
+        if (ei.value > 0 && n === 3) this.holdcurrent = ei.value;
     }
-
 }

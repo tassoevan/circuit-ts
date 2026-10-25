@@ -54,8 +54,12 @@ export class SparkGapElm extends CircuitElm {
         this.resistance = this.offresistance;
     }
 
-    nonLinear(): boolean { return true; }
-    getDumpType(): number { return 187; }
+    nonLinear(): boolean {
+        return true;
+    }
+    getDumpType(): number {
+        return 187;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -96,8 +100,7 @@ export class SparkGapElm extends CircuitElm {
         this.setVoltageColor(g, this.nodes[1].v);
         this.setPowerColor(g, true);
         g.fillPolygon(this.arrow2);
-        if (this.state)
-            this.doDots(g);
+        if (this.state) this.doDots(g);
         this.drawPosts(g);
     }
 
@@ -112,11 +115,9 @@ export class SparkGapElm extends CircuitElm {
     }
 
     startIteration(): void {
-        if (Math.abs(this.current) < this.holdcurrent)
-            this.state = false;
+        if (Math.abs(this.current) < this.holdcurrent) this.state = false;
         const vd = this.nodes[0].v - this.nodes[1].v;
-        if (Math.abs(vd) > this.breakdown)
-            this.state = true;
+        if (Math.abs(vd) > this.breakdown) this.state = true;
     }
 
     doStep(): void {
@@ -138,27 +139,21 @@ export class SparkGapElm extends CircuitElm {
         arr[6] = "Vbreakdown = " + CircuitElm.getUnitText(this.breakdown, "V");
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("On resistance (ohms)", this.onresistance, 0, 0);
-        if (n === 1)
-            return new EditInfo("Off resistance (ohms)", this.offresistance, 0, 0);
-        if (n === 2)
-            return new EditInfo("Breakdown voltage", this.breakdown, 0, 0);
-        if (n === 3)
-            return new EditInfo("Holding current (A)", this.holdcurrent, 0, 0);
+        if (n === 0) return new EditInfo("On resistance (ohms)", this.onresistance, 0, 0);
+        if (n === 1) return new EditInfo("Off resistance (ohms)", this.offresistance, 0, 0);
+        if (n === 2) return new EditInfo("Breakdown voltage", this.breakdown, 0, 0);
+        if (n === 3) return new EditInfo("Holding current (A)", this.holdcurrent, 0, 0);
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (ei.value > 0 && n === 0)
-            this.onresistance = ei.value;
-        if (ei.value > 0 && n === 1)
-            this.offresistance = ei.value;
-        if (ei.value > 0 && n === 2)
-            this.breakdown = ei.value;
-        if (ei.value > 0 && n === 3)
-            this.holdcurrent = ei.value;
+        if (ei.value > 0 && n === 0) this.onresistance = ei.value;
+        if (ei.value > 0 && n === 1) this.offresistance = ei.value;
+        if (ei.value > 0 && n === 2) this.breakdown = ei.value;
+        if (ei.value > 0 && n === 3) this.holdcurrent = ei.value;
     }
 }

@@ -21,7 +21,6 @@ import { Dialog } from "./Dialog";
 import { moduleBaseURL } from "./ModuleBase";
 
 export class AboutBox extends Dialog {
-
     constructor(version: string) {
         super();
 

@@ -56,7 +56,9 @@ export class RelayContactElm extends CircuitElm {
             this.label = CustomLogicModel.unescape(st.nextToken());
             this.r_on = parseFloatStrict(st.nextToken());
             this.r_off = parseFloatStrict(st.nextToken());
-            try { this.i_position = parseIntStrict(st.nextToken()); } catch (e) {}
+            try {
+                this.i_position = parseIntStrict(st.nextToken());
+            } catch (e) {}
             this.noDiagonal = true;
             this.allocNodes();
         } else {
@@ -68,8 +70,12 @@ export class RelayContactElm extends CircuitElm {
         }
     }
 
-    getDumpType(): number { return 426; }
-    useIECSymbol(): boolean { return (this.flags & this.FLAG_IEC) !== 0; }
+    getDumpType(): number {
+        return 426;
+    }
+    useIECSymbol(): boolean {
+        return (this.flags & this.FLAG_IEC) !== 0;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -99,8 +105,7 @@ export class RelayContactElm extends CircuitElm {
         CircuitElm.drawThickLine(g, this.swpoles[0], this.ptSwitch);
 
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.whiteColor);
-        if (this.x === this.x2)
-            g.drawString(this.label, this.x + 10, this.swpoles[this.y < this.y2 ? 0 : 1].y - 5);
+        if (this.x === this.x2) g.drawString(this.label, this.x + 10, this.swpoles[this.y < this.y2 ? 0 : 1].y - 5);
         else {
             g.save();
             g.context.textAlign = "center";
@@ -108,10 +113,25 @@ export class RelayContactElm extends CircuitElm {
             g.restore();
         }
 
-        if (this.useIECSymbol() && (this.type === RelayCoilElm.TYPE_ON_DELAY || this.type === RelayCoilElm.TYPE_OFF_DELAY)) {
+        if (
+            this.useIECSymbol() &&
+            (this.type === RelayCoilElm.TYPE_ON_DELAY || this.type === RelayCoilElm.TYPE_OFF_DELAY)
+        ) {
             g.setColor(Color.lightGray);
-            this.interpPoint(this.lead1!, this.lead2!, this.extraPoints[0], 0.5 - 2/32, this.i_position === 1 ? this.openhs/2 : 0);
-            this.interpPoint(this.lead1!, this.lead2!, this.extraPoints[1], 0.5 + 2/32, this.i_position === 1 ? this.openhs/2 : 0);
+            this.interpPoint(
+                this.lead1!,
+                this.lead2!,
+                this.extraPoints[0],
+                0.5 - 2 / 32,
+                this.i_position === 1 ? this.openhs / 2 : 0,
+            );
+            this.interpPoint(
+                this.lead1!,
+                this.lead2!,
+                this.extraPoints[1],
+                0.5 + 2 / 32,
+                this.i_position === 1 ? this.openhs / 2 : 0,
+            );
             g.drawLine(this.extraPoints[0], this.extraPoints[2]);
             g.drawLine(this.extraPoints[1], this.extraPoints[3]);
             g.context.beginPath();
@@ -119,10 +139,24 @@ export class RelayContactElm extends CircuitElm {
             const ds = 22 * this.dsign;
             if (this.type === RelayCoilElm.TYPE_OFF_DELAY) {
                 this.interpPoint(this.lead1!, this.lead2!, this.extraPoints[4], 0.5, ds + 6 * this.dsign);
-                g.context.arc(this.extraPoints[4].x, this.extraPoints[4].y, 6, -Math.PI/8 + ang + Math.PI, Math.PI*9/8 + ang + Math.PI, true);
+                g.context.arc(
+                    this.extraPoints[4].x,
+                    this.extraPoints[4].y,
+                    6,
+                    -Math.PI / 8 + ang + Math.PI,
+                    (Math.PI * 9) / 8 + ang + Math.PI,
+                    true,
+                );
             } else {
                 this.interpPoint(this.lead1!, this.lead2!, this.extraPoints[4], 0.5, ds - 5 * this.dsign);
-                g.context.arc(this.extraPoints[4].x, this.extraPoints[4].y, 6, -Math.PI/8 + ang, Math.PI*9/8 + ang, true);
+                g.context.arc(
+                    this.extraPoints[4].x,
+                    this.extraPoints[4].y,
+                    6,
+                    -Math.PI / 8 + ang,
+                    (Math.PI * 9) / 8 + ang,
+                    true,
+                );
             }
             g.context.stroke();
         }
@@ -148,9 +182,9 @@ export class RelayContactElm extends CircuitElm {
         this.calcLeads(32);
         this.swposts = [new Point(), new Point(), new Point()];
         this.swpoles = [new Point(), new Point(), new Point()];
-        this.interpPoint(this.lead1!,  this.lead2!,  this.swpoles[0], 0, 0);
-        this.interpPoint(this.lead1!,  this.lead2!,  this.swpoles[1], 1, 0);
-        this.interpPoint(this.lead1!,  this.lead2!,  this.swpoles[2], 1, this.openhs);
+        this.interpPoint(this.lead1!, this.lead2!, this.swpoles[0], 0, 0);
+        this.interpPoint(this.lead1!, this.lead2!, this.swpoles[1], 1, 0);
+        this.interpPoint(this.lead1!, this.lead2!, this.swpoles[2], 1, this.openhs);
         this.interpPoint(this.point1, this.point2, this.swposts[0], 0, 0);
         this.interpPoint(this.point1, this.point2, this.swposts[1], 1, 0);
         this.interpPoint(this.point1, this.point2, this.swposts[2], 1, this.openhs);
@@ -158,22 +192,28 @@ export class RelayContactElm extends CircuitElm {
         if (this.useIECSymbol()) {
             this.extraPoints = this.newPointArray(5);
             const ds = 22 * this.dsign;
-            this.interpPoint(this.lead1!, this.lead2!, this.extraPoints[2], 0.5 - 2/32, ds);
-            this.interpPoint(this.lead1!, this.lead2!, this.extraPoints[3], 0.5 + 2/32, ds);
+            this.interpPoint(this.lead1!, this.lead2!, this.extraPoints[2], 0.5 - 2 / 32, ds);
+            this.interpPoint(this.lead1!, this.lead2!, this.extraPoints[3], 0.5 + 2 / 32, ds);
         }
     }
 
     // (not setPosition(), which would replace CircuitElm.setPosition(x, y, x2, y2) and break
     // loading XML files)
     setContactPosition(i_position_: number, type_: number): void {
-        this.i_position = this.isNormallyClosed() ? (1 - i_position_) : i_position_;
+        this.i_position = this.isNormallyClosed() ? 1 - i_position_ : i_position_;
         this.type = type_;
     }
 
-    isNormallyClosed(): boolean { return (this.flags & this.FLAG_NORMALLY_CLOSED) !== 0; }
+    isNormallyClosed(): boolean {
+        return (this.flags & this.FLAG_NORMALLY_CLOSED) !== 0;
+    }
 
-    getPost(n: number): Point { return this.swposts[n]; }
-    getPostCount(): number { return 2; }
+    getPost(n: number): Point {
+        return this.swposts[n];
+    }
+    getPostCount(): number {
+        return 2;
+    }
 
     reset(): void {
         super.reset();
@@ -186,20 +226,28 @@ export class RelayContactElm extends CircuitElm {
         CircuitElm.sim.stampNonLinear(this.nodes[this.nSwitch1]);
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     doStep(): void {
-        CircuitElm.sim.stampResistor(this.nodes[this.nSwitch0], this.nodes[this.nSwitch1], this.i_position === 0 ? this.r_on : this.r_off);
+        CircuitElm.sim.stampResistor(
+            this.nodes[this.nSwitch0],
+            this.nodes[this.nSwitch1],
+            this.i_position === 0 ? this.r_on : this.r_off,
+        );
     }
 
     calculateCurrent(): void {
-        if (this.i_position === 1)
-            this.switchCurrent = 0;
+        if (this.i_position === 1) this.switchCurrent = 0;
         else
-            this.switchCurrent = (this.nodes[this.nSwitch0].v - this.nodes[this.nSwitch1 + this.i_position].v) / this.r_on;
+            this.switchCurrent =
+                (this.nodes[this.nSwitch0].v - this.nodes[this.nSwitch1 + this.i_position].v) / this.r_on;
     }
 
-    getElmType(): string { return "relay"; }
+    getElmType(): string {
+        return "relay";
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = Locale.LS("relay");
@@ -228,5 +276,7 @@ export class RelayContactElm extends CircuitElm {
         }
     }
 
-    getConnection(n1: number, n2: number): boolean { return true; }
+    getConnection(n1: number, n2: number): boolean {
+        return true;
+    }
 }

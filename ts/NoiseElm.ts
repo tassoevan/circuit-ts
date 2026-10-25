@@ -34,7 +34,11 @@ export class NoiseElm extends RailElm {
     }
 
     // dump this class as a RailElm.  The 'n' dump type is still used in CirSim.createCe to read old files
-//  getDumpType() { return 'n'; }
-    getDumpClass(): typeof RailElm { return RailElm; }
-    getShortcut(): number { return 0; }
+    //  getDumpType() { return 'n'; }
+    getDumpClass(): typeof RailElm {
+        return RailElm;
+    }
+    getShortcut(): number {
+        return 0;
+    }
 }

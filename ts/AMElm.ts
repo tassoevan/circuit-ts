@@ -46,8 +46,7 @@ export class AMElm extends CircuitElm {
             this.carrierfreq = parseFloatStrict(st.nextToken());
             this.signalfreq = parseFloatStrict(st.nextToken());
             this.maxVoltage = parseFloatStrict(st.nextToken());
-            if ((this.flags & AMElm.FLAG_COS) !== 0)
-                this.flags &= ~AMElm.FLAG_COS;
+            if ((this.flags & AMElm.FLAG_COS) !== 0) this.flags &= ~AMElm.FLAG_COS;
         } else {
             this.maxVoltage = 5;
             this.carrierfreq = 1000;
@@ -56,7 +55,9 @@ export class AMElm extends CircuitElm {
         this.reset();
     }
 
-    getDumpType(): number { return 200; }
+    getDumpType(): number {
+        return 200;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -78,7 +79,9 @@ export class AMElm extends CircuitElm {
         this.curcount = 0;
     }
 
-    getPostCount(): number { return 1; }
+    getPostCount(): number {
+        return 1;
+    }
 
     stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource!);
@@ -106,16 +109,19 @@ export class AMElm extends CircuitElm {
         this.drawWaveform(g, this.point2);
         this.drawPosts(g);
         this.curcount = this.updateDotCountImpl(-this.current, this.curcount);
-        if (!this.isCreating())
-            this.drawDots(g, this.point1, this.lead1!, this.curcount);
+        if (!this.isCreating()) this.drawDots(g, this.point1, this.lead1!, this.curcount);
     }
 
     drawWaveform(g: Graphics, center: Point): void {
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : Color.gray);
         this.setPowerColor(g, false);
         CircuitElm.drawThickCircle(g, center.x, center.y, this.circleSize);
-        this.adjustBbox(center.x - this.circleSize, center.y - this.circleSize,
-            center.x + this.circleSize, center.y + this.circleSize);
+        this.adjustBbox(
+            center.x - this.circleSize,
+            center.y - this.circleSize,
+            center.x + this.circleSize,
+            center.y + this.circleSize,
+        );
     }
 
     setPoints(): void {
@@ -123,11 +129,21 @@ export class AMElm extends CircuitElm {
         this.lead1 = this.interpPoint(this.point1, this.point2, 1 - this.circleSize / this.dn);
     }
 
-    getVoltageDiff(): number { return this.nodes[0].v; }
-    validate(): boolean { return this.validateRailNode(0); }
-    hasGroundConnection(n1: number): boolean { return true; }
-    getVoltageSourceCount(): number { return 1; }
-    getPower(): number { return -this.getVoltageDiff() * this.current; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
+    validate(): boolean {
+        return this.validateRailNode(0);
+    }
+    hasGroundConnection(n1: number): boolean {
+        return true;
+    }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    getPower(): number {
+        return -this.getVoltageDiff() * this.current;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "AM Source";

@@ -74,8 +74,7 @@ export class ScopeExportImageDialog extends Dialog {
         const okButton = document.createElement("button");
         okButton.textContent = Locale.LS("OK");
         okButton.addEventListener("click", () => {
-            if (this.apply())
-                this.closeDialog();
+            if (this.apply()) this.closeDialog();
         });
         hp.appendChild(okButton);
 
@@ -90,10 +89,8 @@ export class ScopeExportImageDialog extends Dialog {
         const transparent = this.transparentCheck.checked;
         ScopeExportImageDialog.lastSVG = svg;
         ScopeExportImageDialog.lastTransparent = transparent;
-        if (svg)
-            this.scope.exportSVG(transparent);
-        else
-            this.scope.exportPNG(transparent);
+        if (svg) this.scope.exportSVG(transparent);
+        else this.scope.exportPNG(transparent);
         return true;
     }
 }

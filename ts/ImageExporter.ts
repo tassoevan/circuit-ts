@@ -26,7 +26,7 @@ import { Rectangle } from "./Rectangle";
 export class ImageExporter {
     static readonly CAC_PRINT = 0;
     static readonly CAC_IMAGE = 1;
-    static readonly CAC_SVG   = 2;
+    static readonly CAC_SVG = 2;
 
     sim: CirSim;
 
@@ -37,8 +37,14 @@ export class ImageExporter {
     static defaultFileName(ext: string): string {
         const d = new Date();
         const pad = (n: number) => (n < 10 ? "0" + n : "" + n);
-        const dtf = "" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) +
-            "-" + pad(d.getHours()) + pad(d.getMinutes());
+        const dtf =
+            "" +
+            d.getFullYear() +
+            pad(d.getMonth() + 1) +
+            pad(d.getDate()) +
+            "-" +
+            pad(d.getHours()) +
+            pad(d.getMinutes());
         return "circuit-" + dtf + ext;
     }
 
@@ -50,8 +56,7 @@ export class ImageExporter {
     doImageToClipboard(): void {
         const cv = this.getCircuitAsCanvas(ImageExporter.CAC_IMAGE);
         cv.toBlob((blob) => {
-            if (blob == null)
-                return;
+            if (blob == null) return;
             const item = new (window as any).ClipboardItem({ "image/png": blob });
             navigator.clipboard.write([item]).then((x: any) => console.log(x));
         });
@@ -62,7 +67,8 @@ export class ImageExporter {
         const img = cv.toDataURL("image/png");
         const style = document.createElement("style");
         style.id = "circuit-print-style";
-        style.innerHTML = "@media print { body > *:not(#circuit-print-overlay) { display: none !important; } } " +
+        style.innerHTML =
+            "@media print { body > *:not(#circuit-print-overlay) { display: none !important; } } " +
             "#circuit-print-overlay { display: none; } " +
             "@media print { html, body { height: 100%; margin: 0; padding: 0; } @page { size: auto; margin: 10mm; } " +
             "#circuit-print-overlay { display: flex !important; align-items: center; justify-content: center; width: 100%; height: 100%; } " +
@@ -138,7 +144,13 @@ export class ImageExporter {
         return context.getSerializedSvg();
     }
 
-    drawCircuitInContext(context: CanvasRenderingContext2D, type: number, bounds: Rectangle, w: number, h: number): void {
+    drawCircuitInContext(
+        context: CanvasRenderingContext2D,
+        type: number,
+        bounds: Rectangle,
+        w: number,
+        h: number,
+    ): void {
         const g = new Graphics(context);
         context.setTransform(1, 0, 0, 1, 0, 0);
         const oldTransform = this.sim.transform.slice();
@@ -148,9 +160,8 @@ export class ImageExporter {
         // turn on white background, turn off current display
         const p = this.sim.menus.printableCheckItem.getState();
         const c = this.sim.menus.dotsCheckItem.getState();
-        const print = (type === ImageExporter.CAC_PRINT);
-        if (print)
-            this.sim.menus.printableCheckItem.setState(true);
+        const print = type === ImageExporter.CAC_PRINT;
+        if (print) this.sim.menus.printableCheckItem.setState(true);
         if (this.sim.menus.printableCheckItem.getState()) {
             CircuitElm.whiteColor = Color.black;
             CircuitElm.lightGrayColor = Color.black;
@@ -165,8 +176,7 @@ export class ImageExporter {
 
         const wmargin = 140;
         const hmargin = 100;
-        if (bounds != null)
-            scale = Math.min(w / (bounds.width + wmargin), h / (bounds.height + hmargin));
+        if (bounds != null) scale = Math.min(w / (bounds.width + wmargin), h / (bounds.height + hmargin));
 
         // ScopeElms need the transform array to be updated
         this.sim.transform[0] = this.sim.transform[3] = scale;
@@ -177,10 +187,8 @@ export class ImageExporter {
         context.lineCap = "round";
 
         // draw elements
-        for (const ce of this.sim.elmList)
-            ce.draw(g);
-        for (let i = 0; i !== this.sim.postDrawList.length; i++)
-            CircuitElm.drawPost(g, this.sim.postDrawList[i]);
+        for (const ce of this.sim.elmList) ce.draw(g);
+        for (let i = 0; i !== this.sim.postDrawList.length; i++) CircuitElm.drawPost(g, this.sim.postDrawList[i]);
 
         // restore everything
         this.sim.menus.printableCheckItem.setState(p);

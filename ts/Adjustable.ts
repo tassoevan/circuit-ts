@@ -89,8 +89,7 @@ export class Adjustable {
             this.slider = null;
             this.settingValue = false;
             const e = parseIntStrict(st.nextToken());
-            if (e === -1)
-                return;
+            if (e === -1) return;
             try {
                 let ei = st.nextToken();
 
@@ -120,15 +119,11 @@ export class Adjustable {
     }
 
     createSlider(sim: CirSim): boolean {
-        if (this.elm == null)
-            return false;
+        if (this.elm == null) return false;
         const ei = this.elm.getEditInfo(this.editItem);
-        if (ei == null)
-            return false;
-        if (this.sharedSlider != null)
-            return true;
-        if (this.sliderText.length === 0)
-            return false;
+        if (ei == null) return false;
+        if (this.sharedSlider != null) return true;
+        if (this.sliderText.length === 0) return false;
         const value = ei.value;
         this.createSliderWithValue(sim, value);
         return true;
@@ -143,7 +138,7 @@ export class Adjustable {
         const intValue = this.valueToSliderPosition(value);
         this.slider = new Scrollbar(Scrollbar.HORIZONTAL, intValue, 1, 0, 100);
         if (this.sliderStep > 0 && this.maxValue !== this.minValue)
-            this.slider.setStepSize(this.sliderStep * 100 / (this.maxValue - this.minValue));
+            this.slider.setStepSize((this.sliderStep * 100) / (this.maxValue - this.minValue));
         this.slider.addChangeHandler(() => this.execute());
         sim.addWidgetToVerticalPanel(this.slider.element);
     }
@@ -153,8 +148,7 @@ export class Adjustable {
             this.sharedSlider.setSliderValue(value);
             return;
         }
-        if (this.slider == null)
-            return;
+        if (this.slider == null) return;
         const intValue = this.valueToSliderPosition(value);
         this.settingValue = true; // don't recursively set value again in execute()
         this.slider.setValue(intValue);
@@ -162,13 +156,11 @@ export class Adjustable {
     }
 
     execute(): void {
-        if (this.settingValue)
-            return;
+        if (this.settingValue) return;
         const sim = CirSim.theApp;
         for (let i = 0; i !== sim.adjustables.length; i++) {
             const adj: Adjustable = sim.adjustables[i];
-            if (adj === this || adj.sharedSlider === this)
-                adj.executeSlider();
+            if (adj === this || adj.sharedSlider === this) adj.executeSlider();
         }
     }
 
@@ -184,13 +176,17 @@ export class Adjustable {
     }
 
     getSliderValue(): number {
-        const val = this.sharedSlider == null
-            ? (this.slider ? this.slider.getValue() : 0)
-            : (this.sharedSlider.slider ? this.sharedSlider.slider.getValue() : 0);
+        const val =
+            this.sharedSlider == null
+                ? this.slider
+                    ? this.slider.getValue()
+                    : 0
+                : this.sharedSlider.slider
+                  ? this.sharedSlider.slider.getValue()
+                  : 0;
         let result = this.sliderPositionToValue(val);
         const step = this.sharedSlider != null ? this.sharedSlider.sliderStep : this.sliderStep;
-        if (step > 0)
-            result = this.minValue + Math.round((result - this.minValue) / step) * step;
+        if (step > 0) result = this.minValue + Math.round((result - this.minValue) / step) * step;
         return result;
     }
 
@@ -199,9 +195,9 @@ export class Adjustable {
         if (this.logarithmic && this.minValue > 0) {
             const logMin = Math.log(this.minValue);
             const logMax = Math.log(this.maxValue);
-            return Math.floor((Math.log(value) - logMin) / (logMax - logMin) * 100);
+            return Math.floor(((Math.log(value) - logMin) / (logMax - logMin)) * 100);
         }
-        return Math.floor((value - this.minValue) * 100 / (this.maxValue - this.minValue));
+        return Math.floor(((value - this.minValue) * 100) / (this.maxValue - this.minValue));
     }
 
     // convert a slider position (0-100) to a value
@@ -209,9 +205,9 @@ export class Adjustable {
         if (this.logarithmic && this.minValue > 0) {
             const logMin = Math.log(this.minValue);
             const logMax = Math.log(this.maxValue);
-            return Math.exp(logMin + (logMax - logMin) * pos / 100);
+            return Math.exp(logMin + ((logMax - logMin) * pos) / 100);
         }
-        return this.minValue + (this.maxValue - this.minValue) * pos / 100;
+        return this.minValue + ((this.maxValue - this.minValue) * pos) / 100;
     }
 
     deleteSlider(sim: CirSim): void {
@@ -224,15 +220,13 @@ export class Adjustable {
     }
 
     setMouseElm(e: CircuitElm): void {
-        if (this.slider != null)
-            this.slider.draw();
+        if (this.slider != null) this.slider.draw();
     }
 
     sliderBeingShared(): boolean {
         for (let i = 0; i !== CirSim.theApp.adjustables.length; i++) {
             const adj: Adjustable = CirSim.theApp.adjustables[i];
-            if (adj.sharedSlider === this)
-                return true;
+            if (adj.sharedSlider === this) return true;
         }
         return false;
     }
@@ -249,10 +243,8 @@ export class Adjustable {
         if (elm != null && name != null && name.length > 0) {
             for (let i = 0; ; i++) {
                 const ei = elm.getEditInfo(i);
-                if (ei == null)
-                    break;
-                if (name === ei.name)
-                    return i;
+                if (ei == null) break;
+                if (name === ei.name) return i;
             }
         }
         return fallbackIndex;
@@ -266,31 +258,27 @@ export class Adjustable {
         CircuitXMLSerializer.dumpAttr(ae, "mn", this.minValue);
         CircuitXMLSerializer.dumpAttr(ae, "mx", this.maxValue);
         CircuitXMLSerializer.dumpAttr(ae, "st", this.sliderText);
-        if (this.sliderStep > 0)
-            CircuitXMLSerializer.dumpAttr(ae, "stp", this.sliderStep);
+        if (this.sliderStep > 0) CircuitXMLSerializer.dumpAttr(ae, "stp", this.sliderStep);
         if (this.sharedSlider != null)
             CircuitXMLSerializer.dumpAttr(ae, "ss", app.adjustables.indexOf(this.sharedSlider));
-        if (this.logarithmic)
-            CircuitXMLSerializer.dumpAttr(ae, "log", 1);
+        if (this.logarithmic) CircuitXMLSerializer.dumpAttr(ae, "log", 1);
         root.appendChild(ae);
     }
 
     static undumpXml(xml: CircuitXMLDeserializer, app: CirSim): void {
         const e = xml.parseIntAttr("e", -1);
-        if (e === -1)
-            return;
+        if (e === -1) return;
         const ei = xml.parseIntAttr("ei", 0);
         const en = xml.parseStringAttr("en", null);
         const elm = app.getElm(e);
         const item = Adjustable.findEditItemByName(elm, en, ei);
         const adj = new Adjustable(elm, item);
-        adj.minValue  = xml.parseDoubleAttr("mn", 1);
-        adj.maxValue  = xml.parseDoubleAttr("mx", 1000);
+        adj.minValue = xml.parseDoubleAttr("mn", 1);
+        adj.maxValue = xml.parseDoubleAttr("mx", 1000);
         adj.sliderText = xml.parseStringAttr("st", "") ?? "";
         adj.sliderStep = xml.parseDoubleAttr("stp", 0);
         const ss = xml.parseIntAttr("ss", -1);
-        if (ss !== -1)
-            adj.sharedSlider = app.adjustables[ss];
+        if (ss !== -1) adj.sharedSlider = app.adjustables[ss];
         adj.logarithmic = xml.parseIntAttr("log", 0) !== 0;
         app.adjustables.push(adj);
     }
@@ -302,12 +290,10 @@ export class Adjustable {
         const newList: Adjustable[] = [];
         const oldList: Adjustable[] = CirSim.theApp.adjustables;
         for (let i = 0; i !== oldList.length; i++) {
-            if (oldList[i].sharedSlider == null)
-                newList.push(oldList[i]);
+            if (oldList[i].sharedSlider == null) newList.push(oldList[i]);
         }
         for (let i = 0; i !== oldList.length; i++) {
-            if (oldList[i].sharedSlider != null)
-                newList.push(oldList[i]);
+            if (oldList[i].sharedSlider != null) newList.push(oldList[i]);
         }
         CirSim.theApp.adjustables = newList;
     }

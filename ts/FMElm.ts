@@ -50,8 +50,7 @@ export class FMElm extends CircuitElm {
             this.signalfreq = parseFloatStrict(st.nextToken());
             this.maxVoltage = parseFloatStrict(st.nextToken());
             this.deviation = parseFloatStrict(st.nextToken());
-            if ((this.flags & FMElm.FLAG_COS) !== 0)
-                this.flags &= ~FMElm.FLAG_COS;
+            if ((this.flags & FMElm.FLAG_COS) !== 0) this.flags &= ~FMElm.FLAG_COS;
         } else {
             this.deviation = 200;
             this.maxVoltage = 5;
@@ -61,7 +60,9 @@ export class FMElm extends CircuitElm {
         this.reset();
     }
 
-    getDumpType(): number { return 201; }
+    getDumpType(): number {
+        return 201;
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -85,7 +86,9 @@ export class FMElm extends CircuitElm {
         this.curcount = 0;
     }
 
-    getPostCount(): number { return 1; }
+    getPostCount(): number {
+        return 1;
+    }
 
     stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource!);
@@ -98,7 +101,7 @@ export class FMElm extends CircuitElm {
     getVoltage(): number {
         const deltaT = CircuitElm.sim.t - this.lasttime;
         this.lasttime = CircuitElm.sim.t;
-        const signalamplitude = Math.sin((2 * CircuitElm.pi * (CircuitElm.sim.t - this.freqTimeZero)) * this.signalfreq);
+        const signalamplitude = Math.sin(2 * CircuitElm.pi * (CircuitElm.sim.t - this.freqTimeZero) * this.signalfreq);
         this.funcx += deltaT * (this.carrierfreq + signalamplitude * this.deviation);
         return Math.sin(2 * CircuitElm.pi * this.funcx) * this.maxVoltage;
     }
@@ -116,16 +119,19 @@ export class FMElm extends CircuitElm {
         this.drawWaveform(g, this.point2);
         this.drawPosts(g);
         this.curcount = this.updateDotCountImpl(-this.current, this.curcount);
-        if (!this.isCreating())
-            this.drawDots(g, this.point1, this.lead1!, this.curcount);
+        if (!this.isCreating()) this.drawDots(g, this.point1, this.lead1!, this.curcount);
     }
 
     drawWaveform(g: Graphics, center: Point): void {
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : Color.gray);
         this.setPowerColor(g, false);
         CircuitElm.drawThickCircle(g, center.x, center.y, this.circleSize);
-        this.adjustBbox(center.x - this.circleSize, center.y - this.circleSize,
-            center.x + this.circleSize, center.y + this.circleSize);
+        this.adjustBbox(
+            center.x - this.circleSize,
+            center.y - this.circleSize,
+            center.x + this.circleSize,
+            center.y + this.circleSize,
+        );
     }
 
     setPoints(): void {
@@ -133,11 +139,21 @@ export class FMElm extends CircuitElm {
         this.lead1 = this.interpPoint(this.point1, this.point2, 1 - this.circleSize / this.dn);
     }
 
-    getVoltageDiff(): number { return this.nodes[0].v; }
-    validate(): boolean { return this.validateRailNode(0); }
-    hasGroundConnection(n1: number): boolean { return true; }
-    getVoltageSourceCount(): number { return 1; }
-    getPower(): number { return -this.getVoltageDiff() * this.current; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
+    validate(): boolean {
+        return this.validateRailNode(0);
+    }
+    hasGroundConnection(n1: number): boolean {
+        return true;
+    }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    getPower(): number {
+        return -this.getVoltageDiff() * this.current;
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = "FM Source";

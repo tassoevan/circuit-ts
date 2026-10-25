@@ -43,7 +43,7 @@ export class DecimalDisplayElm extends ChipElm {
             super(xa, ya, xb, yb!, f!, st!);
             this.bitCount = 4;
             try {
-                this.bitCount    = parseIntStrict(st!.nextToken());
+                this.bitCount = parseIntStrict(st!.nextToken());
                 this.displayMode = parseIntStrict(st!.nextToken());
             } catch (e) {}
             this.setupPins();
@@ -52,31 +52,37 @@ export class DecimalDisplayElm extends ChipElm {
 
     getChipName(): string {
         switch (this.displayMode) {
-        case 1:  return "hex display";
-        case 2:  return "octal display";
-        default: return "decimal display";
+            case 1:
+                return "hex display";
+            case 2:
+                return "octal display";
+            default:
+                return "decimal display";
         }
     }
 
     draw(g: Graphics): void {
         this.drawChip(g);
         const xl = this.x + this.cspc + this.flippedSizeX * this.cspc;
-        let yl   = this.y - this.cspc + this.flippedSizeY * this.cspc;
-        if (this.isFlippedXY())
-            yl += ((this.flags & ChipElm.FLAG_FLIP_Y) !== 0) ? -this.cspc / 2 : this.cspc / 2;
+        let yl = this.y - this.cspc + this.flippedSizeY * this.cspc;
+        if (this.isFlippedXY()) yl += (this.flags & ChipElm.FLAG_FLIP_Y) !== 0 ? -this.cspc / 2 : this.cspc / 2;
         g.save();
         g.setFont(new Font("SansSerif", 0, 15 * this.csize));
         g.setColor(CircuitElm.whiteColor);
         g.context.textBaseline = "middle";
         let value = 0;
-        for (let i = 0; i !== this.bitCount; i++)
-            if (this.pins[i].value)
-                value |= 1 << i;
+        for (let i = 0; i !== this.bitCount; i++) if (this.pins[i].value) value |= 1 << i;
         let str: string;
         switch (this.displayMode) {
-        case 1:  str = value.toString(16).toUpperCase(); break;
-        case 2:  str = value.toString(8); break;
-        default: str = String(value); break;
+            case 1:
+                str = value.toString(16).toUpperCase();
+                break;
+            case 2:
+                str = value.toString(8);
+                break;
+            default:
+                str = String(value);
+                break;
         }
         const w = g.context.measureText(str).width;
         g.drawString(str, xl + 5 * this.csize - w / 2, yl);
@@ -91,32 +97,42 @@ export class DecimalDisplayElm extends ChipElm {
 
     undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
-        this.bitCount    = xml.parseIntAttr("bc", this.bitCount);
+        this.bitCount = xml.parseIntAttr("bc", this.bitCount);
         this.displayMode = xml.parseIntAttr("dm", this.displayMode);
         this.setupPins();
     }
 
-    getXmlDumpType(): string { return "dd"; }
-    allowBus(): boolean { return true; }
+    getXmlDumpType(): string {
+        return "dd";
+    }
+    allowBus(): boolean {
+        return true;
+    }
 
     setupPins(): void {
-        if (!this.bitCount)
-            return;
+        if (!this.bitCount) return;
         this.sizeX = 3;
         this.sizeY = this.useBus() ? 2 : this.bitCount;
-        this.pins  = new Array(this.bitCount);
+        this.pins = new Array(this.bitCount);
         this.makeBitPins(this.bitCount, 0, ChipElm.SIDE_W, 0, "I", false, false, false);
         this.allocNodes();
     }
 
-    getPostCount(): number { return this.bitCount ?? 0; }
-    getDumpType(): number { return 419; }
-    getVoltageSourceCount(): number { return 0; }
+    getPostCount(): number {
+        return this.bitCount ?? 0;
+    }
+    getDumpType(): number {
+        return 419;
+    }
+    getVoltageSourceCount(): number {
+        return 0;
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Bits", this.bitCount, 1, 8).setDimensionless();
+        if (n === 0) return new EditInfo("# of Bits", this.bitCount, 1, 8).setDimensionless();
         if (n === 1) {
             const ei = new EditInfo("Display Mode", 0, -1, -1);
             ei.choice = new Choice();
@@ -138,11 +154,9 @@ export class DecimalDisplayElm extends ChipElm {
                     this.setupPins();
                     this.setPoints();
                 }
-            } else
-                ei.setError("must be between 1 and 16");
+            } else ei.setError("must be between 1 and 16");
             return;
         }
-        if (n === 1)
-            this.displayMode = ei.choice!.getSelectedIndex();
+        if (n === 1) this.displayMode = ei.choice!.getSelectedIndex();
     }
 }

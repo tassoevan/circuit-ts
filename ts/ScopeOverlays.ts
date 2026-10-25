@@ -34,25 +34,23 @@ export class ScopeOverlays {
 
     // true if `lines` more lines of text fit in the scope
     hasRoomForText(lines: number): boolean {
-        return this.textY + 15 * (lines - 1) <= (this.scope.rect.height*3/4);
+        return this.textY + 15 * (lines - 1) <= (this.scope.rect.height * 3) / 4;
     }
 
     drawInfoText(g: Graphics, text: string): void {
-        if (this.scope.rect.height <= this.textY + 5)
-            return;
+        if (this.scope.rect.height <= this.textY + 5) return;
         g.drawString(text, 0, this.textY);
         this.textY += 15;
     }
 
     drawScale(g: Graphics): void {
-        if (this.scope.rect.height <= this.textY + 5)
-            return;
+        if (this.scope.rect.height <= this.textY + 5) return;
         const plots = this.scope.visiblePlots;
         const hs = "H=" + CircuitElm.getUnitText(this.scope.gridStepX, "s") + "/div";
 
         // if every plot has the same vertical scale, just show it once
         const vs = plots[0].getUnitText(plots[0].gridStepY);
-        if (plots.every(p => p.getUnitText(p.gridStepY) === vs)) {
+        if (plots.every((p) => p.getUnitText(p.gridStepY) === vs)) {
             this.drawInfoText(g, hs + " V=" + vs + "/div");
             return;
         }
@@ -73,8 +71,7 @@ export class ScopeOverlays {
             if (x + bulletWidth + vScaleWidth > this.scope.rect.width) {
                 x = 0;
                 this.textY += 15;
-                if (this.scope.rect.height <= this.textY + 5)
-                    return;
+                if (this.scope.rect.height <= this.textY + 5) return;
             }
             g.setColor(p.color);
             g.fillOval(x + 7, this.textY - 9, 8, 8);
@@ -89,12 +86,18 @@ export class ScopeOverlays {
     // shared cycle-detection loop for drawAverage, drawRMS, drawDutyCycle.
     // calls onCycleStart at first rising edge, onSample each sample thereafter,
     // onCycleEnd at each subsequent rising edge.  returns end-start span, or 0.
-    iterateCycles(sdi: ScopeDataIterator, mid: number,
-                  onCycleStart: () => void, onSample: () => void, onCycleEnd: () => void): number {
+    iterateCycles(
+        sdi: ScopeDataIterator,
+        mid: number,
+        onCycleStart: () => void,
+        onSample: () => void,
+        onCycleEnd: () => void,
+    ): number {
         const fnz = sdi.skipNonzeroValues();
-        let state = (fnz > mid) ? 1 : -1;
+        let state = fnz > mid ? 1 : -1;
         let waveCount = 0;
-        let start = 0, end = 0;
+        let start = 0,
+            end = 0;
         for (const i of sdi) {
             let sw = false;
             if (state === 1) {
@@ -113,8 +116,7 @@ export class ScopeOverlays {
                     waveCount++;
                 }
             }
-            if (waveCount > 0)
-                onSample();
+            if (waveCount > 0) onSample();
         }
         return end - start;
     }
@@ -136,50 +138,77 @@ export class ScopeOverlays {
         const plot = this.scope.visiblePlots[0];
         const mid = (this.scope.maxValue + this.scope.minValue) / 2;
         const sdi = this.makeSdi(plot);
-        let avg = 0, endAvg = 0;
-        const span = this.iterateCycles(sdi, mid,
-            () => { avg = 0; },
-            () => { const m = (sdi.getMax() + sdi.getMin()) * .5; avg += m * m; },
-            () => { endAvg = avg; });
-        if (span > 0)
-            this.drawInfoText(g, plot.getUnitText(Math.sqrt(endAvg / span)) + "rms");
+        let avg = 0,
+            endAvg = 0;
+        const span = this.iterateCycles(
+            sdi,
+            mid,
+            () => {
+                avg = 0;
+            },
+            () => {
+                const m = (sdi.getMax() + sdi.getMin()) * 0.5;
+                avg += m * m;
+            },
+            () => {
+                endAvg = avg;
+            },
+        );
+        if (span > 0) this.drawInfoText(g, plot.getUnitText(Math.sqrt(endAvg / span)) + "rms");
     }
 
     drawAverage(g: Graphics): void {
         const plot = this.scope.visiblePlots[0];
         const mid = (this.scope.maxValue + this.scope.minValue) / 2;
         const sdi = this.makeSdi(plot);
-        let avg = 0, endAvg = 0;
-        const span = this.iterateCycles(sdi, mid,
-            () => { avg = 0; },
-            () => { avg += (sdi.getMax() + sdi.getMin()) * .5; },
-            () => { endAvg = avg; });
-        if (span > 0)
-            this.drawInfoText(g, plot.getUnitText(endAvg / span) + Locale.LS(" average"));
+        let avg = 0,
+            endAvg = 0;
+        const span = this.iterateCycles(
+            sdi,
+            mid,
+            () => {
+                avg = 0;
+            },
+            () => {
+                avg += (sdi.getMax() + sdi.getMin()) * 0.5;
+            },
+            () => {
+                endAvg = avg;
+            },
+        );
+        if (span > 0) this.drawInfoText(g, plot.getUnitText(endAvg / span) + Locale.LS(" average"));
     }
 
     drawDutyCycle(g: Graphics): void {
         const plot = this.scope.visiblePlots[0];
         const mid = (this.scope.maxValue + this.scope.minValue) / 2;
         const sdi = this.makeSdi(plot);
-        let dutyLen = 0, prevDuty = 0;
-        const span = this.iterateCycles(sdi, mid,
-            () => { dutyLen = 0; },
-            () => { if (sdi.getMax() > mid) dutyLen++; },
-            () => { prevDuty = dutyLen; });
-        if (span > 0)
-            this.drawInfoText(g, Locale.LS("Duty cycle ") + Math.trunc(100 * prevDuty / span) + "%");
+        let dutyLen = 0,
+            prevDuty = 0;
+        const span = this.iterateCycles(
+            sdi,
+            mid,
+            () => {
+                dutyLen = 0;
+            },
+            () => {
+                if (sdi.getMax() > mid) dutyLen++;
+            },
+            () => {
+                prevDuty = dutyLen;
+            },
+        );
+        if (span > 0) this.drawInfoText(g, Locale.LS("Duty cycle ") + Math.trunc((100 * prevDuty) / span) + "%");
     }
 
     drawFrequency(g: Graphics): void {
         const plot = this.scope.visiblePlots[0];
         const sdi = this.makeSdi(plot);
         let avg = 0;
-        for (const i of sdi)
-            avg += sdi.getMin() + sdi.getMax();
+        for (const i of sdi) avg += sdi.getMin() + sdi.getMax();
         avg /= sdi.validCount * 2;
         let state = 0;
-        const thresh = avg * .05;
+        const thresh = avg * 0.05;
         let oi = 0;
         let avperiod = 0;
         let periodct = -1;
@@ -187,36 +216,31 @@ export class ScopeOverlays {
         for (const i of sdi) {
             const q = sdi.getMax() - avg;
             const os = state;
-            if (q < thresh)
-                state = 1;
-            else if (q > -thresh)
-                state = 2;
+            if (q < thresh) state = 1;
+            else if (q > -thresh) state = 2;
             if (state === 2 && os === 1) {
                 const pd = i - oi;
                 oi = i;
-                if (pd < 12)
-                    continue;
+                if (pd < 12) continue;
                 if (periodct >= 0) {
-                    avperiod  += pd;
+                    avperiod += pd;
                     avperiod2 += pd * pd;
                 }
                 periodct++;
             }
         }
-        avperiod  /= periodct;
+        avperiod /= periodct;
         avperiod2 /= periodct;
         const periodstd = Math.sqrt(avperiod2 - avperiod * avperiod);
         const freq = 1 / (avperiod * this.scope.sim.maxTimeStep * this.scope.speed);
-        if (periodct < 1 || periodstd > 2 || !isFinite(freq))
-            return;
+        if (periodct < 1 || periodstd > 2 || !isFinite(freq)) return;
         this.drawInfoText(g, CircuitElm.getUnitText(freq, "Hz"));
     }
 
     drawElmInfo(g: Graphics): void {
         const info: string[] = [null!];
         this.scope.getElm()!.getInfo(info);
-        for (let i = 0; info[i] != null; i++)
-            this.drawInfoText(g, info[i]);
+        for (let i = 0; info[i] != null; i++) this.drawInfoText(g, info[i]);
     }
 
     // legend showing each plot's color and description, used when multiple plots are combined
@@ -226,13 +250,11 @@ export class ScopeOverlays {
         const order = plots.map((_, i) => i);
         // in manual mode, plots may be vertically displaced; list them top to bottom
         // in the order they appear (stable sort keeps original order for ties)
-        if (this.scope.manualScale)
-            order.sort((a, b) => plots[b].manVPosition - plots[a].manVPosition);
+        if (this.scope.manualScale) order.sort((a, b) => plots[b].manVPosition - plots[a].manVPosition);
         for (const i of order) {
-            if (this.scope.rect.height <= this.textY + 5)
-                return;
+            if (this.scope.rect.height <= this.textY + 5) return;
             const plot = plots[i];
-            const label = (plot.elm !== null) ? Locale.LS(plot.elm.getScopeText(plot.value)) : ("Plot " + (i + 1));
+            const label = plot.elm !== null ? Locale.LS(plot.elm.getScopeText(plot.value)) : "Plot " + (i + 1);
             g.setColor(plot.color);
             g.fillRect(0, this.textY - 9, 10, 10);
             g.setColor(CircuitElm.whiteColor);
@@ -245,12 +267,10 @@ export class ScopeOverlays {
     // don't repeat it (e.g. several stacked "logic output" scopes)
     sameLabelAsScopeAbove(t: string): boolean {
         const scope = this.scope;
-        if (scope.position < 0 || scope.exporting)
-            return false;
+        if (scope.position < 0 || scope.exporting) return false;
         const mgr = scope.app.scopeManager;
         const i = mgr.scopes.indexOf(scope);
-        if (i <= 0 || i >= mgr.scopeCount)
-            return false;
+        if (i <= 0 || i >= mgr.scopeCount) return false;
         const above = mgr.scopes[i - 1];
         return above.position === scope.position && above.getScopeLabelOrText(true) === t;
     }
@@ -259,40 +279,35 @@ export class ScopeOverlays {
         g.setColor(CircuitElm.whiteColor);
         this.textY = 10;
         if (this.scope.visiblePlots.length === 0) {
-            if (this.scope.showElmInfo)
-                this.drawElmInfo(g);
+            if (this.scope.showElmInfo) this.drawElmInfo(g);
             return;
         }
         const plot = this.scope.visiblePlots[0];
-        if (this.scope.showScale)
-            this.drawScale(g);
-        if (this.scope.showMax)
-            this.drawInfoText(g, "Max=" + plot.getUnitText(this.scope.maxValue));
+        if (this.scope.showScale) this.drawScale(g);
+        if (this.scope.showMax) this.drawInfoText(g, "Max=" + plot.getUnitText(this.scope.maxValue));
         if (this.scope.showMin) {
             const ym = this.scope.rect.height - 5;
             g.drawString("Min=" + plot.getUnitText(this.scope.minValue), 0, ym);
         }
         if (this.scope.showP2P)
             this.drawInfoText(g, "P-P=" + plot.getUnitText(this.scope.maxValue - this.scope.minValue));
-        if (this.scope.showRMS)
-            this.drawRMS(g);
-        if (this.scope.showAverage)
-            this.drawAverage(g);
-        if (this.scope.showDutyCycle)
-            this.drawDutyCycle(g);
+        if (this.scope.showRMS) this.drawRMS(g);
+        if (this.scope.showAverage) this.drawAverage(g);
+        if (this.scope.showDutyCycle) this.drawDutyCycle(g);
         // embedded (ScopeElm) scopes only show a user-set label, not the elm text or legend
         const embedded = this.scope.position < 0;
         const t = embedded ? this.scope.text : this.scope.getScopeLabelOrText(true);
         if (t != null && t !== "") {
             if (!this.sameLabelAsScopeAbove(t) && (this.scope.text !== null || this.hasRoomForText(1)))
                 this.drawInfoText(g, t);
-        } else if (!embedded && this.scope.visiblePlots.length > 1 && this.hasRoomForText(this.scope.visiblePlots.length))
+        } else if (
+            !embedded &&
+            this.scope.visiblePlots.length > 1 &&
+            this.hasRoomForText(this.scope.visiblePlots.length)
+        )
             this.drawLegend(g);
-        if (this.scope.showFreq)
-            this.drawFrequency(g);
-        if (this.scope.showElmInfo)
-            this.drawElmInfo(g);
-        if (this.scope.fftPlot.showPhaseAngle)
-            this.scope.fftPlot.drawPhaseAngle(g);
+        if (this.scope.showFreq) this.drawFrequency(g);
+        if (this.scope.showElmInfo) this.drawElmInfo(g);
+        if (this.scope.fftPlot.showPhaseAngle) this.scope.fftPlot.drawPhaseAngle(g);
     }
 }

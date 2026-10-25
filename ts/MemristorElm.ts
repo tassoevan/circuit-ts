@@ -54,12 +54,14 @@ export class MemristorElm extends CircuitElm {
             this.r_off = 160 * this.r_on;
             this.dopeWidth = 0;
             this.totalWidth = 10e-9; // meters
-            this.mobility = 1e-10;   // m^2/sV
+            this.mobility = 1e-10; // m^2/sV
         }
         this.resistance = 100;
     }
 
-    getDumpType(): number { return 'm'.charCodeAt(0); }
+    getDumpType(): number {
+        return "m".charCodeAt(0);
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -101,15 +103,13 @@ export class MemristorElm extends CircuitElm {
         // draw zigzag
         for (let i = 0; i <= segments; i++) {
             let nx = (i & 1) === 0 ? 1 : -1;
-            if (i === segments)
-                nx = 0;
-            const v = this.nodes[0].v + (this.nodes[1].v - this.nodes[0].v) * i / segments;
+            if (i === segments) nx = 0;
+            const v = this.nodes[0].v + ((this.nodes[1].v - this.nodes[0].v) * i) / segments;
             this.setVoltageColor(g, v);
             this.interpPoint(this.lead1!, this.lead2!, CircuitElm.ps1, i * segf, hs * ox);
             this.interpPoint(this.lead1!, this.lead2!, CircuitElm.ps2, i * segf, hs * nx);
             CircuitElm.drawThickLine(g, CircuitElm.ps1, CircuitElm.ps2);
-            if (i === segments)
-                break;
+            if (i === segments) break;
             this.interpPoint(this.lead1!, this.lead2!, CircuitElm.ps1, (i + 1) * segf, hs * nx);
             CircuitElm.drawThickLine(g, CircuitElm.ps1, CircuitElm.ps2);
             ox = nx;
@@ -119,7 +119,9 @@ export class MemristorElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    nonLinear(): boolean { return true; }
+    nonLinear(): boolean {
+        return true;
+    }
 
     calculateCurrent(): void {
         this.current = (this.nodes[0].v - this.nodes[1].v) / this.resistance;
@@ -131,11 +133,9 @@ export class MemristorElm extends CircuitElm {
 
     startIteration(): void {
         const wd = this.dopeWidth / this.totalWidth;
-        this.dopeWidth += CircuitElm.sim.timeStep * this.mobility * this.r_on * this.current / this.totalWidth;
-        if (this.dopeWidth < 0)
-            this.dopeWidth = 0;
-        if (this.dopeWidth > this.totalWidth)
-            this.dopeWidth = this.totalWidth;
+        this.dopeWidth += (CircuitElm.sim.timeStep * this.mobility * this.r_on * this.current) / this.totalWidth;
+        if (this.dopeWidth < 0) this.dopeWidth = 0;
+        if (this.dopeWidth > this.totalWidth) this.dopeWidth = this.totalWidth;
         this.resistance = this.r_on * wd + this.r_off * (1 - wd);
     }
 
@@ -156,42 +156,34 @@ export class MemristorElm extends CircuitElm {
     }
 
     getScopeValue(x: number): number {
-        return (x === VAL_R) ? this.resistance : super.getScopeValue(x);
+        return x === VAL_R ? this.resistance : super.getScopeValue(x);
     }
 
     getScopeUnits(x: number): number {
-        return (x === VAL_R) ? UNITS_OHMS : super.getScopeUnits(x);
+        return x === VAL_R ? UNITS_OHMS : super.getScopeUnits(x);
     }
 
     canShowValueInScope(x: number): boolean {
         return x === VAL_R;
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Min Resistance (ohms)", this.r_on, 0, 0);
-        if (n === 1)
-            return new EditInfo("Max Resistance (ohms)", this.r_off, 0, 0);
-        if (n === 2)
-            return new EditInfo("Width of Doped Region (nm)", this.dopeWidth * 1e9, 0, 0);
-        if (n === 3)
-            return new EditInfo("Total Width (nm)", this.totalWidth * 1e9, 0, 0);
-        if (n === 4)
-            return new EditInfo("Mobility (um^2/(s*V))", this.mobility * 1e12, 0, 0);
+        if (n === 0) return new EditInfo("Min Resistance (ohms)", this.r_on, 0, 0);
+        if (n === 1) return new EditInfo("Max Resistance (ohms)", this.r_off, 0, 0);
+        if (n === 2) return new EditInfo("Width of Doped Region (nm)", this.dopeWidth * 1e9, 0, 0);
+        if (n === 3) return new EditInfo("Total Width (nm)", this.totalWidth * 1e9, 0, 0);
+        if (n === 4) return new EditInfo("Mobility (um^2/(s*V))", this.mobility * 1e12, 0, 0);
         return null;
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0)
-            this.r_on = ei.value;
-        if (n === 1)
-            this.r_off = ei.value;
-        if (n === 2)
-            this.dopeWidth = ei.value * 1e-9;
-        if (n === 3)
-            this.totalWidth = ei.value * 1e-9;
-        if (n === 4)
-            this.mobility = ei.value * 1e-12;
+        if (n === 0) this.r_on = ei.value;
+        if (n === 1) this.r_off = ei.value;
+        if (n === 2) this.dopeWidth = ei.value * 1e-9;
+        if (n === 3) this.totalWidth = ei.value * 1e-9;
+        if (n === 4) this.mobility = ei.value * 1e-12;
     }
 }

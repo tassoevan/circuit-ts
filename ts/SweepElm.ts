@@ -43,9 +43,10 @@ export class SweepElm extends CircuitElm {
     constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
         if (xb === undefined) {
             super(xa, ya);
-            this.minF = 20; this.maxF = 4000;
+            this.minF = 20;
+            this.maxF = 4000;
             this.maxV = 5;
-            this.sweepTime = .1;
+            this.sweepTime = 0.1;
             this.flags = SweepElm.FLAG_BIDIR;
             this.reset();
         } else {
@@ -58,9 +59,15 @@ export class SweepElm extends CircuitElm {
         }
     }
 
-    getDumpType(): number { return 170; }
-    getXmlDumpType(): string { return "sw"; }
-    getPostCount(): number { return 1; }
+    getDumpType(): number {
+        return 170;
+    }
+    getXmlDumpType(): string {
+        return "sw";
+    }
+    getPostCount(): number {
+        return 1;
+    }
     readonly circleSize = 17;
 
     dumpXml(doc: Document, elem: Element): void {
@@ -82,13 +89,17 @@ export class SweepElm extends CircuitElm {
 
     setPoints(): void {
         super.setPoints();
-        this.lead1 = this.interpPoint(this.point1, this.point2, 1 - this.circleSize/this.dn);
+        this.lead1 = this.interpPoint(this.point1, this.point2, 1 - this.circleSize / this.dn);
     }
 
     addRoutingObstacle(router: WireRouter): void {
         router.addWire(this.point1.x, this.point1.y, this.lead1!.x, this.lead1!.y);
-        router.addObstacle(this.point2.x - this.circleSize, this.point2.y - this.circleSize,
-                           this.point2.x + this.circleSize, this.point2.y + this.circleSize);
+        router.addObstacle(
+            this.point2.x - this.circleSize,
+            this.point2.y - this.circleSize,
+            this.point2.x + this.circleSize,
+            this.point2.y + this.circleSize,
+        );
     }
 
     draw(g: Graphics): void {
@@ -97,45 +108,41 @@ export class SweepElm extends CircuitElm {
         CircuitElm.drawThickLine(g, this.point1, this.lead1!);
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : Color.gray);
         this.setPowerColor(g, false);
-        const xc = this.point2.x; const yc = this.point2.y;
+        const xc = this.point2.x;
+        const yc = this.point2.y;
         CircuitElm.drawThickCircle(g, xc, yc, this.circleSize);
         const wl = 8;
-        this.adjustBbox(xc - this.circleSize, yc - this.circleSize,
-                        xc + this.circleSize, yc + this.circleSize);
+        this.adjustBbox(xc - this.circleSize, yc - this.circleSize, xc + this.circleSize, yc + this.circleSize);
         const xl = 10;
         let tm = Date.now();
         tm %= 2000;
-        if (tm > 1000)
-            tm = 2000 - tm;
-        let w = 1 + tm * .002;
-        if (CircuitElm.app.simIsRunning())
-            w = 1 + 2*(this.frequency - this.minF)/(this.maxF - this.minF);
+        if (tm > 1000) tm = 2000 - tm;
+        let w = 1 + tm * 0.002;
+        if (CircuitElm.app.simIsRunning()) w = 1 + (2 * (this.frequency - this.minF)) / (this.maxF - this.minF);
 
         g.context.beginPath();
         g.setLineWidth(3.0);
         for (let i = -xl; i <= xl; i++) {
-            const yy = yc + Math.round(.95 * Math.sin(i * CircuitElm.pi * w / xl) * wl);
-            if (i === -xl)
-                g.context.moveTo(xc + i, yy);
-            else
-                g.context.lineTo(xc + i, yy);
+            const yy = yc + Math.round(0.95 * Math.sin((i * CircuitElm.pi * w) / xl) * wl);
+            if (i === -xl) g.context.moveTo(xc + i, yy);
+            else g.context.lineTo(xc + i, yy);
         }
         g.context.stroke();
         g.setLineWidth(1.0);
 
         if (this.showValues()) {
             const s = CircuitElm.getShortUnitText(this.frequency, "Hz");
-            if (this.dx === 0 || this.dy === 0)
-                this.drawValues(g, s, this.circleSize);
+            if (this.dx === 0 || this.dy === 0) this.drawValues(g, s, this.circleSize);
         }
 
         this.drawPosts(g);
         this.curcount = this.updateDotCountImpl(-this.current, this.curcount);
-        if (!this.isCreating())
-            this.drawDots(g, this.point1, this.lead1!, this.curcount);
+        if (!this.isCreating()) this.drawDots(g, this.point1, this.lead1!, this.curcount);
     }
 
-    validate(): boolean { return this.validateRailNode(0); }
+    validate(): boolean {
+        return this.validateRailNode(0);
+    }
 
     stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource);
@@ -155,11 +162,11 @@ export class SweepElm extends CircuitElm {
             this.dir = 1;
         }
         if ((this.flags & SweepElm.FLAG_LOG) === 0) {
-            this.fadd = this.dir * CircuitElm.sim.timeStep * (this.maxF - this.minF) / this.sweepTime;
+            this.fadd = (this.dir * CircuitElm.sim.timeStep * (this.maxF - this.minF)) / this.sweepTime;
             this.fmul = 1;
         } else {
             this.fadd = 0;
-            this.fmul = Math.pow(this.maxF/this.minF, this.dir * CircuitElm.sim.timeStep / this.sweepTime);
+            this.fmul = Math.pow(this.maxF / this.minF, (this.dir * CircuitElm.sim.timeStep) / this.sweepTime);
         }
         this.savedTimeStep = CircuitElm.sim.timeStep;
     }
@@ -173,22 +180,20 @@ export class SweepElm extends CircuitElm {
 
     startIteration(): void {
         // has timestep been changed?
-        if (CircuitElm.sim.timeStep !== this.savedTimeStep)
-            this.setParams();
+        if (CircuitElm.sim.timeStep !== this.savedTimeStep) this.setParams();
         this.v = Math.sin(this.freqTime) * this.maxV;
         this.freqTime += this.frequency * 2 * CircuitElm.pi * CircuitElm.sim.timeStep;
         this.frequency = this.frequency * this.fmul + this.fadd;
         if (this.frequency >= this.maxF && this.dir === 1) {
             if ((this.flags & SweepElm.FLAG_BIDIR) !== 0) {
                 this.fadd = -this.fadd;
-                this.fmul = 1/this.fmul;
+                this.fmul = 1 / this.fmul;
                 this.dir = -1;
-            } else
-                this.frequency = this.minF;
+            } else this.frequency = this.minF;
         }
         if (this.frequency <= this.minF && this.dir === -1) {
             this.fadd = -this.fadd;
-            this.fmul = 1/this.fmul;
+            this.fmul = 1 / this.fmul;
             this.dir = 1;
         }
     }
@@ -197,36 +202,42 @@ export class SweepElm extends CircuitElm {
         CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource, this.v);
     }
 
-    getVoltageDiff(): number { return this.nodes[0].v; }
-    getVoltageSourceCount(): number { return 1; }
-    hasGroundConnection(n1: number): boolean { return true; }
-    isSweepElm(): boolean { return true; }
-    getElmType(): string { return "sweep"; }
+    getVoltageDiff(): number {
+        return this.nodes[0].v;
+    }
+    getVoltageSourceCount(): number {
+        return 1;
+    }
+    hasGroundConnection(n1: number): boolean {
+        return true;
+    }
+    isSweepElm(): boolean {
+        return true;
+    }
+    getElmType(): string {
+        return "sweep";
+    }
 
     getInfo(arr: string[]): void {
-        arr[0] = "sweep " + (((this.flags & SweepElm.FLAG_LOG) === 0) ? "(linear)" : "(log)");
+        arr[0] = "sweep " + ((this.flags & SweepElm.FLAG_LOG) === 0 ? "(linear)" : "(log)");
         arr[1] = "I = " + CircuitElm.getCurrentDText(this.getCurrent());
         arr[2] = "V = " + CircuitElm.getVoltageText(this.nodes[0].v);
         arr[3] = "f = " + CircuitElm.getUnitText(this.frequency, "Hz");
-        arr[4] = "range = " + CircuitElm.getUnitText(this.minF, "Hz") + " .. " +
-            CircuitElm.getUnitText(this.maxF, "Hz");
+        arr[4] =
+            "range = " + CircuitElm.getUnitText(this.minF, "Hz") + " .. " + CircuitElm.getUnitText(this.maxF, "Hz");
         arr[5] = "time = " + CircuitElm.getUnitText(this.sweepTime, "s");
     }
 
     getEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("Min Frequency (Hz)", this.minF, 0, 0);
-        if (n === 1)
-            return new EditInfo("Max Frequency (Hz)", this.maxF, 0, 0);
-        if (n === 2)
-            return new EditInfo("Sweep Time (s)", this.sweepTime, 0, 0);
+        if (n === 0) return new EditInfo("Min Frequency (Hz)", this.minF, 0, 0);
+        if (n === 1) return new EditInfo("Max Frequency (Hz)", this.maxF, 0, 0);
+        if (n === 2) return new EditInfo("Sweep Time (s)", this.sweepTime, 0, 0);
         if (n === 3) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Logarithmic", (this.flags & SweepElm.FLAG_LOG) !== 0);
             return ei;
         }
-        if (n === 4)
-            return new EditInfo("Max Voltage", this.maxV, 0, 0).setUnitStep();
+        if (n === 4) return new EditInfo("Max Voltage", this.maxV, 0, 0).setUnitStep();
         if (n === 5) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Bidirectional", (this.flags & SweepElm.FLAG_BIDIR) !== 0);
@@ -236,33 +247,29 @@ export class SweepElm extends CircuitElm {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        const maxfreq = 1/(8 * CircuitElm.sim.timeStep);
+        const maxfreq = 1 / (8 * CircuitElm.sim.timeStep);
         if (n === 0) {
             this.minF = ei.value;
-            if (this.minF > maxfreq)
-                this.minF = maxfreq;
+            if (this.minF > maxfreq) this.minF = maxfreq;
         }
         if (n === 1) {
             this.maxF = ei.value;
-            if (this.maxF > maxfreq)
-                this.maxF = maxfreq;
+            if (this.maxF > maxfreq) this.maxF = maxfreq;
         }
-        if (n === 2)
-            this.sweepTime = ei.value;
+        if (n === 2) this.sweepTime = ei.value;
         if (n === 3) {
             this.flags &= ~SweepElm.FLAG_LOG;
-            if (ei.checkbox.getState())
-                this.flags |= SweepElm.FLAG_LOG;
+            if (ei.checkbox.getState()) this.flags |= SweepElm.FLAG_LOG;
         }
-        if (n === 4)
-            this.maxV = ei.value;
+        if (n === 4) this.maxV = ei.value;
         if (n === 5) {
             this.flags &= ~SweepElm.FLAG_BIDIR;
-            if (ei.checkbox.getState())
-                this.flags |= SweepElm.FLAG_BIDIR;
+            if (ei.checkbox.getState()) this.flags |= SweepElm.FLAG_BIDIR;
         }
         this.setParams();
     }
 
-    getPower(): number { return -this.getVoltageDiff() * this.current; }
+    getPower(): number {
+        return -this.getVoltageDiff() * this.current;
+    }
 }

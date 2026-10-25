@@ -36,18 +36,18 @@ export class SipoShiftElm extends ChipElm {
         if (st !== undefined) {
             const data = new Array<boolean>(this.bits).fill(false);
             ChipElm.readBits(st, data);
-            for (let i = 0; i < this.bits; i++)
-                this.pins[SipoShiftElm.DATA_PIN_INDEX + i].value = data[i];
+            for (let i = 0; i < this.bits; i++) this.pins[SipoShiftElm.DATA_PIN_INDEX + i].value = data[i];
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void { super.dumpXml(doc, elem); }
+    dumpXml(doc: Document, elem: Element): void {
+        super.dumpXml(doc, elem);
+    }
 
     dumpXmlState(doc: Document, elem: Element): void {
         super.dumpXmlState(doc, elem);
         const data = new Array<boolean>(this.bits).fill(false);
-        for (let i = 0; i < this.bits; i++)
-            data[i] = this.pins[SipoShiftElm.DATA_PIN_INDEX + i].value;
+        for (let i = 0; i < this.bits; i++) data[i] = this.pins[SipoShiftElm.DATA_PIN_INDEX + i].value;
         CircuitXMLSerializer.dumpAttr(elem, "dt", ChipElm.writeBitsToString(data));
     }
 
@@ -57,15 +57,22 @@ export class SipoShiftElm extends ChipElm {
         if (dt !== null) {
             const data = new Array<boolean>(this.bits).fill(false);
             ChipElm.readBitsFromString(dt, data);
-            for (let i = 0; i < this.bits; i++)
-                this.pins[SipoShiftElm.DATA_PIN_INDEX + i].value = data[i];
+            for (let i = 0; i < this.bits; i++) this.pins[SipoShiftElm.DATA_PIN_INDEX + i].value = data[i];
         }
     }
 
-    getDumpType(): number { return 189; }
-    getChipName(): string { return "SIPO shift register"; }
-    needsBits(): boolean { return true; }
-    defaultBitCount(): number { return 8; }
+    getDumpType(): number {
+        return 189;
+    }
+    getChipName(): string {
+        return "SIPO shift register";
+    }
+    needsBits(): boolean {
+        return true;
+    }
+    defaultBitCount(): number {
+        return 8;
+    }
 
     setupPins(): void {
         this.sizeX = this.bits + 1;
@@ -77,32 +84,40 @@ export class SipoShiftElm extends ChipElm {
         this.pins[1].clock = true;
 
         for (let i = 0; i < this.bits; i++) {
-            const prevVal = this.pins[SipoShiftElm.DATA_PIN_INDEX + i] ? this.pins[SipoShiftElm.DATA_PIN_INDEX + i].value : false;
-            const pin = this.pins[SipoShiftElm.DATA_PIN_INDEX + i] = new Pin(this, i + 1, ChipElm.SIDE_N, "Q" + i);
+            const prevVal = this.pins[SipoShiftElm.DATA_PIN_INDEX + i]
+                ? this.pins[SipoShiftElm.DATA_PIN_INDEX + i].value
+                : false;
+            const pin = (this.pins[SipoShiftElm.DATA_PIN_INDEX + i] = new Pin(this, i + 1, ChipElm.SIDE_N, "Q" + i));
             pin.value = prevVal;
             pin.output = true;
         }
         this.allocNodes();
     }
 
-    getPostCount(): number { return 2 + this.bits; }
-    getVoltageSourceCount(): number { return this.bits; }
+    getPostCount(): number {
+        return 2 + this.bits;
+    }
+    getVoltageSourceCount(): number {
+        return this.bits;
+    }
 
     execute(): void {
         if (this.pins[1].value !== this.clockstate) {
             this.clockstate = this.pins[1].value;
             if (this.clockstate && this.bits > 0) {
                 for (let i = this.bits - 2; i >= 0; i--)
-                    this.pins[SipoShiftElm.DATA_PIN_INDEX + i + 1].value = this.pins[SipoShiftElm.DATA_PIN_INDEX + i].value;
+                    this.pins[SipoShiftElm.DATA_PIN_INDEX + i + 1].value =
+                        this.pins[SipoShiftElm.DATA_PIN_INDEX + i].value;
                 this.pins[2].value = this.pins[0].value;
             }
         }
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
+        if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         return null;
     }
 

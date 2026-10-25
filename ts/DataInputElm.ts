@@ -56,7 +56,10 @@ export class DataInputElm extends RailElm {
             this.scaleFactor = parseFloatStrict(st.nextToken());
             this.fileNum = parseIntStrict(st.nextToken());
             const ent = DataInputElm.dataFileMap.get(this.fileNum);
-            if (ent) { this.fileName = ent.fileName; this.data = ent.data; }
+            if (ent) {
+                this.fileName = ent.fileName;
+                this.data = ent.data;
+            }
         } else {
             super(xa, ya, VoltageElm.WF_AC);
             this.scaleFactor = 1;
@@ -72,8 +75,7 @@ export class DataInputElm extends RailElm {
 
     dumpXmlState(doc: Document, elem: Element): void {
         if (this.data !== null) {
-            if (this.fileNum === 0)
-                this.fileNum = DataInputElm.fileNumCounter++;
+            if (this.fileNum === 0) this.fileNum = DataInputElm.fileNumCounter++;
             const ent = new DataFileEntry();
             ent.fileName = this.fileName ?? "";
             ent.data = this.data;
@@ -88,10 +90,15 @@ export class DataInputElm extends RailElm {
         this.scaleFactor = xml.parseDoubleAttr("sf", this.scaleFactor);
         this.fileNum = xml.parseIntAttr("fn", 0);
         const ent = DataInputElm.dataFileMap.get(this.fileNum);
-        if (ent) { this.fileName = ent.fileName; this.data = ent.data; }
+        if (ent) {
+            this.fileName = ent.fileName;
+            this.data = ent.data;
+        }
     }
 
-    reset(): void { this.timeOffset = 0; }
+    reset(): void {
+        this.timeOffset = 0;
+    }
 
     drawRail(g: Graphics): void {
         this.drawRailText(g, this.fileName === null ? Locale.LS("No file") : this.fileName);
@@ -101,24 +108,33 @@ export class DataInputElm extends RailElm {
         return this.fileName === null ? Locale.LS("No file") : this.fileName;
     }
 
-    doesRepeat(): boolean { return (this.flags & this.FLAG_REPEAT) !== 0; }
+    doesRepeat(): boolean {
+        return (this.flags & this.FLAG_REPEAT) !== 0;
+    }
 
     getVoltage(): number {
         if (this.data === null || this.data.length === 0) return 0;
         let ptr = Math.trunc(this.timeOffset / this.sampleLength);
-        if (ptr < 0)
-            ptr = 0;
+        if (ptr < 0) ptr = 0;
         if (ptr >= this.data.length) {
-            if (this.doesRepeat()) { ptr = 0; this.timeOffset = 0; }
-            else ptr = this.data.length - 1;
+            if (this.doesRepeat()) {
+                ptr = 0;
+                this.timeOffset = 0;
+            } else ptr = this.data.length - 1;
         }
         return this.data[ptr] * this.scaleFactor;
     }
 
-    stepFinished(): void { this.timeOffset += CircuitElm.sim.timeStep; }
+    stepFinished(): void {
+        this.timeOffset += CircuitElm.sim.timeStep;
+    }
 
-    getDumpType(): number { return 424; }
-    getShortcut(): number { return 0; }
+    getDumpType(): number {
+        return 424;
+    }
+    getShortcut(): number {
+        return 0;
+    }
 
     getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
@@ -164,7 +180,7 @@ export class DataInputElm extends RailElm {
             // skip blank lines
             if (arr[i].length === 0) continue;
             // skip comments
-            if (arr[i].charAt(0) === '#') continue;
+            if (arr[i].charAt(0) === "#") continue;
             const d = parseFloatStrict(arr[i]);
             if (isNaN(d)) {
                 CirSim.console("parse error on line " + i);
@@ -175,7 +191,8 @@ export class DataInputElm extends RailElm {
         }
         if (this.data.length === 0 || parseError) {
             let msg = parseError ? "Error parsing data file.\n\n" : "No data found in file.\n\n";
-            msg += "Expected format:\n" +
+            msg +=
+                "Expected format:\n" +
                 "- One numeric voltage value per line\n" +
                 "- Lines starting with # are treated as comments\n" +
                 "- Blank lines are ignored\n\n" +
@@ -186,11 +203,16 @@ export class DataInputElm extends RailElm {
 
     getInfo(arr: string[]): void {
         arr[0] = "data input";
-        if (this.data === null) { arr[1] = "no file loaded"; return; }
+        if (this.data === null) {
+            arr[1] = "no file loaded";
+            return;
+        }
         arr[1] = "V = " + CircuitElm.getVoltageText(this.nodes[0].v);
         arr[2] = "pos = " + CircuitElm.getUnitText(this.timeOffset, "s");
         arr[3] = "dur = " + CircuitElm.getUnitText(this.data.length * this.sampleLength, "s");
     }
 
-    static clearCache(): void { DataInputElm.dataFileMap.clear(); }
+    static clearCache(): void {
+        DataInputElm.dataFileMap.clear();
+    }
 }

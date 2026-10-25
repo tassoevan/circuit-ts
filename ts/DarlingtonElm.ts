@@ -59,7 +59,7 @@ export class DarlingtonElm extends CompositeElm {
         } else {
             super(xa, ya);
             this.loadComposite(null, DarlingtonElm.modelString, DarlingtonElm.modelExternalNodes);
-            this.pnp = (xbOrPnp === true) ? -1 : 1;
+            this.pnp = xbOrPnp === true ? -1 : 1;
             this.noDiagonal = true;
         }
         (this.compElmList[0] as TransistorElm).pnp = this.pnp;
@@ -71,9 +71,13 @@ export class DarlingtonElm extends CompositeElm {
         this.curcount_c = this.curcount_e = this.curcount_b = 0;
     }
 
-    getDumpType(): number { return 400; }
+    getDumpType(): number {
+        return 400;
+    }
 
-    getXmlDumpType(): string { return "dar"; }
+    getXmlDumpType(): string {
+        return "dar";
+    }
 
     dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
@@ -103,8 +107,7 @@ export class DarlingtonElm extends CompositeElm {
         g.fillPolygon(this.arrowPoly);
         // draw base
         this.setVoltageColor(g, this.nodes[0].v);
-        if (this.showPower())
-            g.setColor(CircuitElm.lightGrayColor);
+        if (this.showPower()) g.setColor(CircuitElm.lightGrayColor);
         CircuitElm.drawThickLine(g, this.point1, this.base);
         // draw dots
         this.curcount_b = this.updateDotCountImpl(this.getCurrentIntoNode(0), this.curcount_b);
@@ -128,7 +131,9 @@ export class DarlingtonElm extends CompositeElm {
         this.drawPosts(g);
     }
 
-    getElmType(): string { return "darlington pair"; }
+    getElmType(): string {
+        return "darlington pair";
+    }
 
     getInfo(arr: string[]): void {
         arr[0] = Locale.LS("darlington pair") + " (" + (this.pnp === -1 ? "PNP)" : "NPN)");
@@ -154,13 +159,19 @@ export class DarlingtonElm extends CompositeElm {
         this.rect = this.newPointArray(4);
         this.interpPoint2(this.point1, this.point2, this.rect[0], this.rect[1], 1 - 16 / this.dn, hs);
         this.interpPoint2(this.point1, this.point2, this.rect[2], this.rect[3], 1 - 13 / this.dn, hs);
-        this.interpPoint2(this.point1, this.point2, this.coll[1], this.emit[1], 1 - 13 / this.dn, 6 * this.dsign * this.pnp);
+        this.interpPoint2(
+            this.point1,
+            this.point2,
+            this.coll[1],
+            this.emit[1],
+            1 - 13 / this.dn,
+            6 * this.dsign * this.pnp,
+        );
         this.coll2[1] = this.interpPoint(this.point1, this.point2, 1 - 13 / this.dn, this.dsign * this.pnp);
         this.base = new Point();
         this.interpPoint(this.point1, this.point2, this.base, 1 - 16 / this.dn);
         this.rectPoly = this.createPolygon(this.rect[0], this.rect[2], this.rect[3], this.rect[1]);
-        if (this.pnp === 1)
-            this.arrowPoly = this.calcArrow(this.emit[1], this.emit[0], 8, 4);
+        if (this.pnp === 1) this.arrowPoly = this.calcArrow(this.emit[1], this.emit[0], 8, 4);
         else {
             const pt = this.interpPoint(this.point1, this.point2, 1 - 11 / this.dn, -5 * this.dsign * this.pnp);
             this.arrowPoly = this.calcArrow(this.emit[0], pt, 8, 4);
@@ -170,5 +181,7 @@ export class DarlingtonElm extends CompositeElm {
         this.setPost(2, this.emit[0]);
     }
 
-    canFlipY(): boolean { return false; }
+    canFlipY(): boolean {
+        return false;
+    }
 }

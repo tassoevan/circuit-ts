@@ -134,22 +134,19 @@ export class DMatrixSparseCSC {
         if (row < 0 || row >= this.numRows || col < 0 || col >= this.numCols)
             throw new Error("Outside of matrix bounds");
 
-        if (fallBackValue !== undefined)
-            return this.unsafe_get_fallback(row, col, fallBackValue);
+        if (fallBackValue !== undefined) return this.unsafe_get_fallback(row, col, fallBackValue);
         return this.unsafe_get(row, col);
     }
 
     unsafe_get(row: number, col: number): number {
         const index = this.nz_index(row, col);
-        if (index >= 0)
-            return this.nz_values[index];
+        if (index >= 0) return this.nz_values[index];
         return 0;
     }
 
     unsafe_get_fallback(row: number, col: number, fallBackValue: number): number {
         const index = this.nz_index(row, col);
-        if (index >= 0)
-            return this.nz_values[index];
+        if (index >= 0) return this.nz_values[index];
         return fallBackValue;
     }
 
@@ -206,8 +203,7 @@ export class DMatrixSparseCSC {
             }
 
             // if it's already at the maximum array length grow the arrays
-            if (this.nz_length >= this.nz_values.length)
-                this.growMaxLength(this.nz_length * 2 + 1, true);
+            if (this.nz_length >= this.nz_values.length) this.growMaxLength(this.nz_length * 2 + 1, true);
 
             // shift everything by one
             for (let i = this.nz_length; i > index; i--) {
@@ -223,7 +219,8 @@ export class DMatrixSparseCSC {
     remove(row: number, col: number): void {
         const index = this.nz_index(row, col);
 
-        if (index < 0) // it's not in the nz structure
+        if (index < 0)
+            // it's not in the nz structure
             return;
 
         // shift all the col_idx after this point by -1
@@ -292,8 +289,7 @@ export class DMatrixSparseCSC {
      * @param preserveValue If true the old values will be copied into the new arrays. If false that step will be skipped.
      */
     growMaxLength(arrayLength: number, preserveValue: boolean): void {
-        if (arrayLength < 0)
-            throw new Error("Negative array length. Overflow?");
+        if (arrayLength < 0) throw new Error("Negative array length. Overflow?");
 
         if (arrayLength > this.nz_values.length) {
             const data = new Float64Array(arrayLength);
@@ -318,8 +314,7 @@ export class DMatrixSparseCSC {
     growMaxColumns(desiredColumns: number, preserveValue: boolean): void {
         if (this.col_idx.length < desiredColumns + 1) {
             const c = new Int32Array(desiredColumns + 1);
-            if (preserveValue)
-                c.set(this.col_idx);
+            if (preserveValue) c.set(this.col_idx);
             this.col_idx = c;
         }
     }
@@ -338,8 +333,7 @@ export class DMatrixSparseCSC {
         }
         this.nz_length = index;
         this.growMaxLength(this.nz_length, false);
-        if (this.col_idx[this.numCols] !== this.nz_length)
-            throw new Error("Egads");
+        if (this.col_idx[this.numCols] !== this.nz_length) throw new Error("Egads");
     }
 
     /**
@@ -405,17 +399,16 @@ export class DMatrixSparseCSC {
         let nonzero = 0;
         for (let k = 0; k !== entries.length; k++) {
             const j = entries[k] % n;
-            if (circuitMatrix[j][(entries[k] - j) / n] !== 0)
-                nonzero++;
+            if (circuitMatrix[j][(entries[k] - j) / n] !== 0) nonzero++;
         }
         const dst = new DMatrixSparseCSC(n, n, nonzero);
         dst.nz_length = 0;
         dst.col_idx[0] = 0;
         let col = 0;
         for (let k = 0; k !== entries.length; k++) {
-            const j = entries[k] % n, i = (entries[k] - j) / n;
-            while (col < i)
-                dst.col_idx[++col] = dst.nz_length;
+            const j = entries[k] % n,
+                i = (entries[k] - j) / n;
+            while (col < i) dst.col_idx[++col] = dst.nz_length;
             const value = circuitMatrix[j][i];
             if (!(Math.abs(value) <= tol)) {
                 dst.nz_rows[dst.nz_length] = j;
@@ -423,8 +416,7 @@ export class DMatrixSparseCSC {
                 ++dst.nz_length;
             }
         }
-        while (col < n)
-            dst.col_idx[++col] = dst.nz_length;
+        while (col < n) dst.col_idx[++col] = dst.nz_length;
         return dst;
     }
 
@@ -453,7 +445,7 @@ export class DMatrixSparseCSC {
                 nz_index++;
                 incrementColumn();
                 return coordinate;
-            }
+            },
         };
     }
 }

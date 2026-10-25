@@ -32,19 +32,24 @@ export class ADCElm extends ChipElm {
         }
     }
 
-    getChipName(): string { return "ADC"; }
-    needsBits(): boolean { return true; }
-    allowBus(): boolean { return true; }
+    getChipName(): string {
+        return "ADC";
+    }
+    needsBits(): boolean {
+        return true;
+    }
+    allowBus(): boolean {
+        return true;
+    }
 
     setupPins(): void {
-        if (!this.bits)
-            return;
+        if (!this.bits) return;
         this.sizeX = 2;
-        const bitsY = this.useBus() ? 1 : (this.bits > 2 ? this.bits : 2);
+        const bitsY = this.useBus() ? 1 : this.bits > 2 ? this.bits : 2;
         this.sizeY = bitsY > 2 ? bitsY : 2;
         this.pins = new Array(this.getPostCount());
         this.makeBitPins(this.bits, 0, ChipElm.SIDE_E, 0, "D", true, false, false);
-        this.pins[this.bits]     = new Pin(this, 0, ChipElm.SIDE_W, "In");
+        this.pins[this.bits] = new Pin(this, 0, ChipElm.SIDE_W, "In");
         this.pins[this.bits + 1] = new Pin(this, this.sizeY - 1, ChipElm.SIDE_W, "V+");
         this.allocNodes();
     }
@@ -52,24 +57,32 @@ export class ADCElm extends ChipElm {
     execute(): void {
         const imax = (1 << this.bits) - 1;
         // if we round, the half-flash doesn't work
-        const val = imax * this.nodes[this.bits].v / this.nodes[this.bits + 1].v; // + .5;
+        const val = (imax * this.nodes[this.bits].v) / this.nodes[this.bits + 1].v; // + .5;
         let ival = Math.trunc(val);
         ival = Math.min(imax, Math.max(0, ival));
-        for (let i = 0; i !== this.bits; i++)
-            this.pins[i].value = ((ival & (1 << i)) !== 0);
+        for (let i = 0; i !== this.bits; i++) this.pins[i].value = (ival & (1 << i)) !== 0;
     }
 
-    getVoltageSourceCount(): number { return this.bits; }
-    getPostCount(): number { return this.bits + 2; }
-    getDumpType(): number { return 167; }
+    getVoltageSourceCount(): number {
+        return this.bits;
+    }
+    getPostCount(): number {
+        return this.bits + 2;
+    }
+    getDumpType(): number {
+        return 167;
+    }
 
     // there's already a V+ pin, how does that relate to high logic voltage?  figure out later
-    isDigitalChip(): boolean { return false; }
+    isDigitalChip(): boolean {
+        return false;
+    }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getChipEditInfo(n: number): EditInfo | null {
-        if (n === 0)
-            return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
+        if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         return null;
     }
 
@@ -79,8 +92,7 @@ export class ADCElm extends ChipElm {
                 this.bits = Math.trunc(ei.value);
                 this.setupPins();
                 this.setPoints();
-            } else
-                ei.setError("must be >= 2");
+            } else ei.setError("must be >= 2");
         }
     }
 }

@@ -26,7 +26,6 @@ import { StringTokenizer } from "./StringTokenizer";
 import { EditInfo } from "./EditInfo";
 
 export class BoxElm extends GraphicElm {
-
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
@@ -43,7 +42,9 @@ export class BoxElm extends GraphicElm {
         }
     }
 
-    getDumpType(): number { return 'b'.charCodeAt(0); }
+    getDumpType(): number {
+        return "b".charCodeAt(0);
+    }
 
     drag(xx: number, yy: number): void {
         this.x2 = xx;
@@ -59,29 +60,27 @@ export class BoxElm extends GraphicElm {
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : Color.GRAY);
         this.setBbox(this.x, this.y, this.x2, this.y2);
         g.setLineDash(16, 6);
-        if (this.x < this.x2 && this.y < this.y2)
-            g.drawRect(this.x, this.y, this.x2 - this.x, this.y2 - this.y);
-        else if (this.x > this.x2 && this.y < this.y2)
-            g.drawRect(this.x2, this.y, this.x - this.x2, this.y2 - this.y);
-        else if (this.x < this.x2 && this.y > this.y2)
-            g.drawRect(this.x, this.y2, this.x2 - this.x, this.y - this.y2);
-        else
-            g.drawRect(this.x2, this.y2, this.x - this.x2, this.y - this.y2);
+        if (this.x < this.x2 && this.y < this.y2) g.drawRect(this.x, this.y, this.x2 - this.x, this.y2 - this.y);
+        else if (this.x > this.x2 && this.y < this.y2) g.drawRect(this.x2, this.y, this.x - this.x2, this.y2 - this.y);
+        else if (this.x < this.x2 && this.y > this.y2) g.drawRect(this.x, this.y2, this.x2 - this.x, this.y - this.y2);
+        else g.drawRect(this.x2, this.y2, this.x - this.x2, this.y - this.y2);
         g.setLineDash(0, 0);
     }
 
-    showPropertiesOnCreate(): boolean { return false; }
+    showPropertiesOnCreate(): boolean {
+        return false;
+    }
     getEditInfo(n: number): EditInfo | null {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
-    }
+    setEditValue(n: number, ei: EditInfo): void {}
 
-    getInfo(arr: string[]): void {
-    }
+    getInfo(arr: string[]): void {}
 
-    getShortcut(): number { return 0; }
+    getShortcut(): number {
+        return 0;
+    }
 
     getMouseDistance(gx: number, gy: number): number {
         const thresh = 10;
@@ -89,21 +88,15 @@ export class BoxElm extends GraphicElm {
         const dy1 = Math.abs(gy - this.y);
         const dx2 = Math.abs(gx - this.x2);
         const dy2 = Math.abs(gy - this.y2);
-        if (Math.abs(dx1) < thresh)
-            return dx1 * dx1;
-        if (Math.abs(dx2) < thresh)
-            return dx2 * dx2;
-        if (Math.abs(dy1) < thresh)
-            return dy1 * dy1;
-        if (Math.abs(dy2) < thresh)
-            return dy2 * dy2;
+        if (Math.abs(dx1) < thresh) return dx1 * dx1;
+        if (Math.abs(dx2) < thresh) return dx2 * dx2;
+        if (Math.abs(dy1) < thresh) return dy1 * dy1;
+        if (Math.abs(dy2) < thresh) return dy2 * dy2;
         return -1;
     }
 
     selectRect(r: Rectangle, add: boolean): void {
-        if (r.contains(this.boundingBox))
-            this.selected = true;
-        else if (!add)
-            this.selected = false;
+        if (r.contains(this.boundingBox)) this.selected = true;
+        else if (!add) this.selected = false;
     }
 }
