@@ -9,7 +9,6 @@
   ],
   "ignorePatterns": [
     "war/",
-    "websocket/",
     "ts/fixtures/",
     "ts/public/",
     "ts/canvas2svg.js",
