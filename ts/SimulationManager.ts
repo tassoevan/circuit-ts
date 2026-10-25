@@ -28,7 +28,6 @@ import { Locale } from "./Locale";
 import { DMatrixSparseCSC } from "./matrix/DMatrixSparseCSC";
 import { SparseLU } from "./matrix/SparseLU";
 import { HookRegistry } from "./HookRegistry";
-import { parseIntStrict } from "./NumberParse";
 
 // declared before SimulationManager so they can be referenced in static members
 export class WireSegment {

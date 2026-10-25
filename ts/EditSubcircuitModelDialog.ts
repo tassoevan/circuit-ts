@@ -21,7 +21,7 @@ import { Dialog } from "./Dialog";
 import { SubcircuitChipElm } from "./SubcircuitChipElm";
 import { SubcircuitModel } from "./SubcircuitModel";
 import { ExtListEntry } from "./ExtListEntry";
-import { ChipElm, Pin } from "./ChipElm";
+import { ChipElm } from "./ChipElm";
 import { Graphics } from "./Graphics";
 import { Locale } from "./Locale";
 import { CirSim } from "./CirSim";

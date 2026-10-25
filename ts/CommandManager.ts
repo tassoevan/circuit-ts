@@ -101,7 +101,7 @@ export class CommandManager {
         // "search" (Edit menu / toolbar) and "commandpalette" (double-tap Shift, / shortcut,
         // or the palette itself) both open the same command palette.
         if (item == "search" || item == "commandpalette") {
-            CirSim.commandPalette = new CommandPalette(this.app);
+            CirSim.commandPalette = new CommandPalette();
             CirSim.commandPalette.show();
         }
         if (menu == "options" && item == "other") this.doEdit(new EditOptions(this.app, this.app.sim));

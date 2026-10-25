@@ -19,7 +19,6 @@
 
 import { CircuitElm } from "./CircuitElm";
 import { CompositeElm } from "./CompositeElm";
-import { EditInfo } from "./EditInfo";
 import { Font } from "./Font";
 import { Graphics } from "./Graphics";
 import { Point } from "./Point";

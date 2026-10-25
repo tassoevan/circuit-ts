@@ -30,7 +30,6 @@ export class CommandPalette {
     static readonly WIDTH = 520;
     static readonly MAX_RESULTS = 50;
 
-    private sim: CirSim;
     private overlay: HTMLDivElement;
     private panel: HTMLDivElement;
     private filterBox: HTMLInputElement;
@@ -42,9 +41,7 @@ export class CommandPalette {
     private lastQuery = "";
     private closed = false;
 
-    constructor(sim: CirSim) {
-        this.sim = sim;
-
+    constructor() {
         this.overlay = document.createElement("div");
         this.overlay.className = "command-palette-overlay";
         this.overlay.addEventListener("mousedown", (e) => {

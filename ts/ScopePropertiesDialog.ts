@@ -24,7 +24,6 @@ import { EditDialog } from "./EditDialog";
 import { CircuitElm } from "./CircuitElm";
 import { Locale } from "./Locale";
 import { ScopeTrigger } from "./ScopeTrigger";
-import { ScopePlot } from "./ScopePlot";
 import { HookRegistry } from "./HookRegistry";
 import { parseIntStrict } from "./NumberParse";
 

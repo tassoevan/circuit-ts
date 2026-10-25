@@ -18,7 +18,6 @@
 */
 
 import { CircuitElm } from "./CircuitElm";
-import { CircuitNode } from "./CircuitNode";
 import { Graphics } from "./Graphics";
 import { Color } from "./Color";
 import { Point } from "./Point";
@@ -426,7 +425,6 @@ export class MosfetElm extends CircuitElm {
 
             // make fiddly adjustments to pin label locations depending on orientation
             const dsx = CircuitElm.sign(this.dx);
-            const dsy = CircuitElm.sign(this.dy);
             const dsyn = this.dy === 0 ? 0 : 1;
 
             g.drawString("G", this.gate[1].x - (this.dx < 0 ? -2 : 12), this.gate[1].y + (this.dy > 0 ? -5 : 12));

@@ -21,7 +21,6 @@
 
 import { ChipElm, Pin } from "./ChipElm";
 import { Checkbox } from "./Checkbox";
-import { CircuitElm } from "./CircuitElm";
 import { CircuitXMLSerializer } from "./CircuitXMLSerializer";
 import { CircuitXMLDeserializer } from "./CircuitXMLDeserializer";
 import { EditInfo } from "./EditInfo";

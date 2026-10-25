@@ -20,7 +20,7 @@
 import { ChipElm, Pin } from "./ChipElm";
 import { StringTokenizer } from "./StringTokenizer";
 import { EditInfo } from "./EditInfo";
-import { Checkbox } from "./Checkbox";
+
 export class JKFlipFlopElm extends ChipElm {
     static readonly FLAG_RESET = 2;
     static readonly FLAG_POSITIVE_EDGE = 4;

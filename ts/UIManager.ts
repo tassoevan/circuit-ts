@@ -32,7 +32,6 @@ import { Locale } from "./Locale";
 import { ExportAsLocalFileDialog } from "./ExportAsLocalFileDialog";
 import { SubcircuitModel } from "./SubcircuitModel";
 import { CircuitLoader } from "./CircuitLoader";
-import { EditSubcircuitModelDialog } from "./EditSubcircuitModelDialog";
 import { KeyNames } from "./KeyNames";
 import { ScrollValuePopup } from "./ScrollValuePopup";
 import { Toolbar } from "./Toolbar";
@@ -53,8 +52,7 @@ const KEY_UP = 38;
 const KEY_DOWN = 40;
 const KEY_A = 65,
     KEY_C = 67,
-    KEY_D = 68,
-    KEY_N = 78;
+    KEY_D = 68;
 const KEY_O = 79,
     KEY_P = 80,
     KEY_S = 83,
@@ -177,7 +175,6 @@ export class Scrollbar {
         const vpw = this.vpw;
         const hm = Scrollbar.HMARGIN;
         const sh = Scrollbar.SCROLLHEIGHT;
-        const bm = Scrollbar.BARMARGIN;
         const step = this.stepSize > 0 ? Math.max(1, Math.round(this.stepSize)) : 1;
         if (x < hm + sh) {
             this.val = this.snapToStep(Math.max(this.min, this.val - step));
@@ -573,7 +570,6 @@ export class UIManager {
         let neutralColor: string | null = null;
         let selectColor: string | null = null;
         let currentColor: string | null = null;
-        let mouseModeReq: string | null = null;
         let euroGates = false;
 
         this.elmList = this.app.elmList;
@@ -598,7 +594,6 @@ export class UIManager {
             neutralColor = qp.getValue("neutralColor");
             selectColor = qp.getValue("selectColor");
             currentColor = qp.getValue("currentColor");
-            mouseModeReq = qp.getValue("mouseMode");
             this.hideInfoBox = qp.getBooleanValue("hideInfoBox", false);
         } catch (e) {
             CirSim.console("Exception: " + e);

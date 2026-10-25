@@ -18,7 +18,6 @@
 */
 
 import { CircuitElm } from "./CircuitElm";
-import { StringTokenizer } from "./StringTokenizer";
 
 export class GraphicElm extends CircuitElm {
     isGraphicElm(): boolean {

@@ -28,7 +28,6 @@ import { Point } from "./Point";
 import { Polygon } from "./Polygon";
 import { RailElm } from "./RailElm";
 import { StringTokenizer } from "./StringTokenizer";
-import { VoltageElm } from "./VoltageElm";
 
 export class OTAElm extends CompositeElm {
     private static modelString =

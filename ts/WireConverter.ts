@@ -18,7 +18,6 @@
 */
 
 import { CirSim } from "./CirSim";
-import { CircuitElm } from "./CircuitElm";
 import { WireElm } from "./WireElm";
 import { RoutedWireElm } from "./RoutedWireElm";
 import { Point } from "./Point";

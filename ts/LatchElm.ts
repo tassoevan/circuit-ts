@@ -25,7 +25,6 @@ import { StringTokenizer } from "./StringTokenizer";
 import { CircuitXMLDeserializer } from "./CircuitXMLDeserializer";
 import { EditInfo } from "./EditInfo";
 import { Choice } from "./Choice";
-import { Checkbox } from "./Checkbox";
 
 export class LatchElm extends ChipElm {
     static readonly FLAG_STATE = 2;

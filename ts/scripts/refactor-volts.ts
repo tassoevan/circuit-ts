@@ -1,4 +1,4 @@
-import { Project, SyntaxKind, Node } from "ts-morph";
+import { Project, SyntaxKind } from "ts-morph";
 
 const project = new Project({
     tsConfigFilePath: "./tsconfig.json", // Make sure this points to your tsconfig

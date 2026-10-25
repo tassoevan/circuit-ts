@@ -31,7 +31,6 @@ import { Polygon } from "./Polygon";
 import { StringTokenizer } from "./StringTokenizer";
 import { VoltageSource } from "./VoltageSource";
 import { parseIntStrict } from "./NumberParse";
-import { CustomLogicModel } from "./CustomLogicModel";
 
 export class AmmeterElm extends CircuitElm {
     meter: number = 0;

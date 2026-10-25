@@ -103,7 +103,6 @@ export class InductorElm extends CircuitElm {
     draw(g: Graphics): void {
         const v1 = this.nodes[0].v;
         const v2 = this.nodes[1].v;
-        let i: number;
         const hs = 8;
         this.setBbox(this.point1, this.point2, hs);
         this.draw2Leads(g);

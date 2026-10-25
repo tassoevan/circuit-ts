@@ -33,7 +33,6 @@ import { Expr, ExprState } from "./Expr";
 import { ExprEngine } from "./ExprEngine";
 import { SimulationManager } from "./SimulationManager";
 import { parseIntStrict } from "./NumberParse";
-import { HookRegistry } from "./HookRegistry";
 
 export class VCCSElm extends ChipElm {
     gain: number = 0;

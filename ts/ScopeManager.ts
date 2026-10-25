@@ -22,7 +22,6 @@ import type { ScopeElm } from "./ScopeElm";
 import { ScopePopupMenu } from "./ScopePopupMenu";
 import { CircuitElm } from "./CircuitElm";
 import { CirSim } from "./CirSim";
-import { Graphics } from "./Graphics";
 import { Rectangle } from "./Rectangle";
 
 export class ScopeManager {

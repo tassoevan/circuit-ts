@@ -724,13 +724,11 @@ export class MouseManager {
     }
 
     private removeZeroLengthElements(): void {
-        let changed = false;
         for (let i = this.ui.elmList.length - 1; i >= 0; i--) {
             const ce: CircuitElm = this.ui.elmList[i];
             if (ce.x === ce.x2 && ce.y === ce.y2) {
                 this.ui.elmList.splice(i, 1);
                 ce.delete();
-                changed = true;
             }
         }
         this.sim.needAnalyze();
@@ -876,52 +874,6 @@ export class MouseManager {
             this.menuClientX = e.clientX;
             this.menuClientY = e.clientY;
             this.doPopupMenu();
-        }
-    }
-
-    // show a context menu popup, clamping to canvas bounds and repositioning submenus
-    private showContextPanel(x: number, y: number): void {
-        this.watchSubmenus(true);
-        const panel = this.ui.contextPanel as HTMLElement;
-        panel.style.left = x + "px";
-        panel.style.top = y + "px";
-        panel.style.display = "block";
-        const w = panel.offsetWidth;
-        const h = panel.offsetHeight;
-        const clampedX = Math.max(0, Math.min(x, this.ui.canvasWidth - w));
-        const clampedY = Math.max(0, Math.min(y, this.ui.canvasHeight - h));
-        if (clampedX !== x || clampedY !== y) {
-            panel.style.left = clampedX + "px";
-            panel.style.top = clampedY + "px";
-        }
-    }
-
-    // watch for submenu popups and reposition them if they extend below the viewport
-    private watchSubmenus(watch: boolean): void {
-        if (watch) {
-            const vh = window.innerHeight;
-            const clamp = (el: Element) => {
-                const rect = el.getBoundingClientRect();
-                if (rect.bottom > vh) {
-                    const newTop = Math.max(0, vh - rect.height);
-                    (el as HTMLElement).style.top = newTop + "px";
-                }
-            };
-            (window as any).__circuitSubmenuObserver = new MutationObserver(() => {
-                const popups = document.querySelectorAll(".elmContextMenu");
-                popups.forEach(clamp);
-            });
-            (window as any).__circuitSubmenuObserver.observe(document.body, {
-                childList: true,
-                subtree: true,
-                attributes: true,
-                attributeFilter: ["style"],
-            });
-        } else {
-            if ((window as any).__circuitSubmenuObserver) {
-                (window as any).__circuitSubmenuObserver.disconnect();
-                (window as any).__circuitSubmenuObserver = null;
-            }
         }
     }
 

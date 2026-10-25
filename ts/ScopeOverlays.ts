@@ -205,7 +205,7 @@ export class ScopeOverlays {
         const plot = this.scope.visiblePlots[0];
         const sdi = this.makeSdi(plot);
         let avg = 0;
-        for (const i of sdi) avg += sdi.getMin() + sdi.getMax();
+        for (const _ of sdi) avg += sdi.getMin() + sdi.getMax();
         avg /= sdi.validCount * 2;
         let state = 0;
         const thresh = avg * 0.05;

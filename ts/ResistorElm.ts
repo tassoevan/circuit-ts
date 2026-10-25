@@ -71,9 +71,7 @@ export class ResistorElm extends CircuitElm {
     }
 
     draw(g: Graphics): void {
-        const segments = 16;
         let i: number;
-        const ox = 0;
         //int hs = showEuroResistors() ? 6 : 8;
         let hs = 6;
         const v1 = this.nodes[0].v;

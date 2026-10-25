@@ -25,13 +25,11 @@ import { Font } from "./Font";
 import { Point } from "./Point";
 import { StringTokenizer } from "./StringTokenizer";
 import { EditInfo } from "./EditInfo";
-import { Checkbox } from "./Checkbox";
 import { Choice } from "./Choice";
 import { Locale } from "./Locale";
 import { CircuitXMLSerializer } from "./CircuitXMLSerializer";
 import { CircuitXMLDeserializer } from "./CircuitXMLDeserializer";
 import { parseIntStrict, parseFloatStrict } from "./NumberParse";
-import { CustomLogicModel } from "./CustomLogicModel";
 
 export class ProbeElm extends CircuitElm {
     static readonly FLAG_SHOWVOLTAGE = 1;

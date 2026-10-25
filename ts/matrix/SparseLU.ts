@@ -37,7 +37,6 @@ export class SparseLU {
         this.L.nz_length = 0;
         this.U.reshape(m, n, 4 * A.nz_length + o);
         this.U.nz_length = 0;
-        this.singular = false;
         if (this.pinv.length !== m) {
             this.pinv = new Int32Array(m);
             this.x = new Float64Array(m);
@@ -51,8 +50,6 @@ export class SparseLU {
 
     private readonly gxi: IGrowArray = new IGrowArray();
     private pinv: Int32Array = new Int32Array(0);
-
-    private singular: boolean = false;
 
     private performLU(A: DMatrixSparseCSC): boolean {
         const m = A.numRows;
@@ -93,7 +90,6 @@ export class SparseLU {
             }
 
             if (ipiv === -1 || a <= 0.0) {
-                this.singular = true;
                 return false;
             }
 

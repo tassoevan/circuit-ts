@@ -800,7 +800,7 @@ export class Scope {
             const ipa = this.displayStartIndex(plot, this.rect.width);
             const validCount = this.validDataCount(plot, ipa, this.rect.width);
             const sdi = new ScopeDataIterator(this.scopePointCount, ipa, validCount, plot);
-            for (const i of sdi) {
+            for (const _ of sdi) {
                 if (sdi.getMax() > this.maxValue) this.maxValue = sdi.getMax();
                 if (sdi.getMin() < this.minValue) this.minValue = sdi.getMin();
             }
@@ -815,7 +815,7 @@ export class Scope {
         const ipa = this.displayStartIndex(plot, this.rect.width);
         const validCount = this.validDataCount(plot, ipa, this.rect.width);
         const sdi = new ScopeDataIterator(this.scopePointCount, ipa, validCount, plot);
-        for (const i of sdi) {
+        for (const _ of sdi) {
             if (sdi.getMax() > max) max = sdi.getMax();
             if (sdi.getMin() < -max) max = -sdi.getMin();
         }
@@ -1226,11 +1226,9 @@ export class Scope {
         }
         sb += "\n";
         // all visible plots share the same scopePointCount and speed
-        const plot0 = this.visiblePlots[0];
         const w = this.rect.width;
         const ts = this.sim.maxTimeStep * this.speed;
         const tStart = this.sim.t - ts * w;
-        const ipa = plot0.startIndex(w);
         for (i = 0; i !== w; i++) {
             const t = tStart + ts * i;
             if (t < 0) continue;

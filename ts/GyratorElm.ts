@@ -24,7 +24,6 @@ import { EditInfo } from "./EditInfo";
 import { Graphics } from "./Graphics";
 import { Point } from "./Point";
 import { Polygon } from "./Polygon";
-import { StringTokenizer } from "./StringTokenizer";
 
 export class GyratorElm extends CircuitElm {
     gyrResistance: number;
