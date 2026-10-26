@@ -57,13 +57,13 @@ export class CommandManager {
             window.alert(Locale.LS("Editing disabled.  Re-enable from the Options menu."));
             return;
         }
-        if (item == "about") CirSim.aboutBox = new (window as any).AboutBox(CirSim.versionString);
+        if (item == "about") CirSim.aboutBox = new window.AboutBox(CirSim.versionString);
         if (item == "importfromlocalfile") {
             this.app.undoManager?.pushUndo();
             this.app.ui?.loadFileInput?.element.click();
         }
         if (item == "importfromtext") new ImportFromTextDialog(this.app);
-        if (item == "importfromdropbox") CirSim.dialogShowing = new (window as any).ImportFromDropboxDialog(this.app);
+        if (item == "importfromdropbox") CirSim.dialogShowing = new window.ImportFromDropboxDialog(this.app);
         if (item == "exportasurl") {
             this.doExportAsUrl();
             this.app.unsavedChanges = false;
@@ -91,11 +91,11 @@ export class CommandManager {
         if ((menu == "elm" || menu == "scopepop") && contextPanel != null) contextPanel.remove();
         this.app.ui.contextPanel = null;
         if (menu == "options" && item == "shortcuts") {
-            CirSim.dialogShowing = new (window as any).ShortcutsDialog(this.app);
+            CirSim.dialogShowing = new window.ShortcutsDialog(this.app);
             CirSim.dialogShowing.show();
         }
         if (item == "subcircuits") {
-            CirSim.dialogShowing = new (window as any).SubcircuitDialog(this.app);
+            CirSim.dialogShowing = new window.SubcircuitDialog(this.app);
             CirSim.dialogShowing.show();
         }
         // "search" (Edit menu / toolbar) and "commandpalette" (double-tap Shift, / shortcut,
@@ -149,14 +149,10 @@ export class CommandManager {
             WireConverter.convertWires(this.app);
             this.app.needAnalyze();
         }
-        if (item == "createTest") {
-            this.app.undoManager?.pushUndo();
-            (window as any).TestCreator?.createTest(this.app);
-        }
-        if (item == "stackAll") (this.app.scopeManager as any).stackAll?.();
-        if (item == "unstackAll") (this.app.scopeManager as any).unstackAll?.();
-        if (item == "combineAll") (this.app.scopeManager as any).combineAll?.();
-        if (item == "separateAll") (this.app.scopeManager as any).separateAll?.();
+        if (item == "stackAll") this.app.scopeManager.stackAll?.();
+        if (item == "unstackAll") this.app.scopeManager.unstackAll?.();
+        if (item == "combineAll") this.app.scopeManager.combineAll?.();
+        if (item == "separateAll") this.app.scopeManager.separateAll?.();
         if (item == "zoomin") this.app.mouse.zoomCircuit(20, true);
         if (item == "zoomout") this.app.mouse.zoomCircuit(-20, true);
         if (item == "zoom100") this.app.mouse.setCircuitScale(1, true);
@@ -195,7 +191,7 @@ export class CommandManager {
 
         if (item.startsWith("addToScope") && this.app.mouse.menuElm != null) {
             const n = parseIntStrict(item.substring(10));
-            const sm = this.app.scopeManager as any;
+            const sm = this.app.scopeManager;
             if (n < sm.scopeCount + (sm.countScopeElms?.() ?? 0)) {
                 if (n < sm.scopeCount) sm.scopes[n].addElm(this.app.mouse.menuElm);
                 else sm.getNthScopeElm(n - sm.scopeCount).elmScope.addElm(this.app.mouse.menuElm);
@@ -205,7 +201,7 @@ export class CommandManager {
 
         if (menu == "scopepop") {
             this.app.undoManager?.pushUndo();
-            const sm = this.app.scopeManager as any;
+            const sm = this.app.scopeManager;
             let s: any;
             if (sm.menuScope != -1) s = sm.scopes[sm.menuScope];
             else s = this.app.mouse.getMouseElm()?.elmScope;
@@ -295,13 +291,13 @@ export class CommandManager {
     doSliders(ce: any): void {
         this.app.mouse.clearSelection();
         this.app.undoManager?.pushUndo();
-        CirSim.dialogShowing = new (window as any).SliderDialog(ce, this.app);
+        CirSim.dialogShowing = new window.SliderDialog(ce, this.app);
         CirSim.dialogShowing.show();
     }
 
     doExportAsUrl(): void {
         const dump = this.app.dumpCircuit();
-        CirSim.dialogShowing = new (window as any).ExportAsUrlDialog(dump);
+        CirSim.dialogShowing = new window.ExportAsUrlDialog(dump);
         CirSim.dialogShowing.show();
     }
 
@@ -439,7 +435,7 @@ export class CommandManager {
             }
         }
         if (hasDeleted) {
-            (this.app.scopeManager as any).deleteUnusedScopeElms?.();
+            this.app.scopeManager.deleteUnusedScopeElms?.();
             this.app.needAnalyze();
             this.app.undoManager?.writeRecoveryToStorage();
         }

@@ -697,7 +697,7 @@ export class CirSim {
         return ElementFactory.create(name, x1, y1, x2, y2, f, st);
     }
 
-    static constructElement(n: string, x1: number, y1?: number): any {
+    static constructElement(n: string, x1: number, y1?: number): CircuitElm {
         const elm = ElementFactory.create(n, x1, y1 ?? 0);
         if (elm != null) return elm;
 

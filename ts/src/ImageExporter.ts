@@ -49,7 +49,7 @@ export class ImageExporter {
     }
 
     doExportAsImage(): void {
-        CirSim.dialogShowing = new (window as any).ExportAsImageDialog(ImageExporter.CAC_IMAGE, this.sim);
+        CirSim.dialogShowing = new window.ExportAsImageDialog(ImageExporter.CAC_IMAGE, this.sim);
         CirSim.dialogShowing.show();
     }
 
@@ -57,7 +57,7 @@ export class ImageExporter {
         const cv = this.getCircuitAsCanvas(ImageExporter.CAC_IMAGE);
         cv.toBlob((blob) => {
             if (blob == null) return;
-            const item = new (window as any).ClipboardItem({ "image/png": blob });
+            const item = new window.ClipboardItem({ "image/png": blob });
             navigator.clipboard.write([item]).then((x: any) => console.log(x));
         });
     }
@@ -89,7 +89,7 @@ export class ImageExporter {
     }
 
     doExportAsSVG(): void {
-        CirSim.dialogShowing = new (window as any).ExportAsImageDialog(ImageExporter.CAC_SVG, this.sim);
+        CirSim.dialogShowing = new window.ExportAsImageDialog(ImageExporter.CAC_SVG, this.sim);
         CirSim.dialogShowing.show();
     }
 
@@ -139,7 +139,7 @@ export class ImageExporter {
         const hmargin = 100;
         const w = bounds.width + wmargin;
         const h = bounds.height + hmargin;
-        const context = new (window as any).C2S(w, h);
+        const context = new window.C2S(w, h);
         this.drawCircuitInContext(context, ImageExporter.CAC_SVG, bounds, w, h);
         return context.getSerializedSvg();
     }

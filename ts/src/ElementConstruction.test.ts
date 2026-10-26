@@ -19,7 +19,7 @@ describe("controlled source construction", () => {
     // elements touch while being built
     beforeAll(() => {
         const off = { getState: () => false };
-        (CircuitElm as any).app = (CircuitElm as any).app ?? {
+        CircuitElm.app = (CircuitElm as any).app ?? {
             menus: {
                 showValuesCheckItem: off,
                 powerCheckItem: off,

@@ -52,9 +52,9 @@ function place(e: any, x1: number, y1: number, x2: number, y2: number) {
 // analyze, stamp, and run one sub-iteration the way runCircuit does
 function analyzeAndStep(elms: any[]) {
     const app = makeApp(elms);
-    (CircuitElm as any).app = app;
-    const sim = new SimulationManager(app as any);
-    (CircuitElm as any).sim = sim;
+    CircuitElm.app = app;
+    const sim = new SimulationManager(app);
+    CircuitElm.sim = sim;
     sim.analyzeCircuit();
     sim.preStampCircuit(false);
     sim.stampCircuit();
@@ -63,13 +63,12 @@ function analyzeAndStep(elms: any[]) {
         if (m.nonLinear)
             for (let i = 0; i < m.size; i++) for (let j = 0; j < m.size; j++) m.matrix[i][j] = m.origMatrix[i][j];
     }
-    (sim as any).converged = true;
+    sim.converged = true;
     for (const e of elms) e.doStep();
     // snapshot before factoring: lu_factor overwrites the matrix in place
     const stamped = sim.matrices!.map((m) => m.matrix.map((row: number[]) => row.slice()));
     let factored = true;
-    for (const m of sim.matrices!)
-        if (!(SimulationManager as any).lu_factor(m.matrix, m.size, m.permute, m)) factored = false;
+    for (const m of sim.matrices!) if (!SimulationManager.lu_factor(m.matrix, m.size, m.permute, m)) factored = false;
     return { sim, app, factored, stamped };
 }
 
@@ -125,7 +124,7 @@ describe("controlled current source referring to a labeled node", () => {
         const elms = [...railWithLabel(5), ...ccsLoop("v(vcc)", false)];
         const { sim, factored } = analyzeAndStep(elms);
         const ccs: any = elms[2];
-        expect((sim as any).unconnectedNodes).toContain(ccs.nodes[0].index);
+        expect(sim.unconnectedNodes).toContain(ccs.nodes[0].index);
         expect(factored, "matrix should not be singular").toBe(true);
     });
 

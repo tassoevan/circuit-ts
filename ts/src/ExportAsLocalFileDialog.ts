@@ -32,11 +32,11 @@ export class ExportAsLocalFileDialog extends Dialog {
     }
 
     static getBlobUrl(data: string): string {
-        const oldBlob = (document as any).exportBlob;
+        const oldBlob = document.exportBlob;
         if (oldBlob) URL.revokeObjectURL(oldBlob);
         const blob = new Blob([data], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
-        (document as any).exportBlob = url;
+        document.exportBlob = url;
         return url;
     }
 

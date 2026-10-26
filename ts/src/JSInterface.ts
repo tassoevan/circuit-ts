@@ -81,7 +81,7 @@ export class JSInterface {
 
     setupJSInterface(): void {
         const that = this;
-        (window as any).CircuitJS1 = {
+        window.CircuitJS1 = {
             setSimRunning: (run: boolean) => that.setSimRunning(run),
             getTime: () => that.getTime(),
             getTimeStep: () => that.getTimeStep(),
@@ -97,27 +97,27 @@ export class JSInterface {
             importCircuit: (circuit: string, subcircuitsOnly: boolean) =>
                 that.importCircuitFromText(circuit, subcircuitsOnly),
         };
-        const hook = (window as any).oncircuitjsloaded;
-        if (hook) hook((window as any).CircuitJS1);
+        const hook = window.oncircuitjsloaded;
+        if (hook) hook(window.CircuitJS1);
     }
 
     callUpdateHook(): void {
-        const hook = (window as any).CircuitJS1?.onupdate;
-        if (hook) hook((window as any).CircuitJS1);
+        const hook = window.CircuitJS1?.onupdate;
+        if (hook) hook(window.CircuitJS1);
     }
 
     callAnalyzeHook(): void {
-        const hook = (window as any).CircuitJS1?.onanalyze;
-        if (hook) hook((window as any).CircuitJS1);
+        const hook = window.CircuitJS1?.onanalyze;
+        if (hook) hook(window.CircuitJS1);
     }
 
     callTimeStepHook(): void {
-        const hook = (window as any).CircuitJS1?.ontimestep;
-        if (hook) hook((window as any).CircuitJS1);
+        const hook = window.CircuitJS1?.ontimestep;
+        if (hook) hook(window.CircuitJS1);
     }
 
     callSVGRenderedHook(svgData: string): void {
-        const hook = (window as any).CircuitJS1?.onsvgrendered;
-        if (hook) hook((window as any).CircuitJS1, svgData);
+        const hook = window.CircuitJS1?.onsvgrendered;
+        if (hook) hook(window.CircuitJS1, svgData);
     }
 }

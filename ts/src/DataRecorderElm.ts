@@ -118,7 +118,7 @@ export class DataRecorderElm extends CircuitElm {
 
     static getBlobUrl(data: string): string {
         const blob = new Blob([data], { type: "text/plain" });
-        const win = window as any;
+        const win = window;
         if (win.recorderBlob) URL.revokeObjectURL(win.recorderBlob);
         const url = URL.createObjectURL(blob);
         win.recorderBlob = url;

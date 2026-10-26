@@ -97,4 +97,4 @@ export class ExportAsImageDialog extends Dialog {
 }
 
 // Register on window so CommandManager can access without a circular import
-(window as any).ExportAsImageDialog = ExportAsImageDialog;
+window.ExportAsImageDialog = ExportAsImageDialog;

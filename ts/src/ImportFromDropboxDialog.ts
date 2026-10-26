@@ -130,4 +130,4 @@ export class ImportFromDropboxDialog extends Dialog {
     }
 }
 
-(window as any).ImportFromDropboxDialog = ImportFromDropboxDialog;
+window.ImportFromDropboxDialog = ImportFromDropboxDialog;

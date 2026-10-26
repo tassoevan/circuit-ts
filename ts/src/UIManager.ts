@@ -39,6 +39,7 @@ import { SubcircuitBar } from "./SubcircuitBar";
 import { MyCommand } from "./MyCommand";
 import { parseIntStrict, parseFloatStrict } from "./NumberParse";
 import { CommandPaletteRegistry } from "./CommandPaletteRegistry";
+import type { RoutedWireElm } from "./RoutedWireElm";
 
 // GWT KeyCodes equivalents
 const KEY_BACKSPACE = 8;
@@ -1202,7 +1203,7 @@ export class UIManager {
         if (this.mouse.tempMouseMode === MouseManager.MODE_SELECT && this.mouse.getMouseElm() != null) {
             this.mouse.getMouseElm().drawHandles(g, CircuitElm.selectColor);
             if (this.mouse.getMouseElm()!.isRoutedWireElm() && this.mouse.mouseCursorX >= 0) {
-                const rw = this.mouse.getMouseElm() as any;
+                const rw = this.mouse.getMouseElm() as RoutedWireElm;
                 const gx = this.mouse.inverseTransformX(this.mouse.mouseCursorX);
                 const gy = this.mouse.inverseTransformY(this.mouse.mouseCursorY);
                 const sp: Point | null = rw.getSnapPointOnWire(gx, gy);

@@ -74,14 +74,14 @@ export class Locale {
 
     // Ported from circuitjs1.java: circuitjs1.language()
     static language(): string {
-        const nav = navigator as any;
+        const nav = navigator;
         if (nav.languages) {
             if (nav.languages.length > 0) return nav.languages[0];
             else
                 // Some embedded browsers return an empty navigator.languages
                 return "en-US";
         } else {
-            return nav.language || nav.userLanguage;
+            return nav.language;
         }
     }
 

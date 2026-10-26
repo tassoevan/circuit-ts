@@ -518,7 +518,6 @@ export class Menus {
         const toolsMenu = new Menu(this.app);
         toolsMenu.addCommand(Locale.LS("Convert Wires to Routed Wires"), "tools", "convertWires");
         toolsMenu.addCommand(Locale.LS("Subcircuit Manager"), "tools", "subcircuits");
-        // if (TestCreator.enabled) toolsMenu.addCommand(Locale.LS("Create Test"), "tools", "createTest");
 
         // ---- Assemble horizontal bar ----
         this.addTopItem(this.menuBarRow, Locale.LS("File"), fileMenu);
@@ -971,7 +970,7 @@ export class Menus {
                     // Also searchable from the command palette (query length >= 2).
                     CommandPaletteRegistry.registerCircuit(file, title, submenuStack[submenuStack.length - 1]);
 
-                    const app = this.app as any;
+                    const app = this.app;
                     if (file === app.startCircuit && app.startLabel == null) {
                         app.startLabel = title;
                         this.app.setCircuitTitle(title);
@@ -989,10 +988,10 @@ export class Menus {
 
     readSetupFile(str: string, title: string | null): void {
         console.log(str);
-        (this.app as any).resetEditingContext?.();
+        this.app.resetEditingContext?.();
         // don't avoid caching here, it's unnecessary and makes offline PWA's not work
         const url = moduleBaseURL + "circuits/" + str;
-        (this.app as any).loader?.loadFileFromURL(url);
+        this.app.loader?.loadFileFromURL(url);
         if (title != null) this.app.setCircuitTitle(title);
         this.app.unsavedChanges = false;
         this.app.savedFlag = true;

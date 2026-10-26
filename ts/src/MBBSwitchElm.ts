@@ -40,7 +40,7 @@ export class MBBSwitchElm extends SwitchElm {
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
-        super(xa, ya, xb as any, yb, f, st as any);
+        super(xa, ya, xb, yb, f, st);
         if (st !== undefined) {
             this.link = parseIntStrict(st.nextToken());
         }

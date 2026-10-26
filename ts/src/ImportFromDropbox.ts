@@ -33,7 +33,7 @@ export class ImportFromDropbox {
             // even though Dropbox chooser supports firefox
             // See https://github.com/gwtproject/gwt/issues/7923
             if (/Firefox[/\s](\d+\.\d+)/.test(navigator.userAgent)) return false;
-            return !!(window as any).Dropbox?.isBrowserSupported?.();
+            return !!window.Dropbox?.isBrowserSupported?.();
         } catch (err) {
             return false;
         }
@@ -85,6 +85,6 @@ export class ImportFromDropbox {
             // see File types below. By default, all extensions are allowed.
             // extensions: ['.pdf', '.doc', '.docx'],
         };
-        (window as any).Dropbox.choose(options);
+        window.Dropbox.choose(options);
     }
 }

@@ -36,6 +36,7 @@ import { CirSim } from "./CirSim";
 import { Point } from "./Point";
 import { SubcircuitModel } from "./SubcircuitModel";
 import { parseIntStrict } from "./NumberParse";
+import type { GroundElm } from "./GroundElm";
 
 export abstract class CompositeElm extends CircuitElm {
     // need to use escape() instead of converting spaces to _'s so composite elements can be nested
@@ -99,7 +100,7 @@ export abstract class CompositeElm extends CircuitElm {
                 CirSim.console("failed to create " + ceType + " in CompositeElm");
                 continue;
             }
-            if (newce.isGroundElm()) (newce as any).setOldStyle();
+            if (newce.isGroundElm()) (newce as GroundElm).setOldStyle();
             newce.parent = this;
             this.compElmList.push(newce);
             nodeInfoList.push(nodeStr);
@@ -148,7 +149,7 @@ export abstract class CompositeElm extends CircuitElm {
             )
                 continue;
             const newce: CircuitElm = CirSim.constructElement(className, 0, 0);
-            if (newce.isGroundElm()) (newce as any).setOldStyle();
+            if (newce.isGroundElm()) (newce as GroundElm).setOldStyle();
             xml.parseChildElement(childElem);
             newce.undumpXml(xml);
             newce.parent = this;
@@ -276,7 +277,7 @@ export abstract class CompositeElm extends CircuitElm {
 
             // if no state dumped, skip it
             if (child.attributes.length === 0 && !child.hasChildNodes()) continue;
-            (child as any).setAttribute("ix", i);
+            child.setAttribute("ix", String(i));
             elem.appendChild(child);
         }
     }

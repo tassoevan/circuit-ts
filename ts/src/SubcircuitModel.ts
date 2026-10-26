@@ -29,6 +29,7 @@ import { CirSim } from "./CirSim";
 import { StringTokenizer } from "./StringTokenizer";
 import { HookRegistry } from "./HookRegistry";
 import { parseIntStrict } from "./NumberParse";
+import type { GroundElm } from "./GroundElm";
 
 // model for subcircuits
 
@@ -233,7 +234,7 @@ export class SubcircuitModel {
                 ce = CirSim.createCe(ce.getDumpType(), 0, 0, 0, 0, ceFlags, stCe);
             }
 
-            if (ce.isGroundElm()) ce.setOldStyle();
+            if (ce.isGroundElm()) (ce as GroundElm).setOldStyle();
 
             const child = this.elmDoc.createElement(ce.getXmlDumpType());
             CircuitXMLSerializer.dumpAttr(child, "nn", nn);

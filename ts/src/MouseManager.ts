@@ -27,6 +27,8 @@ import { Graphics } from "./Graphics";
 import { Rectangle } from "./Rectangle";
 import { Locale } from "./Locale";
 import { ScrollValuePopup } from "./ScrollValuePopup";
+import type { SwitchElm } from "./SwitchElm";
+import type { RoutedWireElm } from "./RoutedWireElm";
 
 // mode constants
 export class MouseManager {
@@ -352,7 +354,7 @@ export class MouseManager {
 
     private doSwitch(x: number, y: number): boolean {
         if (this.mouseElm == null || !this.mouseElm.isSwitchElm()) return false;
-        const se = this.mouseElm as any; // SwitchElm
+        const se = this.mouseElm as SwitchElm; // SwitchElm
         if (!se.getSwitchRect().contains(x, y)) return false;
         se.toggle();
         if (se.momentary) this.heldSwitchElm = se;
@@ -426,7 +428,7 @@ export class MouseManager {
 
                     if (this.mouseElm.isRoutedWireElm()) {
                         this.tempMouseMode = MouseManager.MODE_DRAG_REROUTE;
-                        (this.mouseElm as any).rerouteVia(this.snapGrid(gx), this.snapGrid(gy));
+                        (this.mouseElm as RoutedWireElm).rerouteVia(this.snapGrid(gx), this.snapGrid(gy));
                         changed = true;
                     } else {
                         this.tempMouseMode = MouseManager.MODE_DRAG_SELECTED;
@@ -439,7 +441,7 @@ export class MouseManager {
                 break;
             case MouseManager.MODE_DRAG_REROUTE:
                 if (this.mouseElm != null && this.mouseElm.isRoutedWireElm()) {
-                    (this.mouseElm as any).rerouteVia(this.snapGrid(gx), this.snapGrid(gy));
+                    (this.mouseElm as RoutedWireElm).rerouteVia(this.snapGrid(gx), this.snapGrid(gy));
                     changed = true;
                 }
                 break;
@@ -612,7 +614,7 @@ export class MouseManager {
         for (let i = this.ui.elmList.length - 1; i >= 0; i--) {
             const ce = this.ui.elmList[i];
             if (!ce.isWireElm() || exclude?.has(ce)) continue;
-            const we = ce as any;
+            const we = ce;
             if (!we.pointOnWireInterior(px, py)) continue;
             const newWire = we.split(px, py);
             if (newWire != null) {

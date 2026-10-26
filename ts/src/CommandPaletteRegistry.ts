@@ -104,8 +104,8 @@ export class CommandPaletteRegistry {
     // Called from UIManager.init() after menus.init() so mainMenuItems is populated.
     static buildStatic(app: CirSim): void {
         CommandPaletteRegistry.clear();
-        const ui = app.ui as any;
-        const m = app.menus as any;
+        const ui = app.ui;
+        const m = app.menus;
 
         // Element placement modes come from the same list as the Draw menu.
         for (let i = 0; i !== ui.mainMenuItems.length; i++) {

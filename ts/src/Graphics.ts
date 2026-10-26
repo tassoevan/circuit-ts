@@ -195,15 +195,9 @@ export class Graphics {
     }
 
     private static requestExitFullScreen(): void {
-        const d = document as any;
+        const d = document;
         if (d.exitFullscreen) {
             d.exitFullscreen();
-        } else if (d.mozExitFullScreen) {
-            d.mozExitFullScreen();
-        } else if (d.webkitExitFullscreen) {
-            d.webkitExitFullscreen();
-        } else if (d.msExitFullscreen) {
-            d.msExitFullscreen();
         }
     }
 }
