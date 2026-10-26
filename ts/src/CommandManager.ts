@@ -63,7 +63,6 @@ export class CommandManager {
             this.app.ui?.loadFileInput?.element.click();
         }
         if (item == "importfromtext") new ImportFromTextDialog(this.app);
-        if (item == "importfromdropbox") CirSim.dialogShowing = new window.ImportFromDropboxDialog(this.app);
         if (item == "exportasurl") {
             this.doExportAsUrl();
             this.app.unsavedChanges = false;

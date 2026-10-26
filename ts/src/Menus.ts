@@ -266,7 +266,6 @@ export class Menus {
     exportAsTextItem = new MenuItem();
     printItem = new MenuItem();
     recoverItem = new MenuItem();
-    importFromDropboxItem = new MenuItem();
     undoItem = new MenuItem();
     redoItem = new MenuItem();
     cutItem = new MenuItem();
@@ -388,12 +387,6 @@ export class Menus {
             iconHtml("doc-text", "Import From Text..."),
             "file",
             "importfromtext",
-        );
-        fileMenu.addMenuItem(
-            this.importFromDropboxItem,
-            iconHtml("dropbox", "Import From Dropbox..."),
-            "file",
-            "importfromdropbox",
         );
 
         fileMenu.addMenuItem(

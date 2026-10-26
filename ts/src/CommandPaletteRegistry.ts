@@ -137,14 +137,6 @@ export class CommandPaletteRegistry {
             "importfromtext",
         );
         CommandPaletteRegistry.add(
-            "file:importfromdropbox",
-            "Import From Dropbox...",
-            "File",
-            "import dropbox",
-            "file",
-            "importfromdropbox",
-        );
-        CommandPaletteRegistry.add(
             "file:exportaslocalfile",
             "Save As...",
             "File",

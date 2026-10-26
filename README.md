@@ -98,7 +98,6 @@ Copy everything under `site/` to your web server. Running `./dist.sh` again with
 
 - Customize the "iframe.html" file to include any branding you want in the right hand panel of the application.
 - The optional file "shortrelay.php" (found in `war/`, not produced by the build) is a server-side script to act as a relay to a URL shortening service to avoid cross-origin problems with a purely client solution. Copy it alongside `circuitjsNUM.html` if you want the "Create short URL" feature; otherwise it's simply unused. You may want to customize it for your site.
-- If you wish to enable dropbox loading and saving, a dropbox API app-key is needed. This should be added as a script tag in `ts/circuitjs.html` before building. If this is not included the relevant features will be disabled.
 
 For a quick unversioned build (used for local testing), use `./dist-offline.sh` instead, which produces the same `site/` layout without the version-numbered rename — the entry point stays `site/circuitjs.html`.
 

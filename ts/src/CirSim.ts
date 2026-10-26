@@ -224,7 +224,6 @@ export class CirSim {
         await import("./ExportAsUrlDialog");
         await import("./ExportAsImageDialog");
         await import("./ScopeExportImageDialog");
-        await import("./ImportFromDropboxDialog");
 
         const qp = new QueryParameters();
         let positiveColor: string | null = null;
@@ -282,8 +281,7 @@ export class CirSim {
             if (this.stopMessage == null && this.startCircuitLink != null) {
                 this.loader.readCircuit("");
                 this.menus.getSetupList(false);
-                window.ImportFromDropboxDialog?.setSim(this);
-                window.ImportFromDropboxDialog?.doImportDropboxLink(this.startCircuitLink, false);
+                this.readCircuitFromLink(this.startCircuitLink);
             } else {
                 this.loader.readCircuit("");
                 if (this.stopMessage == null && this.startCircuit != null) {
@@ -301,6 +299,23 @@ export class CirSim {
         this.jsInterface?.setupJSInterface();
 
         this.setSimRunning(running);
+    }
+
+    readCircuitFromLink(link: string): void {
+        // Work-around to allow CORS access to dropbox links - see
+        // https://www.dropboxforum.com/t5/API-support/CORS-issue-when-trying-to-download-shared-file/m-p/82466
+        link = link.replace("www.dropbox.com", "dl.dropboxusercontent.com");
+        try {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener("load", () => {
+                this.undoManager?.pushUndo();
+                this.readCircuit(xhr.responseText);
+                this.unsavedChanges = false;
+                this.savedFlag = true;
+            });
+            xhr.open("GET", link, false);
+            xhr.send();
+        } catch (err) {}
     }
 
     isPrintable(): boolean {
