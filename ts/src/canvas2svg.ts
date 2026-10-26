@@ -91,7 +91,7 @@ function getTextAnchor(textAlign: string) {
         start: "start",
         end: "end",
     };
-    return mapping[textAlign] || mapping.start;
+    return mapping[textAlign] || mapping["start"];
 }
 
 //helper function to map canvas-textBaseline to svg-dominantBaseline
@@ -104,7 +104,7 @@ function getDominantBaseline(textBaseline: string) {
         bottom: "text-after-edge",
         middle: "central",
     };
-    return mapping[textBaseline] || mapping.alphabetic;
+    return mapping[textBaseline] || mapping["alphabetic"];
 }
 
 //helper function to get the xlink:href of a canvas or image

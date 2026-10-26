@@ -15,7 +15,7 @@ import { initHeadless, createApp, resetCircuit, step, M } from "./HeadlessSim";
 
 const circuitDir = path.resolve(__dirname, "../fixtures/circuits");
 const expectedDir = path.join(circuitDir, "expected");
-const record = !!process.env.RECORD_CIRCUITS;
+const record = !!process.env["RECORD_CIRCUITS"];
 
 // notes and data files kept next to the circuits
 const NOT_CIRCUITS = new Set(["tsbug-README.txt", "missing-tests.txt", "data-input-data.txt"]);
