@@ -17,6 +17,7 @@
     along with CircuitJS1.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { compressToEncodedURIComponent } from "lz-string";
 import { Dialog } from "./Dialog";
 import { Locale } from "./Locale";
 
@@ -53,7 +54,7 @@ export class ExportAsUrlDialog extends Dialog {
         this.closeOnEnter = false;
 
         const start = window.location.href.split("?");
-        const compressed = window.LZString.compressToEncodedURIComponent(dump);
+        const compressed = compressToEncodedURIComponent(dump);
         const query = "?ctz=" + compressed;
         const url = start[0] + query;
         const requrl = encodeURIComponent(query);

@@ -39,6 +39,7 @@ import { ScopeManager } from "./ScopeManager";
 import { ExportAsLocalFileDialog } from "./ExportAsLocalFileDialog";
 import { HookRegistry } from "./HookRegistry";
 import { UndoManager } from "./UndoManager";
+import { decompressFromEncodedURIComponent } from "lz-string";
 
 // GWT Timer equivalent — drives the simulation/render loop via setInterval
 class CirSimTimer {
@@ -751,7 +752,7 @@ export class CirSim {
     }
 
     decompress(dump: string): string {
-        return window.LZString.decompressFromEncodedURIComponent(dump);
+        return decompressFromEncodedURIComponent(dump);
     }
 
     // instance wrappers for Java compatibility

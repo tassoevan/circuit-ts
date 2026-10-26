@@ -7,7 +7,6 @@ import { ScopeExportImageDialog } from "./ScopeExportImageDialog";
 import { ShortcutsDialog } from "./ShortcutsDialog";
 import { SliderDialog } from "./SliderDialog";
 import { SubcircuitDialog } from "./SubcircuitDialog";
-import * as LZString from "lz-string";
 
 declare global {
     interface Window {
@@ -23,7 +22,6 @@ declare global {
         C2S: {
             new (width: number, height: number): CanvasRenderingContext2D & { getSerializedSvg(): string };
         };
-        LZString: typeof LZString;
         recorderBlob?: string;
         CircuitJS1?: any;
         oncircuitjsloaded?: (jsinterface: any) => void;
