@@ -29,6 +29,8 @@ import { Locale } from "./Locale";
 import { ScrollValuePopup } from "./ScrollValuePopup";
 import type { SwitchElm } from "./SwitchElm";
 import type { RoutedWireElm } from "./RoutedWireElm";
+import type { SubcircuitElm } from "./SubcircuitElm";
+import type { ScopeElm } from "./ScopeElm";
 
 // mode constants
 export class MouseManager {
@@ -638,7 +640,7 @@ export class MouseManager {
             const ox = post === 0 ? ce.x : ce.x2;
             const oy = post === 0 ? ce.y : ce.y2;
             ce.movePoint(post, px - ox, py - oy);
-            const w = this.sim.constructElement("WireElm", px, py) as any;
+            const w = this.sim.constructElement("WireElm", px, py);
             w.drag(ox, oy);
             this.ui.elmList.push(w);
             split = true;
@@ -941,7 +943,7 @@ export class MouseManager {
                 this.sim.menus.elmMirrorYMenuItem.setEnabled(canFlipY);
                 this.ui.showContextPanel(this.sim.menus.elmMenuBar, this.menuClientX, this.menuClientY);
             } else {
-                const s = this.mouseElm as any; // ScopeElm
+                const s = this.mouseElm as ScopeElm; // ScopeElm
                 if (s.elmScope.canMenu()) {
                     this.sim.scopeManager.menuPlot = s.elmScope.selectedPlot;
                     this.sim.scopeManager.scopePopupMenu.doScopePopupChecks(true, false, false, false, s.elmScope);
@@ -982,7 +984,7 @@ export class MouseManager {
         // (double-clicking a scope at the bottom shouldn't edit the scope's element)
         if (this.mouseElm == null || this.sim.scopeManager.scopeSelected !== -1) return;
         if (this.mouseElm.isSubcircuitElm()) {
-            (this.mouseElm as any).onDoubleClick();
+            (this.mouseElm as SubcircuitElm).onDoubleClick();
             return;
         }
         if (!this.mouseElm.isSwitchElm() && this.mouseElm.hasProperties() && !this.ui.isReadOnly())
@@ -1063,13 +1065,13 @@ export class MouseManager {
                 (this.sim.scopeManager.scopeSelected === -1 &&
                     this.mouseElm != null &&
                     this.mouseElm.isScopeElm() &&
-                    (this.mouseElm as any).elmScope.cursorInSettingsWheel()))
+                    (this.mouseElm as ScopeElm).elmScope.cursorInSettingsWheel()))
         ) {
             if (this.ui.isReadOnly()) return;
             const s =
                 this.sim.scopeManager.scopeSelected !== -1
                     ? this.sim.scopeManager.scopes[this.sim.scopeManager.scopeSelected]
-                    : (this.mouseElm as any).elmScope;
+                    : (this.mouseElm as ScopeElm).elmScope;
             s.showProperties();
             this.clearSelection();
             this.mouseDragging = false;
@@ -1271,7 +1273,7 @@ export class MouseManager {
             this.dragMovedElms.clear();
         }
         if (this.heldSwitchElm != null) {
-            (this.heldSwitchElm as any).mouseUp();
+            (this.heldSwitchElm as SwitchElm).mouseUp();
             this.heldSwitchElm = null;
             circuitChanged = true;
         }
