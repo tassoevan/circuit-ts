@@ -109,7 +109,7 @@ export class CC2Elm extends ChipElm {
     getDumpType(): number {
         return 179;
     }
-    getMatrixConnection(n1: number, n2: number): boolean {
+    getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 }

@@ -37,7 +37,7 @@ export class GroundElm extends CircuitElm {
     // this is needed for old subcircuits which have GroundElm dumped
     readonly FLAG_OLD_STYLE = 1;
 
-    getDragVertical(requestedVertical: boolean): boolean {
+    getDragVertical(_requestedVertical: boolean): boolean {
         return true;
     }
     getDragLength(): number {
@@ -134,7 +134,7 @@ export class GroundElm extends CircuitElm {
     stamp(): void {
         if (this.isOldStyle()) CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource, 0);
     }
-    setCurrent(vs: any, c: number): void {
+    setCurrent(_vs: any, c: number): void {
         this.current = this.isOldStyle() ? -c : c;
     }
 
@@ -148,7 +148,7 @@ export class GroundElm extends CircuitElm {
     static resetNodeList(): void {
         GroundElm.firstGround = null;
     }
-    getConnectedPost(n?: number): Point {
+    getConnectedPost(_n?: number): Point {
         if (GroundElm.firstGround != null) return GroundElm.firstGround;
         GroundElm.firstGround = this.point1;
         return null!;
@@ -162,7 +162,7 @@ export class GroundElm extends CircuitElm {
         arr[0] = "ground";
         arr[1] = "I = " + CircuitElm.getCurrentText(this.getCurrent());
     }
-    hasGroundConnection(n1: number): boolean {
+    hasGroundConnection(_n1: number): boolean {
         return true;
     }
     addRoutingObstacle(router: WireRouter): void {
@@ -195,7 +195,7 @@ export class GroundElm extends CircuitElm {
         if (n == 0) GroundElm.lastSymbolType = this.symbolType = ei.choice!.getSelectedIndex();
     }
 
-    getCurrentIntoNode(n: number): number {
+    getCurrentIntoNode(_n: number): number {
         return -this.current;
     }
     showPropertiesOnCreate(): boolean {

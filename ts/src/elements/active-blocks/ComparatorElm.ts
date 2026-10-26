@@ -67,7 +67,7 @@ export class ComparatorElm extends CompositeElm {
         this.flags = (this.flags & ~this.FLAG_SMALL) | (s === 1 ? this.FLAG_SMALL : 0);
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
 

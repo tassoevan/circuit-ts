@@ -32,7 +32,7 @@ export class WireElm extends CircuitElm {
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
-    constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
+    constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, _st?: StringTokenizer) {
         if (xb === undefined) {
             super(xa, ya);
         } else {
@@ -57,7 +57,7 @@ export class WireElm extends CircuitElm {
         return new Point(this.point2.x, this.point2.y, n - this.busWidth);
     }
 
-    getPostWidth(n: number): number {
+    getPostWidth(_n: number): number {
         return this.busWidth;
     }
 

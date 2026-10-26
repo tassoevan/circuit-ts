@@ -73,7 +73,7 @@ export class DataInputElm extends RailElm {
         CircuitXMLSerializer.dumpAttr(elem, "sf", this.scaleFactor);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         if (this.data !== null) {
             if (this.fileNum === 0) this.fileNum = DataInputElm.fileNumCounter++;
             const ent = new DataFileEntry();

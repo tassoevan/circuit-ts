@@ -104,7 +104,7 @@ export abstract class GateElm extends CircuitElm {
         if (this.propagationDelay !== 0) CircuitXMLSerializer.dumpAttr(elem, "pd", this.propagationDelay);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         if (this.nodes[this.inputCount].v !== 0)
             CircuitXMLSerializer.dumpAttr(elem, "o", this.nodes[this.inputCount].v);
     }
@@ -236,7 +236,7 @@ export abstract class GateElm extends CircuitElm {
         this.justLoaded = true;
     }
 
-    getLeadAdjustment(ix: number): number {
+    getLeadAdjustment(_ix: number): number {
         return 0;
     }
 
@@ -541,7 +541,7 @@ export abstract class GateElm extends CircuitElm {
     validate(): boolean {
         return this.validateRailNode(this.inputCount);
     }
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
     hasGroundConnection(n1: number): boolean {

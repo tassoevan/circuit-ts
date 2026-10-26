@@ -113,7 +113,7 @@ export class LogicInputElm extends SwitchElm {
         return new Rectangle(this.x2 - 10, this.y2 - 10, 20, 20);
     }
 
-    setCurrent(vs: any, c: number): void {
+    setCurrent(_vs: any, c: number): void {
         this.current = c;
     }
     calculateCurrent(): void {}
@@ -156,7 +156,7 @@ export class LogicInputElm extends SwitchElm {
         arr[2] = "I = " + CircuitElm.getCurrentText(this.getCurrent());
     }
 
-    hasGroundConnection(n1: number): boolean {
+    hasGroundConnection(_n1: number): boolean {
         return true;
     }
 
@@ -207,7 +207,7 @@ export class LogicInputElm extends SwitchElm {
         return "i".charCodeAt(0);
     }
 
-    getCurrentIntoNode(n: number): number {
+    getCurrentIntoNode(_n: number): number {
         return this.current;
     }
 

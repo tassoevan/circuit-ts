@@ -26,7 +26,7 @@ import { StringTokenizer } from "../../StringTokenizer";
 export class TunnelDiodeElm extends CircuitElm {
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
-    constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
+    constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, _st?: StringTokenizer) {
         if (xb === undefined) {
             super(xxOrXa, yyOrYa);
         } else {

@@ -131,7 +131,7 @@ export class LabeledNodeElm extends CircuitElm {
     getPostCount(): number {
         return this.busWidth;
     }
-    getPostWidth(n: number): number {
+    getPostWidth(_n: number): number {
         return this.busWidth;
     }
     getBusWidth(): number {
@@ -244,7 +244,7 @@ export class LabeledNodeElm extends CircuitElm {
         return -this.current;
     }
 
-    setCurrent(vs: VoltageSource, c: number): void {
+    setCurrent(_vs: VoltageSource, c: number): void {
         this.current = c;
     }
 
@@ -306,7 +306,7 @@ export class LabeledNodeElm extends CircuitElm {
         if (n === 2) this.flags = ei.changeFlag(this.flags, LabeledNodeElm.FLAG_ROTATE_TEXT);
     }
 
-    getScopeText(v: number): string {
+    getScopeText(_v: number): string {
         return this.text;
     }
 

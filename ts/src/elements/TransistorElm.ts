@@ -132,7 +132,7 @@ export class TransistorElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modelName);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         // "vBE"/"vBC" (mixed case) are correctly-named, not cross-wired like Java's
         // lowercase "vbe"/"vbc" (see undumpXml, which still accepts the old names)
         CircuitXMLSerializer.dumpAttr(elem, "vBE", this.nodes[0].v - this.nodes[2].v);

@@ -256,7 +256,7 @@ export class TriodeElm extends CircuitElm {
     getConnection(n1: number, n2: number): boolean {
         return !(n1 === 1 || n2 === 1);
     }
-    getMatrixConnection(n1: number, n2: number): boolean {
+    getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 

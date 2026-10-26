@@ -286,7 +286,7 @@ export class SevenSegElm extends ChipElm {
         }
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return this.diodeDirection !== 0;
     }
 

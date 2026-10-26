@@ -27,7 +27,7 @@ import { EditInfo } from "../../EditInfo";
 export class LineElm extends GraphicElm {
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
-    constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
+    constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, _st?: StringTokenizer) {
         if (xb === undefined) {
             super(xxOrXa, yyOrYa);
             this.x2 = xxOrXa;
@@ -64,13 +64,13 @@ export class LineElm extends GraphicElm {
     showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    getEditInfo(_n: number): EditInfo | null {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {}
+    setEditValue(_n: number, _ei: EditInfo): void {}
 
-    getInfo(arr: string[]): void {}
+    getInfo(_arr: string[]): void {}
 
     getShortcut(): number {
         return 0;

@@ -253,10 +253,10 @@ export class TransLineElm extends CircuitElm {
     getVoltageSourceCount(): number {
         return 2;
     }
-    hasGroundConnection(n1: number): boolean {
+    hasGroundConnection(_n1: number): boolean {
         return false;
     }
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
 

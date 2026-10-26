@@ -108,7 +108,7 @@ export class TriacElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "cr", this.cresistance);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "st", this.state);
     }
 

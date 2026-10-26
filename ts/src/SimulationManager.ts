@@ -1240,7 +1240,7 @@ export class SimulationManager {
     }
 
     // update voltage source in doStep()
-    updateVoltageSource(n1: CircuitNode, n2: CircuitNode, vs: VoltageSource | null, v: number): void {
+    updateVoltageSource(_n1: CircuitNode, _n2: CircuitNode, vs: VoltageSource | null, v: number): void {
         if (vs == null) return;
         this.stampRightSideVS(vs, v);
     }
@@ -1351,8 +1351,8 @@ export class SimulationManager {
     }
 
     // indicate that the values on the left side of row change in doStep() (no-ops)
-    stampNonLinear(n: CircuitNode): void {}
-    stampNonLinearVS(vs: VoltageSource): void {}
+    stampNonLinear(_n: CircuitNode): void {}
+    stampNonLinearVS(_vs: VoltageSource): void {}
 
     converged: boolean = false;
     subIterations: number = 0;

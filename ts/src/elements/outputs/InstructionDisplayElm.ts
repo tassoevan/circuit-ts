@@ -87,7 +87,7 @@ export class InstructionDisplayElm extends CircuitElm {
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
-    constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
+    constructor(xxOrXa: number, yyOrYa: number, xb?: number, yb?: number, f?: number, _st?: StringTokenizer) {
         if (xb === undefined) {
             super(xxOrXa, yyOrYa);
             this.lookupText = "0=text0\n1=text1\n0x2-0xF=other ({a})\n";
@@ -103,7 +103,7 @@ export class InstructionDisplayElm extends CircuitElm {
     getPostCount(): number {
         return this.busWidth;
     }
-    getPostWidth(n: number): number {
+    getPostWidth(_n: number): number {
         return this.busWidth;
     }
     getNumHandles(): number {
@@ -266,7 +266,7 @@ export class InstructionDisplayElm extends CircuitElm {
         return parseIntStrict(s);
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
 }

@@ -175,7 +175,7 @@ export class VaractorElm extends DiodeElm {
     getShortcut(): number {
         return 0;
     }
-    setCurrent(vs: VoltageSource, c: number): void {
+    setCurrent(_vs: VoltageSource, c: number): void {
         this.capCurrent = c;
     }
     getVoltageSourceCount(): number {

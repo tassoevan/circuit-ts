@@ -127,7 +127,7 @@ export class RelayCoilElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "tp", this.type);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "ci", this.coilCurrent);
         CircuitXMLSerializer.dumpAttr(elem, "st", this.state);
         CircuitXMLSerializer.dumpAttr(elem, "sp", this.switchPosition);
@@ -420,7 +420,7 @@ export class RelayCoilElm extends CircuitElm {
         if (n === 6) this.label = ei.textf!.value;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 }

@@ -183,7 +183,7 @@ export class InverterElm extends CircuitElm {
     validate(): boolean {
         return this.validateRailNode(1);
     }
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
     hasGroundConnection(n1: number): boolean {

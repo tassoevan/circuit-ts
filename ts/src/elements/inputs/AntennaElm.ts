@@ -77,7 +77,7 @@ export class AntennaElm extends RailElm {
         arr[0] = "Antenna (amplified)";
     }
 
-    getEditInfo(n: number): null {
+    getEditInfo(_n: number): null {
         return null;
     }
 }

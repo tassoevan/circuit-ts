@@ -319,7 +319,7 @@ export abstract class ChipElm extends CircuitElm {
         g.restore();
     }
 
-    drawLabel(g: Graphics, x: number, y: number): void {}
+    drawLabel(_g: Graphics, _x: number, _y: number): void {}
 
     drag(xx: number, yy: number): void {
         yy = this.snapGrid(yy);
@@ -543,7 +543,7 @@ export abstract class ChipElm extends CircuitElm {
         if (this.bitOrder !== 0) CircuitXMLSerializer.dumpAttr(elem, "bo", this.bitOrder);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         for (let i = 0; i !== this.getPostCount(); i++)
             if (this.pins[i].state && this.nodes[i].v > 0)
                 CircuitXMLSerializer.dumpAttr(elem, "v" + i, this.nodes[i].v);
@@ -614,7 +614,7 @@ export abstract class ChipElm extends CircuitElm {
     getChipName(): string {
         return "chip";
     }
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
     hasGroundConnection(n1: number): boolean {
@@ -724,10 +724,10 @@ export abstract class ChipElm extends CircuitElm {
         this.setChipEditValue(n, ei);
     }
 
-    getChipEditInfo(n: number): EditInfo | null {
+    getChipEditInfo(_n: number): EditInfo | null {
         return null;
     }
-    setChipEditValue(n: number, ei: EditInfo): void {}
+    setChipEditValue(_n: number, _ei: EditInfo): void {}
 
     makeBitPins(
         count: number,

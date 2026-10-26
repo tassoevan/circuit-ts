@@ -139,7 +139,7 @@ export class ResistorElm extends CircuitElm {
         arr[4] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    getScopeText(v: number): string {
+    getScopeText(_v: number): string {
         return Locale.LS("resistor") + ", " + CircuitElm.getUnitText(this.resistance, Locale.ohmString);
     }
 
@@ -149,7 +149,7 @@ export class ResistorElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    setEditValue(_n: number, ei: EditInfo): void {
         this.resistance = ei.value <= 0 ? 1e-9 : ei.value;
     }
 

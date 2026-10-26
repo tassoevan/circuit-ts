@@ -194,7 +194,7 @@ export class OpAmpRealElm extends CompositeElm {
         CircuitXMLSerializer.dumpAttr(elem, "mt", this.modelType);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         const elm = this.getCapacitor();
         CircuitXMLSerializer.dumpAttr(elem, "vd", elm ? elm.voltdiff : 0);
     }
@@ -210,7 +210,7 @@ export class OpAmpRealElm extends CompositeElm {
         if (cap) cap.voltdiff = voltdiff;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 

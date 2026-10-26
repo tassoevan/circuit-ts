@@ -1014,7 +1014,7 @@ export class Menus {
             if (!wasOpen) td.classList.add("open");
         });
 
-        td.addEventListener("mouseover", (e) => {
+        td.addEventListener("mouseover", (_e) => {
             if (anyMenuOpen()) {
                 closeAllMenus();
                 td.classList.add("open");

@@ -195,7 +195,7 @@ export class GyratorElm extends CircuitElm {
     }
 
     // VCCS stamps couple all nodes, so they must all be in the same matrix
-    getMatrixConnection(n1: number, n2: number): boolean {
+    getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 

@@ -86,7 +86,7 @@ export class OTAElm extends CompositeElm {
         this.curCount0 = this.curCount1 = this.curCount2 = this.curCount3 = 0;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
 

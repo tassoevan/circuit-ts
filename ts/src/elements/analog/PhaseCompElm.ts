@@ -92,7 +92,7 @@ export class PhaseCompElm extends ChipElm {
     getDumpType(): number {
         return 161;
     }
-    getMatrixConnection(n1: number, n2: number): boolean {
+    getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 }

@@ -81,9 +81,9 @@ export class Scrollbar {
     private vpw: number;
 
     constructor(
-        orientation: number,
+        _orientation: number,
         value: number,
-        visible: number,
+        _visible: number,
         min: number,
         max: number,
         cmd?: () => void,
@@ -171,7 +171,7 @@ export class Scrollbar {
         this.draw();
     }
 
-    private doMouseDown(x: number, mouse: boolean): void {
+    private doMouseDown(x: number, _mouse: boolean): void {
         if (!this.enabled) return;
         const vpw = this.vpw;
         const hm = Scrollbar.HMARGIN;
@@ -1902,7 +1902,7 @@ export class UIManager {
         return true;
     }
 
-    private handleReadonlyKeyDown(e: KeyboardEvent, code: number): void {
+    private handleReadonlyKeyDown(_e: KeyboardEvent, _code: number): void {
         // readonly mode — still allow zoom keys via keypress, nothing here for keydown
     }
 

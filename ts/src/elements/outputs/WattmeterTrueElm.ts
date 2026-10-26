@@ -64,7 +64,7 @@ export class WattmeterTrueElm extends CircuitElm {
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
-    constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
+    constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, _st?: StringTokenizer) {
         super(xa, ya, xb, yb, f);
         this.setup();
     }
@@ -298,7 +298,7 @@ export class WattmeterTrueElm extends CircuitElm {
     getConnection(n1: number, n2: number): boolean {
         return Math.trunc(n1 / 2) === Math.trunc(n2 / 2);
     }
-    hasGroundConnection(n1: number): boolean {
+    hasGroundConnection(_n1: number): boolean {
         return false;
     }
 

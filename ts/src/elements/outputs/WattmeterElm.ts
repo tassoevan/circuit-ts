@@ -264,7 +264,7 @@ export class WattmeterElm extends CircuitElm {
     getConnection(n1: number, n2: number): boolean {
         return Math.trunc(n1 / 2) === Math.trunc(n2 / 2);
     }
-    hasGroundConnection(n1: number): boolean {
+    hasGroundConnection(_n1: number): boolean {
         return false;
     }
 

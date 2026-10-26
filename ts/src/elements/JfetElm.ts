@@ -204,11 +204,11 @@ export class JfetElm extends MosfetElm {
         return null;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 
-    getScopeText(v: number): string {
+    getScopeText(_v: number): string {
         return Locale.LS((this.pnp === -1 ? "p-" : "n-") + "JFET");
     }
 }

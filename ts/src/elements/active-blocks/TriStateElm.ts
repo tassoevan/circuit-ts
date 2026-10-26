@@ -258,7 +258,7 @@ export class TriStateElm extends CircuitElm {
         arr[4] = "Vc = " + CircuitElm.getVoltageText(this.nodes[this.controlNode()].v);
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
     hasGroundConnection(n1: number): boolean {

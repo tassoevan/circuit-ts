@@ -106,7 +106,7 @@ export class CustomTransformerElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "nc", this.coilCount);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         let s = "";
         for (let i = 0; i !== this.coilCount; i++) {
             if (i > 0) s += " ";
@@ -501,7 +501,7 @@ export class CustomTransformerElm extends CircuitElm {
     }
 
     // VCCS stamps couple all nodes, so they must all be in the same matrix
-    getMatrixConnection(n1: number, n2: number): boolean {
+    getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 

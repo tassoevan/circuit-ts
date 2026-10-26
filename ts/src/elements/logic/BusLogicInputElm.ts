@@ -72,7 +72,7 @@ export class BusLogicInputElm extends SwitchElm {
     getNumHandles(): number {
         return 1;
     }
-    getPostWidth(n: number): number {
+    getPostWidth(_n: number): number {
         return this.busWidth;
     }
     getVoltageSourceCount(): number {
@@ -151,7 +151,7 @@ export class BusLogicInputElm extends SwitchElm {
     }
 
     calculateCurrent(): void {}
-    hasGroundConnection(n: number): boolean {
+    hasGroundConnection(_n: number): boolean {
         return true;
     }
     isWireEquivalent(): boolean {

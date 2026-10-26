@@ -78,7 +78,7 @@ export class InductorElm extends CircuitElm {
         if (this.seriesResistance !== 0) CircuitXMLSerializer.dumpAttr(elem, "sr", this.seriesResistance);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "i", this.current);
     }
 
@@ -164,7 +164,7 @@ export class InductorElm extends CircuitElm {
         }
     }
 
-    getScopeText(v: number): string {
+    getScopeText(_v: number): string {
         return Locale.LS("inductor") + ", " + CircuitElm.getUnitText(this.inductance, "H");
     }
 

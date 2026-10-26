@@ -208,7 +208,7 @@ export class SweepElm extends CircuitElm {
     getVoltageSourceCount(): number {
         return 1;
     }
-    hasGroundConnection(n1: number): boolean {
+    hasGroundConnection(_n1: number): boolean {
         return true;
     }
     isSweepElm(): boolean {

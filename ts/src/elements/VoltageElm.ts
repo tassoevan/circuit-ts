@@ -122,7 +122,7 @@ export class VoltageElm extends CircuitElm {
     getDumpType(): number {
         return "v".charCodeAt(0);
     }
-    getDragVertical(requestedVertical: boolean): boolean {
+    getDragVertical(_requestedVertical: boolean): boolean {
         return true;
     }
     // point 2, not point 1, should track the mouse during toolbar drag-and-drop

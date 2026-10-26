@@ -312,7 +312,7 @@ export class MouseManager {
         this.sim.repaint();
     }
 
-    toolbarDragEnd(clientX: number, clientY: number): void {
+    toolbarDragEnd(_clientX: number, _clientY: number): void {
         if (this.toolbarDragClass == null) return;
         const wasActive = this.toolbarDragActive;
         this.toolbarDragClass = null;
@@ -463,7 +463,7 @@ export class MouseManager {
         this.sim.repaint();
     }
 
-    private dragSplitter(x: number, y: number): void {
+    private dragSplitter(_x: number, y: number): void {
         let h = this.ui.canvasHeight as number;
         if (h < 1) h = 1;
         this.sim.scopeManager.scopeHeightFraction = 1.0 - y / h;
@@ -483,7 +483,7 @@ export class MouseManager {
         this.dragScreenY = y;
     }
 
-    private dragRow(x: number, y: number): void {
+    private dragRow(_x: number, y: number): void {
         const dy = y - this.dragGridY;
         if (dy === 0) return;
         for (let i = 0; i < this.dragRowColElms.length; i++)
@@ -491,7 +491,7 @@ export class MouseManager {
         this.removeZeroLengthElements();
     }
 
-    private dragColumn(x: number, y: number): void {
+    private dragColumn(x: number, _y: number): void {
         const dx = x - this.dragGridX;
         if (dx === 0) return;
         for (let i = 0; i < this.dragRowColElms.length; i++)
@@ -991,7 +991,7 @@ export class MouseManager {
             this.sim.commands.doEdit(this.mouseElm);
     }
 
-    private onMouseOut(e: MouseEvent): void {
+    private onMouseOut(_e: MouseEvent): void {
         this.mouseCursorX = -1;
         // if the mouse leaves the canvas while dragging (e.g. dragged off the edge of the
         // browser window), we may never get a mouseup event, so end the drag now instead of

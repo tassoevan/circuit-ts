@@ -219,7 +219,7 @@ export class Adjustable {
         this.slider = null;
     }
 
-    setMouseElm(e: CircuitElm): void {
+    setMouseElm(_e: CircuitElm): void {
         if (this.slider != null) this.slider.draw();
     }
 

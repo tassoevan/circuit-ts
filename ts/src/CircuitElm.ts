@@ -276,18 +276,18 @@ export abstract class CircuitElm implements Editable {
         this.curcount = 0;
     }
 
-    draw(g: Graphics): void {}
+    draw(_g: Graphics): void {}
 
     // override this in elements that use highVoltage (gates, chips, inverters, etc.)
-    setHighVoltage(hv: number): void {}
+    setHighVoltage(_hv: number): void {}
 
     // set current for voltage source vn to c.  vn will be the same value as in a previous call to setVoltageSource(n, vn)
-    setCurrent(vs: VoltageSource, c: number): void {
+    setCurrent(_vs: VoltageSource, c: number): void {
         this.current = c;
     }
 
     // set current for wire-like elements (called from calcWireCurrents, one call per bit for bus wires)
-    setWireCurrent(bit: number, c: number): void {
+    setWireCurrent(_bit: number, c: number): void {
         this.current = c;
     }
 
@@ -296,7 +296,7 @@ export abstract class CircuitElm implements Editable {
         return this.current;
     }
 
-    setParentList(elmList: CircuitElm[]): void {}
+    setParentList(_elmList: CircuitElm[]): void {}
 
     getChildElmList(): CircuitElm[] | null {
         return null;
@@ -716,21 +716,21 @@ export abstract class CircuitElm implements Editable {
         this.setPoints();
     }
 
-    flipX(center2: number, count: number): void {
+    flipX(center2: number, _count: number): void {
         this.x = center2 - this.x;
         this.x2 = center2 - this.x2;
         this.initBoundingBox();
         this.setPoints();
     }
 
-    flipY(center2: number, count: number): void {
+    flipY(center2: number, _count: number): void {
         this.y = center2 - this.y;
         this.y2 = center2 - this.y2;
         this.initBoundingBox();
         this.setPoints();
     }
 
-    flipXY(xmy: number, count: number): void {
+    flipXY(xmy: number, _count: number): void {
         const nx = this.y + xmy;
         const ny = this.x - xmy;
         const nx2 = this.y2 + xmy;
@@ -866,7 +866,7 @@ export abstract class CircuitElm implements Editable {
     }
 
     // notify this element that its nth voltage source is v.  This value v can be passed to stampVoltageSource(), etc and will be passed back in calls to setCurrent()
-    setVoltageSource(n: number, v: VoltageSource): void {
+    setVoltageSource(_n: number, v: VoltageSource): void {
         // default implementation only makes sense for subclasses with one voltage source.  If we have 0 this isn't used, if we have >1 this won't work
         this.voltSource = v;
     }
@@ -883,7 +883,7 @@ export abstract class CircuitElm implements Editable {
     getPostCount(): number {
         return 2;
     }
-    getPostWidth(n: number): number {
+    getPostWidth(_n: number): number {
         return 1;
     }
     getBusWidth(): number {
@@ -914,7 +914,7 @@ export abstract class CircuitElm implements Editable {
 
     // return post we're connected to (for wires, so we can optimize them out in calculateWireClosure())
     // return the post that post n connects through to (for bus wires, each bit connects to its counterpart)
-    getConnectedPost(n?: number): Point {
+    getConnectedPost(_n?: number): Point {
         return this.point2;
     }
 
@@ -1289,7 +1289,7 @@ export abstract class CircuitElm implements Editable {
     setupAdjust(): void {}
 
     // get component info for display in lower right
-    getInfo(arr: string[]): void {}
+    getInfo(_arr: string[]): void {}
 
     // get element type name for edit dialog title.  override if getInfo()[0] includes dynamic state.
     getElmType(): string {
@@ -1304,13 +1304,13 @@ export abstract class CircuitElm implements Editable {
         return 3;
     }
 
-    getScopeText(v: number): string {
+    getScopeText(_v: number): string {
         const info: string[] = new Array(10);
         this.getInfo(info);
         return info[0];
     }
 
-    getVoltageColor(g: Graphics, volts: number): Color {
+    getVoltageColor(_g: Graphics, volts: number): Color {
         if (this.needsHighlight()) {
             return CircuitElm.selectColor;
         }
@@ -1381,14 +1381,14 @@ export abstract class CircuitElm implements Editable {
         return x === Scope.VAL_CURRENT ? Scope.UNITS_A : x === Scope.VAL_POWER ? Scope.UNITS_W : Scope.UNITS_V;
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    getEditInfo(_n: number): EditInfo | null {
         return null;
     }
-    setEditValue(n: number, ei: EditInfo): void {}
+    setEditValue(_n: number, _ei: EditInfo): void {}
 
     // are n1 and n2 connected by this element?  this is used to determine
     // unconnected nodes, and look for loops
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 
@@ -1400,7 +1400,7 @@ export abstract class CircuitElm implements Editable {
     }
 
     // is n1 connected to ground somehow?
-    hasGroundConnection(n1: number): boolean {
+    hasGroundConnection(_n1: number): boolean {
         return false;
     }
 
@@ -1486,7 +1486,7 @@ export abstract class CircuitElm implements Editable {
     isSelected(): boolean {
         return this.selected;
     }
-    canShowValueInScope(v: number): boolean {
+    canShowValueInScope(_v: number): boolean {
         return false;
     }
     setSelected(x: boolean): void {
@@ -1655,7 +1655,7 @@ export abstract class CircuitElm implements Editable {
         return this.lineDistanceSq(this.x, this.y, this.x2, this.y2, gx, gy);
     }
 
-    dumpXmlModel(doc: Document): void {}
+    dumpXmlModel(_doc: Document): void {}
 
     isMouseElm(): boolean {
         return CircuitElm.mouseElmRef === this;
@@ -1689,7 +1689,7 @@ export abstract class CircuitElm implements Editable {
         return this.constructor.name;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    dumpXml(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "x", this.x + " " + this.y + " " + this.x2 + " " + this.y2);
         //if (flags != 0)   // can't do this because some elements set flags to a nonzero value in constructor
         CircuitXMLSerializer.dumpAttr(elem, "f", this.flags);
@@ -1699,7 +1699,7 @@ export abstract class CircuitElm implements Editable {
         this.flags = xml.parseIntAttr("f", this.flags);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {}
+    dumpXmlState(_doc: Document, _elem: Element): void {}
 
     getJsArrayString(): string[] {
         return [];

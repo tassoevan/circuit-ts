@@ -974,7 +974,7 @@ class C2SContext {
      * Adds a radial gradient to a defs tag.
      * Returns a canvas gradient object that has a reference to it's parent def
      */
-    createRadialGradient(x0: number, y0: number, r0: number, x1: number, y1: number, r1: number) {
+    createRadialGradient(x0: number, y0: number, _r0: number, x1: number, y1: number, r1: number) {
         const grad = this.__createElement(
             "radialGradient",
             {
@@ -1158,7 +1158,7 @@ class C2SContext {
         y: number,
         radiusX: number,
         radiusY: number,
-        rotation: number,
+        _rotation: number,
         startAngle: number,
         endAngle: number,
         counterClockwise?: boolean,
@@ -1328,7 +1328,7 @@ class C2SContext {
     /**
      * Generates a pattern tag
      */
-    createPattern(image: DrawableImage, repetition: string | null) {
+    createPattern(image: DrawableImage, _repetition: string | null) {
         const pattern = this.__document.createElementNS("http://www.w3.org/2000/svg", "pattern"),
             id = randomString(this.__ids);
         pattern.setAttribute("id", id);

@@ -103,7 +103,7 @@ export class BatteryElm extends CircuitElm {
     getVoltageSourceCount(): number {
         return 1;
     }
-    getDragVertical(requestedVertical: boolean): boolean {
+    getDragVertical(_requestedVertical: boolean): boolean {
         return true;
     }
     isBatteryElm(): boolean {
@@ -132,7 +132,7 @@ export class BatteryElm extends CircuitElm {
             elem.appendChild(doc.createTextNode(this.socVoltageTable));
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "soc", this.soc);
     }
 

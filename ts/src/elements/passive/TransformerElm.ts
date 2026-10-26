@@ -100,7 +100,7 @@ export class TransformerElm extends CircuitElm {
         if (this.saturationCurrent !== 0) CircuitXMLSerializer.dumpAttr(elem, "isat", this.saturationCurrent);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "c0", this.currents[0]);
         CircuitXMLSerializer.dumpAttr(elem, "c1", this.currents[1]);
     }
@@ -347,7 +347,7 @@ export class TransformerElm extends CircuitElm {
     }
 
     // VCCS stamps couple all nodes, so they must all be in the same matrix
-    getMatrixConnection(n1: number, n2: number): boolean {
+    getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 

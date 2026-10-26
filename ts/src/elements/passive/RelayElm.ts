@@ -223,7 +223,7 @@ export class RelayElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modelName);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "i", this.coilCurrent);
         CircuitXMLSerializer.dumpAttr(elem, "ip", this.i_position);
     }

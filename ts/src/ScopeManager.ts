@@ -54,7 +54,7 @@ export class ScopeManager {
         this.scopePopupMenu = new ScopePopupMenu(this.sim);
     }
 
-    composeSelectScopeMenu(sb: any): void {
+    composeSelectScopeMenu(_sb: any): void {
         // GWT MenuBar/MenuItem/SafeHtml skipped — no-op
     }
 
@@ -170,7 +170,7 @@ export class ScopeManager {
         return true;
     }
 
-    canCombineScope(s: number): boolean {
+    canCombineScope(_s: number): boolean {
         return this.scopeCount >= 2;
     }
 

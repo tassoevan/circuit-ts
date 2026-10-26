@@ -401,7 +401,7 @@ export class ProbeElm extends CircuitElm {
         return "";
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return this.resistance !== 0;
     }
 

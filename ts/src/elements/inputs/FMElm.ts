@@ -145,7 +145,7 @@ export class FMElm extends CircuitElm {
     validate(): boolean {
         return this.validateRailNode(0);
     }
-    hasGroundConnection(n1: number): boolean {
+    hasGroundConnection(_n1: number): boolean {
         return true;
     }
     getVoltageSourceCount(): number {

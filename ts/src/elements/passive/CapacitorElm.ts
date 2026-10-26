@@ -108,7 +108,7 @@ export class CapacitorElm extends CircuitElm {
         // PolarCapacitorElm uses mv
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "vd", this.voltdiff);
     }
 
@@ -233,7 +233,7 @@ export class CapacitorElm extends CircuitElm {
         arr[4] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
         arr[5] = "Q = " + CircuitElm.getUnitText(this.capacitance * this.voltdiff, "C");
     }
-    getScopeText(v: number): string {
+    getScopeText(_v: number): string {
         return Locale.LS("capacitor") + ", " + CircuitElm.getUnitText(this.capacitance, "F");
     }
     getScopeValue(x: number): number {

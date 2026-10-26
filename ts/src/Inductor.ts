@@ -111,7 +111,7 @@ export class Inductor {
         if (this.compResistance > 0) this.current = voltdiff / this.compResistance + this.curSourceValue;
         return this.current;
     }
-    doStep(voltdiff: number): void {
+    doStep(_voltdiff: number): void {
         if (this.saturationCurrent > 0) {
             // stamp companion conductance (matrix was restored to origMatrix)
             this.sim.stampConductance(this.nodes[0], this.nodes[1], 1.0 / this.compResistance);

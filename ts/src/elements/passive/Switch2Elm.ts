@@ -151,7 +151,7 @@ export class Switch2Elm extends SwitchElm {
             this.current = (this.nodes[0].v - this.nodes[this.position + 1].v) / this.resistance;
     }
 
-    setVoltageSource(n: number, v: VoltageSource): void {
+    setVoltageSource(_n: number, v: VoltageSource): void {
         this.voltSource = v;
         v.setNodes(this.nodes[0], this.nodes[this.position + 1]);
     }

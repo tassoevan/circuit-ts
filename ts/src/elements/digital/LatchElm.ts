@@ -282,7 +282,7 @@ export class LatchElm extends ChipElm {
         return false;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
     hasGroundConnection(n1: number): boolean {

@@ -50,7 +50,7 @@ export class OptocouplerElm extends CompositeElm {
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
-    constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
+    constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, _st?: StringTokenizer) {
         if (xb === undefined) {
             super(xa, ya);
             this.loadComposite(null, OptocouplerElm.modelString, OptocouplerElm.modelExternalNodes);

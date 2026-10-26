@@ -123,7 +123,7 @@ export class ScopeTrigger {
         visiblePlots: ScopePlot[],
         plot2d: boolean,
         sim: SimulationManager,
-        scopePointCount: number,
+        _scopePointCount: number,
         rectWidth: number,
     ): void {
         if (this.mode === ScopeTrigger.TRIGGER_FREERUN || visiblePlots.length === 0 || plot2d) return;

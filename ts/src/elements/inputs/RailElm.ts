@@ -119,7 +119,7 @@ export class RailElm extends VoltageElm {
         if (this.waveform != VoltageElm.WF_DC)
             CircuitElm.sim.updateVoltageSource(CircuitNode.ground, vsNode, this.voltSource, this.getVoltage());
     }
-    hasGroundConnection(n1: number): boolean {
+    hasGroundConnection(_n1: number): boolean {
         return true;
     }
     addRoutingObstacle(router: WireRouter): void {

@@ -792,7 +792,7 @@ export class MosfetElm extends CircuitElm {
     getInfo(arr: string[]): void {
         this.getFetInfo(arr, "MOSFET");
     }
-    getScopeText(v: number): string {
+    getScopeText(_v: number): string {
         return Locale.LS((this.pnp === -1 ? "p-" : "n-") + "MOSFET");
     }
     canViewInScope(): boolean {
@@ -805,7 +805,7 @@ export class MosfetElm extends CircuitElm {
         if (this.hasGateCaps()) return true;
         return !(n1 === 0 || n2 === 0);
     }
-    getMatrixConnection(n1: number, n2: number): boolean {
+    getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
     models!: MosfetModel[];

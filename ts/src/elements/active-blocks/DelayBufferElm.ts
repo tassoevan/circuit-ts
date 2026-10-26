@@ -162,7 +162,7 @@ export class DelayBufferElm extends CircuitElm {
 
     // there is no current path through the inverter input, but there
     // is an indirect path through the output to ground.
-    getConnection(n1: number, n2: number): boolean {
+    getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
     hasGroundConnection(n1: number): boolean {

@@ -382,7 +382,7 @@ export class EditSubcircuitModelDialog extends Dialog {
         this.context.restore();
     }
 
-    onMouseUp(event: MouseEvent): void {
+    onMouseUp(_event: MouseEvent): void {
         if (this.rubberBand) {
             const x1 = Math.min(this.rubberBandX1, this.rubberBandX2);
             const x2 = Math.max(this.rubberBandX1, this.rubberBandX2);

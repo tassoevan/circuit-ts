@@ -79,7 +79,7 @@ export class Graphics {
         //  context.closePath();
     }
 
-    fillOval(x: number, y: number, width: number, height: number): void {
+    fillOval(x: number, y: number, width: number, _height: number): void {
         this.context.beginPath();
         this.context.arc(x + width / 2, y + width / 2, width / 2, 0, 2.0 * 3.14159);
         this.context.closePath();

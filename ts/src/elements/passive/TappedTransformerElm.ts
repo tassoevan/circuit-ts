@@ -86,7 +86,7 @@ export class TappedTransformerElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "co", this.couplingCoef);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "c0", this.currents[0]);
         CircuitXMLSerializer.dumpAttr(elem, "c1", this.currents[1]);
         CircuitXMLSerializer.dumpAttr(elem, "c2", this.currents[2]);
@@ -297,7 +297,7 @@ export class TappedTransformerElm extends CircuitElm {
     }
 
     // VCCS stamps couple all nodes, so they must all be in the same matrix
-    getMatrixConnection(n1: number, n2: number): boolean {
+    getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 

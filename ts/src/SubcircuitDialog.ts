@@ -27,7 +27,7 @@ export class SubcircuitDialog extends Dialog {
     private subcircuitListBox: HTMLSelectElement;
     private subcircuits: SubcircuitModel[] = [];
 
-    constructor(sim: CirSim) {
+    constructor(_sim: CirSim) {
         super();
 
         this.dialogEl.style.width = "400px";

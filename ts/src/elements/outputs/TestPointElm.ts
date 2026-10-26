@@ -356,7 +356,7 @@ export class TestPointElm extends CircuitElm {
         }
     }
 
-    getScopeValue(x: number): number {
+    getScopeValue(_x: number): number {
         return this.selectedValue;
     }
 
