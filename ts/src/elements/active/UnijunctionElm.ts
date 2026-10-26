@@ -56,12 +56,12 @@ export class UnijunctionElm extends CompositeElm {
         CircuitElm.sim.adjustTimeStep = true;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.curcountb1 = this.curcountb2 = this.curcounte = 0;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 417;
     }
 
@@ -75,7 +75,7 @@ export class UnijunctionElm extends CompositeElm {
     arrowPoly!: Polygon;
     readonly hs = 16;
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.b1[0], 0);
         this.setVoltageColor(g, this.nodes[1].v);
         CircuitElm.drawThickLine(g, this.b1[0], this.b1[1]);
@@ -105,7 +105,7 @@ export class UnijunctionElm extends CompositeElm {
         this.drawPosts(g);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const flip = this.hasFlag(UnijunctionElm.FLAG_FLIP) ? -1 : 1;
         const hs2 = this.hs * this.dsign * flip;
@@ -129,15 +129,15 @@ export class UnijunctionElm extends CompositeElm {
         this.arrowPoly = this.calcArrow(this.emitter[1], this.emitter[2], 8, 3);
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return n === 0 ? this.emitter[0] : n === 1 ? this.b1[0] : this.b2[0];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "unijunction transistor";
         arr[1] = "Ie = " + CircuitElm.getCurrentText(-this.getCurrentIntoNode(0));
         arr[2] = "Ib2 = " + CircuitElm.getCurrentText(-this.getCurrentIntoNode(2));
@@ -146,17 +146,17 @@ export class UnijunctionElm extends CompositeElm {
         arr[5] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         if (this.dx === 0) this.flags ^= UnijunctionElm.FLAG_FLIP;
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         if (this.dy === 0) this.flags ^= UnijunctionElm.FLAG_FLIP;
         super.flipY(c2, count);
     }
 
-    flipXY(xmy: number, count: number): void {
+    override flipXY(xmy: number, count: number): void {
         this.flags ^= UnijunctionElm.FLAG_FLIP;
         super.flipXY(xmy, count);
     }

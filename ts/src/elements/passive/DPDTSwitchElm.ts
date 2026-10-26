@@ -56,25 +56,25 @@ export class DPDTSwitchElm extends SwitchElm {
         this.allocNodes();
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 429;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "dpdt";
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "po", this.poleCount);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.poleCount = xml.parseIntAttr("po", this.poleCount);
     }
 
-    readonly openhs = 16;
-    readonly posCount = 2;
+    override readonly openhs = 16;
+    override readonly posCount = 2;
     poleLeads!: Point[];
     throwLeads!: Point[];
     polePosts!: Point[];
@@ -94,7 +94,7 @@ export class DPDTSwitchElm extends SwitchElm {
         }
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(32);
         this.ensureArrays();
@@ -124,7 +124,7 @@ export class DPDTSwitchElm extends SwitchElm {
         }
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, 1);
         this.adjustBbox(this.throwPosts[1], this.throwPosts[this.poleCount * 2 - 2]);
 
@@ -179,7 +179,7 @@ export class DPDTSwitchElm extends SwitchElm {
         this.drawPosts(g);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         const t = Math.trunc(n / 3);
         const n3 = n % 3;
         if (n3 === 0) return -this.currents[t];
@@ -187,11 +187,11 @@ export class DPDTSwitchElm extends SwitchElm {
         return 0;
     }
 
-    setCurrent(vs: VoltageSource, c: number): void {
+    override setCurrent(vs: VoltageSource, c: number): void {
         for (let i = 0; i !== this.poleCount; i++) if (vs === this.voltageSources[i]) this.currents[i] = c;
     }
 
-    getSwitchRect(): Rectangle {
+    override getSwitchRect(): Rectangle {
         return new Rectangle(this.poleLeads[0].x, this.poleLeads[0].y, 0, 0)
             .union(new Rectangle(this.throwLeads[1].x, this.throwLeads[1].y, 0, 0))
             .union(
@@ -204,30 +204,30 @@ export class DPDTSwitchElm extends SwitchElm {
             );
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         const t = Math.trunc(n / 3);
         const n3 = n % 3;
         if (n3 === 0) return this.polePosts[t];
         return this.throwPosts[t * 2 + n3 - 1];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3 * this.poleCount;
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         if (this.resistance > 0)
             for (let i = 0; i !== this.poleCount; i++)
                 this.currents[i] = (this.nodes[i * 3].v - this.nodes[i * 3 + 1 + this.position].v) / this.resistance;
     }
 
-    setVoltageSource(j: number, vs: VoltageSource): void {
+    override setVoltageSource(j: number, vs: VoltageSource): void {
         this.ensureArrays();
         this.voltageSources[j] = vs;
         vs.setNodes(this.nodes[j * 3], this.nodes[this.position + 1 + j * 3]);
     }
 
-    stamp(): void {
+    override stamp(): void {
         this.ensureArrays();
         for (let i = 0; i !== this.poleCount; i++) {
             if (this.resistance > 0)
@@ -236,36 +236,36 @@ export class DPDTSwitchElm extends SwitchElm {
         }
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return this.resistance > 0 ? 0 : this.poleCount;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         for (let i = 0; i !== this.poleCount; i++)
             if (this.comparePair(n1, n2, i * 3, i * 3 + 1 + this.position)) return true;
         return false;
     }
 
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return this.resistance === 0;
     }
 
     // optimizing out this element is too complicated to be worth it (see #646)
-    isRemovableWire(): boolean {
+    override isRemovableWire(): boolean {
         return false;
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "switch (DPDT)";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = this.poleCount === 2 ? "switch (DPDT)" : "switch (" + this.poleCount + "PDT)";
         for (let i = 0; i !== this.poleCount; i++)
             arr[i + 1] = "I" + (i + 1) + " = " + CircuitElm.getCurrentDText(this.currents[i]);
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Poles", this.poleCount, 2, 10).setDimensionless();
         if (n === 1) return EditInfo.createCheckbox("IEC Symbol", this.useIECSymbol());
         if (n === 2) return this.getKeyShortcutEditInfo();
@@ -277,7 +277,7 @@ export class DPDTSwitchElm extends SwitchElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 2) {
                 this.poleCount = Math.trunc(ei.value);
@@ -293,7 +293,7 @@ export class DPDTSwitchElm extends SwitchElm {
         if (n === 3) this.resistance = ei.value;
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 
@@ -303,22 +303,22 @@ export class DPDTSwitchElm extends SwitchElm {
         this.position = 1 - this.position;
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         this.flip();
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         this.flip();
         super.flipY(c2, count);
     }
 
-    flipXY(c2: number, count: number): void {
+    override flipXY(c2: number, count: number): void {
         this.flip();
         super.flipXY(c2, count);
     }
 
-    validate(): boolean {
+    override validate(): boolean {
         if (this.resistance > 0) return true;
         for (let i = 0; i !== this.poleCount; i++) {
             const fpi = new FindPathInfo(FindPathInfo.VOLTAGE, this, this.getNode(i * 3), CircuitElm.sim);

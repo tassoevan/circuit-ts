@@ -75,7 +75,7 @@ export class DiodeElm extends CircuitElm {
         }
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
@@ -89,29 +89,29 @@ export class DiodeElm extends CircuitElm {
         this.allocNodes();
     }
 
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return this.hasResistance ? 1 : 0;
     }
 
-    updateModels(): void {
+    override updateModels(): void {
         this.setup();
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "d".charCodeAt(0);
     }
 
-    dumpXmlModel(doc: Document): void {
+    override dumpXmlModel(doc: Document): void {
         if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modelName);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.modelName = xml.parseStringAttr("mo", this.modelName);
         this.setup();
@@ -121,7 +121,7 @@ export class DiodeElm extends CircuitElm {
     poly!: Polygon;
     cathode!: Point[];
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(16);
         this.cathode = this.newPointArray(2);
@@ -131,17 +131,17 @@ export class DiodeElm extends CircuitElm {
         this.poly = this.createPolygon(pa[0], pa[1], this.lead2!);
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         this.addRoutingObstacleWithLeads(router, this.hs);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.drawDiode(g);
         this.doDots(g);
         this.drawPosts(g);
     }
 
-    reset(): void {
+    override reset(): void {
         this.diode.reset();
         this.curcount = 0;
     }
@@ -165,7 +165,7 @@ export class DiodeElm extends CircuitElm {
         CircuitElm.drawThickLine(g, this.cathode[0], this.cathode[1]);
     }
 
-    stamp(): void {
+    override stamp(): void {
         if (this.hasResistance) {
             // create diode from node 0 to internal node
             this.diode.stamp(this.nodes[0], this.nodes[2]);
@@ -176,19 +176,19 @@ export class DiodeElm extends CircuitElm {
             this.diode.stamp(this.nodes[0], this.nodes[1]);
     }
 
-    doStep(): void {
+    override doStep(): void {
         this.diode.doStep(this.nodes[0].v - this.nodes[this.diodeEndNode].v);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.current = this.diode.calculateCurrent(this.nodes[0].v - this.nodes[this.diodeEndNode].v);
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "diode";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         if (this.model.oldStyle) arr[0] = "diode";
         else arr[0] = Locale.LS("diode") + " (" + this.modelName + ")";
         arr[1] = "I = " + CircuitElm.getCurrentText(this.getCurrent());
@@ -199,10 +199,10 @@ export class DiodeElm extends CircuitElm {
 
     models!: DiodeModel[];
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Model", 0, -1, -1);
             this.models = DiodeModel.getModelList(this.isZenerElm());
@@ -239,7 +239,7 @@ export class DiodeElm extends CircuitElm {
         this.setup();
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.model = this.models[ei.choice!.getSelectedIndex()];
             this.modelName = this.model.name;
@@ -276,7 +276,7 @@ export class DiodeElm extends CircuitElm {
         return false;
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "d".charCodeAt(0);
     }
 
@@ -284,7 +284,7 @@ export class DiodeElm extends CircuitElm {
         DiodeElm.lastModelName = n;
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         // stop for huge currents that make simulator act weird
         if (Math.abs(this.current) > 1e12) CircuitElm.sim.stop("max current exceeded", this);
     }

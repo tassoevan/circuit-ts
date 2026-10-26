@@ -56,17 +56,17 @@ export class AnalogMuxElm extends ChipElm {
     hasReset(): boolean {
         return false;
     }
-    getChipName(): string {
+    override getChipName(): string {
         return "Analog Mux";
     }
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 432;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "sb", this.selectBitCount);
         CircuitXMLSerializer.dumpAttr(elem, "ron", this.r_on);
@@ -74,7 +74,7 @@ export class AnalogMuxElm extends ChipElm {
         CircuitXMLSerializer.dumpAttr(elem, "thr", this.threshold);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         // read selectBitCount before super.undumpXml() since ChipElm calls setupPins() there
         this.selectBitCount = xml.parseIntAttr("sb", this.selectBitCount);
         super.undumpXml(xml);
@@ -98,7 +98,7 @@ export class AnalogMuxElm extends ChipElm {
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         if (!this.selectBitCount) return 0; // called from base constructor before fields are initialized
         return this.inputCount + this.selectBitCount + 1;
     }
@@ -110,7 +110,7 @@ export class AnalogMuxElm extends ChipElm {
         return this.hasFlag(AnalogMuxElm.FLAG_PULLDOWN);
     }
 
-    stamp(): void {
+    override stamp(): void {
         for (let i = 0; i !== this.inputCount; i++) CircuitElm.sim.stampNonLinear(this.nodes[i]);
         CircuitElm.sim.stampNonLinear(this.nodes[this.outputPin]);
     }
@@ -119,7 +119,7 @@ export class AnalogMuxElm extends ChipElm {
     // the pulldown flag is set, pull them to ground with r_off instead of
     // connecting them to the output with r_off (better conditioned, and
     // avoids leaving unselected inputs floating).
-    doStep(): void {
+    override doStep(): void {
         let selectedInput = 0;
         for (let i = 0; i !== this.selectBitCount; i++)
             if (this.nodes[this.inputCount + i].v > this.threshold) selectedInput |= 1 << i;
@@ -130,7 +130,7 @@ export class AnalogMuxElm extends ChipElm {
         }
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         let selectedInput = 0;
         for (let i = 0; i !== this.selectBitCount; i++)
             if (this.nodes[this.inputCount + i].v > this.threshold) selectedInput |= 1 << i;
@@ -152,17 +152,17 @@ export class AnalogMuxElm extends ChipElm {
         for (let i = 0; i !== this.selectBitCount; i++) this.pins[this.inputCount + i].current = 0;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         if (n1 >= this.inputCount && n1 < this.outputPin) return false;
         if (n2 >= this.inputCount && n2 < this.outputPin) return false;
         return true;
     }
 
-    hasGroundConnection(n1: number): boolean {
+    override hasGroundConnection(n1: number): boolean {
         return this.needsPulldown() && n1 < this.inputCount;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "analog multiplexer";
         let selectedInput = 0;
         for (let i = 0; i !== this.selectBitCount; i++)
@@ -171,10 +171,10 @@ export class AnalogMuxElm extends ChipElm {
         arr[2] = "Vout = " + CircuitElm.getVoltageText(this.nodes[this.outputPin].v);
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Select Bits", this.selectBitCount, 1, 8).setDimensionless();
         if (n === 1) return new EditInfo("On Resistance (ohms)", this.r_on, 0, 0).setPositive();
         if (n === 2) return new EditInfo("Off Resistance (ohms)", this.r_off, 0, 0).setPositive();
@@ -183,7 +183,7 @@ export class AnalogMuxElm extends ChipElm {
         return super.getChipEditInfo(n);
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 1 && ei.value <= 6) {
                 this.selectBitCount = Math.trunc(ei.value);

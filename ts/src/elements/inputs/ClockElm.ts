@@ -29,10 +29,10 @@ export class ClockElm extends RailElm {
         this.flags |= this.FLAG_CLOCK;
     }
 
-    getDumpClass() {
+    override getDumpClass() {
         return RailElm;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 }

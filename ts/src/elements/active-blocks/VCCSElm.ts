@@ -73,13 +73,13 @@ export class VCCSElm extends ChipElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ic", this.inputCount);
         CircuitXMLSerializer.dumpAttr(elem, "ex", this.exprString);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.inputCount = xml.parseIntAttr("ic", this.inputCount);
         this.exprString = xml.parseStringAttr("ex", this.exprString);
@@ -108,15 +108,15 @@ export class VCCSElm extends ChipElm {
         if (this.engine != null) this.engine.alloc(this.getPinExprInputCount());
     }
 
-    getRefNodeCount(): number {
+    override getRefNodeCount(): number {
         return this.engine ? this.engine.getRefNodeCount() : 0;
     }
 
-    resolveExprRefs(elmList: CircuitElm[]): void {
+    override resolveExprRefs(elmList: CircuitElm[]): void {
         this.engine.resolveRefs(elmList);
     }
 
-    setParentList(elmList: CircuitElm[]): void {
+    override setParentList(elmList: CircuitElm[]): void {
         super.setParentList(elmList);
         // inside a subcircuit our references came in as node numbers, so an i() reference
         // still needs its element found; at the top level this is already done
@@ -129,17 +129,17 @@ export class VCCSElm extends ChipElm {
         return this.inputCount ? this.inputCount : 0;
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "VCCS~";
     }
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
-    isDigitalChip(): boolean {
+    override isDigitalChip(): boolean {
         return false;
     }
 
-    stamp(): void {
+    override stamp(): void {
         const sim = SimulationManager.theSim!;
         sim.stampNonLinear(this.nodes[this.inputCount]);
         sim.stampNonLinear(this.nodes[this.inputCount + 1]);
@@ -164,7 +164,7 @@ export class VCCSElm extends ChipElm {
         return this.nodes[n + this.inputCount];
     }
 
-    doStep(): void {
+    override doStep(): void {
         const sim = SimulationManager.theSim!;
 
         if (this.broken) {
@@ -203,37 +203,37 @@ export class VCCSElm extends ChipElm {
         SimulationManager.theSim!.stampCCCS(this.nodes[this.inputCount], this.nodes[this.inputCount + 1], vs, dx);
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.exprState.updateLastValues(this.pins[this.inputCount].current);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.drawChip(g);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.inputCount + 2;
     }
     getVoltageSourceCount(): number {
         return 0;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 213;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         return this.comparePair(this.inputCount, this.inputCount + 1, n1, n2);
     }
 
-    getMatrixConnection(_n1: number, _n2: number): boolean {
+    override getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 
-    hasGroundConnection(_n1: number): boolean {
+    override hasGroundConnection(_n1: number): boolean {
         return false;
     }
 
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo(EditInfo.makeLink("customfunction.html", "Output Function"), 0, -1, -1);
             ei.text = this.exprString;
@@ -244,7 +244,7 @@ export class VCCSElm extends ChipElm {
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.exprString = ei.textf!.value;
             this.parseExpr(ei);
@@ -275,7 +275,7 @@ export class VCCSElm extends ChipElm {
         }
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         super.getInfo(arr);
         let i = 0;
         while (arr[i] != null) i++;
@@ -288,12 +288,12 @@ export class VCCSElm extends ChipElm {
         this.engine.addUnresolvedInfo(arr, i);
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.engine.reset();
     }
 
-    validate(): boolean {
+    override validate(): boolean {
         const fpi = new FindPathInfo(FindPathInfo.INDUCT, this, this.getOutputNode(0), SimulationManager.theSim);
         if (this.hasCurrentOutput() && !fpi.findPath(this.getOutputNode(1))) this.broken = true;
         else this.broken = false;

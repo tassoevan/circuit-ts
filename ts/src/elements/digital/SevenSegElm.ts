@@ -73,14 +73,14 @@ export class SevenSegElm extends ChipElm {
         this.diodeDirection = 0;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ba", this.baseSegmentCount);
         CircuitXMLSerializer.dumpAttr(elem, "ex", this.extraSegment);
         CircuitXMLSerializer.dumpAttr(elem, "di", this.diodeDirection);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.baseSegmentCount = xml.parseIntAttr("ba", this.baseSegmentCount);
         this.extraSegment = xml.parseIntAttr("ex", this.extraSegment);
@@ -88,10 +88,10 @@ export class SevenSegElm extends ChipElm {
         this.setPinCount();
     }
 
-    allowBus(): boolean {
+    override allowBus(): boolean {
         return this.diodeDirection === 0;
     }
-    getChipName(): string {
+    override getChipName(): string {
         return this.segmentCount + "-segment display";
     }
     darkred!: Color;
@@ -194,7 +194,7 @@ export class SevenSegElm extends ChipElm {
 
     diodes!: Diode[];
 
-    stamp(): void {
+    override stamp(): void {
         super.stamp();
 
         if (this.diodeDirection === 0) return;
@@ -208,7 +208,7 @@ export class SevenSegElm extends ChipElm {
         }
     }
 
-    doStep(): void {
+    override doStep(): void {
         super.doStep();
 
         if (this.diodeDirection === 0) return;
@@ -217,11 +217,11 @@ export class SevenSegElm extends ChipElm {
             this.diodes[i].doStep(this.diodeDirection * (this.nodes[i].v - this.nodes[this.commonPin].v));
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return this.diodeDirection !== 0;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.drawChip(g);
         g.setColor(Color.red);
         let spx = this.cspc * 2;
@@ -269,7 +269,7 @@ export class SevenSegElm extends ChipElm {
         }
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         if (this.diodeDirection === 0 || this.diodes == null) {
             // no current
             for (let i = 0; i !== this.pinCount; i++) this.pins[i].current = 0;
@@ -286,11 +286,11 @@ export class SevenSegElm extends ChipElm {
         }
     }
 
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return this.diodeDirection !== 0;
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         // stop for huge currents that make simulator act weird
         if (this.commonPin > 0 && Math.abs(this.pins[this.commonPin].current) > 1e12)
             CircuitElm.sim.stop("max current exceeded", this);
@@ -313,23 +313,23 @@ export class SevenSegElm extends ChipElm {
         g.setColor(cc);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.pinCount ?? 0;
     }
     getVoltageSourceCount(): number {
         return 0;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 157;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "ssd";
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Segments", 0, -1, -1);
             ei.choice = new Choice();
@@ -360,7 +360,7 @@ export class SevenSegElm extends ChipElm {
         return super.getChipEditInfo(n);
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             const ix = ei.choice!.getSelectedIndex();
             this.baseSegmentCount = ix === 0 ? 7 : ix === 1 ? 14 : 16;
@@ -396,7 +396,7 @@ export class SevenSegElm extends ChipElm {
         this.setPoints();
     }
 
-    isDigitalChip(): boolean {
+    override isDigitalChip(): boolean {
         return false;
     }
 }

@@ -33,7 +33,7 @@ export class HalfAdderElm extends ChipElm {
             super(xxOrXa, yyOrYa, xb, yb!, f!, st!);
         }
     }
-    getChipName(): string {
+    override getChipName(): string {
         return "Half Adder";
     }
 
@@ -49,21 +49,21 @@ export class HalfAdderElm extends ChipElm {
         this.pins[2] = new Pin(this, 0, ChipElm.SIDE_W, "A");
         this.pins[3] = new Pin(this, 1, ChipElm.SIDE_W, "B");
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 4;
     }
     getVoltageSourceCount(): number {
         return 2;
     }
 
-    execute(): void {
+    override execute(): void {
         this.pins[0].value = this.pins[2].value !== this.pins[3].value;
         this.pins[1].value = this.pins[2].value && this.pins[3].value;
     }
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 195;
     }
 }

@@ -214,7 +214,7 @@ export class SliderDialog extends Dialog {
         return this.sim.findAdjustable(this.elm, item) as Adjustable | null;
     }
 
-    apply(): boolean {
+    override apply(): boolean {
         for (let i = 0; i !== this.einfocount; i++) {
             const adj = this.findAdjustable(i);
             if (adj == null) continue;

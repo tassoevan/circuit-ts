@@ -23,10 +23,10 @@ export class DCVoltageElm extends VoltageElm {
     constructor(xx: number, yy: number) {
         super(xx, yy, VoltageElm.WF_DC);
     }
-    getDumpClass() {
+    override getDumpClass() {
         return VoltageElm;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "v".charCodeAt(0);
     }
 }

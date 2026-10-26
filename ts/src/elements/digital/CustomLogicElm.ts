@@ -61,19 +61,19 @@ export class CustomLogicElm extends ChipElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         if (!this.model.dumped) this.model.dumpXml(doc);
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modelName);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.modelName = xml.parseStringAttr("mo", null) ?? this.modelName;
         this.updateModels();
     }
 
-    updateModels(): void {
+    override updateModels(): void {
         this.model = CustomLogicModel.getModelWithNameOrCopy(this.modelName, this.model ?? null);
         this.setupPins();
         this.allocNodes();
@@ -109,7 +109,7 @@ export class CustomLogicElm extends ChipElm {
         this.highImpedance = new Array(this.postCount).fill(false);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.postCount;
     }
 
@@ -122,11 +122,11 @@ export class CustomLogicElm extends ChipElm {
         return this.model == null ? false : this.model.triState;
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return this.hasTriState();
     }
 
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         // for tri-state outputs, we need an internal node to connect a voltage source to, and then connect a resistor from there to the output.
         // we do this for all outputs if any of them are tri-state
         return this.hasTriState() ? this.outputCount : 0;
@@ -134,14 +134,14 @@ export class CustomLogicElm extends ChipElm {
 
     // a tri-state output's voltage source drives an internal node, which connects to the
     // output pin through a resistor, so they have to be in the same matrix
-    getMatrixConnection(n1: number, n2: number): boolean {
+    override getMatrixConnection(n1: number, n2: number): boolean {
         if (this.hasTriState())
             for (let i = this.inputCount; i !== this.postCount; i++)
                 if (this.comparePair(n1, n2, i, i + this.outputCount)) return true;
         return false;
     }
 
-    stamp(): void {
+    override stamp(): void {
         const add = this.hasTriState() ? this.outputCount : 0;
         for (let i = 0; i !== this.getPostCount(); i++) {
             const p = this.pins[i];
@@ -155,7 +155,7 @@ export class CustomLogicElm extends ChipElm {
         }
     }
 
-    doStep(): void {
+    override doStep(): void {
         const add = this.hasTriState() ? this.outputCount : 0;
         for (let i = 0; i !== this.getPostCount(); i++) {
             const p = this.pins[i];
@@ -179,7 +179,7 @@ export class CustomLogicElm extends ChipElm {
         }
     }
 
-    execute(): void {
+    override execute(): void {
         for (let i = 0; i !== this.model.rulesLeft.length; i++) {
             // check for a match
             const rl = this.model.rulesLeft[i];
@@ -237,7 +237,7 @@ export class CustomLogicElm extends ChipElm {
         for (let j = 0; j !== this.postCount; j++) this.lastValues[j] = this.pins[j].value;
     }
 
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Model Name", 0, -1, -1);
             ei.text = this.modelName;
@@ -252,7 +252,7 @@ export class CustomLogicElm extends ChipElm {
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             const newModelName = ei.textf!.value;
             if (this.modelName === newModelName) return;
@@ -272,17 +272,17 @@ export class CustomLogicElm extends ChipElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 208;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "cl";
     }
-    getElmType(): string {
+    override getElmType(): string {
         return "custom logic";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         super.getInfo(arr);
         arr[0] = this.model.infoText;
     }

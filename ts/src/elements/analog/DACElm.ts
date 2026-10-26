@@ -34,13 +34,13 @@ export class DACElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "DAC";
     }
-    needsBits(): boolean {
+    override needsBits(): boolean {
         return true;
     }
-    allowBus(): boolean {
+    override allowBus(): boolean {
         return true;
     }
 
@@ -57,7 +57,7 @@ export class DACElm extends ChipElm {
         this.allocNodes();
     }
 
-    doStep(): void {
+    override doStep(): void {
         let ival = 0;
         for (let i = 0; i !== this.bits; i++) if (this.nodes[i].v > this.getThreshold()) ival |= 1 << i;
         const ivalmax = (1 << this.bits) - 1;
@@ -73,27 +73,27 @@ export class DACElm extends ChipElm {
     getVoltageSourceCount(): number {
         return 1;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.bits + 2;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 166;
     }
 
     // there's already a V+ pin, how does that relate to high logic voltage?  figure out later
-    isDigitalChip(): boolean {
+    override isDigitalChip(): boolean {
         return false;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 2) {
                 this.bits = Math.trunc(ei.value);

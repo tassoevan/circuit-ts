@@ -31,19 +31,19 @@ export class OhmMeterElm extends CurrentElm {
         super(xa, ya, xb, yb, f, st);
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 216;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(26);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const cr = 12;
         this.draw2Leads(g);
         this.setVoltageColor(g, (this.nodes[0].v + this.nodes[1].v) / 2);
@@ -61,19 +61,19 @@ export class OhmMeterElm extends CurrentElm {
         this.drawPosts(g);
     }
 
-    getScopeValue(x: number): number {
+    override getScopeValue(x: number): number {
         return x === VAL_R ? this.getVoltageDiff() / this.current : super.getScopeValue(x);
     }
 
-    getScopeUnits(x: number): number {
+    override getScopeUnits(x: number): number {
         return x === VAL_R ? UNITS_OHMS : super.getScopeUnits(x);
     }
 
-    canShowValueInScope(x: number): boolean {
+    override canShowValueInScope(x: number): boolean {
         return x === VAL_R;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "ohmmeter";
         if (this.current === 0) arr[1] = "R = ∞";
         else arr[1] = "R = " + CircuitElm.getUnitText(this.getVoltageDiff() / this.current, Locale.ohmString);

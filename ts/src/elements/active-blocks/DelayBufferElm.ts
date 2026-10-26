@@ -59,28 +59,28 @@ export class DelayBufferElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "dl", this.delay);
         CircuitXMLSerializer.dumpAttr(elem, "th", this.threshold);
         CircuitXMLSerializer.dumpAttr(elem, "hv", this.highVoltage);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.delay = xml.parseDoubleAttr("dl", this.delay);
         this.threshold = xml.parseDoubleAttr("th", this.threshold);
         this.highVoltage = xml.parseDoubleAttr("hv", this.highVoltage);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 422;
     }
-    setHighVoltage(hv: number): void {
+    override setHighVoltage(hv: number): void {
         this.highVoltage = hv;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.drawPosts(g);
         this.draw2Leads(g);
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.lightGrayColor);
@@ -90,7 +90,7 @@ export class DelayBufferElm extends CircuitElm {
         this.drawDots(g, this.lead2!, this.point2, this.curcount);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const hs = 16;
         let ww = 16 - 2;
@@ -114,15 +114,15 @@ export class DelayBufferElm extends CircuitElm {
         this.setBbox(this.point1, this.point2, hs);
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[1], this.voltSource);
     }
 
-    doStep(): void {
+    override doStep(): void {
         let inState = this.nodes[0].v > this.threshold;
         let outState = this.nodes[1].v > this.threshold;
         if (inState !== outState) {
@@ -136,25 +136,25 @@ export class DelayBufferElm extends CircuitElm {
         );
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = Locale.LS("buffer");
         arr[1] = Locale.LS("delay = ") + CircuitElm.getUnitText(this.delay, "s");
         arr[2] = "Vi = " + CircuitElm.getVoltageText(this.nodes[0].v);
         arr[3] = "Vo = " + CircuitElm.getVoltageText(this.nodes[1].v);
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Delay (s)", this.delay, 0, 0);
         if (n === 1) return new EditInfo("Threshold (V)", this.threshold, 0, 0);
         if (n === 2) return new EditInfo("High Logic Voltage", this.highVoltage, 0, 0).setUnitStep();
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.delay = ei.value;
         if (n === 1) this.threshold = ei.value;
         if (n === 2) this.highVoltage = ei.value;
@@ -162,14 +162,14 @@ export class DelayBufferElm extends CircuitElm {
 
     // there is no current path through the inverter input, but there
     // is an indirect path through the output to ground.
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
-    hasGroundConnection(n1: number): boolean {
+    override hasGroundConnection(n1: number): boolean {
         return n1 === 1;
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 1) return this.current;
         return 0;
     }

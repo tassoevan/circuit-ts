@@ -60,11 +60,11 @@ export class FMElm extends CircuitElm {
         this.reset();
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 201;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "cf", this.carrierfreq);
         CircuitXMLSerializer.dumpAttr(elem, "sf", this.signalfreq);
@@ -72,7 +72,7 @@ export class FMElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "dv", this.deviation);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.carrierfreq = xml.parseDoubleAttr("cf", this.carrierfreq);
         this.signalfreq = xml.parseDoubleAttr("sf", this.signalfreq);
@@ -81,20 +81,20 @@ export class FMElm extends CircuitElm {
         this.reset();
     }
 
-    reset(): void {
+    override reset(): void {
         this.freqTimeZero = 0;
         this.curcount = 0;
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1;
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource!);
     }
 
-    doStep(): void {
+    override doStep(): void {
         CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource!, this.getVoltage());
     }
 
@@ -108,7 +108,7 @@ export class FMElm extends CircuitElm {
 
     readonly circleSize = 17;
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.circleSize);
         this.setVoltageColor(g, this.nodes[0].v);
         CircuitElm.drawThickLine(g, this.point1, this.lead1!);
@@ -134,28 +134,28 @@ export class FMElm extends CircuitElm {
         );
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = this.interpPoint(this.point1, this.point2, 1 - this.circleSize / this.dn);
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
-    validate(): boolean {
+    override validate(): boolean {
         return this.validateRailNode(0);
     }
-    hasGroundConnection(_n1: number): boolean {
+    override hasGroundConnection(_n1: number): boolean {
         return true;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
-    getPower(): number {
+    override getPower(): number {
         return -this.getVoltageDiff() * this.current;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "FM Source";
         arr[1] = "I = " + CircuitElm.getCurrentText(this.getCurrent());
         arr[2] = "V = " + CircuitElm.getVoltageText(this.getVoltageDiff());
@@ -165,7 +165,7 @@ export class FMElm extends CircuitElm {
         arr[6] = "Vmax = " + CircuitElm.getVoltageText(this.maxVoltage);
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Max Voltage", this.maxVoltage, -20, 20).setUnitStep();
         if (n === 1) return new EditInfo("Carrier Frequency (Hz)", this.carrierfreq, 4, 500);
         if (n === 2) return new EditInfo("Signal Frequency (Hz)", this.signalfreq, 4, 500);
@@ -173,7 +173,7 @@ export class FMElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.maxVoltage = ei.value;
         if (n === 1) this.carrierfreq = ei.value;
         if (n === 2) this.signalfreq = ei.value;

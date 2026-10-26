@@ -105,14 +105,14 @@ export class ProbeElm extends CircuitElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "p".charCodeAt(0);
     }
-    isProbeElm(): boolean {
+    override isProbeElm(): boolean {
         return true;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "me", this.meter);
         CircuitXMLSerializer.dumpAttr(elem, "sc", this.scale);
@@ -120,7 +120,7 @@ export class ProbeElm extends CircuitElm {
         if (this.label.length > 0) CircuitXMLSerializer.dumpAttr(elem, "lb", this.label);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         this.flags = 0;
         super.undumpXml(xml);
         this.meter = xml.parseIntAttr("me", this.meter);
@@ -129,12 +129,12 @@ export class ProbeElm extends CircuitElm {
         this.label = xml.parseStringAttr("lb", "") ?? "";
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.center = this.interpPoint(this.point1, this.point2, 0.5) as Point;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.zerocount = 0;
         this.rmsV = this.total = this.count = 0;
@@ -186,7 +186,7 @@ export class ProbeElm extends CircuitElm {
         return (this.flags & ProbeElm.FLAG_CIRCLE) !== 0;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.save();
         const role = CircuitElm.app.mouse.scopePlotRoles.get(this);
         const showCircle = this.drawAsCircle() && (role == null || role === "");
@@ -266,7 +266,7 @@ export class ProbeElm extends CircuitElm {
         g.restore();
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         if (CircuitElm.sim.timeStepCount === this.lastStepCount) return;
         this.lastStepCount = CircuitElm.sim.timeStepCount;
         this.count++;
@@ -347,15 +347,15 @@ export class ProbeElm extends CircuitElm {
         }
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.current = this.resistance === 0 ? 0 : (this.nodes[0].v - this.nodes[1].v) / this.resistance;
     }
 
-    stamp(): void {
+    override stamp(): void {
         if (this.resistance !== 0) CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.resistance);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "voltmeter";
         let i = 1;
         arr[i++] = this.getMeterLine(this.meter);
@@ -401,14 +401,14 @@ export class ProbeElm extends CircuitElm {
         return "";
     }
 
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return this.resistance !== 0;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return EditInfo.createCheckbox("Show Value", this.mustShowVoltage());
         if (n === 1) {
             const ei = new EditInfo("Value", this.selectedValue, -1, -1);
@@ -463,7 +463,7 @@ export class ProbeElm extends CircuitElm {
         return 0;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.checkbox!.getState()) this.flags |= ProbeElm.FLAG_SHOWVOLTAGE;
             else this.flags &= ~ProbeElm.FLAG_SHOWVOLTAGE;
@@ -475,7 +475,7 @@ export class ProbeElm extends CircuitElm {
         if (n === 5) this.label = ei.textf ? ei.textf.value : (ei.text ?? "");
     }
 
-    getExprRefName(): string | null {
+    override getExprRefName(): string | null {
         return this.label.length > 0 ? this.label : null;
     }
 }

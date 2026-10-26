@@ -70,22 +70,22 @@ export abstract class ControlledSourceElm extends CircuitElm {
     // the label shown in the edit dialog and in getInfo()
     protected abstract getExprLabel(): string;
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 2;
     }
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    getRefNodeCount(): number {
+    override getRefNodeCount(): number {
         return this.engine ? this.engine.getRefNodeCount() : 0;
     }
 
-    resolveExprRefs(elmList: CircuitElm[]): void {
+    override resolveExprRefs(elmList: CircuitElm[]): void {
         this.engine.resolveRefs(elmList);
     }
 
-    setParentList(elmList: CircuitElm[]): void {
+    override setParentList(elmList: CircuitElm[]): void {
         super.setParentList(elmList);
         // inside a subcircuit our references came in as node numbers, so an i() reference
         // still needs its element found; at the top level this is already done
@@ -109,19 +109,19 @@ export abstract class ControlledSourceElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ex", this.engine.exprString);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.engine.exprString = xml.parseStringAttr("ex", this.engine.exprString) ?? this.engine.exprString;
         this.parseExpr();
     }
 
     // the diamond's long diagonal runs along the element; the leads meet its two tips
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const d = ControlledSourceElm.diamondSize;
         this.calcLeads(d * 2);
@@ -149,16 +149,16 @@ export abstract class ControlledSourceElm extends CircuitElm {
     // rolled over once per timestep
     protected abstract getOutputValue(): number;
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.engine.stepFinished(this.getOutputValue());
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.engine.reset();
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo(EditInfo.makeLink("customfunction.html", this.getExprLabel()), 0, -1, -1);
             ei.text = this.engine.exprString;
@@ -168,14 +168,14 @@ export abstract class ControlledSourceElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.engine.exprString = ei.textf!.value;
             this.parseExpr(ei);
         }
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = this.getElmType();
         arr[1] = this.getExprLabel() + " = " + this.engine.exprString;
         arr[2] = "V = " + CircuitElm.getVoltageText(this.getVoltageDiff());
@@ -183,10 +183,10 @@ export abstract class ControlledSourceElm extends CircuitElm {
         this.engine.addUnresolvedInfo(arr, 4);
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[1].v - this.nodes[0].v;
     }
-    getPower(): number {
+    override getPower(): number {
         return -this.getVoltageDiff() * this.current;
     }
 

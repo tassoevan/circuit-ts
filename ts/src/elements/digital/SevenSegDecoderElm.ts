@@ -112,12 +112,12 @@ export class SevenSegDecoderElm extends ChipElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "sgt", this.segmentType);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.segmentType = xml.parseIntAttr("sgt", this.segmentType);
         this.setupPins();
@@ -129,14 +129,14 @@ export class SevenSegDecoderElm extends ChipElm {
         return 7;
     }
 
-    needsBits(): boolean {
+    override needsBits(): boolean {
         return false;
     }
-    allowBus(): boolean {
+    override allowBus(): boolean {
         return true;
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         if (this.getSegmentCount() === 7) return "7-Segment Decoder";
         if (this.getSegmentCount() === 14) return "14-Segment Decoder";
         return "16-Segment Decoder";
@@ -190,7 +190,7 @@ export class SevenSegDecoderElm extends ChipElm {
         return sym[digit][seg];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         const segCount = this.getSegmentCount();
         return segCount + 4 + (this.hasBlank() ? 1 : 0);
     }
@@ -199,7 +199,7 @@ export class SevenSegDecoderElm extends ChipElm {
         return this.getSegmentCount();
     }
 
-    execute(): void {
+    override execute(): void {
         const segCount = this.getSegmentCount();
         let input = 0;
         if (this.pins[segCount + 0].value) input += 8;
@@ -221,10 +221,10 @@ export class SevenSegDecoderElm extends ChipElm {
         }
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Segments", 0, -1, -1);
             ei.choice = new Choice();
@@ -252,7 +252,7 @@ export class SevenSegDecoderElm extends ChipElm {
         return super.getChipEditInfo(n);
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.segmentType = ei.choice!.getSelectedIndex();
             this.setupPins();
@@ -270,7 +270,7 @@ export class SevenSegDecoderElm extends ChipElm {
         super.setChipEditValue(n, ei);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 197;
     }
 }

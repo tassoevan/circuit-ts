@@ -41,26 +41,26 @@ export class PolarCapacitorElm extends CapacitorElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 209;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "pc";
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "mv", this.maxNegativeVoltage);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.maxNegativeVoltage = xml.parseDoubleAttr("mv", this.maxNegativeVoltage);
     }
 
     plusPoint!: Point;
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const f = (this.dn / 2 - 4) / this.dn;
         this.platePoints = this.newPointArray(14);
@@ -80,7 +80,7 @@ export class PolarCapacitorElm extends CapacitorElm {
         if (this.y > this.y2) this.plusPoint.y += 3;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         super.draw(g);
         g.setColor(CircuitElm.whiteColor);
         g.setFont(CircuitElm.unitsFont);
@@ -88,17 +88,17 @@ export class PolarCapacitorElm extends CapacitorElm {
         g.drawString("+", this.plusPoint.x - Math.floor(w / 2), this.plusPoint.y);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         super.getInfo(arr);
         arr[0] = "capacitor (polarized)";
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 4) return new EditInfo("Max Reverse Voltage", this.maxNegativeVoltage, 0, 0);
         return super.getEditInfo(n);
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 4) {
             if (ei.value >= 0) this.maxNegativeVoltage = ei.value;
             else ei.setError("must be >= 0");
@@ -106,13 +106,13 @@ export class PolarCapacitorElm extends CapacitorElm {
         super.setEditValue(n, ei);
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         if (this.getVoltageDiff() < 0 && this.getVoltageDiff() < -this.maxNegativeVoltage)
             CircuitElm.sim.stop("capacitor exceeded max reverse voltage", this);
         super.stepFinished();
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "C".charCodeAt(0);
     }
 }

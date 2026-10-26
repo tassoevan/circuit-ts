@@ -87,32 +87,32 @@ export class TriacElm extends CircuitElm {
         this.diode30.setupForDefaultModel();
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    reset(): void {
+    override reset(): void {
         this.diode03.reset();
         this.diode30.reset();
         this.curcount_1 = this.curcount_2 = this.curcount_g = 0;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 206;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ti", this.triggerI);
         CircuitXMLSerializer.dumpAttr(elem, "hi", this.holdingI);
         CircuitXMLSerializer.dumpAttr(elem, "cr", this.cresistance);
     }
 
-    dumpXmlState(_doc: Document, elem: Element): void {
+    override dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "st", this.state);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.triggerI = xml.parseDoubleAttr("ti", this.triggerI);
         this.holdingI = xml.parseDoubleAttr("hi", this.holdingI);
@@ -127,7 +127,7 @@ export class TriacElm extends CircuitElm {
     plate2!: Point[];
     gate!: Point[];
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         let dir = 0;
         if (CircuitElm.abs(this.dx) > CircuitElm.abs(this.dy)) {
@@ -175,7 +175,7 @@ export class TriacElm extends CircuitElm {
         );
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const v1 = this.nodes[0].v;
         const v2 = this.nodes[1].v;
         this.setBbox(this.point1, this.point2, 6);
@@ -227,24 +227,24 @@ export class TriacElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return n === 0 ? this.point1 : n === 1 ? this.point2 : this.gate[1];
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0) return -this.i2;
         if (n === 1) return -this.i1;
         return -this.ig;
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3;
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return 1;
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[this.mt1node]);
         CircuitElm.sim.stampNonLinear(this.nodes[this.mt2node]);
         CircuitElm.sim.stampNonLinear(this.nodes[this.gnode]);
@@ -254,19 +254,19 @@ export class TriacElm extends CircuitElm {
         this.diode30.stamp(this.nodes[this.mtinode], this.nodes[this.mt2node]);
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         if (Math.abs(this.i2) < this.holdingI) this.state = false;
         if (Math.abs(this.ig) > this.triggerI) this.state = true;
         this.aresistance = this.state ? 0.01 : 10e5;
     }
 
-    doStep(): void {
+    override doStep(): void {
         this.diode03.doStep(this.nodes[this.mt2node].v - this.nodes[this.mtinode].v);
         this.diode30.doStep(this.nodes[this.mtinode].v - this.nodes[this.mt2node].v);
         CircuitElm.sim.stampResistor(this.nodes[this.mtinode], this.nodes[this.mt1node], this.aresistance);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "TRIAC";
         arr[1] = this.state ? "on" : "off";
         arr[2] = "Vmt2mt1 = " + CircuitElm.getVoltageText(this.nodes[this.mt2node].v - this.nodes[this.mt1node].v);
@@ -276,43 +276,43 @@ export class TriacElm extends CircuitElm {
         arr[6] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         if (this.aresistance === 0) this.i2 = 0;
         else this.i2 = (this.nodes[this.mtinode].v - this.nodes[this.mt1node].v) / this.aresistance;
         this.ig = -(this.nodes[this.mt1node].v - this.nodes[this.gnode].v) / this.cresistance;
         this.i1 = -this.i2 - this.ig;
     }
 
-    getPower(): number {
+    override getPower(): number {
         return (
             (this.nodes[this.mt2node].v - this.nodes[this.mt1node].v) * this.i2 +
             (this.nodes[this.gnode].v - this.nodes[this.mt1node].v) * this.ig
         );
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Trigger Current (A)", this.triggerI, 0, 0).setPositive();
         if (n === 1) return new EditInfo("Holding Current (A)", this.holdingI, 0, 0).setPositive();
         if (n === 2) return new EditInfo("Gate-MT1 Resistance (ohms)", this.cresistance, 0, 0).setPositive();
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.triggerI = ei.value;
         if (n === 1) this.holdingI = ei.value;
         if (n === 2) this.cresistance = ei.value;
     }
 
-    canViewInScope(): boolean {
+    override canViewInScope(): boolean {
         return true;
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[this.mt2node].v - this.nodes[this.mt1node].v;
     }
-    getCurrent(): number {
+    override getCurrent(): number {
         return this.i2;
     }
 }

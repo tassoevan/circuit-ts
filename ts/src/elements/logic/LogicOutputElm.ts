@@ -52,23 +52,23 @@ export class LogicOutputElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         if (this.threshold !== 2.5) CircuitXMLSerializer.dumpAttr(elem, "th", this.threshold);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.threshold = xml.parseDoubleAttr("th", this.threshold);
     }
 
-    isLogicOutputElm(): boolean {
+    override isLogicOutputElm(): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return "M".charCodeAt(0);
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1;
     }
     isTernary(): boolean {
@@ -80,16 +80,16 @@ export class LogicOutputElm extends CircuitElm {
     needsPullDown(): boolean {
         return (this.flags & LogicOutputElm.FLAG_PULLDOWN) !== 0;
     }
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = this.interpPoint(this.point1, this.point2, 1 - 12 / this.dn);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.save();
         const f = new Font("SansSerif", Font.BOLD, 20);
         g.setFont(f);
@@ -115,22 +115,22 @@ export class LogicOutputElm extends CircuitElm {
         g.restore();
     }
 
-    stamp(): void {
+    override stamp(): void {
         if (this.needsPullDown()) CircuitElm.sim.stampResistor(this.nodes[0], CircuitNode.ground, 1e6);
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "logic output";
         arr[1] = this.nodes[0].v < this.threshold ? "low" : "high";
         if (this.isNumeric()) arr[1] = this.value;
         arr[2] = "V = " + CircuitElm.getVoltageText(this.nodes[0].v);
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Threshold", this.threshold, 10, -10);
         if (n === 1) {
             const ei = new EditInfo("", 0, -1, -1);
@@ -150,7 +150,7 @@ export class LogicOutputElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.threshold = ei.value;
         if (n === 1) {
             if (ei.checkbox!.getState()) this.flags |= LogicOutputElm.FLAG_PULLDOWN;
@@ -166,12 +166,12 @@ export class LogicOutputElm extends CircuitElm {
         }
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         router.addWire(this.point1.x, this.point1.y, this.lead1!.x, this.lead1!.y);
         router.addObstacle(this.x2 - 10, this.y2 - 10, this.x2 + 10, this.y2 + 10);
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "o".charCodeAt(0);
     }
 }

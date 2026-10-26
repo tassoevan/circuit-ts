@@ -42,20 +42,20 @@ export class BoxElm extends GraphicElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "b".charCodeAt(0);
     }
 
-    drag(xx: number, yy: number): void {
+    override drag(xx: number, yy: number): void {
         this.x2 = xx;
         this.y2 = yy;
     }
 
-    creationFailed(): boolean {
+    override creationFailed(): boolean {
         return Math.abs(this.x2 - this.x) < 32 || Math.abs(this.y2 - this.y) < 32;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         //g.setColor(needsHighlight() ? selectColor : lightGrayColor);
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : Color.GRAY);
         this.setBbox(this.x, this.y, this.x2, this.y2);
@@ -67,22 +67,22 @@ export class BoxElm extends GraphicElm {
         g.setLineDash(0, 0);
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(_n: number): EditInfo | null {
+    override getEditInfo(_n: number): EditInfo | null {
         return null;
     }
 
-    setEditValue(_n: number, _ei: EditInfo): void {}
+    override setEditValue(_n: number, _ei: EditInfo): void {}
 
-    getInfo(_arr: string[]): void {}
+    override getInfo(_arr: string[]): void {}
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 
-    getMouseDistance(gx: number, gy: number): number {
+    override getMouseDistance(gx: number, gy: number): number {
         const thresh = 10;
         const dx1 = Math.abs(gx - this.x);
         const dy1 = Math.abs(gy - this.y);
@@ -95,7 +95,7 @@ export class BoxElm extends GraphicElm {
         return -1;
     }
 
-    selectRect(r: Rectangle, add: boolean): void {
+    override selectRect(r: Rectangle, add: boolean): void {
         if (r.contains(this.boundingBox)) this.selected = true;
         else if (!add) this.selected = false;
     }

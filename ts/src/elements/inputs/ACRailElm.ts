@@ -25,10 +25,10 @@ export class ACRailElm extends RailElm {
         super(xx, yy, VoltageElm.WF_AC);
         this.maxVoltage = 120 * Math.sqrt(2);
     }
-    getDumpClass(): Function {
+    override getDumpClass(): Function {
         return RailElm;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 }

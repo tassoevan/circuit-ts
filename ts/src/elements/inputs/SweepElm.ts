@@ -59,18 +59,18 @@ export class SweepElm extends CircuitElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 170;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "sw";
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1;
     }
     readonly circleSize = 17;
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "mi", this.minF);
         CircuitXMLSerializer.dumpAttr(elem, "ma", this.maxF);
@@ -78,7 +78,7 @@ export class SweepElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "sw", this.sweepTime);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.minF = xml.parseDoubleAttr("mi", this.minF);
         this.maxF = xml.parseDoubleAttr("ma", this.maxF);
@@ -87,12 +87,12 @@ export class SweepElm extends CircuitElm {
         this.reset();
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = this.interpPoint(this.point1, this.point2, 1 - this.circleSize / this.dn);
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         router.addWire(this.point1.x, this.point1.y, this.lead1!.x, this.lead1!.y);
         router.addObstacle(
             this.point2.x - this.circleSize,
@@ -102,7 +102,7 @@ export class SweepElm extends CircuitElm {
         );
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.circleSize);
         this.setVoltageColor(g, this.nodes[0].v);
         CircuitElm.drawThickLine(g, this.point1, this.lead1!);
@@ -140,11 +140,11 @@ export class SweepElm extends CircuitElm {
         if (!this.isCreating()) this.drawDots(g, this.point1, this.lead1!, this.curcount);
     }
 
-    validate(): boolean {
+    override validate(): boolean {
         return this.validateRailNode(0);
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource);
     }
 
@@ -171,14 +171,14 @@ export class SweepElm extends CircuitElm {
         this.savedTimeStep = CircuitElm.sim.timeStep;
     }
 
-    reset(): void {
+    override reset(): void {
         this.frequency = this.minF;
         this.freqTime = 0;
         this.dir = 1;
         this.setParams();
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         // has timestep been changed?
         if (CircuitElm.sim.timeStep !== this.savedTimeStep) this.setParams();
         this.v = Math.sin(this.freqTime) * this.maxV;
@@ -198,27 +198,27 @@ export class SweepElm extends CircuitElm {
         }
     }
 
-    doStep(): void {
+    override doStep(): void {
         CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource, this.v);
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
-    hasGroundConnection(_n1: number): boolean {
+    override hasGroundConnection(_n1: number): boolean {
         return true;
     }
-    isSweepElm(): boolean {
+    override isSweepElm(): boolean {
         return true;
     }
-    getElmType(): string {
+    override getElmType(): string {
         return "sweep";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "sweep " + ((this.flags & SweepElm.FLAG_LOG) === 0 ? "(linear)" : "(log)");
         arr[1] = "I = " + CircuitElm.getCurrentDText(this.getCurrent());
         arr[2] = "V = " + CircuitElm.getVoltageText(this.nodes[0].v);
@@ -228,7 +228,7 @@ export class SweepElm extends CircuitElm {
         arr[5] = "time = " + CircuitElm.getUnitText(this.sweepTime, "s");
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Min Frequency (Hz)", this.minF, 0, 0);
         if (n === 1) return new EditInfo("Max Frequency (Hz)", this.maxF, 0, 0);
         if (n === 2) return new EditInfo("Sweep Time (s)", this.sweepTime, 0, 0);
@@ -246,7 +246,7 @@ export class SweepElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         const maxfreq = 1 / (8 * CircuitElm.sim.timeStep);
         if (n === 0) {
             this.minF = ei.value;
@@ -269,7 +269,7 @@ export class SweepElm extends CircuitElm {
         this.setParams();
     }
 
-    getPower(): number {
+    override getPower(): number {
         return -this.getVoltageDiff() * this.current;
     }
 }

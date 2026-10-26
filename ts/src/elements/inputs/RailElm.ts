@@ -37,23 +37,23 @@ export class RailElm extends VoltageElm {
         }
     }
 
-    isRailElm(): boolean {
+    override isRailElm(): boolean {
         return true;
     }
     // unlike other VoltageElm subclasses, RailElm can be placed either horizontally or
     // vertically via toolbar drag-and-drop, so this undoes VoltageElm's forced-vertical override
-    getDragVertical(requestedVertical: boolean): boolean {
+    override getDragVertical(requestedVertical: boolean): boolean {
         return requestedVertical;
     }
     readonly FLAG_CLOCK = 1;
-    getDumpType(): number {
+    override getDumpType(): number {
         return "R".charCodeAt(0);
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = this.interpPoint(this.point1, this.point2, 1 - this.circleSize / this.dn);
     }
@@ -62,7 +62,7 @@ export class RailElm extends VoltageElm {
         return null;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const rt = this.getRailText();
         let w = rt == null ? this.circleSize : g.context.measureText(rt).width / 2;
         if (w > this.dn * 0.8) w = this.dn * 0.8;
@@ -98,15 +98,15 @@ export class RailElm extends VoltageElm {
         this.drawLabeledNode(g, s, this.point1, this.lead1!);
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
-    setVoltageSource(n: number, v: any): void {
+    override setVoltageSource(n: number, v: any): void {
         super.setVoltageSource(n, v);
         if (this.internalResistance > 0) v.setNodes(CircuitNode.ground, this.nodes[1]);
         else v.setNodes(CircuitNode.ground, this.nodes[0]);
     }
-    stamp(): void {
+    override stamp(): void {
         const vsNode = this.internalResistance > 0 ? this.nodes[1] : this.nodes[0];
         if (this.waveform == VoltageElm.WF_DC)
             CircuitElm.sim.stampVoltageSource(CircuitNode.ground, vsNode, this.voltSource, this.getVoltage());
@@ -114,15 +114,15 @@ export class RailElm extends VoltageElm {
         if (this.internalResistance > 0)
             CircuitElm.sim.stampResistor(this.nodes[1], this.nodes[0], this.internalResistance);
     }
-    doStep(): void {
+    override doStep(): void {
         const vsNode = this.internalResistance > 0 ? this.nodes[1] : this.nodes[0];
         if (this.waveform != VoltageElm.WF_DC)
             CircuitElm.sim.updateVoltageSource(CircuitNode.ground, vsNode, this.voltSource, this.getVoltage());
     }
-    hasGroundConnection(_n1: number): boolean {
+    override hasGroundConnection(_n1: number): boolean {
         return true;
     }
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         router.addWire(this.point1.x, this.point1.y, this.point2.x, this.point2.y);
         router.addObstacle(
             this.point2.x - this.circleSize,
@@ -132,10 +132,10 @@ export class RailElm extends VoltageElm {
         );
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "V".charCodeAt(0);
     }
-    validateRailNode(n: number): boolean {
+    override validateRailNode(n: number): boolean {
         const fpi = new FindPathInfo(FindPathInfo.VOLTAGE, this, this.getNode(n), CircuitElm.sim);
         if (fpi.findPath(CircuitNode.ground)) {
             //CircuitElm.sim.stop("Path to ground with no resistance!", this);
@@ -144,7 +144,7 @@ export class RailElm extends VoltageElm {
         }
         return true;
     }
-    validate(): boolean {
+    override validate(): boolean {
         return this.internalResistance > 0 || this.validateRailNode(0);
     }
 

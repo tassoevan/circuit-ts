@@ -72,27 +72,27 @@ export class TappedTransformerElm extends CircuitElm {
         this.noDiagonal = true;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 169;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "tt";
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "in", this.inductance);
         CircuitXMLSerializer.dumpAttr(elem, "ra", this.ratio);
         CircuitXMLSerializer.dumpAttr(elem, "co", this.couplingCoef);
     }
 
-    dumpXmlState(_doc: Document, elem: Element): void {
+    override dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "c0", this.currents[0]);
         CircuitXMLSerializer.dumpAttr(elem, "c1", this.currents[1]);
         CircuitXMLSerializer.dumpAttr(elem, "c2", this.currents[2]);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.inductance = xml.parseDoubleAttr("in", this.inductance);
         this.ratio = xml.parseDoubleAttr("ra", this.ratio);
@@ -102,7 +102,7 @@ export class TappedTransformerElm extends CircuitElm {
         this.currents[2] = xml.parseDoubleAttr("c2", 0);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         for (let i = 0; i !== 5; i++) {
             this.setVoltageColor(g, this.nodes[i].v);
             CircuitElm.drawThickLine(g, this.ptEnds[i], this.ptCoil[i]);
@@ -141,7 +141,7 @@ export class TappedTransformerElm extends CircuitElm {
         this.setBbox(this.ptEnds[0], this.ptEnds[4], 0);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.flip = this.hasFlag(TappedTransformerElm.FLAG_FLIP) ? -1 : 1;
         const hs = 32 * this.flip;
@@ -167,15 +167,15 @@ export class TappedTransformerElm extends CircuitElm {
         }
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return this.ptEnds[n];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 5;
     }
 
-    reset(): void {
+    override reset(): void {
         this.currents[0] = this.currents[1] = this.currents[2] = this.currents[3] = 0;
         this.nodes[0].v = this.nodes[1].v = this.nodes[2].v = this.nodes[3].v = this.nodes[4].v = 0;
         this.curcounts[0] = this.curcounts[1] = this.curcounts[2] = 0;
@@ -185,7 +185,7 @@ export class TappedTransformerElm extends CircuitElm {
         this.curSourceValue[0] = this.curSourceValue[1] = this.curSourceValue[2] = 0;
     }
 
-    stamp(): void {
+    override stamp(): void {
         // equations for transformer:
         //   v1 = L1 di1/dt + M1 di2/dt + M1 di3/dt
         //   v2 = M1 di1/dt + L2 di2/dt + M2 di3/dt
@@ -243,7 +243,7 @@ export class TappedTransformerElm extends CircuitElm {
         return (this.flags & Inductor.FLAG_BACK_EULER) === 0;
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         this.voltdiff[0] = this.nodes[0].v - this.nodes[1].v;
         this.voltdiff[1] = this.nodes[2].v - this.nodes[3].v;
         this.voltdiff[2] = this.nodes[3].v - this.nodes[4].v;
@@ -254,13 +254,13 @@ export class TappedTransformerElm extends CircuitElm {
         }
     }
 
-    doStep(): void {
+    override doStep(): void {
         CircuitElm.sim.stampCurrentSource(this.nodes[0], this.nodes[1], this.curSourceValue[0]);
         CircuitElm.sim.stampCurrentSource(this.nodes[2], this.nodes[3], this.curSourceValue[1]);
         CircuitElm.sim.stampCurrentSource(this.nodes[3], this.nodes[4], this.curSourceValue[2]);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.voltdiff[0] = this.nodes[0].v - this.nodes[1].v;
         this.voltdiff[1] = this.nodes[2].v - this.nodes[3].v;
         this.voltdiff[2] = this.nodes[3].v - this.nodes[4].v;
@@ -272,7 +272,7 @@ export class TappedTransformerElm extends CircuitElm {
         this.currents[3] = this.currents[1] - this.currents[2];
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "transformer";
         arr[1] = "L = " + CircuitElm.getUnitText(this.inductance, "H");
         arr[2] = "Ratio = 1:" + this.ratio;
@@ -280,7 +280,7 @@ export class TappedTransformerElm extends CircuitElm {
         arr[4] = "Vd2 = " + CircuitElm.getVoltageText(this.nodes[1].v - this.nodes[3].v);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0) return -this.currents[0];
         if (n === 1) return this.currents[0];
         if (n === 2) return -this.currents[1];
@@ -288,7 +288,7 @@ export class TappedTransformerElm extends CircuitElm {
         return this.currents[2];
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         if (this.comparePair(n1, n2, 0, 1)) return true;
         if (this.comparePair(n1, n2, 2, 3)) return true;
         if (this.comparePair(n1, n2, 3, 4)) return true;
@@ -297,11 +297,11 @@ export class TappedTransformerElm extends CircuitElm {
     }
 
     // VCCS stamps couple all nodes, so they must all be in the same matrix
-    getMatrixConnection(_n1: number, _n2: number): boolean {
+    override getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Primary Inductance (H)", this.inductance, 0.01, 5).setPositive();
         if (n === 1) return new EditInfo("Ratio (N1/N2)", 1 / this.ratio, 1, 10).setDimensionless().setPositive();
         if (n === 2)
@@ -314,7 +314,7 @@ export class TappedTransformerElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) this.inductance = ei.value;
         if (n === 1 && this.ratio > 0) this.ratio = 1 / ei.value;
         if (n === 2) {
@@ -327,17 +327,17 @@ export class TappedTransformerElm extends CircuitElm {
         }
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         this.flags ^= TappedTransformerElm.FLAG_FLIP;
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         this.flags ^= TappedTransformerElm.FLAG_FLIP;
         super.flipY(c2, count);
     }
 
-    flipXY(c2: number, count: number): void {
+    override flipXY(c2: number, count: number): void {
         this.flags ^= TappedTransformerElm.FLAG_FLIP;
         super.flipXY(c2, count);
     }

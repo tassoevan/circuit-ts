@@ -183,7 +183,7 @@ export class RelayElm extends CircuitElm {
         this.ind.setup(this.inductance(), this.coilCurrent, Inductor.FLAG_BACK_EULER);
     }
 
-    updateModels(): void {
+    override updateModels(): void {
         this.setup();
         this.setPoints();
     }
@@ -206,29 +206,29 @@ export class RelayElm extends CircuitElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 178;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "rl";
     }
 
-    dumpXmlModel(doc: Document): void {
+    override dumpXmlModel(doc: Document): void {
         if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modelName);
     }
 
-    dumpXmlState(_doc: Document, elem: Element): void {
+    override dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "i", this.coilCurrent);
         CircuitXMLSerializer.dumpAttr(elem, "ip", this.i_position);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         const mo = xml.parseStringAttr("mo", null);
         if (mo != null) {
@@ -272,7 +272,7 @@ export class RelayElm extends CircuitElm {
         this.postUndump();
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         for (let i = 0; i !== 2; i++) {
             this.setVoltageColor(g, this.nodes[this.nCoil1 + i].v);
             CircuitElm.drawThickLine(g, this.coilLeads[i], this.coilPosts[i]);
@@ -376,7 +376,7 @@ export class RelayElm extends CircuitElm {
         this.adjustBbox(this.swposts[0][0], this.swposts[0][1]);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n < 3 * this.poleCount()) {
             const p = Math.trunc(n / 3);
             const k = n % 3;
@@ -388,7 +388,7 @@ export class RelayElm extends CircuitElm {
         return this.coilCurrent;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.setupPoles();
         this.allocNodes();
@@ -457,7 +457,7 @@ export class RelayElm extends CircuitElm {
         this.currentOffset2 = this.currentOffset1 + CircuitElm.distance(this.coilLeads[0], this.coilLeads[1]);
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         if (n < 3 * this.poleCount()) {
             const p = Math.trunc(n / 3);
             if (this.swposts[p] == null) {
@@ -473,14 +473,14 @@ export class RelayElm extends CircuitElm {
         return this.coilPosts[n - 3 * this.poleCount()];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 2 + this.poleCount() * 3;
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return 1;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.ind.reset();
         this.coilCurrent = this.coilCurCount = 0;
@@ -491,7 +491,7 @@ export class RelayElm extends CircuitElm {
         // onState = false;
     }
 
-    stamp(): void {
+    override stamp(): void {
         // inductor from coil post 1 to internal node
         this.ind.stamp(this.nodes[this.nCoil1], this.nodes[this.nCoil3]);
         // resistor from internal node to coil post 2
@@ -509,7 +509,7 @@ export class RelayElm extends CircuitElm {
         }
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         // using old model?
         if (this.switchingTime() === 0) {
             this.startIterationOld();
@@ -558,11 +558,11 @@ export class RelayElm extends CircuitElm {
     }
 
     // we need this to be able to change the matrix for each step
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    doStep(): void {
+    override doStep(): void {
         const voltdiff = this.nodes[this.nCoil1].v - this.nodes[this.nCoil3].v;
         this.ind.doStep(voltdiff);
         for (let p = 0; p !== this.poleCount() * 3; p += 3) {
@@ -599,7 +599,7 @@ export class RelayElm extends CircuitElm {
         }
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         const voltdiff = this.nodes[this.nCoil1].v - this.nodes[this.nCoil3].v;
         this.coilCurrent = this.ind.calculateCurrent(voltdiff);
 
@@ -614,11 +614,11 @@ export class RelayElm extends CircuitElm {
         }
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "relay";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = Locale.LS("relay");
         arr[0] += " (" + (this.switchingTime() === 0 ? "old model" : this.modelName) + ")";
         arr[1] = this.i_position === 0 ? Locale.LS("off") : Locale.LS("on");
@@ -634,10 +634,10 @@ export class RelayElm extends CircuitElm {
 
     models!: RelayModel[];
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Model", 0, -1, -1);
             this.models = RelayModel.getModelList();
@@ -663,7 +663,7 @@ export class RelayElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.model = this.models[ei.choice!.getSelectedIndex()];
             this.modelName = this.model.name;
@@ -690,33 +690,33 @@ export class RelayElm extends CircuitElm {
         }
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         if (Math.trunc(n1 / 3) !== Math.trunc(n2 / 3)) return false;
 
         // nodes in the same group (both coil or both same switch) are potentially connected
         return true;
     }
 
-    hasGroundConnection(n: number): boolean {
+    override hasGroundConnection(n: number): boolean {
         // switch contact nodes have ground connection via pulldown
         return this.needsPulldown() && n < this.nCoil1;
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "R".charCodeAt(0);
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         if (this.dx === 0) this.flags ^= this.FLAG_FLIP;
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         if (this.dy === 0) this.flags ^= this.FLAG_FLIP;
         super.flipY(c2, count);
     }
 
-    flipXY(xmy: number, count: number): void {
+    override flipXY(xmy: number, count: number): void {
         this.flags ^= this.FLAG_FLIP;
         super.flipXY(xmy, count);
     }

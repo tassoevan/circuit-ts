@@ -59,11 +59,11 @@ export class MemristorElm extends CircuitElm {
         this.resistance = 100;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "m".charCodeAt(0);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ron", this.r_on);
         CircuitXMLSerializer.dumpAttr(elem, "rof", this.r_off);
@@ -72,7 +72,7 @@ export class MemristorElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.mobility);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.r_on = xml.parseDoubleAttr("ron", this.r_on);
         this.r_off = xml.parseDoubleAttr("rof", this.r_off);
@@ -84,14 +84,14 @@ export class MemristorElm extends CircuitElm {
     ps3!: Point;
     ps4!: Point;
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(32);
         this.ps3 = new Point();
         this.ps4 = new Point();
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const segments = 6;
         let ox = 0;
         const hs = 2 + Math.floor(8 * (1 - this.dopeWidth / this.totalWidth));
@@ -119,19 +119,19 @@ export class MemristorElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.current = (this.nodes[0].v - this.nodes[1].v) / this.resistance;
     }
 
-    reset(): void {
+    override reset(): void {
         this.dopeWidth = 0;
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         const wd = this.dopeWidth / this.totalWidth;
         this.dopeWidth += (CircuitElm.sim.timeStep * this.mobility * this.r_on * this.current) / this.totalWidth;
         if (this.dopeWidth < 0) this.dopeWidth = 0;
@@ -139,38 +139,38 @@ export class MemristorElm extends CircuitElm {
         this.resistance = this.r_on * wd + this.r_off * (1 - wd);
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[0]);
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
     }
 
-    doStep(): void {
+    override doStep(): void {
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.resistance);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "memristor";
         this.getBasicInfo(arr);
         arr[3] = "R = " + CircuitElm.getUnitText(this.resistance, Locale.ohmString);
         arr[4] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    getScopeValue(x: number): number {
+    override getScopeValue(x: number): number {
         return x === VAL_R ? this.resistance : super.getScopeValue(x);
     }
 
-    getScopeUnits(x: number): number {
+    override getScopeUnits(x: number): number {
         return x === VAL_R ? UNITS_OHMS : super.getScopeUnits(x);
     }
 
-    canShowValueInScope(x: number): boolean {
+    override canShowValueInScope(x: number): boolean {
         return x === VAL_R;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Min Resistance (ohms)", this.r_on, 0, 0);
         if (n === 1) return new EditInfo("Max Resistance (ohms)", this.r_off, 0, 0);
         if (n === 2) return new EditInfo("Width of Doped Region (nm)", this.dopeWidth * 1e9, 0, 0);
@@ -179,7 +179,7 @@ export class MemristorElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.r_on = ei.value;
         if (n === 1) this.r_off = ei.value;
         if (n === 2) this.dopeWidth = ei.value * 1e-9;

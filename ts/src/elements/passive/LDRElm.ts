@@ -41,20 +41,20 @@ export class LDRElm extends CircuitElm {
         this.createSlider();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 2;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 374;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ps", this.position);
         CircuitXMLSerializer.dumpAttr(elem, "st", this.sliderText);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.position = xml.parseDoubleAttr("ps", this.position);
         this.sliderText = xml.parseStringAttr("st", this.sliderText) ?? this.sliderText;
@@ -82,13 +82,13 @@ export class LDRElm extends CircuitElm {
         CircuitElm.app.addWidgetToVerticalPanel(this.slider.element);
     }
 
-    delete(): void {
+    override delete(): void {
         if (this.labelEl) CircuitElm.app.removeWidgetFromVerticalPanel(this.labelEl);
         if (this.slider) CircuitElm.app.removeWidgetFromVerticalPanel(this.slider.element);
         super.delete();
     }
 
-    setMouseElm(v: boolean): void {
+    override setMouseElm(v: boolean): void {
         super.setMouseElm(v);
         this.slider?.draw();
     }
@@ -97,7 +97,7 @@ export class LDRElm extends CircuitElm {
         this.slider?.onMouseWheel(e);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(32);
         if (this.slider) {
@@ -107,7 +107,7 @@ export class LDRElm extends CircuitElm {
         }
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const hs = 6;
         this.setBbox(this.point1, this.point2, hs);
         this.draw2Leads(g);
@@ -163,17 +163,17 @@ export class LDRElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.current = (this.nodes[0].v - this.nodes[1].v) / this.resistance;
     }
 
-    stamp(): void {
+    override stamp(): void {
         this.lux = this.luxFromSliderPos();
         this.resistance = this.calcResistance(this.lux);
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.resistance);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "photoresistor";
         arr[1] = "I = " + CircuitElm.getCurrentDText(this.current);
         arr[2] = "Vd = " + CircuitElm.getVoltageDText(this.getVoltageDiff());
@@ -181,10 +181,10 @@ export class LDRElm extends CircuitElm {
         arr[4] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Slider Text", 0, -1, -1);
             ei.text = this.sliderText;
@@ -193,7 +193,7 @@ export class LDRElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.sliderText = ei.textf!.value;
             if (this.labelEl) this.labelEl.textContent = this.sliderText;

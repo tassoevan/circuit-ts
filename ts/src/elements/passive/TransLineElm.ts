@@ -70,27 +70,27 @@ export class TransLineElm extends CircuitElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 171;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 4;
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return 2;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "tl";
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "de", this.delay);
         CircuitXMLSerializer.dumpAttr(elem, "im", this.imped);
         CircuitXMLSerializer.dumpAttr(elem, "wi", this.width);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.delay = xml.parseDoubleAttr("de", this.delay);
         this.imped = xml.parseDoubleAttr("im", this.imped);
@@ -98,7 +98,7 @@ export class TransLineElm extends CircuitElm {
         this.reset();
     }
 
-    drag(xx: number, yy: number): void {
+    override drag(xx: number, yy: number): void {
         xx = this.snapGrid(xx);
         yy = this.snapGrid(yy);
         const w1 = CircuitElm.max(CircuitElm.app.gridSize, CircuitElm.abs(yy - this.y));
@@ -115,7 +115,7 @@ export class TransLineElm extends CircuitElm {
         this.setPoints();
     }
 
-    reset(): void {
+    override reset(): void {
         if (CircuitElm.sim.maxTimeStep === 0) return;
         this.lenSteps = Math.trunc(this.delay / CircuitElm.sim.maxTimeStep);
         if (this.lenSteps > 100000) {
@@ -129,7 +129,7 @@ export class TransLineElm extends CircuitElm {
         this.lastStepCount = 0;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const ds = this.dy === 0 ? CircuitElm.sign(this.dx) : -CircuitElm.sign(this.dy);
         const p3 = this.interpPoint(this.point1, this.point2, 0, -this.width * ds);
@@ -148,7 +148,7 @@ export class TransLineElm extends CircuitElm {
         this.inner = [p7, p8, p5, p6];
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.posts[0], this.posts[3], 0);
         const segments = Math.trunc(this.dn / 2);
         const ix0 = this.ptr - 1 + this.lenSteps;
@@ -195,7 +195,7 @@ export class TransLineElm extends CircuitElm {
         }
     }
 
-    setVoltageSource(n: number, v: VoltageSource): void {
+    override setVoltageSource(n: number, v: VoltageSource): void {
         if (n === 0) {
             this.voltSource1 = v;
             v.setNodes(this.nodes[4], this.nodes[0]);
@@ -205,19 +205,19 @@ export class TransLineElm extends CircuitElm {
         }
     }
 
-    setCurrent(vs: VoltageSource, c: number): void {
+    override setCurrent(vs: VoltageSource, c: number): void {
         if (vs === this.voltSource1) this.current1 = c;
         else this.current2 = c;
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampVoltageSource(this.nodes[4], this.nodes[0], this.voltSource1);
         CircuitElm.sim.stampVoltageSource(this.nodes[5], this.nodes[1], this.voltSource2);
         CircuitElm.sim.stampResistor(this.nodes[2], this.nodes[4], this.imped);
         CircuitElm.sim.stampResistor(this.nodes[3], this.nodes[5], this.imped);
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         if (this.voltageL == null || this.voltageR == null) {
             CircuitElm.sim.stop("Transmission line delay too large!", this);
             return;
@@ -226,7 +226,7 @@ export class TransLineElm extends CircuitElm {
         this.voltageR[this.ptr] = this.nodes[3].v - this.nodes[1].v + this.nodes[3].v - this.nodes[5].v;
     }
 
-    doStep(): void {
+    override doStep(): void {
         if (this.voltageL == null) {
             CircuitElm.sim.stop("Transmission line delay too large!", this);
             return;
@@ -240,32 +240,32 @@ export class TransLineElm extends CircuitElm {
         }
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         if (CircuitElm.sim.timeStepCount === this.lastStepCount) return;
         this.lastStepCount = CircuitElm.sim.timeStepCount;
         this.ptr = (this.ptr + 1) % this.lenSteps;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return this.posts[n];
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 2;
     }
-    hasGroundConnection(_n1: number): boolean {
+    override hasGroundConnection(_n1: number): boolean {
         return false;
     }
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
 
-    getMatrixConnection(n1: number, n2: number): boolean {
+    override getMatrixConnection(n1: number, n2: number): boolean {
         // odd nodes == right side, even nodes == left side
         return n1 % 2 === n2 % 2;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "transmission line";
         arr[1] = CircuitElm.getUnitText(this.imped, Locale.ohmString);
         // use velocity factor for RG-58 cable (65%)
@@ -273,13 +273,13 @@ export class TransLineElm extends CircuitElm {
         arr[3] = "delay = " + CircuitElm.getUnitText(this.delay, "s");
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Delay (s)", this.delay, 0, 0).setPositive();
         if (n === 1) return new EditInfo("Impedance (ohms)", this.imped, 0, 0).setPositive();
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) {
             this.delay = ei.value;
             this.reset();
@@ -290,17 +290,17 @@ export class TransLineElm extends CircuitElm {
         }
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0) return this.current1;
         if (n === 2) return -this.current1;
         if (n === 3) return -this.current2;
         return this.current2;
     }
 
-    canFlipX(): boolean {
+    override canFlipX(): boolean {
         return this.dy === 0;
     }
-    canFlipY(): boolean {
+    override canFlipY(): boolean {
         return this.dx === 0;
     }
 }

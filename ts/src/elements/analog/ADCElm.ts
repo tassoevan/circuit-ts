@@ -32,13 +32,13 @@ export class ADCElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "ADC";
     }
-    needsBits(): boolean {
+    override needsBits(): boolean {
         return true;
     }
-    allowBus(): boolean {
+    override allowBus(): boolean {
         return true;
     }
 
@@ -54,7 +54,7 @@ export class ADCElm extends ChipElm {
         this.allocNodes();
     }
 
-    execute(): void {
+    override execute(): void {
         const imax = (1 << this.bits) - 1;
         // if we round, the half-flash doesn't work
         const val = (imax * this.nodes[this.bits].v) / this.nodes[this.bits + 1].v; // + .5;
@@ -66,27 +66,27 @@ export class ADCElm extends ChipElm {
     getVoltageSourceCount(): number {
         return this.bits;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.bits + 2;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 167;
     }
 
     // there's already a V+ pin, how does that relate to high logic voltage?  figure out later
-    isDigitalChip(): boolean {
+    override isDigitalChip(): boolean {
         return false;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 2) {
                 this.bits = Math.trunc(ei.value);

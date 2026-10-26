@@ -88,7 +88,7 @@ export class TestPointElm extends CircuitElm {
         }
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.zerocount = 0;
         this.rmsV = this.total = this.count = 0;
@@ -105,25 +105,25 @@ export class TestPointElm extends CircuitElm {
         this.lastStepCount = 0;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 368;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = new Point();
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "me", this.meter);
         if (this.label !== "TP") CircuitXMLSerializer.dumpAttr(elem, "lb", this.label);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.meter = xml.parseIntAttr("me", this.meter);
         this.label = xml.parseStringAttr("lb", "TP") ?? "TP";
@@ -181,7 +181,7 @@ export class TestPointElm extends CircuitElm {
         g.restore();
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.save();
         const selected = this.needsHighlight();
         const f = new Font("SansSerif", selected ? Font.BOLD : 0, 14);
@@ -240,7 +240,7 @@ export class TestPointElm extends CircuitElm {
         g.restore();
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         if (CircuitElm.sim.timeStepCount === this.lastStepCount) return;
         this.lastStepCount = CircuitElm.sim.timeStepCount;
         this.count++;
@@ -356,15 +356,15 @@ export class TestPointElm extends CircuitElm {
         }
     }
 
-    getScopeValue(_x: number): number {
+    override getScopeValue(_x: number): number {
         return this.selectedValue;
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "Test Point";
         let i = 1;
         arr[i++] = this.getMeterLine(this.meter);
@@ -410,7 +410,7 @@ export class TestPointElm extends CircuitElm {
         return "";
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Value", this.selectedValue, -1, -1);
             ei.choice = new Choice();
@@ -452,12 +452,12 @@ export class TestPointElm extends CircuitElm {
         return 0;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.meter = this.meterChoices()[ei.choice!.getSelectedIndex()];
         if (n === 1) this.label = ei.textf ? ei.textf.value : (ei.text ?? "TP");
     }
 
-    isTestPointElm(): boolean {
+    override isTestPointElm(): boolean {
         return true;
     }
 }

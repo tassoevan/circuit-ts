@@ -84,7 +84,7 @@ export class ScopeExportImageDialog extends Dialog {
         hp.appendChild(cancelButton);
     }
 
-    apply(): boolean {
+    override apply(): boolean {
         const svg = this.svgRadio.checked;
         const transparent = this.transparentCheck.checked;
         ScopeExportImageDialog.lastSVG = svg;

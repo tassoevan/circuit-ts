@@ -57,21 +57,21 @@ export class ControlledCurrentElm extends ControlledSourceElm {
     }
 
     // integer dump types are for the obsolete text format; this element is XML only
-    getDumpType(): number {
+    override getDumpType(): number {
         return 0;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "ci";
     }
-    getElmType(): string {
+    override getElmType(): string {
         return "Controlled Current Source";
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 0;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         // arrow along the diamond's long axis, pointing from post 1 to post 2
         this.ashaft1 = this.interpPoint(this.lead1!, this.lead2!, 0.3) as Point;
@@ -80,7 +80,7 @@ export class ControlledCurrentElm extends ControlledSourceElm {
         this.arrow = this.calcArrow(this.center, tip, 7, 6);
     }
 
-    stamp(): void {
+    override stamp(): void {
         const sim = SimulationManager.theSim!;
         if (this.broken) {
             // no current path; stamping a current source would cause a matrix error
@@ -91,7 +91,7 @@ export class ControlledCurrentElm extends ControlledSourceElm {
         sim.stampNonLinear(this.nodes[1]);
     }
 
-    doStep(): void {
+    override doStep(): void {
         const sim = SimulationManager.theSim!;
         if (this.broken || this.expr == null) {
             this.current = 0;
@@ -116,13 +116,13 @@ export class ControlledCurrentElm extends ControlledSourceElm {
     }
 
     // a current source with nowhere for the current to go is a matrix error, so check
-    validate(): boolean {
+    override validate(): boolean {
         const fpi = new FindPathInfo(FindPathInfo.INDUCT, this, this.getNode(1), SimulationManager.theSim);
         this.broken = !fpi.findPath(this.getNode(0));
         return true;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.draw2Leads(g);
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : Color.gray);
         this.setPowerColor(g, false);
@@ -136,7 +136,7 @@ export class ControlledCurrentElm extends ControlledSourceElm {
         this.drawPosts(g);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         super.getInfo(arr);
         if (this.broken) {
             let i = 0;

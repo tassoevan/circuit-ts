@@ -177,7 +177,7 @@ export class OpAmpRealElm extends CompositeElm {
         this.loadComposite(st, OpAmpRealElm.lm324v2ModelString, OpAmpRealElm.lm324v2ExternalNodes);
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.curCounts = new Array(5).fill(0);
     }
@@ -187,19 +187,19 @@ export class OpAmpRealElm extends CompositeElm {
         return this.compElmList[this.modelType === OpAmpRealElm.MODEL_741 ? 20 : 4] as CapacitorElm;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "slr", this.slewRate);
         CircuitXMLSerializer.dumpAttr(elem, "cl", this.currentLimit);
         CircuitXMLSerializer.dumpAttr(elem, "mt", this.modelType);
     }
 
-    dumpXmlState(_doc: Document, elem: Element): void {
+    override dumpXmlState(_doc: Document, elem: Element): void {
         const elm = this.getCapacitor();
         CircuitXMLSerializer.dumpAttr(elem, "vd", elm ? elm.voltdiff : 0);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.slewRate = xml.parseDoubleAttr("slr", this.slewRate);
         this.currentLimit = xml.parseDoubleAttr("cl", this.currentLimit);
@@ -210,11 +210,11 @@ export class OpAmpRealElm extends CompositeElm {
         if (cap) cap.voltdiff = voltdiff;
     }
 
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.opheight * 2);
         this.setVoltageColor(g, this.nodes[0].v);
         CircuitElm.drawThickLine(g, this.in1p[0], this.in1p[1]);
@@ -242,7 +242,7 @@ export class OpAmpRealElm extends CompositeElm {
         this.drawPosts(g);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         let ww = this.opwidth;
         if (ww > this.dn / 2) ww = Math.trunc(this.dn / 2);
@@ -271,14 +271,14 @@ export class OpAmpRealElm extends CompositeElm {
         this.setPost(4, this.rail2p[0]);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 409;
     }
-    getElmType(): string {
+    override getElmType(): string {
         return "op-amp";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         const type = this.modelType === OpAmpRealElm.MODEL_741 ? "LM741" : "LM324";
         arr[0] = "op-amp (" + type + ")";
         arr[1] = "V+ = " + CircuitElm.getVoltageText(this.nodes[1].v);
@@ -287,10 +287,10 @@ export class OpAmpRealElm extends CompositeElm {
         arr[4] = "Iout = " + CircuitElm.getCurrentText(this.getCurrentIntoNode(2));
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo(EditInfo.makeLink("opampreal.html", "Model"), this.modelType);
             ei.choice = new Choice();
@@ -316,7 +316,7 @@ export class OpAmpRealElm extends CompositeElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.modelType = ei.choice!.getSelectedIndex();
             if (ei.choice!.getItemCount() === 2 && this.modelType === 1) this.modelType = OpAmpRealElm.MODEL_324v2;
@@ -338,10 +338,10 @@ export class OpAmpRealElm extends CompositeElm {
         }
     }
 
-    canFlipX(): boolean {
+    override canFlipX(): boolean {
         return this.dy === 0;
     }
-    canFlipY(): boolean {
+    override canFlipY(): boolean {
         return this.dx === 0;
     }
 }

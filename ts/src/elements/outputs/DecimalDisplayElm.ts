@@ -50,7 +50,7 @@ export class DecimalDisplayElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         switch (this.displayMode) {
             case 1:
                 return "hex display";
@@ -61,7 +61,7 @@ export class DecimalDisplayElm extends ChipElm {
         }
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.drawChip(g);
         const xl = this.x + this.cspc + this.flippedSizeX * this.cspc;
         let yl = this.y - this.cspc + this.flippedSizeY * this.cspc;
@@ -89,23 +89,23 @@ export class DecimalDisplayElm extends ChipElm {
         g.restore();
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "bc", this.bitCount);
         CircuitXMLSerializer.dumpAttr(elem, "dm", this.displayMode);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.bitCount = xml.parseIntAttr("bc", this.bitCount);
         this.displayMode = xml.parseIntAttr("dm", this.displayMode);
         this.setupPins();
     }
 
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "dd";
     }
-    allowBus(): boolean {
+    override allowBus(): boolean {
         return true;
     }
 
@@ -118,20 +118,20 @@ export class DecimalDisplayElm extends ChipElm {
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.bitCount ?? 0;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 419;
     }
     getVoltageSourceCount(): number {
         return 0;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Bits", this.bitCount, 1, 8).setDimensionless();
         if (n === 1) {
             const ei = new EditInfo("Display Mode", 0, -1, -1);
@@ -145,7 +145,7 @@ export class DecimalDisplayElm extends ChipElm {
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 1 && ei.value <= 16) {
                 const newBitCount = Math.trunc(ei.value);

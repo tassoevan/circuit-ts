@@ -57,13 +57,13 @@ export class LEDArrayElm extends ChipElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "sx", this.sizeX);
         CircuitXMLSerializer.dumpAttr(elem, "sy", this.sizeY);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.sizeX = xml.parseIntAttr("sx", this.sizeX);
         this.sizeY = xml.parseIntAttr("sy", this.sizeY);
@@ -72,7 +72,7 @@ export class LEDArrayElm extends ChipElm {
         this.setPoints();
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "LED array";
     }
 
@@ -87,11 +87,11 @@ export class LEDArrayElm extends ChipElm {
         this.brightness = new Array(this.sizeX * this.sizeY).fill(0);
     }
 
-    reset(): void {
+    override reset(): void {
         this.brightness = new Array(this.sizeX * this.sizeY).fill(0);
     }
 
-    stamp(): void {
+    override stamp(): void {
         super.stamp();
         this.diodes = new Array(this.sizeX * this.sizeY);
         const model = DiodeModel.getModelWithName("default-led");
@@ -103,7 +103,7 @@ export class LEDArrayElm extends ChipElm {
         this.currents = new Array(this.diodes.length).fill(0);
     }
 
-    doStep(): void {
+    override doStep(): void {
         super.doStep();
         let i = 0;
         for (let iy = 0; iy !== this.sizeY; iy++)
@@ -111,14 +111,14 @@ export class LEDArrayElm extends ChipElm {
                 this.diodes![i].doStep(this.nodes[this.sizeX + iy].v - this.nodes[ix].v);
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
-    isDigitalChip(): boolean {
+    override isDigitalChip(): boolean {
         return false;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const elapsed = CircuitElm.sim.t - this.lastDrawTime;
         this.lastDrawTime = CircuitElm.sim.t;
         this.decayMultiplier = elapsed > 0 ? Math.exp(-elapsed / LEDArrayElm.brightnessTau) : 1;
@@ -145,7 +145,7 @@ export class LEDArrayElm extends ChipElm {
         }
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         for (let ix = 0; ix !== this.sizeX; ix++) this.pins[ix].current = 0;
 
         // avoid exception if called before stamp()
@@ -163,7 +163,7 @@ export class LEDArrayElm extends ChipElm {
         }
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         for (let i = 0; i !== this.currents.length; i++)
             if (Math.abs(this.currents[i]) > 1e12) CircuitElm.sim.stop("max current exceeded", this);
     }
@@ -186,26 +186,26 @@ export class LEDArrayElm extends ChipElm {
         g.setColor(new Color(Math.trunc(w), 0, 0));
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.sizeX + this.sizeY;
     }
     getVoltageSourceCount(): number {
         return 0;
     }
-    getMatrixConnection(_n1: number, _n2: number): boolean {
+    override getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 405;
     }
 
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Grid Width", this.sizeX).setDimensionless();
         if (n === 1) return new EditInfo("Grid Height", this.sizeY).setDimensionless();
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 2 && ei.value <= 16) {
                 this.sizeX = Math.trunc(ei.value);
@@ -226,7 +226,7 @@ export class LEDArrayElm extends ChipElm {
         }
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = this.getChipName();
     }
 }

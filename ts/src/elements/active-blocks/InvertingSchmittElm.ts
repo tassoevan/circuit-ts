@@ -68,7 +68,7 @@ export class InvertingSchmittElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "slr", this.slewRate);
         CircuitXMLSerializer.dumpAttr(elem, "lt", this.lowerTrigger);
@@ -76,7 +76,7 @@ export class InvertingSchmittElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "lon", this.logicOnLevel);
         CircuitXMLSerializer.dumpAttr(elem, "loff", this.logicOffLevel);
     }
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.slewRate = xml.parseDoubleAttr("slr", this.slewRate);
         this.lowerTrigger = xml.parseDoubleAttr("lt", this.lowerTrigger);
@@ -85,11 +85,11 @@ export class InvertingSchmittElm extends CircuitElm {
         this.logicOffLevel = xml.parseDoubleAttr("loff", this.logicOffLevel);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 183;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.drawPosts(g);
         this.draw2Leads(g);
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.lightGrayColor);
@@ -104,7 +104,7 @@ export class InvertingSchmittElm extends CircuitElm {
     gatePoly: Polygon = null!;
     symbolPoly: Polygon = null!;
     pcircle: Point = null!;
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const hs = 16;
         let ww = 16;
@@ -120,13 +120,13 @@ export class InvertingSchmittElm extends CircuitElm {
         this.symbolPoly = this.getSchmittPolygon(1, 0.3);
         this.setBbox(this.point1, this.point2, hs);
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[1], this.voltSource!);
     }
-    doStep(): void {
+    override doStep(): void {
         const v0 = this.nodes[1].v;
         let out: number;
         if (this.state) {
@@ -153,21 +153,21 @@ export class InvertingSchmittElm extends CircuitElm {
         out = Math.max(Math.min(v0 + maxStep, out), v0 - maxStep);
         CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[1], this.voltSource, out);
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "inverting Schmitt trigger";
         arr[1] = "Vi = " + CircuitElm.getVoltageText(this.nodes[0].v);
         arr[2] = "Vo = " + CircuitElm.getVoltageText(this.nodes[1].v);
     }
     dlt: number = 0;
     dut: number = 0;
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             this.dlt = this.lowerTrigger;
             return new EditInfo("Lower threshold (V)", this.lowerTrigger, 0.01, 5);
@@ -182,7 +182,7 @@ export class InvertingSchmittElm extends CircuitElm {
 
         return null;
     }
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.dlt = ei.value;
         if (n === 1) this.dut = ei.value;
         if (n === 2) this.slewRate = ei.value;
@@ -199,14 +199,14 @@ export class InvertingSchmittElm extends CircuitElm {
     }
     // there is no current path through the InvertingSchmitt input, but there
     // is an indirect path through the output to ground.
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
-    hasGroundConnection(n1: number): boolean {
+    override hasGroundConnection(n1: number): boolean {
         return n1 === 1;
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 1) return this.current;
         return 0;
     }

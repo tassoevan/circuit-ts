@@ -77,28 +77,28 @@ export class SCRElm extends CircuitElm {
         this.aresistance = 1; // to avoid divide by zero
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    reset(): void {
+    override reset(): void {
         this.nodes[this.anode].v = this.nodes[this.cnode].v = this.nodes[this.gnode].v = 0;
         this.diode.reset();
         this.lastvag = this.lastvac = this.curcount_a = this.curcount_c = this.curcount_g = 0;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 177;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "tr", this.triggerI);
         CircuitXMLSerializer.dumpAttr(elem, "ho", this.holdingI);
         CircuitXMLSerializer.dumpAttr(elem, "gr", this.gresistance);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.triggerI = xml.parseDoubleAttr("tr", this.triggerI);
         this.holdingI = xml.parseDoubleAttr("ho", this.holdingI);
@@ -127,7 +127,7 @@ export class SCRElm extends CircuitElm {
         return (this.flags & this.FLAG_GATE_FIX) !== 0;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.dir = 0;
         if (Math.abs(this.dx) > Math.abs(this.dy)) {
@@ -170,7 +170,7 @@ export class SCRElm extends CircuitElm {
         this.gate[1].y = this.snapGrid(this.gate[1].y);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.hs);
         this.adjustBbox(this.gate[0], this.gate[1]);
 
@@ -223,24 +223,24 @@ export class SCRElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === this.anode) return -this.ia;
         if (n === this.cnode) return -this.ic;
         return -this.ig;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return n === 0 ? this.point1 : n === 1 ? this.point2 : this.gate[1];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3;
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return 1;
     }
 
-    getPower(): number {
+    override getPower(): number {
         return (
             (this.nodes[this.anode].v - this.nodes[this.gnode].v) * this.ia +
             (this.nodes[this.cnode].v - this.nodes[this.gnode].v) * this.ic
@@ -249,7 +249,7 @@ export class SCRElm extends CircuitElm {
 
     aresistance!: number;
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[this.anode]);
         CircuitElm.sim.stampNonLinear(this.nodes[this.cnode]);
         CircuitElm.sim.stampNonLinear(this.nodes[this.gnode]);
@@ -258,7 +258,7 @@ export class SCRElm extends CircuitElm {
         this.diode.stamp(this.nodes[this.inode], this.nodes[this.cnode]);
     }
 
-    doStep(): void {
+    override doStep(): void {
         const vac = this.nodes[this.anode].v - this.nodes[this.cnode].v; // typically negative
         const vag = this.nodes[this.anode].v - this.nodes[this.gnode].v; // typically positive
         if (Math.abs(vac - this.lastvac) > 0.01 || Math.abs(vag - this.lastvag) > 0.01)
@@ -272,7 +272,7 @@ export class SCRElm extends CircuitElm {
         CircuitElm.sim.stampResistor(this.nodes[this.anode], this.nodes[this.inode], this.aresistance);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "SCR";
         const vac = this.nodes[this.anode].v - this.nodes[this.cnode].v;
         const vag = this.nodes[this.anode].v - this.nodes[this.gnode].v;
@@ -285,23 +285,23 @@ export class SCRElm extends CircuitElm {
         arr[6] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.ig = (this.nodes[this.gnode].v - this.nodes[this.cnode].v) / this.gresistance;
         this.ia = (this.nodes[this.anode].v - this.nodes[this.inode].v) / this.aresistance;
         this.ic = -this.ig - this.ia;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Trigger Current (A)", this.triggerI, 0, 0).setPositive();
         if (n === 1) return new EditInfo("Holding Current (A)", this.holdingI, 0, 0).setPositive();
         if (n === 2) return new EditInfo("Gate Resistance (ohms)", this.gresistance, 0, 0).setPositive();
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.triggerI = ei.value;
         if (n === 1) this.holdingI = ei.value;
         if (n === 2) this.gresistance = ei.value;
@@ -316,17 +316,17 @@ export class SCRElm extends CircuitElm {
         this.y2 = pt.y;
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         this.fixEnds();
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         this.fixEnds();
         super.flipY(c2, count);
     }
 
-    flipXY(c2: number, count: number): void {
+    override flipXY(c2: number, count: number): void {
         this.fixEnds();
         super.flipXY(c2, count);
     }

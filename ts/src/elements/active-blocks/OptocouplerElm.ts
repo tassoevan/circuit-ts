@@ -71,12 +71,12 @@ export class OptocouplerElm extends CompositeElm {
         }
     }
 
-    dumpXmlModel(doc: Document): void {
+    override dumpXmlModel(doc: Document): void {
         const model = this.diode.model;
         if (!(model.builtIn || model.dumped)) model.dumpXml(doc);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         const model = this.diode.model;
         if (!(model.builtIn || model.dumped)) model.dumpXml(doc);
         super.dumpXml(doc, elem);
@@ -84,7 +84,7 @@ export class OptocouplerElm extends CompositeElm {
         CircuitXMLSerializer.dumpAttr(elem, "dmo", this.diode.modelName);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.ctr = xml.parseDoubleAttr("ctr", this.ctr);
         // "ix" is set on state-restore calls (from CompositeElm.dumpXmlState); absent on
@@ -114,16 +114,16 @@ export class OptocouplerElm extends CompositeElm {
         this.curCounts = new Array(4).fill(0);
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.curCounts = new Array(4).fill(0);
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         return Math.trunc(n1 / 2) === Math.trunc(n2 / 2);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.lightGrayColor);
         CircuitElm.drawThickPolygon(g, this.rectPointsX, this.rectPointsY, 4);
 
@@ -156,7 +156,7 @@ export class OptocouplerElm extends CompositeElm {
         }
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
 
         // adapted from ChipElm
@@ -201,11 +201,11 @@ export class OptocouplerElm extends CompositeElm {
     isFlippedY(): boolean {
         return (this.flags & ChipElm.FLAG_FLIP_Y) !== 0;
     }
-    canFlipXY(): boolean {
+    override canFlipXY(): boolean {
         return false;
     }
 
-    flipX(center2: number, count: number): void {
+    override flipX(center2: number, count: number): void {
         this.flags ^= ChipElm.FLAG_FLIP_X;
         if (count !== 1) {
             const xs = 3 * this.cspc2;
@@ -215,7 +215,7 @@ export class OptocouplerElm extends CompositeElm {
         this.setPoints();
     }
 
-    flipY(center2: number, count: number): void {
+    override flipY(center2: number, count: number): void {
         this.flags ^= ChipElm.FLAG_FLIP_Y;
         if (count !== 1) {
             const ys = 1 * this.cspc2;
@@ -255,21 +255,21 @@ export class OptocouplerElm extends CompositeElm {
         this.stubs[n] = new Point(xa + dax * this.cspc, ya + day * this.cspc);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 407;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "optocoupler";
         arr[1] = "CTR Scale = " + CircuitElm.showFormat.format(this.ctr);
         arr[2] = "Iin = " + CircuitElm.getCurrentText(this.getCurrentIntoNode(0));
         arr[3] = "Iout = " + CircuitElm.getCurrentText(this.getCurrentIntoNode(2));
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("CTR Scale", this.ctr, 0, 0).setDimensionless();
         if (n === 1) {
             const ei = new EditInfo("LED Model", 0, -1, -1);
@@ -285,11 +285,11 @@ export class OptocouplerElm extends CompositeElm {
         return null;
     }
 
-    updateModels(): void {
+    override updateModels(): void {
         this.diode.setup();
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) {
             this.ctr = ei.value;
             this.initOptocoupler();

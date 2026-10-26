@@ -86,7 +86,7 @@ export class OpAmpElm extends CircuitElm {
         this.gain = (this.flags & this.FLAG_LOWGAIN) !== 0 ? 1000 : 100000;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ma", this.maxOut);
         CircuitXMLSerializer.dumpAttr(elem, "mi", this.minOut);
@@ -94,7 +94,7 @@ export class OpAmpElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "ga", this.gain);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         this.flags = 0; // size might have changed
         super.undumpXml(xml);
         this.maxOut = xml.parseDoubleAttr("ma", this.maxOut);
@@ -104,11 +104,11 @@ export class OpAmpElm extends CircuitElm {
         this.setSize((this.flags & this.FLAG_SMALL) !== 0 ? 1 : 2);
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.opheight * 2);
         this.setVoltageColor(g, this.nodes[0].v);
         CircuitElm.drawThickLine(g, this.in1p[0], this.in1p[1]);
@@ -127,7 +127,7 @@ export class OpAmpElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    getPower(): number {
+    override getPower(): number {
         return this.nodes[2].v * this.current;
     }
 
@@ -144,7 +144,7 @@ export class OpAmpElm extends CircuitElm {
         this.flags = (this.flags & ~this.FLAG_SMALL) | (s === 1 ? this.FLAG_SMALL : 0);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         if (this.dn > 150 && this.isCreating()) this.setSize(2);
         let ww = this.opwidth;
@@ -164,19 +164,19 @@ export class OpAmpElm extends CircuitElm {
         this.plusFont = new Font("SansSerif", 0, this.opsize === 2 ? 14 : 10);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return n === 0 ? this.in1p[0] : n === 1 ? this.in2p[0] : this.point2;
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "op-amp";
         arr[1] = "V+ = " + CircuitElm.getVoltageText(this.nodes[1].v);
         arr[2] = "V- = " + CircuitElm.getVoltageText(this.nodes[0].v);
@@ -192,12 +192,12 @@ export class OpAmpElm extends CircuitElm {
     savedVd: number = 0;
     justLoaded: boolean = false;
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinearVS(this.voltSource!);
         CircuitElm.sim.stampMatrixVN(this.nodes[2], this.voltSource!, 1);
     }
 
-    doStep(): void {
+    override doStep(): void {
         const vd = this.justLoaded ? this.savedVd : this.nodes[1].v - this.nodes[0].v;
         this.justLoaded = false;
         const midpoint = (this.maxOut + this.minOut) * 0.5;
@@ -231,66 +231,66 @@ export class OpAmpElm extends CircuitElm {
 
     // there is no current path through the op-amp inputs, but there
     // is an indirect path through the output to ground.
-    validate(): boolean {
+    override validate(): boolean {
         return this.validateRailNode(2);
     }
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
-    getMatrixConnection(_n1: number, _n2: number): boolean {
+    override getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
-    hasGroundConnection(n1: number): boolean {
+    override hasGroundConnection(n1: number): boolean {
         return n1 === 2;
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[2].v - this.nodes[1].v;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return "a".charCodeAt(0);
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Max Output (V)", this.maxOut, 1, 20);
         if (n === 1) return new EditInfo("Min Output (V)", this.minOut, -20, 0);
         if (n === 2) return new EditInfo("Gain", this.gain, 10, 1000000).setPositive();
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.maxOut = ei.value;
         if (n === 1) this.minOut = ei.value;
         if (n === 2) this.gain = ei.value;
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "a".charCodeAt(0);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 2) return -this.current;
         return 0;
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         if (this.dx === 0) this.flags ^= this.FLAG_SWAP;
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         if (this.dy === 0) this.flags ^= this.FLAG_SWAP;
         super.flipY(c2, count);
     }
 
-    flipXY(xmy: number, count: number): void {
+    override flipXY(xmy: number, count: number): void {
         this.flags ^= this.FLAG_SWAP;
         super.flipXY(xmy, count);
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         this.addRoutingObstacleWithLeads(router, this.opwidth);
     }
 }

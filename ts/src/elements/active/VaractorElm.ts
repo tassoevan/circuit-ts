@@ -54,46 +54,46 @@ export class VaractorElm extends DiodeElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 176;
     }
-    getElmType(): string {
+    override getElmType(): string {
         return "varactor";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         super.getInfo(arr);
         arr[0] = "varactor";
         arr[5] = "C = " + CircuitElm.getUnitText(this.capacitance, "F");
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.capvoltdiff = this.nodes[0].v - this.nodes[1].v;
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         super.calculateCurrent();
         this.current += this.capCurrent;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.capvoltdiff = 0;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ca", this.capvoltdiff);
         CircuitXMLSerializer.dumpAttr(elem, "ba", this.baseCapacitance);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.capvoltdiff = xml.parseDoubleAttr("ca", this.capvoltdiff);
         this.baseCapacitance = xml.parseDoubleAttr("ba", this.baseCapacitance);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const platef = 0.6;
         const pa = this.newPointArray(2);
@@ -108,7 +108,7 @@ export class VaractorElm extends DiodeElm {
         this.interpPoint2(this.lead1!, this.lead2!, this.plate2[0], this.plate2[1], 1, this.hs);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         // draw leads and diode arrow
         this.drawDiode(g);
 
@@ -127,18 +127,18 @@ export class VaractorElm extends DiodeElm {
         this.drawPosts(g);
     }
 
-    setVoltageSource(n: number, v: VoltageSource): void {
+    override setVoltageSource(n: number, v: VoltageSource): void {
         super.setVoltageSource(n, v);
         v.setNodes(this.nodes[0], this.nodes[2]);
     }
 
-    stamp(): void {
+    override stamp(): void {
         super.stamp();
         CircuitElm.sim.stampVoltageSource(this.nodes[0], this.nodes[2], this.voltSource);
         CircuitElm.sim.stampNonLinear(this.nodes[2]);
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         super.startIteration();
         // capacitor companion model using trapezoidal approximation
         // (Thevenin equivalent) consists of a voltage source in
@@ -150,21 +150,21 @@ export class VaractorElm extends DiodeElm {
         this.voltSourceValue = -this.capvoltdiff - this.capCurrent * this.compResistance;
     }
 
-    doStep(): void {
+    override doStep(): void {
         super.doStep();
         CircuitElm.sim.stampResistor(this.nodes[2], this.nodes[1], this.compResistance);
         CircuitElm.sim.updateVoltageSource(this.nodes[0], this.nodes[2], this.voltSource, this.voltSourceValue);
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return true;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 1) return new EditInfo("Capacitance @ 0V (F)", this.baseCapacitance, 10, 1000);
         return super.getEditInfo(n);
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 1) {
             this.baseCapacitance = ei.value;
             return;
@@ -172,16 +172,16 @@ export class VaractorElm extends DiodeElm {
         super.setEditValue(n, ei);
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
-    setCurrent(_vs: VoltageSource, c: number): void {
+    override setCurrent(_vs: VoltageSource, c: number): void {
         this.capCurrent = c;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return 1;
     }
 }

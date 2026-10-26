@@ -66,14 +66,14 @@ export class DiacElm extends CircuitElm {
         this.diode2.setupForDefaultModel();
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 203;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ron", this.onresistance);
         CircuitXMLSerializer.dumpAttr(elem, "roff", this.offresistance);
@@ -81,7 +81,7 @@ export class DiacElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "hc", this.holdcurrent);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.onresistance = xml.parseDoubleAttr("ron", this.onresistance);
         this.offresistance = xml.parseDoubleAttr("roff", this.offresistance);
@@ -93,7 +93,7 @@ export class DiacElm extends CircuitElm {
     plate1!: Point[];
     plate2!: Point[];
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(16);
 
@@ -112,7 +112,7 @@ export class DiacElm extends CircuitElm {
         }
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const v1 = this.nodes[0].v;
         const v2 = this.nodes[1].v;
         this.setBbox(this.point1, this.point2, 6);
@@ -132,18 +132,18 @@ export class DiacElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         const r = this.state ? this.onresistance : this.offresistance;
         this.current = (this.nodes[0].v - this.nodes[2].v) / r + (this.nodes[0].v - this.nodes[3].v) / r;
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         const vd = this.nodes[0].v - this.nodes[1].v;
         if (Math.abs(this.current) < this.holdcurrent) this.state = false;
         if (Math.abs(vd) > this.breakdown) this.state = true;
     }
 
-    doStep(): void {
+    override doStep(): void {
         const r = this.state ? this.onresistance : this.offresistance;
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[2], r);
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[3], r);
@@ -151,18 +151,18 @@ export class DiacElm extends CircuitElm {
         this.diode2.doStep(this.nodes[1].v - this.nodes[3].v);
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[0]);
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
         this.diode1.stamp(this.nodes[2], this.nodes[1]);
         this.diode2.stamp(this.nodes[1], this.nodes[3]);
     }
 
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return 2;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "DIAC";
         this.getBasicInfo(arr);
         arr[3] = this.state ? "on" : "off";
@@ -173,10 +173,10 @@ export class DiacElm extends CircuitElm {
         arr[8] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("On resistance (ohms)", this.onresistance, 0, 0);
         if (n === 1) return new EditInfo("Off resistance (ohms)", this.offresistance, 0, 0);
         if (n === 2) return new EditInfo("Breakdown voltage (volts)", this.breakdown, 0, 0);
@@ -184,7 +184,7 @@ export class DiacElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (ei.value > 0 && n === 0) this.onresistance = ei.value;
         if (ei.value > 0 && n === 1) this.offresistance = ei.value;
         if (ei.value > 0 && n === 2) this.breakdown = ei.value;

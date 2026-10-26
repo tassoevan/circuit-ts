@@ -76,11 +76,11 @@ export class SwitchElm extends CircuitElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "s".charCodeAt(0);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         if (this.position !== 0) CircuitXMLSerializer.dumpAttr(elem, "p", this.position);
         if (this.momentary) CircuitXMLSerializer.dumpAttr(elem, "mm", this.momentary);
@@ -89,7 +89,7 @@ export class SwitchElm extends CircuitElm {
         if (this.resistance !== 0) CircuitXMLSerializer.dumpAttr(elem, "r", this.resistance);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.position = xml.parseIntAttr("p", this.position);
         this.momentary = xml.parseBooleanAttr("mm", this.momentary);
@@ -104,7 +104,7 @@ export class SwitchElm extends CircuitElm {
 
     readonly openhs = 16;
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(32);
         this.ps = new Point();
@@ -122,7 +122,7 @@ export class SwitchElm extends CircuitElm {
         }
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const hs1 = this.position === 1 ? 0 : 2;
         const hs2 = this.position === 1 ? this.openhs : 2;
         this.setBbox(this.point1, this.point2, this.openhs);
@@ -174,7 +174,7 @@ export class SwitchElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    isSwitchElm(): boolean {
+    override isSwitchElm(): boolean {
         return true;
     }
 
@@ -187,7 +187,7 @@ export class SwitchElm extends CircuitElm {
         return new Rectangle(x, y, w, h);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         if (this.position === 1) this.current = 0;
         else if (this.resistance > 0) this.current = (this.nodes[0].v - this.nodes[1].v) / this.resistance;
         else if (this.parent != null) this.current = (this.nodes[0].v - this.nodes[1].v) / SwitchElm.COMPOSITE_CLOSED_R;
@@ -215,11 +215,11 @@ export class SwitchElm extends CircuitElm {
         }
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "switch (SPST)";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = this.momentary ? "push switch (SPST)" : "switch (SPST)";
         if (this.position === 1) {
             arr[1] = "open";
@@ -231,17 +231,17 @@ export class SwitchElm extends CircuitElm {
         }
     }
 
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return this.position === 0;
     }
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return this.position === 0 && this.parent == null && this.resistance === 0;
     }
-    isRemovableWire(): boolean {
+    override isRemovableWire(): boolean {
         return this.position === 0 && this.parent == null && this.resistance === 0;
     }
 
-    stamp(): void {
+    override stamp(): void {
         if (this.position === 0) {
             if (this.resistance > 0) CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.resistance);
             else if (this.parent != null)
@@ -253,10 +253,10 @@ export class SwitchElm extends CircuitElm {
         return (this.flags & SwitchElm.FLAG_IEC) !== 0;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Momentary Switch", this.momentary);
@@ -273,7 +273,7 @@ export class SwitchElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.momentary = ei.checkbox!.getState();
         if (n === 1) {
             this.flags = ei.changeFlag(this.flags, SwitchElm.FLAG_IEC);
@@ -304,7 +304,7 @@ export class SwitchElm extends CircuitElm {
         else this.keyShortcut = s.substring(0, 1).toLowerCase();
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         if (this.x === this.x2 || this.y === this.y2) {
             router.addWire(this.x, this.y, this.x2, this.y2);
             const pa = this.interpPoint(this.lead1!, this.lead2!, 0, 0);
@@ -313,7 +313,7 @@ export class SwitchElm extends CircuitElm {
         }
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "s".charCodeAt(0);
     }
 }

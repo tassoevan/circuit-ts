@@ -48,18 +48,18 @@ export class PisoShiftElm extends ChipElm {
         this.setupPins();
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    override dumpXmlState(doc: Document, elem: Element): void {
         super.dumpXmlState(doc, elem);
         const newData = new Array<boolean>(this.data.length).fill(false);
         for (let i = 0; i < this.data.length; i++) newData[i] = this.data[(i + this.dataIndex) % this.data.length];
         CircuitXMLSerializer.dumpAttr(elem, "dt", ChipElm.writeBitsToString(newData));
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.data = new Array<boolean>(this.bits).fill(false);
         this.dataIndex = 0;
@@ -67,23 +67,23 @@ export class PisoShiftElm extends ChipElm {
         if (dt !== null) ChipElm.readBitsFromString(dt, this.data);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 186;
     }
-    getChipName(): string {
+    override getChipName(): string {
         return "PISO shift register";
     }
-    needsBits(): boolean {
+    override needsBits(): boolean {
         return true;
     }
-    defaultBitCount(): number {
+    override defaultBitCount(): number {
         return 8;
     }
     hasNewBhvr(): boolean {
         return (this.flags & PisoShiftElm.FLAG_NEW_BEHAVIOR) !== 0;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.data = new Array<boolean>(this.bits).fill(false);
     }
@@ -119,14 +119,14 @@ export class PisoShiftElm extends ChipElm {
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return (this.hasNewBhvr() ? 4 : 3) + this.bits;
     }
     getVoltageSourceCount(): number {
         return 1;
     }
 
-    execute(): void {
+    override execute(): void {
         // LOAD raised
         if (this.pins[0].value !== this.loadState) {
             this.loadState = this.pins[0].value;
@@ -152,15 +152,15 @@ export class PisoShiftElm extends ChipElm {
         }
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value !== this.bits && ei.value >= 1) {
             this.bits = Math.trunc(ei.value);
             this.data = new Array<boolean>(this.bits).fill(false);

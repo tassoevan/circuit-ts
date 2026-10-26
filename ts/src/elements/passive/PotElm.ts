@@ -82,24 +82,24 @@ export class PotElm extends CircuitElm {
         }
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 174;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "pt";
     }
-    isPotElm(): boolean {
+    override isPotElm(): boolean {
         return true;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return n === 0 ? this.point1 : n === 1 ? this.point2 : this.post3;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ma", this.maxResistance);
         CircuitXMLSerializer.dumpAttr(elem, "po", this.position);
@@ -107,7 +107,7 @@ export class PotElm extends CircuitElm {
         if (this.link !== 0) CircuitXMLSerializer.dumpAttr(elem, "li", this.link);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.maxResistance = xml.parseDoubleAttr("ma", this.maxResistance);
         this.position = xml.parseDoubleAttr("po", this.position);
@@ -184,13 +184,13 @@ export class PotElm extends CircuitElm {
         this.sliderOwner = true;
     }
 
-    delete(): void {
+    override delete(): void {
         this.deleted = true;
         this.detachSlider();
         super.delete();
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const app = CircuitElm.app;
         let offset = 0;
@@ -226,7 +226,7 @@ export class PotElm extends CircuitElm {
         this.ps4 = new Point();
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const segments = 16;
         const hs = this.showEuroResistors() ? 6 : 8;
         const v1 = this.nodes[0].v;
@@ -346,25 +346,25 @@ export class PotElm extends CircuitElm {
         }
     }
 
-    reset(): void {
+    override reset(): void {
         this.curcount1 = this.curcount2 = this.curcount3 = 0;
         super.reset();
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         if (this.resistance1 === 0) return;
         this.current1 = (this.nodes[0].v - this.nodes[2].v) / this.resistance1;
         this.current2 = (this.nodes[1].v - this.nodes[2].v) / this.resistance2;
         this.current3 = -this.current1 - this.current2;
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0) return -this.current1;
         if (n === 1) return -this.current2;
         return -this.current3;
     }
 
-    stamp(): void {
+    override stamp(): void {
         const sim = SimulationManager.theSim!;
         this.resistance1 = this.maxResistance * this.position;
         this.resistance2 = this.maxResistance * (1 - this.position);
@@ -372,7 +372,7 @@ export class PotElm extends CircuitElm {
         sim.stampResistor(this.nodes[2], this.nodes[1], this.resistance2);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "potentiometer";
         arr[1] = "Vd = " + CircuitElm.getVoltageDText(this.getVoltageDiff());
         arr[2] = "R1 = " + CircuitElm.getUnitText(this.resistance1, Locale.ohmString);
@@ -381,7 +381,7 @@ export class PotElm extends CircuitElm {
         arr[5] = "I2 = " + CircuitElm.getCurrentDText(this.current2);
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Resistance (ohms)", this.maxResistance, 0, 0);
         if (n === 1) {
             const ei = new EditInfo("Slider Text", 0, -1, -1);
@@ -397,7 +397,7 @@ export class PotElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.maxResistance = ei.value;
         if (n === 1) {
             this.sliderText = ei.textf!.value;
@@ -411,7 +411,7 @@ export class PotElm extends CircuitElm {
         }
     }
 
-    setMouseElm(v: boolean): void {
+    override setMouseElm(v: boolean): void {
         super.setMouseElm(v);
         this.slider?.draw();
     }
@@ -420,17 +420,17 @@ export class PotElm extends CircuitElm {
         this.slider?.onMouseWheel(e);
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         this.flags ^= this.FLAG_FLIP_OFFSET;
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         this.flags ^= this.FLAG_FLIP_OFFSET;
         super.flipY(c2, count);
     }
 
-    flipXY(xmy: number, count: number): void {
+    override flipXY(xmy: number, count: number): void {
         if (CircuitElm.abs(this.dx) === CircuitElm.abs(this.dy)) this.flags ^= this.FLAG_FLIP;
         this.flags ^= this.FLAG_FLIP_OFFSET;
         super.flipXY(xmy, count);

@@ -53,14 +53,14 @@ export class ThermistorNTCElm extends CircuitElm {
         this.createSlider();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 2;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 350;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "r25", this.r25);
         CircuitXMLSerializer.dumpAttr(elem, "r50", this.r50);
@@ -70,7 +70,7 @@ export class ThermistorNTCElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "st", this.sliderText);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.r25 = xml.parseDoubleAttr("r25", this.r25);
         this.r50 = xml.parseDoubleAttr("r50", this.r50);
@@ -104,13 +104,13 @@ export class ThermistorNTCElm extends CircuitElm {
         CircuitElm.app.addWidgetToVerticalPanel(this.slider.element);
     }
 
-    delete(): void {
+    override delete(): void {
         if (this.labelEl) CircuitElm.app.removeWidgetFromVerticalPanel(this.labelEl);
         if (this.slider) CircuitElm.app.removeWidgetFromVerticalPanel(this.slider.element);
         super.delete();
     }
 
-    setMouseElm(v: boolean): void {
+    override setMouseElm(v: boolean): void {
         super.setMouseElm(v);
         this.slider?.draw();
     }
@@ -119,7 +119,7 @@ export class ThermistorNTCElm extends CircuitElm {
         this.slider?.onMouseWheel(e);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(32);
         if (this.slider) {
@@ -129,7 +129,7 @@ export class ThermistorNTCElm extends CircuitElm {
         }
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const hs = 6;
         this.setBbox(this.point1, this.point2, hs);
         this.draw2Leads(g);
@@ -178,17 +178,17 @@ export class ThermistorNTCElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.current = (this.nodes[0].v - this.nodes[1].v) / this.resistance;
     }
 
-    stamp(): void {
+    override stamp(): void {
         this.temperature = this.temprFromSliderPos();
         this.resistance = this.calcResistance(this.temperature);
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.resistance);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "thermistor";
         arr[1] = "I = " + CircuitElm.getCurrentDText(this.current);
         arr[2] = "Vd = " + CircuitElm.getVoltageDText(this.getVoltageDiff());
@@ -197,10 +197,10 @@ export class ThermistorNTCElm extends CircuitElm {
         arr[5] = "T = " + CircuitElm.getUnitText(this.temperature, "°C");
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("R at 25°C", this.r25, this.r50 + 100, 100000);
         if (n === 1) return new EditInfo("R at 50°C", this.r50, 100, this.r25 - 100);
         if (n === 2) return new EditInfo("Slider min temp (°C)", this.minTempr, -40, this.maxTempr);
@@ -213,7 +213,7 @@ export class ThermistorNTCElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.r25 = ei.value;
         if (n === 1) this.r50 = ei.value;
         if (n === 2) this.minTempr = ei.value;

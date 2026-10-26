@@ -38,7 +38,7 @@ export class TimerElm extends ChipElm {
     static readonly N_RST = 6;
     static readonly N_GND = 7;
 
-    getDefaultFlags(): number {
+    override getDefaultFlags(): number {
         return TimerElm.FLAG_RESET | TimerElm.FLAG_GROUND;
     }
 
@@ -56,7 +56,7 @@ export class TimerElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "555 Timer";
     }
 
@@ -78,7 +78,7 @@ export class TimerElm extends ChipElm {
         this.pins[N.N_GND] = new Pin(this, 2, ChipElm.SIDE_S, this.usePinNames() ? "gnd" : "1");
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
     hasReset(): boolean {
@@ -93,11 +93,11 @@ export class TimerElm extends ChipElm {
     usePinNames(): boolean {
         return (this.flags & TimerElm.FLAG_NUMBERS) === 0;
     }
-    isDigitalChip(): boolean {
+    override isDigitalChip(): boolean {
         return false;
     }
 
-    stamp(): void {
+    override stamp(): void {
         const N = TimerElm;
         this.ground = this.hasGroundPin() ? this.nodes[N.N_GND] : CircuitNode.ground;
         // stamp voltage divider to put ctl pin at 2/3 V
@@ -110,7 +110,7 @@ export class TimerElm extends ChipElm {
         if (this.hasGroundPin()) CircuitElm.sim.stampNonLinear(this.nodes[N.N_GND]);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         // need current for V, discharge, control, ground; output current is
         // calculated for us, and other pins have no current.
         const N = TimerElm;
@@ -128,7 +128,7 @@ export class TimerElm extends ChipElm {
         }
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         const N = TimerElm;
         const groundVolts = this.hasGroundPin() ? this.nodes[N.N_GND].v : 0;
         this.out = this.nodes[N.N_OUT].v > (this.nodes[N.N_VCC].v + groundVolts) / 2;
@@ -148,7 +148,7 @@ export class TimerElm extends ChipElm {
         } else this.triggerSuppressed = false;
     }
 
-    doStep(): void {
+    override doStep(): void {
         const N = TimerElm;
         // if output is low, discharge pin 0.  we use a small
         // resistor because it's easier, and sometimes people tie
@@ -159,23 +159,23 @@ export class TimerElm extends ChipElm {
         CircuitElm.sim.stampResistor(this.out ? this.nodes[N.N_VCC] : this.ground, this.nodes[N.N_OUT], 1);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.hasGroundPin() ? 8 : this.hasReset() ? 7 : 6;
     }
     getVoltageSourceCount(): number {
         return 0;
     }
-    getMatrixConnection(_n1: number, _n2: number): boolean {
+    override getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 165;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, 0, 0);
             ei.checkbox = new Checkbox("Ground Pin", this.hasGroundPin());
@@ -185,7 +185,7 @@ export class TimerElm extends ChipElm {
         return super.getChipEditInfo(n);
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.flags = ei.changeFlag(this.flags, TimerElm.FLAG_GROUND);
             this.allocNodes();

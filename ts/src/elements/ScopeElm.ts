@@ -63,7 +63,7 @@ export class ScopeElm extends CircuitElm {
         if (!r.equals(this.elmScope.rect)) this.elmScope.setRect(r);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.setScopeRect();
     }
@@ -76,29 +76,29 @@ export class ScopeElm extends CircuitElm {
         this.elmScope.timeStep();
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.elmScope.resetGraphFull(true);
     }
 
-    clearElmScope(): void {
+    override clearElmScope(): void {
         this.elmScope = null!;
     }
 
-    canViewInScope(): boolean {
+    override canViewInScope(): boolean {
         return false;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 403;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         this.elmScope.dumpXml(doc, elem);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         for (const child of xml.getChildElements()) {
             if (child.tagName === "o") {
@@ -110,7 +110,7 @@ export class ScopeElm extends CircuitElm {
         this.elmScope.resetGraph();
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.whiteColor);
         g.context.save();
         // setTransform() doesn't work in version of canvas2svg we are using
@@ -125,13 +125,13 @@ export class ScopeElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 0;
     }
-    getNumHandles(): number {
+    override getNumHandles(): number {
         return 2;
     }
-    isScopeElm(): boolean {
+    override isScopeElm(): boolean {
         return true;
     }
 

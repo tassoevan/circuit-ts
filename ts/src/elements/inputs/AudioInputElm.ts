@@ -86,7 +86,7 @@ export class AudioInputElm extends RailElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ma", this.maxVoltage);
         CircuitXMLSerializer.dumpAttr(elem, "st", this.startPosition);
@@ -94,7 +94,7 @@ export class AudioInputElm extends RailElm {
         CircuitXMLSerializer.dumpAttr(elem, "fi", this.fileNum);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.maxVoltage = xml.parseDoubleAttr("ma", this.maxVoltage);
         this.startPosition = xml.parseDoubleAttr("st", this.startPosition);
@@ -103,15 +103,15 @@ export class AudioInputElm extends RailElm {
         this.samplingRate = AudioInputElm.lastSamplingRate;
     }
 
-    reset(): void {
+    override reset(): void {
         this.timeOffset = this.startPosition;
     }
 
-    drawRail(g: Graphics): void {
+    override drawRail(g: Graphics): void {
         this.drawRailText(g, this.fileName === null ? Locale.LS("No file") : this.fileName);
     }
 
-    getRailText(): string {
+    override getRailText(): string {
         return this.fileName === null ? Locale.LS("No file") : this.fileName;
     }
 
@@ -119,7 +119,7 @@ export class AudioInputElm extends RailElm {
         this.samplingRate = sr;
     }
 
-    getVoltage(): number {
+    override getVoltage(): number {
         if (this.data === null) return 0;
         if (this.timeOffset < this.startPosition) this.timeOffset = this.startPosition;
         const dptr = this.timeOffset * this.samplingRate;
@@ -131,21 +131,21 @@ export class AudioInputElm extends RailElm {
         return (value1 * (1 - frac) + value2 * frac) * this.maxVoltage;
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.timeOffset += CircuitElm.sim.timeStep;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 411;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "ain";
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             const input = document.createElement("input");
@@ -166,7 +166,7 @@ export class AudioInputElm extends RailElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 1) this.maxVoltage = ei.value;
         if (n === 2) this.startPosition = ei.value;
     }
@@ -196,7 +196,7 @@ export class AudioInputElm extends RailElm {
         AudioOutputElm.lastSamplingRate = this.samplingRate;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "audio input";
         if (this.data === null) {
             arr[1] = "no file loaded";

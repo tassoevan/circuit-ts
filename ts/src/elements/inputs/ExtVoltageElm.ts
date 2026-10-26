@@ -44,17 +44,17 @@ export class ExtVoltageElm extends RailElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "nm", this.name);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.name = xml.parseStringAttr("nm", this.name) ?? this.name;
     }
 
-    drawRail(g: Graphics): void {
+    override drawRail(g: Graphics): void {
         this.drawRailText(g, this.name);
     }
 
@@ -65,18 +65,18 @@ export class ExtVoltageElm extends RailElm {
         return this.name;
     }
 
-    getVoltage(): number {
+    override getVoltage(): number {
         return this.voltage;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 418;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Name", 0, -1, -1);
             ei.text = this.name;
@@ -85,18 +85,18 @@ export class ExtVoltageElm extends RailElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.name = ei.textf!.value;
     }
 
-    isExtVoltageElm(): boolean {
+    override isExtVoltageElm(): boolean {
         return true;
     }
-    getElmType(): string {
+    override getElmType(): string {
         return "ext. voltage";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         super.getInfo(arr);
         arr[0] = Locale.LS("ext. voltage") + " (" + this.name + ")";
     }

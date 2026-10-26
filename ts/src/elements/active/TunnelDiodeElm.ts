@@ -35,13 +35,13 @@ export class TunnelDiodeElm extends CircuitElm {
         this.setup();
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
     setup(): void {}
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 175;
     }
 
@@ -49,7 +49,7 @@ export class TunnelDiodeElm extends CircuitElm {
     poly!: Polygon;
     cathode!: Point[];
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(16);
         this.cathode = this.newPointArray(4);
@@ -60,7 +60,7 @@ export class TunnelDiodeElm extends CircuitElm {
         this.poly = this.createPolygon(pa[0], pa[1], this.lead2!);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.hs);
 
         const v1 = this.nodes[0].v;
@@ -83,7 +83,7 @@ export class TunnelDiodeElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    reset(): void {
+    override reset(): void {
         this.lastvoltdiff = this.curcount = 0;
     }
 
@@ -96,7 +96,7 @@ export class TunnelDiodeElm extends CircuitElm {
         return vnew;
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[0]);
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
     }
@@ -108,7 +108,7 @@ export class TunnelDiodeElm extends CircuitElm {
     static readonly pvpp = 0.525;
     static readonly piv = 370e-6;
 
-    doStep(): void {
+    override doStep(): void {
         let voltdiff = this.nodes[0].v - this.nodes[1].v;
         if (Math.abs(voltdiff - this.lastvoltdiff) > 0.01) CircuitElm.sim.converged = false;
         voltdiff = this.limitStep(voltdiff, this.lastvoltdiff);
@@ -132,7 +132,7 @@ export class TunnelDiodeElm extends CircuitElm {
         CircuitElm.sim.stampCurrentSource(this.nodes[0], this.nodes[1], nc);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         const voltdiff = this.nodes[0].v - this.nodes[1].v;
         const { pvp, pip, pvv, pvt, pvpp, piv } = TunnelDiodeElm;
         const i0 = piv * Math.exp(-pvv);
@@ -143,7 +143,7 @@ export class TunnelDiodeElm extends CircuitElm {
             i0;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "tunnel diode";
         arr[1] = "I = " + CircuitElm.getCurrentText(this.getCurrent());
         arr[2] = "Vd = " + CircuitElm.getVoltageText(this.getVoltageDiff());

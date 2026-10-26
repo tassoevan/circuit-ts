@@ -61,27 +61,27 @@ export class Switch2Elm extends SwitchElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "S".charCodeAt(0);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "li", this.link);
         CircuitXMLSerializer.dumpAttr(elem, "th", this.throwCount);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.link = xml.parseIntAttr("li", this.link);
         this.throwCount = xml.parseIntAttr("th", this.throwCount);
     }
 
-    readonly openhs = 16;
+    override readonly openhs = 16;
     swposts: Point[] = [];
     swpoles: Point[] = [];
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(32);
         this.swposts = this.newPointArray(this.throwCount);
@@ -96,7 +96,7 @@ export class Switch2Elm extends SwitchElm {
         this.posCount = this.hasCenterOff() ? 3 : this.throwCount;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.openhs);
         this.adjustBbox(this.swposts[0], this.swposts[this.throwCount - 1]);
 
@@ -121,13 +121,13 @@ export class Switch2Elm extends SwitchElm {
         this.drawPosts(g);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0) return -this.current;
         if (n === this.position + 1) return this.current;
         return 0;
     }
 
-    getSwitchRect(): Rectangle {
+    override getSwitchRect(): Rectangle {
         const p0 = this.swpoles[0];
         const p1 = this.swpoles[this.throwCount - 1];
         const x = Math.min(this.lead1!.x, p0.x, p1.x);
@@ -137,38 +137,38 @@ export class Switch2Elm extends SwitchElm {
         return new Rectangle(x, y, w, h);
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return n === 0 ? this.point1 : this.swposts[n - 1];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1 + (this.throwCount ?? 0);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         if (this.position === 2 && this.hasCenterOff()) this.current = 0;
         else if (this.resistance > 0)
             this.current = (this.nodes[0].v - this.nodes[this.position + 1].v) / this.resistance;
     }
 
-    setVoltageSource(_n: number, v: VoltageSource): void {
+    override setVoltageSource(_n: number, v: VoltageSource): void {
         this.voltSource = v;
         v.setNodes(this.nodes[0], this.nodes[this.position + 1]);
     }
 
-    stamp(): void {
+    override stamp(): void {
         if (this.position === 2 && this.hasCenterOff()) return;
         if (this.resistance > 0)
             CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[this.position + 1], this.resistance);
         else CircuitElm.sim.stampVoltageSource(this.nodes[0], this.nodes[this.position + 1], this.voltSource!, 0);
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         if (this.position === 2 && this.hasCenterOff()) return 0;
         return this.resistance > 0 ? 0 : 1;
     }
 
-    toggle(): void {
+    override toggle(): void {
         super.toggle();
         if (this.link !== 0) {
             for (let i = 0; i !== CircuitElm.sim.elmList.length; i++) {
@@ -185,31 +185,31 @@ export class Switch2Elm extends SwitchElm {
         }
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         if (this.position === 2 && this.hasCenterOff()) return false;
         return this.comparePair(n1, n2, 0, 1 + this.position);
     }
 
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return this.resistance === 0;
     }
 
     // optimizing out this element is too complicated to be worth it (see #646)
-    isRemovableWire(): boolean {
+    override isRemovableWire(): boolean {
         return false;
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "switch (SPDT)";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] =
             "switch (" + (this.link === 0 ? "S" : "D") + "P" + (this.throwCount > 2 ? this.throwCount + "T)" : "DT)");
         arr[1] = "I = " + CircuitElm.getCurrentDText(this.getCurrent());
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         /*if (n == 1) {
             EditInfo ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Center Off", hasCenterOff());
@@ -221,7 +221,7 @@ export class Switch2Elm extends SwitchElm {
         return super.getEditInfo(n);
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         /*if (n == 1) {
             flags &= ~FLAG_CENTER_OFF;
             if (ei.checkbox!.getState())
@@ -248,7 +248,7 @@ export class Switch2Elm extends SwitchElm {
         return (this.flags & Switch2Elm.FLAG_FLIPPED) !== 0;
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         router.addWire(this.point1.x, this.point1.y, this.lead1!.x, this.lead1!.y);
         for (let i = 0; i !== this.throwCount; i++)
             router.addWire(this.swposts[i].x, this.swposts[i].y, this.swpoles[i].x, this.swpoles[i].y);
@@ -266,29 +266,29 @@ export class Switch2Elm extends SwitchElm {
         router.addObstacle(minX, minY, maxX, maxY);
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "S".charCodeAt(0);
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         super.flipX(c2, count);
         this.position = this.posCount - 1 - this.position;
         this.flags ^= Switch2Elm.FLAG_FLIPPED;
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         super.flipY(c2, count);
         this.position = this.posCount - 1 - this.position;
         this.flags ^= Switch2Elm.FLAG_FLIPPED;
     }
 
-    flipXY(c2: number, count: number): void {
+    override flipXY(c2: number, count: number): void {
         super.flipXY(c2, count);
         this.position = this.posCount - 1 - this.position;
         this.flags ^= Switch2Elm.FLAG_FLIPPED;
     }
 
-    validate(): boolean {
+    override validate(): boolean {
         if (this.position === 2 && this.hasCenterOff()) return true;
         if (this.resistance > 0) return true;
         const fpi = new FindPathInfo(FindPathInfo.VOLTAGE, this, this.getNode(0), CircuitElm.sim);

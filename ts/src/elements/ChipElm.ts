@@ -254,7 +254,7 @@ export abstract class ChipElm extends CircuitElm {
 
     abstract setupPins(): void;
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.drawChip(g);
     }
 
@@ -321,7 +321,7 @@ export abstract class ChipElm extends CircuitElm {
 
     drawLabel(_g: Graphics, _x: number, _y: number): void {}
 
-    drag(xx: number, yy: number): void {
+    override drag(xx: number, yy: number): void {
         yy = this.snapGrid(yy);
         if (xx < this.x) {
             xx = this.x;
@@ -333,7 +333,7 @@ export abstract class ChipElm extends CircuitElm {
         this.setPoints();
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         if (this.x2 - this.x > this.sizeX * this.cspc2 && this.isCreating()) this.setSize(2);
         const x0 = this.x + this.cspc2;
         const y0 = this.y;
@@ -373,7 +373,7 @@ export abstract class ChipElm extends CircuitElm {
         this.labelY = yr + ys / 2;
     }
 
-    initBoundingBox(): void {
+    override initBoundingBox(): void {
         super.initBoundingBox();
         if (this.pins == null || this.cspc === 0) return;
         const xr = this.x + this.cspc2 - this.cspc;
@@ -385,7 +385,7 @@ export abstract class ChipElm extends CircuitElm {
         this.setBbox(xr, yr, xr + xs, yr + ys);
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         router.addObstacle(this.rectPointsX[0], this.rectPointsY[0], this.rectPointsX[2], this.rectPointsY[2]);
     }
 
@@ -459,16 +459,16 @@ export abstract class ChipElm extends CircuitElm {
         return -1;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return this.pins[n].post;
     }
-    getPostWidth(n: number): number {
+    override getPostWidth(n: number): number {
         return this.pins[n].busWidth;
     }
 
-    abstract getVoltageSourceCount(): number;
+    abstract override getVoltageSourceCount(): number;
 
-    setVoltageSource(j: number, vs: VoltageSource): void {
+    override setVoltageSource(j: number, vs: VoltageSource): void {
         for (let i = 0; i !== this.getPostCount(); i++) {
             const p = this.pins[i];
             if (p.output && j-- === 0) {
@@ -480,11 +480,11 @@ export abstract class ChipElm extends CircuitElm {
         console.log("setVoltageSource failed for " + this);
     }
 
-    setHighVoltage(hv: number): void {
+    override setHighVoltage(hv: number): void {
         this.highVoltage = hv;
     }
 
-    stamp(): void {
+    override stamp(): void {
         let vsc = 0;
         for (let i = 0; i !== this.getPostCount(); i++) {
             const p = this.pins[i];
@@ -498,7 +498,7 @@ export abstract class ChipElm extends CircuitElm {
 
     execute(): void {}
 
-    startIteration(): void {
+    override startIteration(): void {
         for (let i = 0; i !== this.getPostCount(); i++) {
             const p = this.pins[i];
             if (!p.output) p.value = this.nodes[i].v > this.getThreshold();
@@ -515,7 +515,7 @@ export abstract class ChipElm extends CircuitElm {
         else this.execute();
     }
 
-    doStep(): void {
+    override doStep(): void {
         for (let i = 0; i !== this.getPostCount(); i++) {
             const p = this.pins[i];
             if (p.output)
@@ -528,7 +528,7 @@ export abstract class ChipElm extends CircuitElm {
         }
     }
 
-    reset(): void {
+    override reset(): void {
         for (let i = 0; i !== this.getPostCount(); i++) {
             this.pins[i].value = false;
             this.pins[i].curcount = 0;
@@ -536,20 +536,20 @@ export abstract class ChipElm extends CircuitElm {
         this.lastClock = false;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         if (this.bits > 0) CircuitXMLSerializer.dumpAttr(elem, "bi", this.bits);
         if (this.highVoltage !== 5) CircuitXMLSerializer.dumpAttr(elem, "hv", this.highVoltage);
         if (this.bitOrder !== 0) CircuitXMLSerializer.dumpAttr(elem, "bo", this.bitOrder);
     }
 
-    dumpXmlState(_doc: Document, elem: Element): void {
+    override dumpXmlState(_doc: Document, elem: Element): void {
         for (let i = 0; i !== this.getPostCount(); i++)
             if (this.pins[i].state && this.nodes[i].v > 0)
                 CircuitXMLSerializer.dumpAttr(elem, "v" + i, this.nodes[i].v);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         // "ix" is present on state-restore calls (from CompositeElm.dumpXmlState/undumpXml).
         // In that case this element already exists with correct flags/pins (set up when the
         // containing model was loaded), and the state element has no "f" attribute, so
@@ -578,7 +578,7 @@ export abstract class ChipElm extends CircuitElm {
         this.pins[n].value = value;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = this.getChipName();
         let a = 1,
             shown = 0;
@@ -600,12 +600,12 @@ export abstract class ChipElm extends CircuitElm {
         }
     }
 
-    setCurrent(vs: VoltageSource, c: number): void {
+    override setCurrent(vs: VoltageSource, c: number): void {
         for (let i = 0; i !== this.getPostCount(); i++)
             if (this.pins[i].output && this.pins[i].voltSource === vs) this.pins[i].current = c;
     }
 
-    validate(): boolean {
+    override validate(): boolean {
         for (let i = 0; i !== this.getPostCount(); i++)
             if (this.pins[i].output && !this.validateRailNode(i)) return false;
         return true;
@@ -614,14 +614,14 @@ export abstract class ChipElm extends CircuitElm {
     getChipName(): string {
         return "chip";
     }
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
-    hasGroundConnection(n1: number): boolean {
+    override hasGroundConnection(n1: number): boolean {
         return this.pins[n1].output;
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         // n may be out of range if this chip's pin count changed (e.g. via edit dialog)
         // after a containing CompositeElm/subcircuit recorded its node mapping.
         if (n < 0 || n >= this.pins.length) return 0;
@@ -649,7 +649,7 @@ export abstract class ChipElm extends CircuitElm {
         return s;
     }
 
-    flipX(center2: number, count: number): void {
+    override flipX(center2: number, count: number): void {
         this.flags ^= ChipElm.FLAG_FLIP_X;
         if (count !== 1) {
             const xs = (this.flippedSizeX + 1) * this.cspc2;
@@ -659,7 +659,7 @@ export abstract class ChipElm extends CircuitElm {
         this.setPoints();
     }
 
-    flipY(center2: number, count: number): void {
+    override flipY(center2: number, count: number): void {
         this.flags ^= ChipElm.FLAG_FLIP_Y;
         if (count !== 1) {
             const ys = (this.flippedSizeY - 1) * this.cspc2;
@@ -669,7 +669,7 @@ export abstract class ChipElm extends CircuitElm {
         this.setPoints();
     }
 
-    flipXY(xmy: number, count: number): void {
+    override flipXY(xmy: number, count: number): void {
         this.flags ^= ChipElm.FLAG_FLIP_XY;
         if (this.isFlippedX() !== this.isFlippedY()) this.flags ^= ChipElm.FLAG_FLIP_X | ChipElm.FLAG_FLIP_Y;
         if (count !== 1) {
@@ -680,11 +680,11 @@ export abstract class ChipElm extends CircuitElm {
         this.setPoints();
     }
 
-    getNumHandles(): number {
+    override getNumHandles(): number {
         return 0;
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (this.isDigitalChip()) {
             if (n === 0) return new EditInfo("High Logic Voltage", this.highVoltage).setUnitStep();
             n--;
@@ -704,7 +704,7 @@ export abstract class ChipElm extends CircuitElm {
         return this.getChipEditInfo(n);
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (this.isDigitalChip()) {
             if (n === 0) {
                 this.highVoltage = ei.value;

@@ -47,7 +47,7 @@ export class JKFlipFlopElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "JK flip-flop";
     }
 
@@ -71,14 +71,14 @@ export class JKFlipFlopElm extends ChipElm {
         }
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 5 + (this.hasReset() ? 1 : 0);
     }
     getVoltageSourceCount(): number {
         return 2;
     }
 
-    execute(): void {
+    override execute(): void {
         const transition = this.positiveEdgeTriggered()
             ? this.pins[1].value && !this.lastClock
             : !this.pins[1].value && this.lastClock;
@@ -98,21 +98,21 @@ export class JKFlipFlopElm extends ChipElm {
         this.writeOutput(4, !this.pins[3].value);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 156;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return EditInfo.createCheckbox("Reset Pin", this.hasReset());
         if (n === 1) return EditInfo.createCheckbox("Positive Edge Triggered", this.positiveEdgeTriggered());
         if (n === 2) return EditInfo.createCheckbox("Invert Reset", this.invertReset());
         return super.getChipEditInfo(n);
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.flags = ei.changeFlag(this.flags, JKFlipFlopElm.FLAG_RESET);
             this.setupPins();

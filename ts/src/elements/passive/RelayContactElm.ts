@@ -70,14 +70,14 @@ export class RelayContactElm extends CircuitElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 426;
     }
     useIECSymbol(): boolean {
         return (this.flags & this.FLAG_IEC) !== 0;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "lb", this.label);
         CircuitXMLSerializer.dumpAttr(elem, "ron", this.r_on);
@@ -85,7 +85,7 @@ export class RelayContactElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "ip", this.i_position);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.label = xml.parseStringAttr("lb", this.label) ?? this.label;
         this.r_on = xml.parseDoubleAttr("ron", this.r_on);
@@ -95,7 +95,7 @@ export class RelayContactElm extends CircuitElm {
         this.allocNodes();
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         for (let i = 0; i !== 2; i++) {
             this.setVoltageColor(g, this.nodes[this.nSwitch0 + i].v);
             CircuitElm.drawThickLine(g, this.swposts[i], this.swpoles[i]);
@@ -169,13 +169,13 @@ export class RelayContactElm extends CircuitElm {
         this.setBbox(this.point1, this.point2, this.openhs);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0) return -this.switchCurrent;
         if (n === 1 + this.i_position) return this.switchCurrent;
         return 0;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.allocNodes();
         this.openhs = this.dsign * 16;
@@ -208,29 +208,29 @@ export class RelayContactElm extends CircuitElm {
         return (this.flags & this.FLAG_NORMALLY_CLOSED) !== 0;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return this.swposts[n];
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 2;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.switchCurrent = this.switchCurCount = 0;
         this.i_position = 0;
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[this.nSwitch0]);
         CircuitElm.sim.stampNonLinear(this.nodes[this.nSwitch1]);
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    doStep(): void {
+    override doStep(): void {
         CircuitElm.sim.stampResistor(
             this.nodes[this.nSwitch0],
             this.nodes[this.nSwitch1],
@@ -238,25 +238,25 @@ export class RelayContactElm extends CircuitElm {
         );
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         if (this.i_position === 1) this.switchCurrent = 0;
         else
             this.switchCurrent =
                 (this.nodes[this.nSwitch0].v - this.nodes[this.nSwitch1 + this.i_position].v) / this.r_on;
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "relay";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = Locale.LS("relay");
         if (this.i_position === 0) arr[0] += " (" + Locale.LS("off") + ")";
         else if (this.i_position === 1) arr[0] += " (" + Locale.LS("on") + ")";
         arr[1] = "I = " + CircuitElm.getCurrentDText(this.switchCurrent);
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("On Resistance (ohms)", this.r_on, 0, 0).setPositive();
         if (n === 1) return new EditInfo("Off Resistance (ohms)", this.r_off, 0, 0).setPositive();
         if (n === 2) return new EditInfo("Label (for linking)", this.label);
@@ -265,7 +265,7 @@ export class RelayContactElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) this.r_on = ei.value;
         if (n === 1 && ei.value > 0) this.r_off = ei.value;
         if (n === 2) this.label = ei.textf!.value;
@@ -276,7 +276,7 @@ export class RelayContactElm extends CircuitElm {
         }
     }
 
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 }

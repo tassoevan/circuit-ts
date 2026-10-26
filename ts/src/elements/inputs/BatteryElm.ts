@@ -97,26 +97,26 @@ export class BatteryElm extends CircuitElm {
         this.reset();
     }
 
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return 2;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
-    getDragVertical(_requestedVertical: boolean): boolean {
+    override getDragVertical(_requestedVertical: boolean): boolean {
         return true;
     }
-    isBatteryElm(): boolean {
+    override isBatteryElm(): boolean {
         return true;
     }
 
     // point 2, not point 1, should track the mouse during toolbar drag-and-drop
-    dragPlace(xa: number, ya: number, vertical: boolean): void {
+    override dragPlace(xa: number, ya: number, vertical: boolean): void {
         super.dragPlace(xa, ya, vertical);
         this.swapDragEndpoints();
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "r0", this.r0);
         CircuitXMLSerializer.dumpAttr(elem, "r1", this.r1);
@@ -132,11 +132,11 @@ export class BatteryElm extends CircuitElm {
             elem.appendChild(doc.createTextNode(this.socVoltageTable));
     }
 
-    dumpXmlState(_doc: Document, elem: Element): void {
+    override dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "soc", this.soc);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.r0 = xml.parseDoubleAttr("r0", 0.01);
         this.r1 = xml.parseDoubleAttr("r1", 0.02);
@@ -163,7 +163,7 @@ export class BatteryElm extends CircuitElm {
         this.parseSocTable(null);
     }
 
-    reset(): void {
+    override reset(): void {
         this.soc = BatteryElm.clampSoc(this.initialSoc);
         this.capVoltDiff = this.capCurrent = this.curSourceValue = 0;
         this.curcount = 0;
@@ -238,12 +238,12 @@ export class BatteryElm extends CircuitElm {
         return this.socTable[n - 1][1];
     }
 
-    setVoltageSource(n: number, v: VoltageSource): void {
+    override setVoltageSource(n: number, v: VoltageSource): void {
         super.setVoltageSource(n, v);
         v.setNodes(this.nodes[0], this.nodes[2]);
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampVoltageSource(this.nodes[0], this.nodes[2], this.voltSource);
         CircuitElm.sim.stampResistor(this.nodes[2], this.nodes[3], this.r0);
         CircuitElm.sim.stampResistor(this.nodes[3], this.nodes[1], this.r1);
@@ -261,12 +261,12 @@ export class BatteryElm extends CircuitElm {
         CircuitElm.sim.stampRightSide(this.nodes[1]);
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         if (this.doDcAnalysis()) this.curSourceValue = 0;
         else this.curSourceValue = -this.capVoltDiff / this.compResistance - this.capCurrent;
     }
 
-    doStep(): void {
+    override doStep(): void {
         CircuitElm.sim.updateVoltageSource(
             this.nodes[0],
             this.nodes[2],
@@ -276,7 +276,7 @@ export class BatteryElm extends CircuitElm {
         CircuitElm.sim.stampCurrentSource(this.nodes[3], this.nodes[1], this.curSourceValue);
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.capVoltDiff = this.nodes[3].v - this.nodes[1].v;
         if (this.compResistance > 0) this.capCurrent = this.capVoltDiff / this.compResistance + this.curSourceValue;
 
@@ -291,12 +291,12 @@ export class BatteryElm extends CircuitElm {
     }
 
     readonly circleSize = 17;
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(8);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.x, this.y, this.x2, this.y2);
         this.draw2Leads(g);
         this.setVoltageColor(g, this.nodes[0].v);
@@ -325,14 +325,14 @@ export class BatteryElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    addRoutingObstacle(wr: WireRouter): void {
+    override addRoutingObstacle(wr: WireRouter): void {
         this.addRoutingObstacleWithLeads(wr, 16);
     }
 
-    getPower(): number {
+    override getPower(): number {
         return -this.getVoltageDiff() * this.current;
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[1].v - this.nodes[0].v;
     }
 
@@ -348,7 +348,7 @@ export class BatteryElm extends CircuitElm {
             : "Custom";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = Locale.LS("battery") + " (" + Locale.LS(this.getBatteryTypeName()) + ")";
         arr[1] = "I = " + CircuitElm.getCurrentText(this.getCurrent());
         arr[2] = "Vd = " + CircuitElm.getVoltageText(this.getVoltageDiff());
@@ -356,7 +356,7 @@ export class BatteryElm extends CircuitElm {
         arr[4] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Battery Type", this.batteryType, -1, -1);
             ei.choice = new Choice();
@@ -393,7 +393,7 @@ export class BatteryElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.choice != null) {
             const oldType = this.batteryType;
             const sel = ei.choice!.getSelectedIndex();

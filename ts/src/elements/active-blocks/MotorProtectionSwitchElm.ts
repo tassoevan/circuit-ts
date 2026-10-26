@@ -65,7 +65,7 @@ export class MotorProtectionSwitchElm extends CircuitElm {
         this.curcounts = [0, 0, 0];
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "re", this.resistance);
         CircuitXMLSerializer.dumpAttr(elem, "i2", this.i2t);
@@ -73,7 +73,7 @@ export class MotorProtectionSwitchElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "la", this.label);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.resistance = xml.parseDoubleAttr("re", this.resistance);
         this.i2t = xml.parseDoubleAttr("i2", this.i2t);
@@ -81,11 +81,11 @@ export class MotorProtectionSwitchElm extends CircuitElm {
         this.label = xml.parseStringAttr("la", this.label) ?? this.label;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 428;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.heats = [0, 0, 0];
         this.currents = [0, 0, 0];
@@ -93,7 +93,7 @@ export class MotorProtectionSwitchElm extends CircuitElm {
         this.setSwitchPositions();
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.posts = new Array(6);
         this.leads = new Array(6);
@@ -105,10 +105,10 @@ export class MotorProtectionSwitchElm extends CircuitElm {
         }
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 6;
     }
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return this.posts[n];
     }
 
@@ -135,7 +135,7 @@ export class MotorProtectionSwitchElm extends CircuitElm {
         return Color.white;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const ctx = g.context;
         this.setBbox(this.posts[0], this.posts[5], 6);
         ctx.save();
@@ -202,24 +202,24 @@ export class MotorProtectionSwitchElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         for (let i = 0; i !== 3; i++)
             this.currents[i] =
                 (this.nodes[i * 2].v - this.nodes[i * 2 + 1].v) / (this.blown ? this.blownResistance : this.resistance);
     }
 
-    stamp(): void {
+    override stamp(): void {
         for (let i = 0; i !== 6; i++) CircuitElm.sim.stampNonLinear(this.nodes[i]);
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         return Math.trunc(n1 / 2) === Math.trunc(n2 / 2);
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         const wasBlown = this.blown;
         for (let j = 0; j !== 3; j++) {
             const i = this.currents[j];
@@ -241,7 +241,7 @@ export class MotorProtectionSwitchElm extends CircuitElm {
         }
     }
 
-    doStep(): void {
+    override doStep(): void {
         for (let i = 0; i !== 3; i++)
             CircuitElm.sim.stampResistor(
                 this.nodes[i * 2],
@@ -250,34 +250,34 @@ export class MotorProtectionSwitchElm extends CircuitElm {
             );
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "motor protection switch";
         this.getBasicInfo(arr);
         arr[3] = "R = " + CircuitElm.getUnitText(this.resistance, Locale.ohmString);
         arr[4] = "I2t = " + this.i2t;
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         return n % 2 === 1 ? this.currents[Math.trunc(n / 2)] : -this.currents[Math.trunc(n / 2)];
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("I2t", this.i2t, 0, 0).setPositive();
         if (n === 1) return new EditInfo("On Resistance", this.resistance, 0, 0).setPositive();
         if (n === 2) return new EditInfo("Label (for linking)", this.label);
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.i2t = ei.value;
         if (n === 1) this.resistance = ei.value;
         if (n === 2) this.label = ei.textf!.value;
     }
 
-    canFlipX(): boolean {
+    override canFlipX(): boolean {
         return false;
     }
-    canFlipY(): boolean {
+    override canFlipY(): boolean {
         return false;
     }
 }

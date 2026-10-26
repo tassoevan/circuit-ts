@@ -67,13 +67,13 @@ export class DataInputElm extends RailElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "sl", this.sampleLength);
         CircuitXMLSerializer.dumpAttr(elem, "sf", this.scaleFactor);
     }
 
-    dumpXmlState(_doc: Document, elem: Element): void {
+    override dumpXmlState(_doc: Document, elem: Element): void {
         if (this.data !== null) {
             if (this.fileNum === 0) this.fileNum = DataInputElm.fileNumCounter++;
             const ent = new DataFileEntry();
@@ -84,7 +84,7 @@ export class DataInputElm extends RailElm {
         }
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.sampleLength = xml.parseDoubleAttr("sl", this.sampleLength);
         this.scaleFactor = xml.parseDoubleAttr("sf", this.scaleFactor);
@@ -96,15 +96,15 @@ export class DataInputElm extends RailElm {
         }
     }
 
-    reset(): void {
+    override reset(): void {
         this.timeOffset = 0;
     }
 
-    drawRail(g: Graphics): void {
+    override drawRail(g: Graphics): void {
         this.drawRailText(g, this.fileName === null ? Locale.LS("No file") : this.fileName);
     }
 
-    getRailText(): string {
+    override getRailText(): string {
         return this.fileName === null ? Locale.LS("No file") : this.fileName;
     }
 
@@ -112,7 +112,7 @@ export class DataInputElm extends RailElm {
         return (this.flags & this.FLAG_REPEAT) !== 0;
     }
 
-    getVoltage(): number {
+    override getVoltage(): number {
         if (this.data === null || this.data.length === 0) return 0;
         let ptr = Math.trunc(this.timeOffset / this.sampleLength);
         if (ptr < 0) ptr = 0;
@@ -125,18 +125,18 @@ export class DataInputElm extends RailElm {
         return this.data[ptr] * this.scaleFactor;
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.timeOffset += CircuitElm.sim.timeStep;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 424;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             const input = document.createElement("input");
@@ -157,7 +157,7 @@ export class DataInputElm extends RailElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 1) this.scaleFactor = ei.value;
         if (n === 2) this.sampleLength = ei.value;
         if (n === 3) this.flags = ei.changeFlag(this.flags, this.FLAG_REPEAT);
@@ -201,7 +201,7 @@ export class DataInputElm extends RailElm {
         }
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "data input";
         if (this.data === null) {
             arr[1] = "no file loaded";

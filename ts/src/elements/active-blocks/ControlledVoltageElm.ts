@@ -49,34 +49,34 @@ export class ControlledVoltageElm extends ControlledSourceElm {
     }
 
     // integer dump types are for the obsolete text format; this element is XML only
-    getDumpType(): number {
+    override getDumpType(): number {
         return 0;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "cv";
     }
-    getElmType(): string {
+    override getElmType(): string {
         return "Controlled Voltage Source";
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
 
     // tell the voltage source which nodes it sits between, so assignMatrix() can find
     // its matrix.  same order as the stamp below.
-    setVoltageSource(n: number, v: VoltageSource): void {
+    override setVoltageSource(n: number, v: VoltageSource): void {
         super.setVoltageSource(n, v);
         v.setNodes(this.nodes[0], this.nodes[1]);
     }
 
-    stamp(): void {
+    override stamp(): void {
         const sim = SimulationManager.theSim!;
         sim.stampNonLinearVS(this.voltSource!);
         sim.stampVoltageSource(this.nodes[0], this.nodes[1], this.voltSource);
     }
 
-    doStep(): void {
+    override doStep(): void {
         const sim = SimulationManager.theSim!;
         if (this.expr == null) return;
 
@@ -104,11 +104,11 @@ export class ControlledVoltageElm extends ControlledSourceElm {
         SimulationManager.theSim!.stampMatrixVV(this.voltSource!, ivs, -dx);
     }
 
-    setCurrent(_vs: VoltageSource, c: number): void {
+    override setCurrent(_vs: VoltageSource, c: number): void {
         this.current = c;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.draw2Leads(g);
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : Color.gray);
         this.setPowerColor(g, false);

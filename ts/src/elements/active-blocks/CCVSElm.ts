@@ -49,7 +49,7 @@ export class CCVSElm extends VCCSElm {
         }
     }
 
-    setupPins(): void {
+    override setupPins(): void {
         if (!this.inputCount) this.inputCount = 0;
         this.sizeX = 2;
         this.sizeY = this.inputCount > 2 ? this.inputCount : 2;
@@ -71,15 +71,15 @@ export class CCVSElm extends VCCSElm {
 
     // our pin inputs are currents, handled by their own loop below, so the generic
     // expression-input machinery only covers the v()/i() references
-    protected getPinExprInputCount(): number {
+    protected override getPinExprInputCount(): number {
         return 0;
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "CCVS";
     }
 
-    stamp(): void {
+    override stamp(): void {
         const sim = SimulationManager.theSim!;
         if (this.isSpiceStyle()) {
             for (let i = 0; i !== this.inputCount; i += 2)
@@ -97,7 +97,7 @@ export class CCVSElm extends VCCSElm {
         sim.stampVoltageSource(this.nodes[this.inputCount + 1], this.nodes[this.inputCount], vn2);
     }
 
-    doStep(): void {
+    override doStep(): void {
         const sim = SimulationManager.theSim!;
 
         if (this.isSpiceStyle()) {
@@ -159,17 +159,17 @@ export class CCVSElm extends VCCSElm {
     }
 
     // our output is a voltage source, so derivatives go into its matrix row
-    stampInputDerivative(pos: CircuitNode, neg: CircuitNode, dx: number): void {
+    override stampInputDerivative(pos: CircuitNode, neg: CircuitNode, dx: number): void {
         const sim = SimulationManager.theSim!;
         sim.stampMatrixNV(this.outputVS!, pos, -dx);
         sim.stampMatrixNV(this.outputVS!, neg, dx);
     }
 
-    stampInputDerivativeVS(ivs: VoltageSource, dx: number): void {
+    override stampInputDerivativeVS(ivs: VoltageSource, dx: number): void {
         SimulationManager.theSim!.stampMatrixVV(this.outputVS!, ivs, -dx);
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.exprState.updateLastValues(this.nodes[this.inputCount].v - this.nodes[this.inputCount + 1].v);
         for (let i = 0; i !== this.inputPairCount; i++) this.exprState.lastValues[i] = this.pins[i * 2 + 1].current;
     }
@@ -180,28 +180,28 @@ export class CCVSElm extends VCCSElm {
         this.exprState.values[n] = cur;
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.inputCount + 2;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return this.isSpiceStyle() ? 1 : 1 + this.inputPairCount;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 214;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         return Math.floor(n1 / 2) === Math.floor(n2 / 2);
     }
 
-    hasCurrentOutput(): boolean {
+    override hasCurrentOutput(): boolean {
         return false;
     }
     isSpiceStyle(): boolean {
         return (this.flags & CCVSElm.FLAG_SPICE) !== 0;
     }
 
-    setCurrent(vs: VoltageSource, c: number): void {
+    override setCurrent(vs: VoltageSource, c: number): void {
         let i = 0;
         if (!this.isSpiceStyle()) {
             for (i = 0; i !== this.inputCount; i += 2) {
@@ -220,7 +220,7 @@ export class CCVSElm extends VCCSElm {
         }
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 1) {
             // input count must be even
             if (ei.value < 0 || ei.value > 8 || ei.value % 2 === 1) return;
@@ -233,7 +233,7 @@ export class CCVSElm extends VCCSElm {
         }
     }
 
-    setParentList(elmList: CircuitElm[]): void {
+    override setParentList(elmList: CircuitElm[]): void {
         super.setParentList(elmList); // resolves our v()/i() references
         if (!this.isSpiceStyle()) return;
         this.voltageSources = new Array(this.inputPairCount).fill(null);
@@ -247,7 +247,7 @@ export class CCVSElm extends VCCSElm {
         }
     }
 
-    setVoltageSource(j: number, vs: VoltageSource): void {
+    override setVoltageSource(j: number, vs: VoltageSource): void {
         if (this.isSpiceStyle()) {
             this.pins[this.inputCount].voltSource = vs;
             vs.setNodes(this.nodes[this.inputCount + 1], this.nodes[this.inputCount]);
@@ -258,7 +258,7 @@ export class CCVSElm extends VCCSElm {
         }
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         super.getInfo(arr);
         let i = 1;
         let j = 0;

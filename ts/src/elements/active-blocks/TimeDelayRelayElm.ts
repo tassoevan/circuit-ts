@@ -54,12 +54,12 @@ export class TimeDelayRelayElm extends ChipElm {
         }
     }
 
-    reset(): void {
+    override reset(): void {
         this.lastTransition = 0;
         this.poweredState = this.onState = false;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ond", this.onDelay);
         CircuitXMLSerializer.dumpAttr(elem, "ofd", this.offDelay);
@@ -67,7 +67,7 @@ export class TimeDelayRelayElm extends ChipElm {
         CircuitXMLSerializer.dumpAttr(elem, "ofr", this.offResistance);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.onDelay = xml.parseDoubleAttr("ond", this.onDelay);
         this.offDelay = xml.parseDoubleAttr("ofd", this.offDelay);
@@ -76,7 +76,7 @@ export class TimeDelayRelayElm extends ChipElm {
         this.resistance = this.offResistance;
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "time delay relay";
     }
 
@@ -90,23 +90,23 @@ export class TimeDelayRelayElm extends ChipElm {
         this.pins[3] = new Pin(this, 0, ChipElm.SIDE_E, "out");
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    stamp(): void {
+    override stamp(): void {
         this.resistance = this.onState ? this.onResistance : this.offResistance;
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.vinResistance);
         CircuitElm.sim.stampNonLinear(this.nodes[2]);
         CircuitElm.sim.stampNonLinear(this.nodes[3]);
     }
 
-    doStep(): void {
+    override doStep(): void {
         this.resistance = this.onState ? this.onResistance : this.offResistance;
         CircuitElm.sim.stampResistor(this.nodes[2], this.nodes[3], this.resistance);
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         // power applied, then delay, then in and out are connected
         const oldState = this.poweredState;
         this.poweredState = this.nodes[0].v - this.nodes[1].v > 2.5;
@@ -115,7 +115,7 @@ export class TimeDelayRelayElm extends ChipElm {
             this.onState = this.poweredState;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.pins[0].current = -(this.nodes[0].v - this.nodes[1].v) / this.vinResistance;
         this.pins[2].current = -(this.nodes[2].v - this.nodes[3].v) / this.resistance;
         this.pins[1].current = -this.pins[0].current;
@@ -123,20 +123,20 @@ export class TimeDelayRelayElm extends ChipElm {
         this.drawChip(g);
     }
 
-    isDigitalChip(): boolean {
+    override isDigitalChip(): boolean {
         return false;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 4;
     }
     getVoltageSourceCount(): number {
         return 0;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 414;
     }
 
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("On Delay (s)", this.onDelay, 0, 0);
         if (n === 1) return new EditInfo("Off Delay (s)", this.offDelay, 0, 0);
         if (n === 2) return new EditInfo("On Resistance (ohms)", this.onResistance, 0, 0).setPositive();
@@ -144,7 +144,7 @@ export class TimeDelayRelayElm extends ChipElm {
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.onDelay = ei.value;
         if (n === 1) this.offDelay = ei.value;
         if (n === 2) this.onResistance = ei.value;

@@ -37,11 +37,11 @@ export class AntennaElm extends RailElm {
         }
     }
 
-    drawRail(g: Graphics): void {
+    override drawRail(g: Graphics): void {
         this.drawRailText(g, "Ant");
     }
 
-    getVoltage(): number {
+    override getVoltage(): number {
         const fm = 3 * Math.sin(this.fmphase);
         return (
             Math.sin(2 * CircuitElm.pi * CircuitElm.sim.t * 3000) *
@@ -57,7 +57,7 @@ export class AntennaElm extends RailElm {
         );
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.fmphase +=
             2 *
             CircuitElm.pi *
@@ -65,19 +65,19 @@ export class AntennaElm extends RailElm {
             CircuitElm.sim.timeStep;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "A".charCodeAt(0);
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         super.getInfo(arr);
         arr[0] = "Antenna (amplified)";
     }
 
-    getEditInfo(_n: number): null {
+    override getEditInfo(_n: number): null {
         return null;
     }
 }

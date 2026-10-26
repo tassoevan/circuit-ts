@@ -41,23 +41,23 @@ export class Counter2Elm extends ChipElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modulus);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.modulus = xml.parseIntAttr("mo", this.modulus);
     }
 
-    needsBits(): boolean {
+    override needsBits(): boolean {
         return true;
     }
-    allowBus(): boolean {
+    override allowBus(): boolean {
         return true;
     }
-    getChipName(): string {
+    override getChipName(): string {
         if (this.modulus === 0) return "Counter";
         return Locale.LS("Counter") + Locale.LS(" (mod ") + this.modulus + ")";
     }
@@ -96,18 +96,18 @@ export class Counter2Elm extends ChipElm {
         this.pins[this.load].bubble = true;
         this.pins[this.ent] = new Pin(this, bitsY + 2, ChipElm.SIDE_E, "EnT");
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.bits * 2 + 6;
     }
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         if (n === 1) return new EditInfo("Modulus", this.modulus, 1, 1).setDimensionless();
         return null;
     }
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 2) {
                 this.bits = Math.floor(ei.value);
@@ -124,7 +124,7 @@ export class Counter2Elm extends ChipElm {
 
     carry: boolean = false;
 
-    execute(): void {
+    override execute(): void {
         if (this.pins[this.clk].value && !this.lastClock) {
             if (this.pins[this.enp].value && this.pins[this.ent].value) {
                 let value = 0;
@@ -166,10 +166,10 @@ export class Counter2Elm extends ChipElm {
         this.lastClock = this.pins[this.clk].value;
         this.writeOutput(this.rco, this.carry && this.pins[this.ent].value);
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 421;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "ctr2";
     }
 }

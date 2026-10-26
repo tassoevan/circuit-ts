@@ -36,16 +36,16 @@ export class SchmittElm extends InvertingSchmittElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 182;
     }
 
     lastOutputVoltage: number = 0;
 
-    startIteration(): void {
+    override startIteration(): void {
         this.lastOutputVoltage = this.nodes[1].v;
     }
-    doStep(): void {
+    override doStep(): void {
         let out: number;
         if (this.state) {
             // Output is high
@@ -72,7 +72,7 @@ export class SchmittElm extends InvertingSchmittElm {
         CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[1], this.voltSource, out);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.drawPosts(g);
         this.draw2Leads(g);
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.lightGrayColor);
@@ -83,7 +83,7 @@ export class SchmittElm extends InvertingSchmittElm {
         this.curcount = this.updateDotCountImpl(this.current, this.curcount);
         this.drawDots(g, this.lead2!, this.point2, this.curcount);
     }
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const hs = 16;
         let ww = 16;
@@ -95,11 +95,11 @@ export class SchmittElm extends InvertingSchmittElm {
         triPoints[2] = this.interpPoint(this.point1, this.point2, 0.5 + (ww - 5) / this.dn);
         this.gatePoly = this.createPolygon(triPoints);
     }
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "Schmitt Trigger~"; // ~ is for localization
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 1) return this.current;
         return 0;
     }

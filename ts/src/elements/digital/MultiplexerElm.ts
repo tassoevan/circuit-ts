@@ -71,18 +71,18 @@ export class MultiplexerElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "Multiplexer";
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "se", this.selectBitCount);
         if (this.inputMode !== 0) CircuitXMLSerializer.dumpAttr(elem, "im", this.inputMode);
         if (this.dataBusWidth !== 4) CircuitXMLSerializer.dumpAttr(elem, "dw", this.dataBusWidth);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.selectBitCount = xml.parseIntAttr("se", this.selectBitCount);
         this.inputMode = xml.parseIntAttr("im", 0);
@@ -246,7 +246,7 @@ export class MultiplexerElm extends ChipElm {
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         const M = MultiplexerElm;
         if (this.inputMode === M.INPUT_MODE_BUS_BUS) {
             const invertedCount = this.hasFlag(M.FLAG_INVERTED_OUTPUT) ? this.dataBusWidth : 0;
@@ -280,7 +280,7 @@ export class MultiplexerElm extends ChipElm {
         return sel;
     }
 
-    execute(): void {
+    override execute(): void {
         const M = MultiplexerElm;
         const selectedValue = this.readSelectValue();
 
@@ -302,17 +302,17 @@ export class MultiplexerElm extends ChipElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 184;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "mux";
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Select Bits", this.selectBitCount, 1, 8).setDimensionless();
         if (n === 1)
             return EditInfo.createCheckbox("Inverted Output", this.hasFlag(MultiplexerElm.FLAG_INVERTED_OUTPUT));
@@ -332,7 +332,7 @@ export class MultiplexerElm extends ChipElm {
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         const M = MultiplexerElm;
         if (n === 0) {
             if (ei.value >= 1 && ei.value <= 6) {

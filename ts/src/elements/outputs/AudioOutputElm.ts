@@ -63,14 +63,14 @@ export class AudioOutputElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "du", this.duration);
         CircuitXMLSerializer.dumpAttr(elem, "sa", this.samplingRate);
         CircuitXMLSerializer.dumpAttr(elem, "la", this.labelNum);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.duration = xml.parseDoubleAttr("du", this.duration);
         this.samplingRate = xml.parseIntAttr("sa", this.samplingRate);
@@ -79,7 +79,7 @@ export class AudioOutputElm extends CircuitElm {
         this.setButtonLabel();
     }
 
-    draggingDone(): void {
+    override draggingDone(): void {
         this.setTimeStep();
     }
 
@@ -95,31 +95,31 @@ export class AudioOutputElm extends CircuitElm {
         return num;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 211;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "aout";
     }
-    isAudioOutputElm(): boolean {
+    override isAudioOutputElm(): boolean {
         return true;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1;
     }
 
-    reset(): void {
+    override reset(): void {
         this.dataPtr = 0;
         this.dataFull = false;
         this.dataSampleCount = 0;
         this.nextDataSample = 0;
         this.dataSample = 0;
     }
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = new Point();
     }
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.save();
         const selected = this.needsHighlight();
         const fontSize = 14;
@@ -139,10 +139,10 @@ export class AudioOutputElm extends CircuitElm {
         this.drawPosts(g);
         g.restore();
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "audio output";
         arr[1] = "V = " + CircuitElm.getVoltageText(this.nodes[0].v);
         const ct = this.dataFull ? this.dataCount : this.dataPtr;
@@ -157,7 +157,7 @@ export class AudioOutputElm extends CircuitElm {
     nextDataSample: number = 0;
     dataSample: number = 0;
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.dataSample += this.nodes[0].v;
         this.dataSampleCount++;
         if (CircuitElm.sim.t >= this.nextDataSample) {
@@ -184,10 +184,10 @@ export class AudioOutputElm extends CircuitElm {
 
     readonly samplingRateChoices = [8000, 11025, 16000, 22050, 44100, 48000];
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             return new EditInfo("Duration (s)", this.duration, 0, 5).setPositive();
         }
@@ -225,7 +225,7 @@ export class AudioOutputElm extends CircuitElm {
 
         return null;
     }
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) {
             this.duration = ei.value;
             this.setDataCount();
@@ -286,7 +286,7 @@ export class AudioOutputElm extends CircuitElm {
         if (this.button) this.button.innerHTML = label;
     }
 
-    delete(): void {
+    override delete(): void {
         if (this.button) CircuitElm.app.removeWidgetFromVerticalPanel(this.button);
         super.delete();
     }

@@ -55,12 +55,12 @@ export class JfetElm extends MosfetElm {
         this.diode.setupForDefaultModel();
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.diode.reset();
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.hs);
         this.setVoltageColor(g, this.nodes[1].v);
         CircuitElm.drawThickLine(g, this.src[0], this.src[1]);
@@ -114,13 +114,13 @@ export class JfetElm extends MosfetElm {
         this.drawPosts(g);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0) return -this.gateCurrent;
         if (n === 1) return this.gateCurrent + this.ids;
         return -this.ids;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
 
         // find the coordinates of the various points we need to draw
@@ -145,70 +145,70 @@ export class JfetElm extends MosfetElm {
         } else this.arrowPoly = this.calcArrow(this.point1, this.gatePt, 12, 5);
     }
 
-    stamp(): void {
+    override stamp(): void {
         super.stamp();
         if (this.pnp < 0) this.diode.stamp(this.nodes[1], this.nodes[0]);
         else this.diode.stamp(this.nodes[0], this.nodes[1]);
     }
 
-    doStep(): void {
+    override doStep(): void {
         super.doStep();
         this.diode.doStep(this.pnp * (this.nodes[0].v - this.nodes[1].v));
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.gateCurrent = this.pnp * this.diode.calculateCurrent(this.pnp * (this.nodes[0].v - this.nodes[1].v));
     }
 
-    showBulk(): boolean {
+    override showBulk(): boolean {
         return false;
     }
-    isJfet(): boolean {
+    override isJfet(): boolean {
         return true;
     }
-    hasSwapDS(): boolean {
+    override hasSwapDS(): boolean {
         return true;
     }
 
     static lastJfetModelName: string = "default-jfet";
-    getLastModelName(): string {
+    override getLastModelName(): string {
         return JfetElm.lastJfetModelName;
     }
-    setLastModelName(n: string): void {
+    override setLastModelName(n: string): void {
         JfetElm.lastJfetModelName = n;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "j".charCodeAt(0);
     }
-    isJfetElm(): boolean {
+    override isJfetElm(): boolean {
         return true;
     }
     // these values are taken from Hayes+Horowitz p155
-    getDefaultThreshold(): number {
+    override getDefaultThreshold(): number {
         return -4;
     }
-    getBackwardCompatibilityBeta(): number {
+    override getBackwardCompatibilityBeta(): number {
         return 0.00125;
     }
-    getElmType(): string {
+    override getElmType(): string {
         return "JFET";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         this.getFetInfo(arr, "JFET");
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n < 3) return super.getEditInfo(n);
         return null;
     }
 
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 
-    getScopeText(_v: number): string {
+    override getScopeText(_v: number): string {
         return Locale.LS((this.pnp === -1 ? "p-" : "n-") + "JFET");
     }
 }
@@ -217,7 +217,7 @@ export class NJfetElm extends JfetElm {
     constructor(xx: number, yy: number) {
         super(xx, yy, false);
     }
-    getDumpClass(): typeof JfetElm {
+    override getDumpClass(): typeof JfetElm {
         return JfetElm;
     }
 }
@@ -229,7 +229,7 @@ export class PJfetElm extends JfetElm {
         if (xb !== undefined) super(xa, ya, xb, yb!, f!, st!);
         else super(xa, ya, true);
     }
-    getDumpClass(): typeof JfetElm {
+    override getDumpClass(): typeof JfetElm {
         return JfetElm;
     }
 }

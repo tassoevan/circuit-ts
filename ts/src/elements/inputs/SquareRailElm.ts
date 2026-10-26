@@ -24,10 +24,10 @@ export class SquareRailElm extends RailElm {
     constructor(xx: number, yy: number) {
         super(xx, yy, VoltageElm.WF_SQUARE);
     }
-    getDumpClass(): Function {
+    override getDumpClass(): Function {
         return RailElm;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 }

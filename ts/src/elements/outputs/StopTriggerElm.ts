@@ -54,7 +54,7 @@ export class StopTriggerElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "tv", this.triggerVoltage);
         CircuitXMLSerializer.dumpAttr(elem, "tp", this.type);
@@ -63,7 +63,7 @@ export class StopTriggerElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "rd", this.requiredDuration);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.triggerVoltage = xml.parseDoubleAttr("tv", this.triggerVoltage);
         this.type = xml.parseIntAttr("tp", this.type);
@@ -73,25 +73,25 @@ export class StopTriggerElm extends CircuitElm {
         this.requiredDuration = xml.parseDoubleAttr("rd", 0);
     }
 
-    reset(): void {
+    override reset(): void {
         this.triggered = false;
         this.conditionActive = false;
         this.durationMet = false;
         this.triggerCount = 0;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 408;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = this.interpPoint(this.point1, this.point2, 1 - 8 / this.dn);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.save();
         const selected = this.needsHighlight() || this.stopped;
         g.setFont(new Font("SansSerif", selected ? Font.BOLD : 0, 14));
@@ -105,7 +105,7 @@ export class StopTriggerElm extends CircuitElm {
         g.restore();
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.stopped = false;
         const condition =
             (this.type === 0 && this.nodes[0].v >= this.triggerVoltage) ||
@@ -137,11 +137,11 @@ export class StopTriggerElm extends CircuitElm {
         }
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "stop trigger";
         arr[1] = "V = " + CircuitElm.getVoltageText(this.nodes[0].v);
         arr[2] = "Vtrigger = " + CircuitElm.getVoltageText(this.triggerVoltage);
@@ -153,7 +153,7 @@ export class StopTriggerElm extends CircuitElm {
             arr[3] += " (" + Math.min(this.triggerCount, this.count) + "/" + this.count + ")";
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Voltage", this.triggerVoltage).setUnitStep();
         if (n === 1) {
             const ei = new EditInfo("Trigger Type", this.type, -1, -1);
@@ -172,7 +172,7 @@ export class StopTriggerElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.triggerVoltage = ei.value;
         if (n === 1) this.type = ei.choice!.getSelectedIndex();
         if (n === 2) this.delay = ei.value;

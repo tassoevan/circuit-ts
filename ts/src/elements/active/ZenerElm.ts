@@ -50,19 +50,19 @@ export class ZenerElm extends DiodeElm {
         }
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return "z".charCodeAt(0);
     }
 
-    readonly hs = 8;
+    override readonly hs = 8;
     declare poly: Polygon;
     declare cathode: Point[];
     wing!: Point[];
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(16);
         this.cathode = this.newPointArray(2);
@@ -75,7 +75,7 @@ export class ZenerElm extends DiodeElm {
         this.poly = this.createPolygon(pa[0], pa[1], this.lead2!);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.hs);
 
         const v1 = this.nodes[0].v;
@@ -102,25 +102,25 @@ export class ZenerElm extends DiodeElm {
 
     readonly default_zvoltage = 5.6;
 
-    getElmType(): string {
+    override getElmType(): string {
         return "Zener diode";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         super.getInfo(arr);
         arr[0] = "Zener diode";
         arr[5] = "Vz = " + DiodeElm.getVoltageText(this.model.breakdownVoltage);
     }
 
-    isZenerElm(): boolean {
+    override isZenerElm(): boolean {
         return true;
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "z".charCodeAt(0);
     }
 
-    setLastModelName(n: string): void {
+    override setLastModelName(n: string): void {
         ZenerElm.lastZenerModelName = n;
     }
 }

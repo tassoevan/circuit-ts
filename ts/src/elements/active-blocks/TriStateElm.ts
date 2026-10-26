@@ -77,7 +77,7 @@ export class TriStateElm extends CircuitElm {
         this.allocNodes();
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ron", this.r_on);
         CircuitXMLSerializer.dumpAttr(elem, "roff", this.r_off);
@@ -86,7 +86,7 @@ export class TriStateElm extends CircuitElm {
         if (this.busWidth !== 1) CircuitXMLSerializer.dumpAttr(elem, "bw", this.busWidth);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.r_on = xml.parseDoubleAttr("ron", this.r_on);
         this.r_off = xml.parseDoubleAttr("roff", this.r_off);
@@ -96,17 +96,17 @@ export class TriStateElm extends CircuitElm {
         this.allocNodes();
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 180;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "ts";
     }
-    setHighVoltage(hv: number): void {
+    override setHighVoltage(hv: number): void {
         this.highVoltage = hv;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const len = 32;
         this.calcLeads(len);
@@ -125,7 +125,7 @@ export class TriStateElm extends CircuitElm {
         this.lead3 = this.interpPoint(this.lead1!, this.lead2!, 0.5, sign * (hs / 2 + 2));
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const hs = 16;
         this.setBbox(this.point1, this.point2, hs);
         this.setVoltageColor(g, this.nodes[2 * this.busWidth].v);
@@ -152,7 +152,7 @@ export class TriStateElm extends CircuitElm {
         return 2 * this.busWidth + 1 + bit;
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.current = 0;
         for (let i = 0; i < this.busWidth; i++) {
             const intNode = this.internalNode(i);
@@ -163,16 +163,16 @@ export class TriStateElm extends CircuitElm {
         }
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n >= this.busWidth && n < 2 * this.busWidth) return this.current / this.busWidth;
         return 0;
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    stamp(): void {
+    override stamp(): void {
         for (let i = 0; i < this.busWidth; i++) {
             CircuitElm.sim.stampVoltageSource(
                 CircuitNode.ground,
@@ -184,7 +184,7 @@ export class TriStateElm extends CircuitElm {
         }
     }
 
-    doStep(): void {
+    override doStep(): void {
         this.open = this.nodes[this.controlNode()].v < this.highVoltage * 0.5;
         this.resistance = this.open ? this.r_off : this.r_on;
         for (let i = 0; i < this.busWidth; i++) {
@@ -202,7 +202,7 @@ export class TriStateElm extends CircuitElm {
         }
     }
 
-    drag(xx: number, yy: number): void {
+    override drag(xx: number, yy: number): void {
         let flip = xx < this.x === yy < this.y;
         xx = this.snapGrid(xx);
         yy = this.snapGrid(yy);
@@ -215,41 +215,41 @@ export class TriStateElm extends CircuitElm {
         super.drag(xx, yy);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 2 * this.busWidth + 1;
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return this.busWidth;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return this.busWidth;
     }
 
-    setVoltageSource(n: number, v: VoltageSource): void {
+    override setVoltageSource(n: number, v: VoltageSource): void {
         if (!this.voltageSources || this.voltageSources.length !== this.busWidth)
             this.voltageSources = new Array(this.busWidth);
         this.voltageSources[n] = v;
         v.setNodes(CircuitNode.ground, this.nodes[this.internalNode(n)]);
     }
 
-    getMatrixConnection(n1: number, n2: number): boolean {
+    override getMatrixConnection(n1: number, n2: number): boolean {
         for (let i = 0; i < this.busWidth; i++)
             if (this.comparePair(n1, n2, this.busWidth + i, this.internalNode(i))) return true;
         return false;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         if (n < this.busWidth) return this.busWidth > 1 ? new Point(this.point1.x, this.point1.y, n) : this.point1;
         if (n < 2 * this.busWidth)
             return this.busWidth > 1 ? new Point(this.point2.x, this.point2.y, n - this.busWidth) : this.point2;
         return this.point3;
     }
 
-    getPostWidth(n: number): number {
+    override getPostWidth(n: number): number {
         return n < 2 * this.busWidth ? this.busWidth : 1;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "tri-state buffer";
         if (this.busWidth > 1) arr[0] += " (" + this.busWidth + ")";
         arr[1] = this.open ? "open" : "closed";
@@ -258,17 +258,17 @@ export class TriStateElm extends CircuitElm {
         arr[4] = "Vc = " + CircuitElm.getVoltageText(this.nodes[this.controlNode()].v);
     }
 
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
-    hasGroundConnection(n1: number): boolean {
+    override hasGroundConnection(n1: number): boolean {
         return n1 >= this.busWidth && n1 < 2 * this.busWidth;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("On Resistance (ohms)", this.r_on, 0, 0).setPositive();
         if (n === 1) return new EditInfo("Off Resistance (ohms)", this.r_off, 0, 0).setPositive();
         if (n === 2) return new EditInfo("Output Pulldown Resistance (ohms)", this.r_off_ground, 0, 0).setPositive();
@@ -277,7 +277,7 @@ export class TriStateElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) this.r_on = ei.value;
         if (n === 1 && ei.value > 0) this.r_off = ei.value;
         if (n === 2 && ei.value > 0) this.r_off_ground = ei.value;
@@ -290,15 +290,15 @@ export class TriStateElm extends CircuitElm {
         }
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         this.flags ^= this.FLAG_FLIP | this.FLAG_FLIP_X;
         super.flipX(c2, count);
     }
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         this.flags ^= this.FLAG_FLIP | this.FLAG_FLIP_Y;
         super.flipY(c2, count);
     }
-    flipXY(c2: number, count: number): void {
+    override flipXY(c2: number, count: number): void {
         this.flags ^= this.FLAG_FLIP;
         super.flipXY(c2, count);
     }

@@ -83,7 +83,7 @@ export class CapacitorElm extends CircuitElm {
         return (this.flags & CapacitorElm.FLAG_BACK_EULER) === 0;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.current = this.curcount = this.curSourceValue = 0;
         // put small charge on caps when reset to start oscillators
@@ -93,14 +93,14 @@ export class CapacitorElm extends CircuitElm {
         super.reset();
         this.voltdiff = this.current = this.curcount = this.curSourceValue = 0;
     }
-    isCapacitorElm(): boolean {
+    override isCapacitorElm(): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return "c".charCodeAt(0);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "c", this.capacitance);
         CircuitXMLSerializer.dumpAttr(elem, "iv", this.initialVoltage);
@@ -108,11 +108,11 @@ export class CapacitorElm extends CircuitElm {
         // PolarCapacitorElm uses mv
     }
 
-    dumpXmlState(_doc: Document, elem: Element): void {
+    override dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "vd", this.voltdiff);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.capacitance = xml.parseDoubleAttr("c", this.capacitance);
         this.initialVoltage = xml.parseDoubleAttr("iv", this.initialVoltage);
@@ -124,7 +124,7 @@ export class CapacitorElm extends CircuitElm {
     // used for PolarCapacitorElm
     platePoints!: Point[];
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const f = (this.dn / 2 - 4) / this.dn;
         // calc leads
@@ -137,7 +137,7 @@ export class CapacitorElm extends CircuitElm {
         this.interpPoint2(this.point1, this.point2, this.plate2[0], this.plate2[1], 1 - f, 12);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const hs = 12;
         this.setBbox(this.point1, this.point2, hs);
 
@@ -170,7 +170,7 @@ export class CapacitorElm extends CircuitElm {
             this.drawValues(g, s, hs);
         }
     }
-    stamp(): void {
+    override stamp(): void {
         if (this.doDcAnalysis()) {
             // when finding DC operating point, replace cap with a 100M resistor
             CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], 1e8);
@@ -198,17 +198,17 @@ export class CapacitorElm extends CircuitElm {
         if (this.seriesResistance > 0)
             CircuitElm.sim.stampResistor(this.nodes[1], this.nodes[2], this.seriesResistance);
     }
-    startIteration(): void {
+    override startIteration(): void {
         if (this.isTrapezoidal()) this.curSourceValue = -this.voltdiff / this.compResistance - this.current;
         else this.curSourceValue = -this.voltdiff / this.compResistance;
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.voltdiff = this.nodes[0].v - this.nodes[this.capNode2].v;
         this.calculateCurrent();
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         const voltdiff = this.nodes[0].v - this.nodes[this.capNode2].v;
         if (this.doDcAnalysis()) {
             this.current = voltdiff / 1e8;
@@ -219,32 +219,32 @@ export class CapacitorElm extends CircuitElm {
         // infinite current
         if (this.compResistance > 0) this.current = voltdiff / this.compResistance + this.curSourceValue;
     }
-    doStep(): void {
+    override doStep(): void {
         if (this.doDcAnalysis()) return;
         CircuitElm.sim.stampCurrentSource(this.nodes[0], this.nodes[this.capNode2], this.curSourceValue);
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return !this.doDcAnalysis() && this.seriesResistance > 0 ? 1 : 0;
     }
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "capacitor";
         this.getBasicInfo(arr);
         arr[3] = "C = " + CircuitElm.getUnitText(this.capacitance, "F");
         arr[4] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
         arr[5] = "Q = " + CircuitElm.getUnitText(this.capacitance * this.voltdiff, "C");
     }
-    getScopeText(_v: number): string {
+    override getScopeText(_v: number): string {
         return Locale.LS("capacitor") + ", " + CircuitElm.getUnitText(this.capacitance, "F");
     }
-    getScopeValue(x: number): number {
+    override getScopeValue(x: number): number {
         if (x === Scope.VAL_CHARGE) return this.capacitance * this.voltdiff;
         return super.getScopeValue(x);
     }
-    getScopeUnits(x: number): number {
+    override getScopeUnits(x: number): number {
         if (x === Scope.VAL_CHARGE) return Scope.UNITS_C;
         return super.getScopeUnits(x);
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Capacitance (F)", this.capacitance, 1e-6, 1e-3);
         if (n === 1) {
             const ei = new EditInfo("", 0, -1, -1);
@@ -256,7 +256,7 @@ export class CapacitorElm extends CircuitElm {
         // if you add more things here, check PolarCapacitorElm
         return null;
     }
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.capacitance = ei.value > 0 ? ei.value : 1e-12;
         if (n === 1) {
             if (ei.checkbox!.getState()) this.flags &= ~CapacitorElm.FLAG_BACK_EULER;
@@ -268,7 +268,7 @@ export class CapacitorElm extends CircuitElm {
             this.allocNodes();
         }
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "c".charCodeAt(0);
     }
     getCapacitance(): number {
@@ -283,14 +283,14 @@ export class CapacitorElm extends CircuitElm {
     setSeriesResistance(c: number): void {
         this.seriesResistance = c;
     }
-    isIdealCapacitor(): boolean {
+    override isIdealCapacitor(): boolean {
         return this.seriesResistance === 0;
     }
 
-    addRoutingObstacle(wr: WireRouter): void {
+    override addRoutingObstacle(wr: WireRouter): void {
         this.addRoutingObstacleWithLeads(wr, 12);
     }
-    validate(): boolean {
+    override validate(): boolean {
         if (this.isIdealCapacitor()) {
             let fpi = new FindPathInfo(FindPathInfo.SHORT, this, this.getNode(1), CircuitElm.sim);
             if (fpi.findPath(this.getNode(0))) {

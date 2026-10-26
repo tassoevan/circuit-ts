@@ -51,7 +51,7 @@ export class FuseElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "re", this.resistance);
         CircuitXMLSerializer.dumpAttr(elem, "i2", this.i2t);
@@ -59,7 +59,7 @@ export class FuseElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "bl", this.blown);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.resistance = xml.parseDoubleAttr("re", this.resistance);
         this.i2t = xml.parseDoubleAttr("i2", this.i2t);
@@ -67,7 +67,7 @@ export class FuseElm extends CircuitElm {
         this.blown = xml.parseBooleanAttr("bl", this.blown);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 404;
     }
 
@@ -75,13 +75,13 @@ export class FuseElm extends CircuitElm {
         return (this.flags & this.FLAG_IEC_SYMBOL) !== 0;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.heat = 0;
         this.blown = false;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const llen = this.isIECSymbol() ? 32 : 16;
         this.calcLeads(llen);
@@ -110,7 +110,7 @@ export class FuseElm extends CircuitElm {
         return Color.white;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const hs = 6;
         this.setBbox(this.point1, this.point2, hs);
         this.draw2Leads(g);
@@ -151,20 +151,20 @@ export class FuseElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.current = (this.nodes[0].v - this.nodes[1].v) / (this.blown ? this.blownResistance : this.resistance);
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[0]);
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         const i = this.getCurrent();
 
         // accumulate heat
@@ -177,15 +177,15 @@ export class FuseElm extends CircuitElm {
         if (this.heat > this.i2t) this.blown = true;
     }
 
-    doStep(): void {
+    override doStep(): void {
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.blown ? this.blownResistance : this.resistance);
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "fuse";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = this.blown ? "fuse (blown)" : "fuse";
         this.getBasicInfo(arr);
         arr[3] = "R = " + CircuitElm.getUnitText(this.resistance, Locale.ohmString);
@@ -193,14 +193,14 @@ export class FuseElm extends CircuitElm {
         if (!this.blown) arr[5] = Math.trunc((this.heat * 100) / this.i2t) + "% " + Locale.LS("melted");
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("I2t", this.i2t, 0, 0).setPositive();
         if (n === 1) return new EditInfo("Resistance", this.resistance, 0, 0).setPositive();
         if (n === 2) return EditInfo.createCheckbox("IEC Symbol", this.isIECSymbol());
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.i2t = ei.value;
         if (n === 1) this.resistance = ei.value;
         if (n === 2) {

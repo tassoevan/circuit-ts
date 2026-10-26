@@ -84,14 +84,14 @@ export class CrystalElm extends CompositeElm {
         (this.compElmList[3] as ResistorElm).setResistance(this.resistance);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 412;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "cr";
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "pc", this.parallelCapacitance);
         CircuitXMLSerializer.dumpAttr(elem, "sc", this.seriesCapacitance);
@@ -99,7 +99,7 @@ export class CrystalElm extends CompositeElm {
         CircuitXMLSerializer.dumpAttr(elem, "r", this.resistance);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.resistance = xml.parseDoubleAttr("r", this.resistance);
         this.inductance = xml.parseDoubleAttr("in", this.inductance);
@@ -108,7 +108,7 @@ export class CrystalElm extends CompositeElm {
         this.initCrystal();
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const f = (this.dn / 2 - 10) / this.dn;
         // calc leads
@@ -130,7 +130,7 @@ export class CrystalElm extends CompositeElm {
         this.setPost(1, this.point2);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const hs = 12;
         this.setBbox(this.point1, this.point2, hs);
 
@@ -164,12 +164,12 @@ export class CrystalElm extends CompositeElm {
         }
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         super.stepFinished();
         this.current = this.getCurrentIntoNode(1);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "crystal";
         this.getBasicInfo(arr);
         const fs = 1 / (Math.sqrt(this.inductance * this.seriesCapacitance) * Math.PI * 2);
@@ -183,14 +183,14 @@ export class CrystalElm extends CompositeElm {
         arr[6] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    canViewInScope(): boolean {
+    override canViewInScope(): boolean {
         return true;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0)
             return new EditInfo(
                 EditInfo.makeLink("crystal.html", "Parallel Capacitance"),
@@ -207,7 +207,7 @@ export class CrystalElm extends CompositeElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) this.parallelCapacitance = ei.value;
         if (n === 1 && ei.value > 0) this.seriesCapacitance = ei.value;
         if (n === 2 && ei.value > 0) this.inductance = ei.value;

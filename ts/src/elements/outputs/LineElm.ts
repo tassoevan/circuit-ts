@@ -41,42 +41,42 @@ export class LineElm extends GraphicElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 423;
     }
 
-    drag(xx: number, yy: number): void {
+    override drag(xx: number, yy: number): void {
         this.x2 = xx;
         this.y2 = yy;
     }
 
-    creationFailed(): boolean {
+    override creationFailed(): boolean {
         return Math.hypot(this.x - this.x2, this.y - this.y2) < 16;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         //g.setColor(needsHighlight() ? selectColor : lightGrayColor);
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : Color.GRAY);
         this.setBbox(this.x, this.y, this.x2, this.y2);
         g.drawLine(this.x, this.y, this.x2, this.y2);
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(_n: number): EditInfo | null {
+    override getEditInfo(_n: number): EditInfo | null {
         return null;
     }
 
-    setEditValue(_n: number, _ei: EditInfo): void {}
+    override setEditValue(_n: number, _ei: EditInfo): void {}
 
-    getInfo(_arr: string[]): void {}
+    override getInfo(_arr: string[]): void {}
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 
-    getMouseDistance(gx: number, gy: number): number {
+    override getMouseDistance(gx: number, gy: number): number {
         const thresh = 10;
         const d2 = this.lineDistanceSq(this.x, this.y, this.x2, this.y2, gx, gy);
         if (d2 <= thresh * thresh) return d2;

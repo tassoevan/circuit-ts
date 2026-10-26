@@ -67,12 +67,12 @@ export class LabeledNodeElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "te", this.text);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.text = xml.parseStringAttr("te", this.text) ?? this.text;
     }
@@ -90,13 +90,13 @@ export class LabeledNodeElm extends CircuitElm {
 
     readonly circleSize: number = 17;
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = this.interpPoint(this.point1, this.point2, 1 - this.circleSize / this.dn);
     }
 
     // get post we're connected to
-    getConnectedPost(n: number = 0): Point {
+    override getConnectedPost(n: number = 0): Point {
         const key = this.busWidth > 1 ? this.text + ":" + n : this.text;
         const myPost = this.getPost(n);
         const le = LabeledNodeElm.labelList.get(key);
@@ -111,7 +111,7 @@ export class LabeledNodeElm extends CircuitElm {
         return null!;
     }
 
-    setNode(p: number, n: CircuitNode): void {
+    override setNode(p: number, n: CircuitNode): void {
         super.setNode(p, n);
 
         // save node so we can return it in getByName()
@@ -122,28 +122,28 @@ export class LabeledNodeElm extends CircuitElm {
             le.node = n;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 207;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "ln";
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.busWidth;
     }
-    getPostWidth(_n: number): number {
+    override getPostWidth(_n: number): number {
         return this.busWidth;
     }
-    getBusWidth(): number {
+    override getBusWidth(): number {
         return this.busWidth;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         if (this.busWidth === 1) return this.point1;
         return new Point(this.point1.x, this.point1.y, n);
     }
 
-    getWireSegments(list: InstanceType<typeof SimulationManager.WireSegment>[]): void {
+    override getWireSegments(list: InstanceType<typeof SimulationManager.WireSegment>[]): void {
         for (let b = 0; b < this.busWidth; b++) {
             const ep0 = SimulationManager.pointKey(this.getPost(b));
             const ep1 = this.busWidth > 1 ? "label:" + this.text + ":" + b : "label:" + this.text;
@@ -152,13 +152,13 @@ export class LabeledNodeElm extends CircuitElm {
     }
 
     // this is basically a wire, since it just connects two or more nodes together
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return true;
     }
-    isRemovableWire(): boolean {
+    override isRemovableWire(): boolean {
         return true;
     }
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         return n1 === n2;
     }
 
@@ -181,7 +181,7 @@ export class LabeledNodeElm extends CircuitElm {
         return null;
     }
 
-    drawLabeledNode(g: Graphics, str: string, pt1: Point, pt2: Point): void {
+    override drawLabeledNode(g: Graphics, str: string, pt1: Point, pt2: Point): void {
         if (this.isRotateText() && pt1.x === pt2.x) {
             this.drawRotatedLabeledNode(g, str, pt1, pt2);
             return;
@@ -221,7 +221,7 @@ export class LabeledNodeElm extends CircuitElm {
         }
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setVoltageColor(g, this.nodes[0].v);
         CircuitElm.drawThickLine(g, this.point1, this.lead1!, this.busWidth > 1 ? 5 : 3);
         g.setColor(this.needsHighlight() ? CircuitElm.selectColor : CircuitElm.whiteColor);
@@ -239,27 +239,27 @@ export class LabeledNodeElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (this.currents != null) return -this.currents[n];
         return -this.current;
     }
 
-    setCurrent(_vs: VoltageSource, c: number): void {
+    override setCurrent(_vs: VoltageSource, c: number): void {
         this.current = c;
     }
 
-    setWireCurrent(bit: number, c: number): void {
+    override setWireCurrent(bit: number, c: number): void {
         if (this.currents != null) this.currents[bit] = c;
         else this.current = c;
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "b".charCodeAt(0);
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
-    getElmType(): string {
+    override getElmType(): string {
         return "Labeled Node";
     }
 
@@ -269,7 +269,7 @@ export class LabeledNodeElm extends CircuitElm {
         return value;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = Locale.LS(this.text) + " (" + Locale.LS("Labeled Node") + ")";
         if (this.busWidth > 1) {
             const value = this.getBusValue();
@@ -281,7 +281,7 @@ export class LabeledNodeElm extends CircuitElm {
         }
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Text", 0, -1, -1);
             ei.text = this.text;
@@ -300,24 +300,24 @@ export class LabeledNodeElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.text = ei.textf!.value;
         if (n === 1) this.flags = ei.changeFlag(this.flags, LabeledNodeElm.FLAG_INTERNAL);
         if (n === 2) this.flags = ei.changeFlag(this.flags, LabeledNodeElm.FLAG_ROTATE_TEXT);
     }
 
-    getScopeText(_v: number): string {
+    override getScopeText(_v: number): string {
         return this.text;
     }
 
     getName(): string {
         return this.text;
     }
-    isLabeledNodeElm(): boolean {
+    override isLabeledNodeElm(): boolean {
         return true;
     }
 
-    addJSMethods(): void {
+    override addJSMethods(): void {
         super.addJSMethods();
         const p = this._jsProxy!;
         p["getLabelName"] = () => this.getName();

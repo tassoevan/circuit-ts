@@ -111,7 +111,7 @@ export class ExportAsLocalFileDialog extends Dialog {
         hp.appendChild(cancelButton);
     }
 
-    apply(): boolean {
+    override apply(): boolean {
         let fname = this.textBox.value;
         if (!fname.includes(".")) fname += ".txt";
         if (this.rememberName) ExportAsLocalFileDialog.setLastFileName(fname);

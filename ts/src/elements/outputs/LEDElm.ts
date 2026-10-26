@@ -69,11 +69,11 @@ export class LEDElm extends DiodeElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 162;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "cr", this.colorR);
         CircuitXMLSerializer.dumpAttr(elem, "cg", this.colorG);
@@ -81,7 +81,7 @@ export class LEDElm extends DiodeElm {
         CircuitXMLSerializer.dumpAttr(elem, "mbc", this.maxBrightnessCurrent);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.colorR = xml.parseDoubleAttr("cr", this.colorR);
         this.colorG = xml.parseDoubleAttr("cg", this.colorG);
@@ -89,7 +89,7 @@ export class LEDElm extends DiodeElm {
         this.maxBrightnessCurrent = xml.parseDoubleAttr("mbc", this.maxBrightnessCurrent);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const cr = 12;
         this.ledLead1 = this.interpPoint(this.point1, this.point2, 0.5 - cr / this.dn) as Point;
@@ -97,7 +97,7 @@ export class LEDElm extends DiodeElm {
         this.ledCenter = this.interpPoint(this.point1, this.point2, 0.5) as Point;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         if (this.needsHighlight() || this.isCreating()) {
             super.draw(g);
             return;
@@ -125,17 +125,17 @@ export class LEDElm extends DiodeElm {
         this.drawPosts(g);
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "LED";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         super.getInfo(arr);
         if (this.model.oldStyle) arr[0] = "LED";
         else arr[0] = Locale.LS("LED") + " (" + this.modelName + ")";
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Red Value (0-1)", this.colorR, 0, 1).setDimensionless();
         if (n === 1) return new EditInfo("Green Value (0-1)", this.colorG, 0, 1).setDimensionless();
         if (n === 2) return new EditInfo("Blue Value (0-1)", this.colorB, 0, 1).setDimensionless();
@@ -143,7 +143,7 @@ export class LEDElm extends DiodeElm {
         return super.getEditInfo(n - 4);
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.colorR = ei.value;
         if (n === 1) this.colorG = ei.value;
         if (n === 2) this.colorB = ei.value;
@@ -151,11 +151,11 @@ export class LEDElm extends DiodeElm {
         super.setEditValue(n - 4, ei);
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "l".charCodeAt(0);
     }
 
-    setLastModelName(n: string): void {
+    override setLastModelName(n: string): void {
         LEDElm.lastLEDModelName = n;
     }
 }

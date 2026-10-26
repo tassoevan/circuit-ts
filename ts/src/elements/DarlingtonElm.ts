@@ -66,32 +66,32 @@ export class DarlingtonElm extends CompositeElm {
         (this.compElmList[1] as TransistorElm).pnp = this.pnp;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.curcount_c = this.curcount_e = this.curcount_b = 0;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 400;
     }
 
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "dar";
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "pnp", this.pnp);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.pnp = xml.parseIntAttr("pnp", this.pnp);
         (this.compElmList[0] as TransistorElm).pnp = this.pnp;
         (this.compElmList[1] as TransistorElm).pnp = this.pnp;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, 16);
         this.setPowerColor(g, true);
         // draw collector
@@ -131,11 +131,11 @@ export class DarlingtonElm extends CompositeElm {
         this.drawPosts(g);
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "darlington pair";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = Locale.LS("darlington pair") + " (" + (this.pnp === -1 ? "PNP)" : "NPN)");
         const vbc = this.nodes[0].v - this.nodes[1].v;
         const vbe = this.nodes[0].v - this.nodes[2].v;
@@ -147,7 +147,7 @@ export class DarlingtonElm extends CompositeElm {
         arr[5] = "Vce = " + CircuitElm.getVoltageText(vce);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const hs = 16;
         const hs2 = hs * this.dsign * this.pnp;
@@ -181,7 +181,7 @@ export class DarlingtonElm extends CompositeElm {
         this.setPost(2, this.emit[0]);
     }
 
-    canFlipY(): boolean {
+    override canFlipY(): boolean {
         return false;
     }
 }

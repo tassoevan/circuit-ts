@@ -62,7 +62,7 @@ export class VoltageElm extends CircuitElm {
     noiseValue: number;
     riseTime: number;
     internalResistance: number = 0;
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return this.internalResistance > 0 ? 1 : 0;
     }
 
@@ -119,19 +119,19 @@ export class VoltageElm extends CircuitElm {
             this.reset();
         }
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return "v".charCodeAt(0);
     }
-    getDragVertical(_requestedVertical: boolean): boolean {
+    override getDragVertical(_requestedVertical: boolean): boolean {
         return true;
     }
     // point 2, not point 1, should track the mouse during toolbar drag-and-drop
-    dragPlace(xa: number, ya: number, vertical: boolean): void {
+    override dragPlace(xa: number, ya: number, vertical: boolean): void {
         super.dragPlace(xa, ya, vertical);
         this.swapDragEndpoints();
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "wf", this.waveform);
         if (this.waveform != VoltageElm.WF_DC) CircuitXMLSerializer.dumpAttr(elem, "fr", this.frequency);
@@ -143,7 +143,7 @@ export class VoltageElm extends CircuitElm {
         if (this.internalResistance != 0) CircuitXMLSerializer.dumpAttr(elem, "ir", this.internalResistance);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.waveform = xml.parseIntAttr("wf", this.waveform);
         this.frequency = xml.parseDoubleAttr("fr", this.frequency);
@@ -155,7 +155,7 @@ export class VoltageElm extends CircuitElm {
         this.internalResistance = xml.parseDoubleAttr("ir", 0);
     }
 
-    reset(): void {
+    override reset(): void {
         this.freqTimeZero = 0;
         this.curcount = 0;
     }
@@ -167,13 +167,13 @@ export class VoltageElm extends CircuitElm {
         return this.voltSource;
     }
 
-    setVoltageSource(n: number, v: any): void {
+    override setVoltageSource(n: number, v: any): void {
         super.setVoltageSource(n, v);
         if (this.internalResistance > 0) v.setNodes(this.nodes[0], this.nodes[2]);
         else v.setNodes(this.nodes[0], this.nodes[1]);
     }
 
-    stamp(): void {
+    override stamp(): void {
         const vsNode2 = this.internalResistance > 0 ? this.nodes[2] : this.nodes[1];
         if (this.waveform == VoltageElm.WF_DC)
             CircuitElm.sim.stampVoltageSource(this.nodes[0], vsNode2, this.voltSource, this.getVoltage());
@@ -181,12 +181,12 @@ export class VoltageElm extends CircuitElm {
         if (this.internalResistance > 0)
             CircuitElm.sim.stampResistor(this.nodes[2], this.nodes[1], this.internalResistance);
     }
-    doStep(): void {
+    override doStep(): void {
         const vsNode2 = this.internalResistance > 0 ? this.nodes[2] : this.nodes[1];
         if (this.waveform != VoltageElm.WF_DC)
             CircuitElm.sim.updateVoltageSource(this.nodes[0], vsNode2, this.voltSource, this.getVoltage());
     }
-    stepFinished(): void {
+    override stepFinished(): void {
         if (this.waveform == VoltageElm.WF_NOISE)
             this.noiseValue = (CircuitElm.app.random.nextDouble() * 2 - 1) * this.maxVoltage + this.bias;
     }
@@ -266,7 +266,7 @@ export class VoltageElm extends CircuitElm {
         }
     }
     readonly circleSize = 17;
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         if (this.waveform == VoltageElm.WF_DC && (this.flags & VoltageElm.FLAG_CIRCLE_SYMBOL) != 0)
             this.calcLeads(this.circleSize * 2);
@@ -275,7 +275,7 @@ export class VoltageElm extends CircuitElm {
                 this.waveform == VoltageElm.WF_DC || this.waveform == VoltageElm.WF_VAR ? 8 : this.circleSize * 2,
             );
     }
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.x, this.y, this.x2, this.y2);
         this.draw2Leads(g);
         if (this.waveform == VoltageElm.WF_DC && (this.flags & VoltageElm.FLAG_CIRCLE_SYMBOL) != 0) {
@@ -437,7 +437,7 @@ export class VoltageElm extends CircuitElm {
         }
     }
 
-    addRoutingObstacle(wr: WireRouter): void {
+    override addRoutingObstacle(wr: WireRouter): void {
         this.addRoutingObstacleWithLeads(wr, 16);
     }
 
@@ -485,20 +485,20 @@ export class VoltageElm extends CircuitElm {
         }
     }
 
-    isVoltageElm(): boolean {
+    override isVoltageElm(): boolean {
         return true;
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
-    getPower(): number {
+    override getPower(): number {
         return -this.getVoltageDiff() * this.current;
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[1].v - this.nodes[0].v;
     }
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         switch (this.waveform) {
             case VoltageElm.WF_DC:
             case VoltageElm.WF_VAR:
@@ -577,7 +577,7 @@ export class VoltageElm extends CircuitElm {
         this.dutyCycle = newDuty;
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n == 0)
             return new EditInfo(
                 this.waveform == VoltageElm.WF_DC ? "Voltage" : "Max Voltage",
@@ -661,7 +661,7 @@ export class VoltageElm extends CircuitElm {
         }
         return null;
     }
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         // any edit-dialog change makes the waveform phase-coherent with other sources
         if (!ei.continuous) this.freqTimeZero = 0;
         if (n == 0) this.maxVoltage = ei.value;
@@ -739,7 +739,7 @@ export class VoltageElm extends CircuitElm {
             }
         }
     }
-    validate(): boolean {
+    override validate(): boolean {
         if (this.internalResistance > 0) return true;
         if (this.getPostCount() == 2) {
             const fpi = new FindPathInfo(FindPathInfo.VOLTAGE, this, this.getNode(1), CircuitElm.sim);

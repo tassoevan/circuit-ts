@@ -81,16 +81,16 @@ export class OTAElm extends CompositeElm {
         (this.compElmList[1] as RailElm).maxVoltage = this.posVolt;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.curCount0 = this.curCount1 = this.curCount2 = this.curCount3 = 0;
     }
 
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, (3 * this.opheight) / 2);
         this.setVoltageColor(g, this.nodes[0].v);
         CircuitElm.drawThickLine(g, this.in1p[0], this.in1p[1]);
@@ -123,7 +123,7 @@ export class OTAElm extends CompositeElm {
         this.drawPosts(g);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const ww = this.opwidth;
         const wtot = ww * 2 + 2 * this.circDiam - this.circOverlap;
@@ -180,48 +180,48 @@ export class OTAElm extends CompositeElm {
         this.setPost(4, this.point2bis);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "pv", this.posVolt);
         CircuitXMLSerializer.dumpAttr(elem, "nv", this.negVolt);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.posVolt = xml.parseDoubleAttr("pv", this.posVolt);
         this.negVolt = xml.parseDoubleAttr("nv", this.negVolt);
         this.initOTA();
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 402;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "OTA (LM13700 style)";
         arr[1] = "Iabc = " + CircuitElm.getCurrentText(-this.getCurrentIntoNode(3));
         arr[2] = "V+ - V- = " + CircuitElm.getVoltageText(this.nodes[0].v - this.nodes[1].v);
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Positive Supply Voltage (5-20V)", this.posVolt, 5, 20).setUnitStep();
         if (n === 1) return new EditInfo("Negative Supply Voltage (V)", this.negVolt, -20, -5).setUnitStep();
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.posVolt = ei.value;
         if (n === 1) this.negVolt = ei.value;
         this.initOTA();
     }
 
-    canFlipX(): boolean {
+    override canFlipX(): boolean {
         return false;
     }
-    canFlipY(): boolean {
+    override canFlipY(): boolean {
         return false;
     }
 }

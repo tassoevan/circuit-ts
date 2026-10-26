@@ -43,19 +43,19 @@ export class ResistorElm extends CircuitElm {
         }
     }
 
-    isResistorElm(): boolean {
+    override isResistorElm(): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return "r".charCodeAt(0);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "r", this.resistance);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.resistance = xml.parseDoubleAttr("r", this.resistance);
     }
@@ -63,14 +63,14 @@ export class ResistorElm extends CircuitElm {
     ps3: Point = new Point();
     ps4: Point = new Point();
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(32);
         this.ps3 = new Point();
         this.ps4 = new Point();
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         let i: number;
         //int hs = showEuroResistors() ? 6 : 8;
         let hs = 6;
@@ -119,41 +119,41 @@ export class ResistorElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    addRoutingObstacle(wr: WireRouter): void {
+    override addRoutingObstacle(wr: WireRouter): void {
         this.addRoutingObstacleWithLeads(wr, 6);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.current = (this.nodes[0].v - this.nodes[1].v) / this.resistance;
         //System.out.print(this + " res current set to " + current + "\n");
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.resistance);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "resistor";
         this.getBasicInfo(arr);
         arr[3] = "R = " + CircuitElm.getUnitText(this.resistance, Locale.ohmString);
         arr[4] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    getScopeText(_v: number): string {
+    override getScopeText(_v: number): string {
         return Locale.LS("resistor") + ", " + CircuitElm.getUnitText(this.resistance, Locale.ohmString);
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         // ohmString doesn't work here on linux
         if (n === 0) return new EditInfo("Resistance (ohms)", this.resistance, 0, 0);
         return null;
     }
 
-    setEditValue(_n: number, ei: EditInfo): void {
+    override setEditValue(_n: number, ei: EditInfo): void {
         this.resistance = ei.value <= 0 ? 1e-9 : ei.value;
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "r".charCodeAt(0);
     }
     getResistance(): number {

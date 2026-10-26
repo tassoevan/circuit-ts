@@ -75,14 +75,14 @@ export class AmmeterElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "me", this.meter);
         CircuitXMLSerializer.dumpAttr(elem, "sc", this.scale);
         if (this.label.length > 0) CircuitXMLSerializer.dumpAttr(elem, "lb", this.label);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.meter = xml.parseIntAttr("me", this.meter);
         this.scale = xml.parseIntAttr("sc", this.scale);
@@ -103,14 +103,14 @@ export class AmmeterElm extends CircuitElm {
     mid!: Point;
     arrowPoly!: Polygon;
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.mid = this.interpPoint(this.point1, this.point2, 0.6);
         this.center = this.interpPoint(this.point1, this.point2, 0.5);
         this.arrowPoly = this.calcArrow(this.point1, this.mid, 14, 7);
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.count++;
         this.total += this.current * this.current;
         if (this.current > this.maxI && this.increasingI) {
@@ -170,7 +170,7 @@ export class AmmeterElm extends CircuitElm {
 
     readonly circleSize = 12;
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         super.draw(g);
         this.setVoltageColor(g, this.nodes[0].v);
         let width = 4;
@@ -220,16 +220,16 @@ export class AmmeterElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 370;
     }
 
-    setVoltageSource(n: number, v: VoltageSource): void {
+    override setVoltageSource(n: number, v: VoltageSource): void {
         super.setVoltageSource(n, v);
         v.setNodes(this.nodes[0], this.nodes[1]);
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampVoltageSource(this.nodes[0], this.nodes[1], this.voltSource, 0);
     }
 
@@ -237,11 +237,11 @@ export class AmmeterElm extends CircuitElm {
         return (this.flags & AmmeterElm.FLAG_SHOWCURRENT) !== 0;
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "Ammeter";
         switch (this.meter) {
             case AmmeterElm.AM_VOL:
@@ -253,16 +253,16 @@ export class AmmeterElm extends CircuitElm {
         }
     }
 
-    getPower(): number {
+    override getPower(): number {
         return 0;
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
 
     // do not optimize out, even though isWireEquivalent() is true
     // (because we need current calculated every timestep)
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return true;
     }
 
@@ -270,10 +270,10 @@ export class AmmeterElm extends CircuitElm {
         return (this.flags & AmmeterElm.FLAG_CIRCLE) !== 0;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Value", this.selectedValue, -1, -1);
             ei.choice = new Choice();
@@ -303,14 +303,14 @@ export class AmmeterElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.meter = ei.choice!.getSelectedIndex();
         if (n === 1) this.scale = ei.choice!.getSelectedIndex();
         if (n === 2) this.flags = ei.changeFlag(this.flags, AmmeterElm.FLAG_CIRCLE);
         if (n === 3) this.label = ei.textf ? ei.textf.value : (ei.text ?? "");
     }
 
-    getExprRefName(): string | null {
+    override getExprRefName(): string | null {
         return this.label.length > 0 ? this.label : null;
     }
 }

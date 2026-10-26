@@ -44,30 +44,30 @@ export class WireElm extends CircuitElm {
     static readonly FLAG_SHOW_BUS_VALUE = 4;
     static readonly FLAG_SHOW_BUS_VALUE_HEX = 8;
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return (this.busWidth ?? 1) * 2;
     }
-    getBusWidth(): number {
+    override getBusWidth(): number {
         return this.busWidth;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         if (this.busWidth == 1) return n == 0 ? this.point1 : this.point2;
         if (n < this.busWidth) return new Point(this.point1.x, this.point1.y, n);
         return new Point(this.point2.x, this.point2.y, n - this.busWidth);
     }
 
-    getPostWidth(_n: number): number {
+    override getPostWidth(_n: number): number {
         return this.busWidth;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         if (this.busWidth == 1) return true;
         // only connect matching bits: post n1 connects to n1 +/- busWidth
         return Math.abs(n1 - n2) == this.busWidth;
     }
 
-    getConnectedPost(n?: number): Point {
+    override getConnectedPost(n?: number): Point {
         if (n === undefined) return this.point2;
         if (this.busWidth == 1) return n == 0 ? this.point2 : this.point1;
         if (n < this.busWidth) return new Point(this.point2.x, this.point2.y, n);
@@ -80,7 +80,7 @@ export class WireElm extends CircuitElm {
         return value;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         if (this.currents != null) {
             this.current = 0;
             for (let i = 0; i < this.currents.length; i++) this.current += this.currents[i];
@@ -102,7 +102,7 @@ export class WireElm extends CircuitElm {
         this.drawValues(g, s, 4);
         this.drawPosts(g);
     }
-    stamp(): void {
+    override stamp(): void {
         //	    sim.stampVoltageSource(nodes[0], nodes[1], voltSource, 0);
     }
     mustShowCurrent(): boolean {
@@ -118,7 +118,7 @@ export class WireElm extends CircuitElm {
         return (this.flags & WireElm.FLAG_SHOW_BUS_VALUE_HEX) != 0;
     }
     //	int getVoltageSourceCount() { return 1; }
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = this.busWidth > 1 ? "bus wire (" + this.busWidth + ")" : "wire";
         if (this.busWidth > 1) {
             const value = this.getBusValue();
@@ -141,34 +141,34 @@ export class WireElm extends CircuitElm {
             if (label != null) arr[3] = label;
         }
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return "w".charCodeAt(0);
     }
-    getPower(): number {
+    override getPower(): number {
         return 0;
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return true;
     }
-    isRemovableWire(): boolean {
+    override isRemovableWire(): boolean {
         return true;
     }
-    isWireElm(): boolean {
+    override isWireElm(): boolean {
         return true;
     }
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
 
-    setWireCurrent(bit: number, c: number): void {
+    override setWireCurrent(bit: number, c: number): void {
         if (this.currents != null) this.currents[bit] = c;
         else this.current = c;
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (this.currents != null) {
             if (n < this.busWidth) return -this.currents[n];
             return this.currents[n - this.busWidth];
@@ -176,7 +176,7 @@ export class WireElm extends CircuitElm {
         if (n == 0) return -this.current;
         return this.current;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n == 0) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Show Current", this.mustShowCurrent());
@@ -199,7 +199,7 @@ export class WireElm extends CircuitElm {
         }
         return null;
     }
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n == 0) {
             if (ei.checkbox!.getState()) this.flags |= WireElm.FLAG_SHOWCURRENT;
             else this.flags &= ~WireElm.FLAG_SHOWCURRENT;
@@ -211,7 +211,7 @@ export class WireElm extends CircuitElm {
         if (n == 2) this.flags = ei.changeFlag(this.flags, WireElm.FLAG_SHOW_BUS_VALUE);
         if (n == 3) this.flags = ei.changeFlag(this.flags, WireElm.FLAG_SHOW_BUS_VALUE_HEX);
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "w".charCodeAt(0);
     }
 
@@ -266,7 +266,7 @@ export class WireElm extends CircuitElm {
     // would duplicate an existing colinear element (both endpoints of that
     // element lying on the new wire) is dropped instead of added, since adding
     // it would just create a parallel loop.
-    draggingDone(): void {
+    override draggingDone(): void {
         // postDrawList holds the points (as of the last analysis, i.e. before this wire)
         // where a dot is drawn: dead ends and real junctions, but not plain pass-through
         // connections between two elements. Only split at those, so we don't tap into
@@ -315,7 +315,7 @@ export class WireElm extends CircuitElm {
         }
     }
 
-    getMouseDistance(gx: number, gy: number): number {
+    override getMouseDistance(gx: number, gy: number): number {
         const thresh = 10;
         const d2 = this.lineDistanceSq(this.x, this.y, this.x2, this.y2, gx, gy);
         if (d2 <= thresh * thresh) return d2;

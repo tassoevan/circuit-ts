@@ -97,23 +97,23 @@ export class InstructionDisplayElm extends CircuitElm {
         }
     }
 
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "ins";
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.busWidth;
     }
-    getPostWidth(_n: number): number {
+    override getPostWidth(_n: number): number {
         return this.busWidth;
     }
-    getNumHandles(): number {
+    override getNumHandles(): number {
         return 1;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 0;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "bw", this.busWidth);
         if (this.threshold !== 2.5) CircuitXMLSerializer.dumpAttr(elem, "th", this.threshold);
@@ -121,7 +121,7 @@ export class InstructionDisplayElm extends CircuitElm {
             elem.appendChild(doc.createTextNode(this.lookupText));
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.busWidth = xml.parseIntAttr("bw", this.busWidth);
         this.threshold = xml.parseDoubleAttr("th", this.threshold);
@@ -137,11 +137,11 @@ export class InstructionDisplayElm extends CircuitElm {
         this.parseEntries(null);
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return new Point(this.x, this.y, n);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = new Point();
     }
@@ -161,7 +161,7 @@ export class InstructionDisplayElm extends CircuitElm {
         return String(value);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.save();
         const selected = this.needsHighlight();
         const fontSize = 14;
@@ -183,23 +183,23 @@ export class InstructionDisplayElm extends CircuitElm {
         g.restore();
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         router.addWire(this.point1.x, this.point1.y, this.x2, this.y2);
         router.addObstacle(this.x2 - 10, this.y2 - 10, this.x2 + 10, this.y2 + 10);
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "instruction display";
         const value = this.readInputValue();
         arr[1] = "in = " + value + " (0x" + value.toString(16).toUpperCase() + ")";
         arr[2] = "text = " + this.getDisplayText();
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Bus Width", this.busWidth, 2, 32).setDimensionless();
         if (n === 1) return new EditInfo("Threshold Voltage", this.threshold);
         if (n === 2) {
@@ -210,7 +210,7 @@ export class InstructionDisplayElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 1 && ei.value <= 32) {
                 this.busWidth = Math.floor(ei.value);
@@ -266,7 +266,7 @@ export class InstructionDisplayElm extends CircuitElm {
         return parseIntStrict(s);
     }
 
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
 }

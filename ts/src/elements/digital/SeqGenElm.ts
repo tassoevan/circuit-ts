@@ -71,7 +71,7 @@ export class SeqGenElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "sequence generator";
     }
 
@@ -87,10 +87,10 @@ export class SeqGenElm extends ChipElm {
         if (this.hasReset()) this.pins[2] = new Pin(this, 1, ChipElm.SIDE_W, "R");
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[1].v;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.hasReset() ? 3 : 2;
     }
     getVoltageSourceCount(): number {
@@ -103,7 +103,7 @@ export class SeqGenElm extends ChipElm {
         return (this.flags & SeqGenElm.FLAG_HAS_RESET) !== 0;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.bitPosition = 0;
     }
@@ -124,7 +124,7 @@ export class SeqGenElm extends ChipElm {
         }
     }
 
-    execute(): void {
+    override execute(): void {
         if (this.hasReset() && this.pins[2].value) {
             this.bitPosition = 0;
             this.clockstate = this.pins[0].value;
@@ -137,11 +137,11 @@ export class SeqGenElm extends ChipElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 188;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "bc", this.bitCount);
         let s = "";
@@ -152,7 +152,7 @@ export class SeqGenElm extends ChipElm {
         CircuitXMLSerializer.dumpAttr(elem, "dt", s);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.bitCount = xml.parseIntAttr("bc", this.bitCount);
         const dt = xml.parseStringAttr("dt", null);
@@ -165,7 +165,7 @@ export class SeqGenElm extends ChipElm {
         if (this.bitCount > this.data.length * 32) this.bitCount = this.data.length * 32;
     }
 
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Play Once", this.hasPlayOnce());
@@ -183,7 +183,7 @@ export class SeqGenElm extends ChipElm {
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.flags = ei.changeFlag(this.flags, SeqGenElm.FLAG_PLAY_ONCE);
             return;

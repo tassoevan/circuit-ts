@@ -238,7 +238,7 @@ export class EditSubcircuitModelDialog extends Dialog {
         this.chip.setPoints();
     }
 
-    enterPressed(): void {
+    override enterPressed(): void {
         if (this.modelNameInput) {
             const name = this.modelNameInput.value;
             if (name.length === 0) {
@@ -279,13 +279,13 @@ export class EditSubcircuitModelDialog extends Dialog {
         this.closeDialog();
     }
 
-    closeDialog(): void {
+    override closeDialog(): void {
         // a newly created model that was never named (cancelled) is discarded
         if (this.model && this.model.name === "") this.model.remove();
         super.closeDialog();
     }
 
-    show(): void {
+    override show(): void {
         super.show();
         this.drawChip();
     }

@@ -88,20 +88,20 @@ export class NortonAmpElm extends CompositeElm {
         this.setSize(this.useSmallGrid() ? 1 : 2);
     }
 
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "nor";
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.setSize((this.flags & NortonAmpElm.FLAG_SMALL) !== 0 ? 1 : 2);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.opheight * 2);
         this.setVoltageColor(g, this.nodes[0].v); // post 0 = in+
         CircuitElm.drawThickLine(g, this.in1p[0], this.in1p[1]);
@@ -145,7 +145,7 @@ export class NortonAmpElm extends CompositeElm {
         this.flags = (this.flags & ~NortonAmpElm.FLAG_SMALL) | (s === 1 ? NortonAmpElm.FLAG_SMALL : 0);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         if (this.dn > 150 && this.isCreating()) this.setSize(2);
         let ww = this.opwidth;
@@ -178,12 +178,12 @@ export class NortonAmpElm extends CompositeElm {
         this.setPost(2, this.point2); // out
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.curcount0 = this.curcount1 = 0;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "norton amp";
         arr[1] = "V+ = " + CircuitElm.getVoltageText(this.nodes[0].v);
         arr[2] = "V- = " + CircuitElm.getVoltageText(this.nodes[1].v);
@@ -191,22 +191,22 @@ export class NortonAmpElm extends CompositeElm {
         arr[4] = "Iout = " + CircuitElm.getCurrentText(-this.getCurrentIntoNode(2));
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         if (this.dx === 0) this.flags ^= NortonAmpElm.FLAG_SWAP;
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         if (this.dy === 0) this.flags ^= NortonAmpElm.FLAG_SWAP;
         super.flipY(c2, count);
     }
 
-    flipXY(xmy: number, count: number): void {
+    override flipXY(xmy: number, count: number): void {
         this.flags ^= NortonAmpElm.FLAG_SWAP;
         super.flipXY(xmy, count);
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         this.addRoutingObstacleWithLeads(router, this.opwidth);
     }
 }

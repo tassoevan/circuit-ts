@@ -75,30 +75,30 @@ export class WattmeterElm extends CircuitElm {
         this.curcounts = [0, 0];
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "w", this.width);
         CircuitXMLSerializer.dumpAttr(elem, "meter", this.meter);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.width = xml.parseIntAttr("w", this.width);
         this.meter = xml.parseIntAttr("meter", this.meter);
         this.setup();
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 2;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 420;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 4;
     }
 
-    drag(xx: number, yy: number): void {
+    override drag(xx: number, yy: number): void {
         xx = this.snapGrid(xx);
         yy = this.snapGrid(yy);
         const w1 = Math.max(CircuitElm.app.gridSize, CircuitElm.abs(yy - this.y));
@@ -115,7 +115,7 @@ export class WattmeterElm extends CircuitElm {
         this.setPoints();
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const ds = this.dy === 0 ? CircuitElm.sign(this.dx) : -CircuitElm.sign(this.dy);
         const p3 = this.interpPoint(this.point1, this.point2, 0, -this.width * ds);
@@ -137,21 +137,21 @@ export class WattmeterElm extends CircuitElm {
         this.maxTextLen = Math.max(Math.abs(r1.x - r4.x) - 5, 5);
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return this.posts[n];
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampVoltageSource(this.nodes[0], this.nodes[1], this.voltSources[0], 0);
         CircuitElm.sim.stampVoltageSource(this.nodes[2], this.nodes[3], this.voltSources[1], 0);
     }
 
-    setVoltageSource(j: number, vs: VoltageSource): void {
+    override setVoltageSource(j: number, vs: VoltageSource): void {
         this.voltSources[j] = vs;
         vs.setNodes(this.nodes[j * 2], this.nodes[j * 2 + 1]);
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         const p = this.getPower();
         const dt = CircuitElm.sim.timeStep;
         this.cycleTime += dt;
@@ -216,7 +216,7 @@ export class WattmeterElm extends CircuitElm {
         }
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         for (let i = 0; i !== 2; i++) this.curcounts[i] = this.updateDotCountImpl(this.currents[i], this.curcounts[i]);
         let flip = 1;
         for (let i = 0; i !== 4; i++) {
@@ -249,52 +249,52 @@ export class WattmeterElm extends CircuitElm {
         g.restore();
     }
 
-    getPower(): number {
+    override getPower(): number {
         return this.getVoltageDiff() * this.getCurrent();
     }
 
-    setCurrent(vs: VoltageSource, c: number): void {
+    override setCurrent(vs: VoltageSource, c: number): void {
         this.currents[vs === this.voltSources[0] ? 0 : 1] = c;
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         return n % 2 === 0 ? -this.currents[Math.trunc(n / 2)] : this.currents[Math.trunc(n / 2)];
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         return Math.trunc(n1 / 2) === Math.trunc(n2 / 2);
     }
-    hasGroundConnection(_n1: number): boolean {
+    override hasGroundConnection(_n1: number): boolean {
         return false;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "wattmeter (old)";
         this.getBasicInfo(arr);
         arr[3] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
         if (this.meter === this.PM_AVG) arr[4] = "Pavg = " + CircuitElm.getUnitText(this.avgPower, "W");
     }
 
-    canViewInScope(): boolean {
+    override canViewInScope(): boolean {
         return true;
     }
-    getCurrent(): number {
+    override getCurrent(): number {
         return this.currents[1];
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[2].v - this.nodes[0].v;
     }
-    canFlipX(): boolean {
+    override canFlipX(): boolean {
         return false;
     }
-    canFlipY(): boolean {
+    override canFlipY(): boolean {
         return false;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Value", 0, -1, -1);
             ei.choice = new Choice();
@@ -306,7 +306,7 @@ export class WattmeterElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.meter = ei.choice!.getSelectedIndex();
     }
 }

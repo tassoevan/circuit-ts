@@ -68,7 +68,7 @@ export abstract class CompositeElm extends CircuitElm {
         else super(xx, yy, xb, yb!, f!);
     }
 
-    getChildElmList(): CircuitElm[] {
+    override getChildElmList(): CircuitElm[] {
         return this.compElmList;
     }
 
@@ -263,13 +263,13 @@ export abstract class CompositeElm extends CircuitElm {
         this.numNodes = this.compNodeList.length;
     }
 
-    preStamp(): void {
+    override preStamp(): void {
         for (const ce of this.compElmList) ce.preStamp();
         this.buildCompNodeList();
         this.allocNodes();
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    override dumpXmlState(doc: Document, elem: Element): void {
         for (let i = 0; i !== this.compElmList.length; i++) {
             const ce = this.compElmList[i];
             const child = doc.createElement(ce.getXmlDumpType());
@@ -282,7 +282,7 @@ export abstract class CompositeElm extends CircuitElm {
         }
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         const state = xml.currentXmlElement;
 
@@ -302,25 +302,25 @@ export abstract class CompositeElm extends CircuitElm {
         xml.parseChildElement(state);
     }
 
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
-    hasGroundConnection(_n1: number): boolean {
+    override hasGroundConnection(_n1: number): boolean {
         return false;
     }
 
-    reset(): void {
+    override reset(): void {
         for (const ce of this.compElmList) ce.reset();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.numPosts;
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return this.numNodes - this.numPosts;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return this.posts[n];
     }
 
@@ -331,18 +331,18 @@ export abstract class CompositeElm extends CircuitElm {
         else this.posts[n] = pOrX;
     }
 
-    getPower(): number {
+    override getPower(): number {
         let power = 0;
         for (const ce of this.compElmList) power += ce.getPower();
         return power;
     }
 
-    stamp(): void {
+    override stamp(): void {
         for (const ce of this.compElmList) ce.setParentList(this.compElmList);
     }
 
     // called to set node p (local to this element) to equal n (global)
-    setNode(p: number, n: CircuitNode): void {
+    override setNode(p: number, n: CircuitNode): void {
         super.setNode(p, n);
         if (this.compNodeList == null) return;
 
@@ -350,16 +350,16 @@ export abstract class CompositeElm extends CircuitElm {
         for (let i = 0; i < cnLinks.length; i++) cnLinks[i].elm.setNode(cnLinks[i].num, n);
     }
 
-    canViewInScope(): boolean {
+    override canViewInScope(): boolean {
         return false;
     }
 
-    delete(): void {
+    override delete(): void {
         if (this.compElmList != null) for (const ce of this.compElmList) ce.delete();
         super.delete();
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         let c = 0;
         if (this.compNodeList == null) return 0;
         const cnLinks = this.compNodeList[n].links;

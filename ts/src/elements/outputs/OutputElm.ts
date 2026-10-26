@@ -50,32 +50,32 @@ export class OutputElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "sc", this.scale);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.scale = xml.parseIntAttr("sc", this.scale);
     }
 
-    isOutputElm(): boolean {
+    override isOutputElm(): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return "O".charCodeAt(0);
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = new Point();
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.save();
         const selected = this.needsHighlight();
         const f = new Font("SansSerif", selected ? Font.BOLD : 0, 14);
@@ -102,24 +102,24 @@ export class OutputElm extends CircuitElm {
         g.restore();
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         router.addWire(this.point1.x, this.point1.y, this.x2, this.y2);
         router.addObstacle(this.x2 - 10, this.y2 - 10, this.x2 + 10, this.y2 + 10);
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "output";
         arr[1] = "V = " + CircuitElm.getVoltageText(this.nodes[0].v);
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return EditInfo.createCheckbox("Show Voltage", this.showVoltage());
         if (!this.showVoltage()) return null;
         if (n === 1) {
@@ -144,7 +144,7 @@ export class OutputElm extends CircuitElm {
         return (this.flags & OutputElm.FLAG_VALUE) !== 0;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.flags = ei.changeFlag(this.flags, OutputElm.FLAG_VALUE);
             ei.newDialog = true;

@@ -32,7 +32,7 @@ export class VCVSElm extends VCCSElm {
         else super(xa, ya, xb, yb!, f!, st!);
     }
 
-    setupPins(): void {
+    override setupPins(): void {
         if (!this.inputCount) this.inputCount = 0;
         this.sizeX = 2;
         this.sizeY = this.inputCount > 2 ? this.inputCount : 2;
@@ -46,18 +46,18 @@ export class VCVSElm extends VCCSElm {
         this.allocNodes();
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "VCVS";
     }
 
-    stamp(): void {
+    override stamp(): void {
         const sim = SimulationManager.theSim!;
         const vs = this.pins[this.inputCount].voltSource!;
         sim.stampNonLinearVS(vs);
         sim.stampVoltageSource(this.nodes[this.inputCount + 1], this.nodes[this.inputCount], vs);
     }
 
-    doStep(): void {
+    override doStep(): void {
         const sim = SimulationManager.theSim!;
 
         // check convergence
@@ -80,40 +80,40 @@ export class VCVSElm extends VCCSElm {
     }
 
     // our output is a voltage source, so derivatives go into its matrix row
-    stampInputDerivative(pos: CircuitNode, neg: CircuitNode, dx: number): void {
+    override stampInputDerivative(pos: CircuitNode, neg: CircuitNode, dx: number): void {
         const sim = SimulationManager.theSim!;
         const vn = this.pins[this.inputCount].voltSource!;
         sim.stampMatrixNV(vn, pos, -dx);
         sim.stampMatrixNV(vn, neg, dx);
     }
 
-    stampInputDerivativeVS(ivs: VoltageSource, dx: number): void {
+    override stampInputDerivativeVS(ivs: VoltageSource, dx: number): void {
         SimulationManager.theSim!.stampMatrixVV(this.pins[this.inputCount].voltSource!, ivs, -dx);
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.exprState.updateLastValues(this.nodes[this.inputCount].v - this.nodes[this.inputCount + 1].v);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.inputCount + 2;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 212;
     }
-    hasCurrentOutput(): boolean {
+    override hasCurrentOutput(): boolean {
         return false;
     }
 
-    setVoltageSource(j: number, vs: VoltageSource): void {
+    override setVoltageSource(j: number, vs: VoltageSource): void {
         super.setVoltageSource(j, vs);
         vs.setNodes(this.nodes[this.inputCount + 1], this.nodes[this.inputCount]);
     }
 
-    setCurrent(vs: VoltageSource, c: number): void {
+    override setCurrent(vs: VoltageSource, c: number): void {
         if (this.pins[this.inputCount].voltSource === vs) {
             this.pins[this.inputCount].current = c;
             this.pins[this.inputCount + 1].current = -c;

@@ -30,7 +30,7 @@ export class SubcircuitChipElm extends ChipElm {
         this.setSize(2);
     }
 
-    needsBits(): boolean {
+    override needsBits(): boolean {
         return false;
     }
     setupPins(): void {}
@@ -55,7 +55,7 @@ export class SubcircuitChipElm extends ChipElm {
         this.label = text;
     }
 
-    drawLabel(g: Graphics, x: number, y: number): void {
+    override drawLabel(g: Graphics, x: number, y: number): void {
         if (this.label === null) return;
         g.save();
         g.context.textBaseline = "middle";
@@ -64,7 +64,7 @@ export class SubcircuitChipElm extends ChipElm {
         g.restore();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.pins == null ? 1 : this.pins.length;
     }
 }

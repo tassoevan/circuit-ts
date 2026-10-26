@@ -149,7 +149,7 @@ export class ShortcutsDialog extends Dialog {
         this.checkForDuplicates();
     }
 
-    enterPressed(): void {
+    override enterPressed(): void {
         if (this.checkForDuplicates()) return;
         // clear existing shortcuts
         this.sim.shortcuts.clear();

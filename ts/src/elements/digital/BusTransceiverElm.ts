@@ -45,27 +45,27 @@ export class BusTransceiverElm extends ChipElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "db", this.dataBits);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.dataBits = xml.parseIntAttr("db", this.dataBits);
         this.setupPins();
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
-    allowBus(): boolean {
+    override allowBus(): boolean {
         return true;
     }
-    getChipName(): string {
+    override getChipName(): string {
         return "Bus Transceiver";
     }
-    defaultBitCount(): number {
+    override defaultBitCount(): number {
         return 4;
     }
 
@@ -91,23 +91,23 @@ export class BusTransceiverElm extends ChipElm {
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 2 + 2 * this.dataBits;
     }
     getVoltageSourceCount(): number {
         return this.dataBits;
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return this.dataBits;
     }
 
-    setVoltageSource(j: number, vs: VoltageSource): void {
+    override setVoltageSource(j: number, vs: VoltageSource): void {
         if (!this.vSources || this.vSources.length !== this.dataBits) this.vSources = new Array(this.dataBits);
         this.vSources[j] = vs;
         vs.setNodes(CircuitNode.ground, this.nodes[this.intNodes + j]);
     }
 
-    getMatrixConnection(n1: number, n2: number): boolean {
+    override getMatrixConnection(n1: number, n2: number): boolean {
         for (let i = 0; i < this.dataBits; i++) {
             if (this.comparePair(n1, n2, this.intNodes + i, this.aNodes + i)) return true;
             if (this.comparePair(n1, n2, this.intNodes + i, this.bNodes + i)) return true;
@@ -115,7 +115,7 @@ export class BusTransceiverElm extends ChipElm {
         return false;
     }
 
-    stamp(): void {
+    override stamp(): void {
         for (let i = 0; i < this.dataBits; i++) {
             CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[this.intNodes + i], this.vSources[i]);
             CircuitElm.sim.stampNonLinear(this.nodes[this.intNodes + i]);
@@ -124,7 +124,7 @@ export class BusTransceiverElm extends ChipElm {
         }
     }
 
-    doStep(): void {
+    override doStep(): void {
         const outputEnabled = this.nodes[0].v < this.getThreshold();
         const dirAtoB = this.nodes[1].v > this.getThreshold();
 
@@ -151,19 +151,19 @@ export class BusTransceiverElm extends ChipElm {
         }
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "bus transceiver";
         const outputEnabled = this.nodes[0].v < this.getThreshold();
         const dirAtoB = this.nodes[1].v > this.getThreshold();
         arr[1] = outputEnabled ? (dirAtoB ? "A→B" : "B→A") : "hi-Z";
     }
 
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Bits", this.dataBits, 1, 1).setDimensionless();
         return super.getChipEditInfo(n);
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 1 && ei.value <= 16) {
                 this.dataBits = Math.trunc(ei.value);

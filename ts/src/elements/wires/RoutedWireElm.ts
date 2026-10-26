@@ -47,21 +47,21 @@ export class RoutedWireElm extends WireElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 0;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "rw";
     }
-    isRoutedWireElm(): boolean {
+    override isRoutedWireElm(): boolean {
         return true;
     }
 
     // RoutedWireElm routes around other elements' posts rather than splitting to
     // connect to them, so don't auto-split like a plain WireElm would.
-    draggingDone(): void {}
+    override draggingDone(): void {}
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         if (this.routePoints !== null && this.routePoints.length > 0) {
             const parts = this.routePoints.map((p) => p.x + "," + p.y);
@@ -69,7 +69,7 @@ export class RoutedWireElm extends WireElm {
         }
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         try {
             const contents = xml.parseContents();
@@ -84,18 +84,18 @@ export class RoutedWireElm extends WireElm {
         } catch (e) {}
     }
 
-    move(dx: number, dy: number): void {
+    override move(dx: number, dy: number): void {
         if (this.routePoints !== null) {
             for (const p of this.routePoints) p.move(dx, dy);
         }
         super.move(dx, dy);
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "W".charCodeAt(0);
     }
 
-    setPoints(pointsOrRouting?: boolean | Point[]): void {
+    override setPoints(pointsOrRouting?: boolean | Point[]): void {
         if (Array.isArray(pointsOrRouting)) {
             const points = pointsOrRouting;
             const first = points[0];
@@ -137,7 +137,7 @@ export class RoutedWireElm extends WireElm {
     }
 
     // split this routed wire at the point nearest (mx, my)
-    split(mx: number, my: number): RoutedWireElm | null {
+    override split(mx: number, my: number): RoutedWireElm | null {
         if (this.routePoints === null || this.routePoints.length < 2) return null;
 
         let bestSeg = -1;
@@ -187,7 +187,7 @@ export class RoutedWireElm extends WireElm {
         return new RoutedWireElm(rp2);
     }
 
-    selectRect(r: Rectangle, add: boolean): void {
+    override selectRect(r: Rectangle, add: boolean): void {
         if (this.routePoints === null || this.routePoints.length < 2) {
             super.selectRect(r, add);
             return;
@@ -223,7 +223,7 @@ export class RoutedWireElm extends WireElm {
         }
     }
 
-    pointOnWireInterior(px: number, py: number): boolean {
+    override pointOnWireInterior(px: number, py: number): boolean {
         if (this.routePoints === null || this.routePoints.length < 2) return false;
         return WireElm.pointOnWireInteriorForPoints(px, py, this.routePoints);
     }
@@ -242,7 +242,7 @@ export class RoutedWireElm extends WireElm {
         this.routePoints = [...rp1, ...rp2.slice(1)];
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         if (this.routePoints === null) return;
         for (let i = 0; i < this.routePoints.length - 1; i++)
             router.addWire(
@@ -253,7 +253,7 @@ export class RoutedWireElm extends WireElm {
             );
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         if (this.routePoints === null || this.routePoints.length < 2) {
             super.draw(g);
             return;
@@ -323,7 +323,7 @@ export class RoutedWireElm extends WireElm {
         else g.drawString(s, mx + 4, my + ya);
     }
 
-    doDots(g: Graphics): void {
+    override doDots(g: Graphics): void {
         this.updateDotCount();
         if (this.isCreating() || this.curcount === 0 || this.routePoints === null) return;
         let cc = this.curcount;
@@ -338,7 +338,7 @@ export class RoutedWireElm extends WireElm {
         }
     }
 
-    getMouseDistance(gx: number, gy: number): number {
+    override getMouseDistance(gx: number, gy: number): number {
         if (this.routePoints === null) return super.getMouseDistance(gx, gy);
         const thresh = 10;
         let best = Number.MAX_SAFE_INTEGER;
@@ -413,7 +413,7 @@ export class RoutedWireElm extends WireElm {
         return new Point(sx, sy);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         super.getInfo(arr);
         arr[0] = this.busWidth > 1 ? "routed bus wire (" + this.busWidth + ")" : "routed wire";
     }

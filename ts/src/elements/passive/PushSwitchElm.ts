@@ -23,10 +23,10 @@ export class PushSwitchElm extends SwitchElm {
     constructor(xx: number, yy: number) {
         super(xx, yy, true);
     }
-    getDumpClass(): Function {
+    override getDumpClass(): Function {
         return SwitchElm;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 }

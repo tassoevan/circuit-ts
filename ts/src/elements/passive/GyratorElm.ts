@@ -53,7 +53,7 @@ export class GyratorElm extends CircuitElm {
         this.curcounts = [0, 0];
     }
 
-    drag(xx: number, yy: number): void {
+    override drag(xx: number, yy: number): void {
         xx = this.snapGrid(xx);
         yy = this.snapGrid(yy);
         if (Math.abs(xx - this.x) > Math.abs(yy - this.y)) this.flags &= ~GyratorElm.FLAG_VERTICAL;
@@ -69,7 +69,7 @@ export class GyratorElm extends CircuitElm {
     // Wikipedia gyrator symbol: rectangular box with the Greek letter pi
     // (denoting the 180-degree phase shift in the gyration direction)
     // and an arrow showing the gyration direction.
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         // Stubs from each terminal toward the box
         for (let i = 0; i !== 4; i++) {
             this.setVoltageColor(g, this.nodes[i].v);
@@ -101,7 +101,7 @@ export class GyratorElm extends CircuitElm {
         this.setBbox(this.ptEnds[0], this.ptEnds[3], 0);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         if (this.hasFlag(GyratorElm.FLAG_VERTICAL)) this.point2.x = this.point1.x;
         else this.point2.y = this.point1.y;
@@ -137,13 +137,13 @@ export class GyratorElm extends CircuitElm {
         this.arrowPoly = this.calcArrow(this.arrowTail, this.arrowHead, 4, 3);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "r", this.gyrResistance);
         CircuitXMLSerializer.dumpAttr(elem, "wi", this.width);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         if (this.hasFlag(GyratorElm.FLAG_VERTICAL)) this.width = -Math.max(32, Math.abs(this.x2 - this.x));
         else this.width = Math.max(32, Math.abs(this.y2 - this.y));
@@ -151,15 +151,15 @@ export class GyratorElm extends CircuitElm {
         this.width = xml.parseIntAttr("wi", this.width);
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return this.ptEnds[n];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 4;
     }
 
-    reset(): void {
+    override reset(): void {
         this.currents[0] = this.currents[1] = 0;
         this.nodes[0].v = this.nodes[1].v = this.nodes[2].v = this.nodes[3].v = 0;
         this.curcounts[0] = this.curcounts[1] = 0;
@@ -171,13 +171,13 @@ export class GyratorElm extends CircuitElm {
     // where G = 1/R is the gyration conductance.  Linear, memoryless: the
     // entire behavior is captured by stamping two voltage-controlled current
     // sources -- no doStep().
-    stamp(): void {
+    override stamp(): void {
         const g = 1.0 / this.gyrResistance;
         CircuitElm.sim.stampVCCurrentSource(this.nodes[0], this.nodes[2], this.nodes[1], this.nodes[3], g);
         CircuitElm.sim.stampVCCurrentSource(this.nodes[1], this.nodes[3], this.nodes[0], this.nodes[2], -g);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         const g = 1.0 / this.gyrResistance;
         const v1 = this.nodes[0].v - this.nodes[2].v;
         const v2 = this.nodes[1].v - this.nodes[3].v;
@@ -185,21 +185,21 @@ export class GyratorElm extends CircuitElm {
         this.currents[1] = -g * v1;
     }
 
-    getCurrent(): number {
+    override getCurrent(): number {
         return this.currents[0];
     } // for scope
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n < 2) return -this.currents[n];
         return this.currents[n - 2];
     }
 
     // VCCS stamps couple all nodes, so they must all be in the same matrix
-    getMatrixConnection(_n1: number, _n2: number): boolean {
+    override getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         // Port-1 terminals connect to each other; port-2 terminals connect
         // to each other; the two ports are coupled only via the VCCS, not
         // galvanically.
@@ -208,7 +208,7 @@ export class GyratorElm extends CircuitElm {
         return false;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "gyrator";
         arr[1] = "R = " + CircuitElm.getUnitText(this.gyrResistance, "Ω");
         arr[2] = "Vd1 = " + CircuitElm.getVoltageText(this.nodes[0].v - this.nodes[2].v);
@@ -217,26 +217,26 @@ export class GyratorElm extends CircuitElm {
         arr[5] = "I2 = " + CircuitElm.getCurrentText(this.currents[1]);
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Gyration Resistance (Ω)", this.gyrResistance, 1, 0);
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) this.gyrResistance = ei.value;
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         if (this.hasFlag(GyratorElm.FLAG_VERTICAL)) this.flags ^= GyratorElm.FLAG_FLIP;
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         if (!this.hasFlag(GyratorElm.FLAG_VERTICAL)) this.flags ^= GyratorElm.FLAG_FLIP;
         super.flipY(c2, count);
     }
 
-    flipXY(xmy: number, count: number): void {
+    override flipXY(xmy: number, count: number): void {
         this.flags ^= GyratorElm.FLAG_VERTICAL;
         this.width *= -1;
         super.flipXY(xmy, count);

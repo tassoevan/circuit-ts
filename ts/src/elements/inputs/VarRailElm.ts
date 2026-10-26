@@ -49,12 +49,12 @@ export class VarRailElm extends RailElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "st", this.sliderText);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.sliderText = xml.parseStringAttr("st", this.sliderText);
         if (this.labelEl != null) this.labelEl.textContent = Locale.LS(this.sliderText);
@@ -62,10 +62,10 @@ export class VarRailElm extends RailElm {
         this.slider?.setValue(value);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 172;
     }
-    isVarRailElm(): boolean {
+    override isVarRailElm(): boolean {
         return true;
     }
 
@@ -84,18 +84,18 @@ export class VarRailElm extends RailElm {
         CircuitElm.app.addWidgetToVerticalPanel(this.slider.element);
     }
 
-    getVoltage(): number {
+    override getVoltage(): number {
         this.frequency = (this.slider!.getValue() * (this.maxVoltage - this.bias)) / 100 + this.bias;
         return this.frequency;
     }
 
-    delete(): void {
+    override delete(): void {
         if (this.labelEl != null) CircuitElm.app.removeWidgetFromVerticalPanel(this.labelEl);
         if (this.slider != null) CircuitElm.app.removeWidgetFromVerticalPanel(this.slider.element);
         super.delete();
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Min Voltage", this.bias, -20, 20).setUnitStep();
         if (n === 1) return new EditInfo("Max Voltage", this.maxVoltage, -20, 20).setUnitStep();
         if (n === 2) {
@@ -106,7 +106,7 @@ export class VarRailElm extends RailElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.bias = ei.value;
         if (n === 1) this.maxVoltage = ei.value;
         if (n === 2) {
@@ -116,11 +116,11 @@ export class VarRailElm extends RailElm {
         }
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 
-    setMouseElm(v: boolean): void {
+    override setMouseElm(v: boolean): void {
         super.setMouseElm(v);
         this.slider?.draw();
     }

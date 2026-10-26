@@ -56,25 +56,25 @@ export class MBBSwitchElm extends SwitchElm {
         this.allocNodes();
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 416;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "li", this.link);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.link = xml.parseIntAttr("li", this.link);
     }
 
-    readonly openhs = 16;
+    override readonly openhs = 16;
     swposts!: Point[];
     swpoles!: Point[];
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(32);
         this.swposts = this.newPointArray(2);
@@ -87,7 +87,7 @@ export class MBBSwitchElm extends SwitchElm {
         this.posCount = 4;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.openhs);
         this.adjustBbox(this.swposts[0], this.swposts[1]);
 
@@ -112,31 +112,31 @@ export class MBBSwitchElm extends SwitchElm {
         this.drawPosts(g);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0) return -this.currents[0] - this.currents[1];
         return this.currents[n - 1];
     }
 
-    getSwitchRect(): Rectangle {
+    override getSwitchRect(): Rectangle {
         return new Rectangle(this.lead1!.x, this.lead1!.y, 0, 0)
             .union(new Rectangle(this.swpoles[0].x, this.swpoles[0].y, 0, 0))
             .union(new Rectangle(this.swpoles[1].x, this.swpoles[1].y, 0, 0));
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return n === 0 ? this.point1 : this.swposts[n - 1];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3;
     }
 
-    setCurrent(vs: VoltageSource, c: number): void {
+    override setCurrent(vs: VoltageSource, c: number): void {
         if (vs === this.voltSources[0]) this.currents[this.both ? 0 : Math.trunc(this.position / 2)] = c;
         else if (vs === this.voltSources[1]) this.currents[1] = c;
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         if (this.resistance > 0) {
             this.currents[0] =
                 this.both || this.position === 0 ? (this.nodes[0].v - this.nodes[1].v) / this.resistance : 0;
@@ -148,14 +148,14 @@ export class MBBSwitchElm extends SwitchElm {
         if (!this.both) this.currents[1 - Math.trunc(this.position / 2)] = 0;
     }
 
-    setVoltageSource(n: number, v: VoltageSource): void {
+    override setVoltageSource(n: number, v: VoltageSource): void {
         this.voltSources[n] = v;
         if (this.both) v.setNodes(this.nodes[0], this.nodes[n + 1]);
         else if (this.position === 0) v.setNodes(this.nodes[0], this.nodes[1]);
         else v.setNodes(this.nodes[0], this.nodes[2]);
     }
 
-    stamp(): void {
+    override stamp(): void {
         if (this.resistance > 0) {
             if (this.both || this.position === 0)
                 CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.resistance);
@@ -170,13 +170,13 @@ export class MBBSwitchElm extends SwitchElm {
 
     // connection is implemented by voltage source with voltage = 0.
     // need two for both loads connected, otherwise one.
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         this.both = this.position === 1 || this.position === 3;
         if (this.resistance > 0) return 0;
         return this.both ? 2 : 1;
     }
 
-    toggle(): void {
+    override toggle(): void {
         super.toggle();
         if (this.link !== 0) {
             for (const ce of CircuitElm.app.elmList) {
@@ -186,30 +186,30 @@ export class MBBSwitchElm extends SwitchElm {
         }
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         if (this.both) return true;
         return this.comparePair(n1, n2, 0, 1 + Math.trunc(this.position / 2));
     }
 
     // do not optimize out, even though isWireEquivalent() is true (because it may have 3 nodes to merge
     // and calcWireClosure() doesn't handle that case)
-    isRemovableWire(): boolean {
+    override isRemovableWire(): boolean {
         return false;
     }
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return this.resistance === 0;
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "switch (SPDT, MBB)";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "switch (" + (this.link === 0 ? "S" : "D") + "PDT, MBB)";
         arr[1] = "I = " + CircuitElm.getCurrentDText(this.getCurrent());
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return super.getEditInfo(0);
         if (n === 1) return new EditInfo("Switch Group", this.link, 0, 100).setDimensionless();
         if (n === 2) return this.getKeyShortcutEditInfo();
@@ -221,14 +221,14 @@ export class MBBSwitchElm extends SwitchElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 1) this.link = Math.trunc(ei.value);
         else if (n === 2) this.setKeyShortcutEditValue(ei);
         else if (n === 3) this.resistance = ei.value;
         else super.setEditValue(n, ei);
     }
 
-    validate(): boolean {
+    override validate(): boolean {
         if (this.resistance > 0) return true;
         const b = this.position === 1 || this.position === 3;
         if (b || this.position === 0) {
@@ -248,7 +248,7 @@ export class MBBSwitchElm extends SwitchElm {
         return true;
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 }

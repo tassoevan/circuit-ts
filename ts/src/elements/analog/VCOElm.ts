@@ -34,7 +34,7 @@ export class VCOElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "VCO";
     }
 
@@ -53,11 +53,11 @@ export class VCOElm extends ChipElm {
         this.pins[5].output = true;
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    stamp(): void {
+    override stamp(): void {
         // output pin
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[1], this.pins[1].voltSource);
         // attach Vi to R1 pin so its current is proportional to Vi
@@ -75,7 +75,7 @@ export class VCOElm extends ChipElm {
     cCurrent: number = 0;
     cDir: number = 0;
 
-    doStep(): void {
+    override doStep(): void {
         const vc = this.nodes[3].v - this.nodes[2].v;
         let vo = this.nodes[1].v;
         let dir = vo < 2.5 ? 1 : -1;
@@ -113,27 +113,27 @@ export class VCOElm extends ChipElm {
         this.pins[0].current = -this.pins[4].current;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.computeCurrent();
         this.drawChip(g);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 6;
     }
     getVoltageSourceCount(): number {
         return 3;
     }
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 158;
     }
-    getMatrixConnection(_n1: number, _n2: number): boolean {
+    override getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
-    isDigitalChip(): boolean {
+    override isDigitalChip(): boolean {
         return false;
     }
 }

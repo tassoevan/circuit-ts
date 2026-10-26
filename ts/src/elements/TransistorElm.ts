@@ -94,7 +94,7 @@ export class TransistorElm extends CircuitElm {
         this.noDiagonal = true;
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
@@ -112,7 +112,7 @@ export class TransistorElm extends CircuitElm {
         );
     }
 
-    reset(): void {
+    override reset(): void {
         this.lastvbc = this.lastvbe = this.curcount_c = this.curcount_e = this.curcount_b = 0;
         this.capVoltBE = this.capVoltBC = this.capCurBE = this.capCurBC = 0;
         this.geqBE = this.geqBC = this.ceqBE = this.ceqBC = 0;
@@ -120,11 +120,11 @@ export class TransistorElm extends CircuitElm {
         this.localSubIters = 0;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "t".charCodeAt(0);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "pn", this.pnp);
@@ -132,14 +132,14 @@ export class TransistorElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modelName);
     }
 
-    dumpXmlState(_doc: Document, elem: Element): void {
+    override dumpXmlState(_doc: Document, elem: Element): void {
         // "vBE"/"vBC" (mixed case) are correctly-named, not cross-wired like Java's
         // lowercase "vbe"/"vbc" (see undumpXml, which still accepts the old names)
         CircuitXMLSerializer.dumpAttr(elem, "vBE", this.nodes[0].v - this.nodes[2].v);
         CircuitXMLSerializer.dumpAttr(elem, "vBC", this.nodes[0].v - this.nodes[1].v);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.pnp = xml.parseIntAttr("pn", this.pnp);
         this.beta = xml.parseDoubleAttr("be", this.beta);
@@ -158,11 +158,11 @@ export class TransistorElm extends CircuitElm {
         this.setup();
     }
 
-    updateModels(): void {
+    override updateModels(): void {
         this.setup();
     }
 
-    dumpXmlModel(doc: Document): void {
+    override dumpXmlModel(doc: Document): void {
         if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
     }
 
@@ -191,7 +191,7 @@ export class TransistorElm extends CircuitElm {
         return (TransistorElm.globalFlags & TransistorElm.FLAG_CIRCLE) !== 0;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         // pick up global flags changes
         if ((this.flags & TransistorElm.FLAGS_GLOBAL) !== TransistorElm.globalFlags) this.setPoints();
 
@@ -242,15 +242,15 @@ export class TransistorElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    getPost(n: number): Point | null {
+    override getPost(n: number): Point | null {
         return n === 0 ? this.point1 : n === 1 ? this.coll[0] : this.emit[0];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3;
     }
 
-    getPower(): number {
+    override getPower(): number {
         return (this.nodes[0].v - this.nodes[2].v) * this.ib + (this.nodes[1].v - this.nodes[2].v) * this.ic;
     }
 
@@ -259,7 +259,7 @@ export class TransistorElm extends CircuitElm {
     emit!: Point[];
     base!: Point;
 
-    setPoints(): void {
+    override setPoints(): void {
         // these flags apply to all transistors
         this.flags &= ~TransistorElm.FLAGS_GLOBAL;
         this.flags |= TransistorElm.globalFlags;
@@ -301,7 +301,7 @@ export class TransistorElm extends CircuitElm {
         this.circleCenter = this.interpPoint(this.base, this.point2, 0.5) as Point;
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         router.addObstacle([this.rect[0], this.rect[1], this.rect[2], this.rect[3], this.coll[0], this.emit[0]]);
         router.addWire(this.point1.x, this.point1.y, this.base.x, this.base.y);
     }
@@ -354,7 +354,7 @@ export class TransistorElm extends CircuitElm {
         }
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         // Compute junction capacitance companion model for this time step.
         // Uses trapezoidal integration (same as CapacitorElm).
         // Total cap = depletion cap (CJE/CJC) + diffusion cap (TF*gm / TR*gm).
@@ -402,13 +402,13 @@ export class TransistorElm extends CircuitElm {
         }
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[0]);
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
         CircuitElm.sim.stampNonLinear(this.nodes[2]);
     }
 
-    doStep(): void {
+    override doStep(): void {
         let vbc = this.justLoaded ? this.pnp * this.lastvbc : this.pnp * (this.nodes[0].v - this.nodes[1].v); // typically negative
         let vbe = this.justLoaded ? this.pnp * this.lastvbe : this.pnp * (this.nodes[0].v - this.nodes[2].v); // typically positive
         this.justLoaded = false;
@@ -600,11 +600,11 @@ export class TransistorElm extends CircuitElm {
         }
     }
 
-    isTransistorElm(): boolean {
+    override isTransistorElm(): boolean {
         return true;
     }
 
-    getScopeText(x: number): string {
+    override getScopeText(x: number): string {
         let t = "";
         switch (x) {
             case Scope.VAL_IB:
@@ -632,11 +632,11 @@ export class TransistorElm extends CircuitElm {
         return Locale.LS("transistor") + ", " + t;
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "transistor";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = Locale.LS("transistor") + (this.pnp === -1 ? " (PNP)" : " (NPN)");
         arr[1] = this.model.name + ", β=" + CircuitElm.showFormat.format(this.beta);
         const vbc = this.nodes[0].v - this.nodes[1].v;
@@ -677,7 +677,7 @@ export class TransistorElm extends CircuitElm {
         */
     }
 
-    getScopeValue(x: number): number {
+    override getScopeValue(x: number): number {
         switch (x) {
             case Scope.VAL_IB:
                 return this.ib;
@@ -697,7 +697,7 @@ export class TransistorElm extends CircuitElm {
         return 0;
     }
 
-    getScopeUnits(x: number): number {
+    override getScopeUnits(x: number): number {
         switch (x) {
             case Scope.VAL_IB:
             case Scope.VAL_IC:
@@ -712,10 +712,10 @@ export class TransistorElm extends CircuitElm {
 
     models!: TransistorModel[];
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Beta/hFE", this.beta, 10, 1000).setDimensionless();
         if (n === 1) {
             const ei = new EditInfo("", 0, -1, -1);
@@ -755,7 +755,7 @@ export class TransistorElm extends CircuitElm {
         this.setup();
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.beta = ei.value;
             this.setup();
@@ -803,7 +803,7 @@ export class TransistorElm extends CircuitElm {
         this.setup();
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         // stop for huge currents that make simulator act weird
         if (Math.abs(this.ic) > 1e12 || Math.abs(this.ib) > 1e12) CircuitElm.sim.stop("max current exceeded", this);
 
@@ -840,17 +840,17 @@ export class TransistorElm extends CircuitElm {
         this.localSubIters = 0;
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         if (this.x === this.x2) this.flags ^= TransistorElm.FLAG_FLIP;
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         if (this.y === this.y2) this.flags ^= TransistorElm.FLAG_FLIP;
         super.flipY(c2, count);
     }
 
-    flipXY(xmy: number, count: number): void {
+    override flipXY(xmy: number, count: number): void {
         this.flags ^= TransistorElm.FLAG_FLIP;
         super.flipXY(xmy, count);
     }
@@ -859,11 +859,11 @@ export class TransistorElm extends CircuitElm {
         if (((this.flags & TransistorElm.FLAG_FLIP) !== 0) !== flip) this.flags ^= TransistorElm.FLAG_FLIP;
     }
 
-    canViewInScope(): boolean {
+    override canViewInScope(): boolean {
         return true;
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0) return -this.ib;
         if (n === 1) return -this.ic;
         return -this.ie;
@@ -874,10 +874,10 @@ export class NTransistorElm extends TransistorElm {
     constructor(xx: number, yy: number) {
         super(xx, yy, false);
     }
-    getDumpClass(): typeof TransistorElm {
+    override getDumpClass(): typeof TransistorElm {
         return TransistorElm;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "n".charCodeAt(0);
     }
 }
@@ -886,10 +886,10 @@ export class PTransistorElm extends TransistorElm {
     constructor(xx: number, yy: number) {
         super(xx, yy, true);
     }
-    getDumpClass(): typeof TransistorElm {
+    override getDumpClass(): typeof TransistorElm {
         return TransistorElm;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "p".charCodeAt(0);
     }
 }

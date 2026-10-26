@@ -451,7 +451,7 @@ export class EditDialog extends Dialog {
         return parseFloatStrict(s) * mult * rmsMult;
     }
 
-    apply(): boolean {
+    override apply(): boolean {
         for (let i = 0; i !== this.einfocount; i++) {
             const ei = this.einfos[i]!;
             ei.error = null;
@@ -526,7 +526,7 @@ export class EditDialog extends Dialog {
     // interacting with the rest of the circuit (clicking other elements re-targets this same
     // dialog instead of opening a second one; see CommandManager.doEdit).  Editors for anything
     // else (models, Other Options) are opened explicitly, so they are modal like other dialogs.
-    show(topOffset: number = 70): void {
+    override show(topOffset: number = 70): void {
         if (!(this.elm instanceof CircuitElm)) {
             super.show();
             return;
@@ -540,7 +540,7 @@ export class EditDialog extends Dialog {
         this.dialogEl.show();
     }
 
-    closeDialog(): void {
+    override closeDialog(): void {
         super.closeDialog();
         if (CirSim.editDialog === this) CirSim.editDialog = null;
         if (CirSim.customLogicEditDialog === this) CirSim.customLogicEditDialog = null;

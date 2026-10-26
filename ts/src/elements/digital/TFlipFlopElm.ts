@@ -41,7 +41,7 @@ export class TFlipFlopElm extends ChipElm {
             this.pins[2].value = !this.pins[1].value;
         }
     }
-    getChipName(): string {
+    override getChipName(): string {
         return "T flip-flop";
     }
     setupPins(): void {
@@ -63,17 +63,17 @@ export class TFlipFlopElm extends ChipElm {
             this.pins[4] = new Pin(this, 2, ChipElm.SIDE_E, "R");
         }
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 4 + (this.hasReset() ? 1 : 0) + (this.hasSet() ? 1 : 0);
     }
     getVoltageSourceCount(): number {
         return 2;
     }
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.pins[2].value = true;
     }
-    execute(): void {
+    override execute(): void {
         if (this.pins[3].value && !this.lastClock) {
             if (this.pins[0].value) // if T = 1
             {
@@ -90,13 +90,13 @@ export class TFlipFlopElm extends ChipElm {
         this.pins[2].value = !this.pins[1].value;
         this.lastClock = this.pins[3].value;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 193;
     }
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Reset Pin", this.hasReset());
@@ -109,7 +109,7 @@ export class TFlipFlopElm extends ChipElm {
         }
         return super.getChipEditInfo(n);
     }
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.checkbox!.getState()) this.flags |= TFlipFlopElm.FLAG_RESET;
             else this.flags &= ~TFlipFlopElm.FLAG_RESET | TFlipFlopElm.FLAG_SET;

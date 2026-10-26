@@ -33,14 +33,14 @@ export class EditMosfetModelDialog extends EditDialog {
         this.applyButton.remove();
     }
 
-    apply(): boolean {
+    override apply(): boolean {
         const ok = super.apply();
         if (this.model.name === null || this.model.name.length === 0) this.model.pickName();
         if (this.mosfetElm !== null) this.mosfetElm.newModelCreated(this.model);
         return ok;
     }
 
-    closeDialog(): void {
+    override closeDialog(): void {
         super.closeDialog();
         const edlg = CirSim.editDialog;
         CirSim.console("resetting dialog " + edlg);

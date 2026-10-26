@@ -33,14 +33,14 @@ export class EditRelayModelDialog extends EditDialog {
         this.applyButton.remove();
     }
 
-    apply(): boolean {
+    override apply(): boolean {
         if (!super.apply()) return false;
         if (this.model.name === null || this.model.name.length === 0) this.model.pickName();
         if (this.relayElm !== null) this.relayElm.newModelCreated(this.model);
         return true;
     }
 
-    closeDialog(): void {
+    override closeDialog(): void {
         super.closeDialog();
         const edlg = CirSim.editDialog;
         if (edlg !== null) edlg.resetDialog();

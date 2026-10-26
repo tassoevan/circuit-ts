@@ -43,7 +43,7 @@ export abstract class GateElm extends CircuitElm {
     delayEndTime: number = 0; // time at which pending output change takes effect
     static lastHighVoltage: number = 5;
     static lastSchmitt: boolean = false;
-    getDragLength(): number {
+    override getDragLength(): number {
         return 96;
     }
 
@@ -97,19 +97,19 @@ export abstract class GateElm extends CircuitElm {
         this.flags |= s === 1 ? GateElm.FLAG_SMALL : 0;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         if (this.highVoltage !== 5) CircuitXMLSerializer.dumpAttr(elem, "hi", this.highVoltage);
         if (this.inputCount !== 2) CircuitXMLSerializer.dumpAttr(elem, "in", this.inputCount);
         if (this.propagationDelay !== 0) CircuitXMLSerializer.dumpAttr(elem, "pd", this.propagationDelay);
     }
 
-    dumpXmlState(_doc: Document, elem: Element): void {
+    override dumpXmlState(_doc: Document, elem: Element): void {
         if (this.nodes[this.inputCount].v !== 0)
             CircuitXMLSerializer.dumpAttr(elem, "o", this.nodes[this.inputCount].v);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         // "ix" is present on state-restore calls (from CompositeElm.dumpXmlState/undumpXml).
         // In that case this element already exists with correct flags (set up when the
         // containing model was loaded), and the state element has no "f" attribute, so
@@ -128,7 +128,7 @@ export abstract class GateElm extends CircuitElm {
         this.setupVolts();
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         // add wires from each input post to gate body
         for (let i = 0; i < this.inputCount; i++)
             router.addWire(this.inPosts[i].x, this.inPosts[i].y, this.inGates[i].x, this.inGates[i].y);
@@ -142,7 +142,7 @@ export abstract class GateElm extends CircuitElm {
         router.addObstacle(pa.x, pa.y, pb.x, pb.y);
     }
 
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return this.getClassName().replace("GateElm", "");
     }
 
@@ -151,7 +151,7 @@ export abstract class GateElm extends CircuitElm {
     inputStates!: boolean[];
     ww: number = 0;
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.inputStates = new Array(this.inputCount).fill(false);
         if (this.dn > 150 && this.isCreating()) this.setSize(2);
@@ -353,7 +353,7 @@ export abstract class GateElm extends CircuitElm {
         g.setLineWidth(1.0);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         for (let i = 0; i !== this.inputCount; i++) {
             this.setVoltageColor(g, this.nodes[i].v);
             CircuitElm.drawThickLine(g, this.inPosts[i], this.inGates[i]);
@@ -388,14 +388,14 @@ export abstract class GateElm extends CircuitElm {
     linePoints: Point[] | null = null;
     icircles: Point[] | null = null;
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.inputCount + 1;
     }
-    getPost(n: number): Point | null {
+    override getPost(n: number): Point | null {
         if (n === this.inputCount) return this.point2;
         return this.inPosts[n];
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
 
@@ -403,18 +403,18 @@ export abstract class GateElm extends CircuitElm {
     abstract calcFunction(): boolean;
     abstract drawAsAndGate(): boolean;
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = this.getGateName();
         arr[1] = "Vout = " + CircuitElm.getVoltageText(this.nodes[this.inputCount].v);
         arr[2] = "Iout = " + CircuitElm.getCurrentText(this.getCurrent());
         if (this.propagationDelay > 0) arr[3] = "delay = " + CircuitElm.getUnitText(this.propagationDelay, "s");
     }
 
-    setHighVoltage(hv: number): void {
+    override setHighVoltage(hv: number): void {
         this.highVoltage = hv;
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[this.inputCount], this.voltSource);
     }
 
@@ -437,7 +437,7 @@ export abstract class GateElm extends CircuitElm {
     oscillationCount: number = 0;
     lastTime: number = 0;
 
-    doStep(): void {
+    override doStep(): void {
         if (this.justLoaded) {
             this.justLoaded = false;
             CircuitElm.sim.updateVoltageSource(
@@ -489,10 +489,10 @@ export abstract class GateElm extends CircuitElm {
         CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[this.inputCount], this.voltSource, res);
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Inputs", this.inputCount, 1, 8).setDimensionless();
         if (n === 1) return new EditInfo("High Logic Voltage", this.highVoltage, 1, 10).setUnitStep();
         if (n === 2) return EditInfo.createCheckbox("Schmitt Inputs", this.hasSchmittInputs());
@@ -502,7 +502,7 @@ export abstract class GateElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 1) {
                 this.inputCount = Math.trunc(ei.value);
@@ -538,17 +538,17 @@ export abstract class GateElm extends CircuitElm {
         }
     }
 
-    validate(): boolean {
+    override validate(): boolean {
         return this.validateRailNode(this.inputCount);
     }
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
-    hasGroundConnection(n1: number): boolean {
+    override hasGroundConnection(n1: number): boolean {
         return n1 === this.inputCount;
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === this.inputCount) return this.current;
         return 0;
     }
@@ -562,7 +562,7 @@ export class AndGateElm extends GateElm {
         else super(xa, ya, xb, yb!, f!, st!);
     }
 
-    getGateText(): string {
+    override getGateText(): string {
         return "&";
     }
 
@@ -575,10 +575,10 @@ export class AndGateElm extends GateElm {
         for (let i = 0; i !== this.inputCount; i++) f = f && this.getInput(i);
         return f;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 150;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "2".charCodeAt(0);
     }
     // false = drawn as OR, true = drawn as AND; FLAG_DEMORGAN and FLAG_INVERT_INPUTS
@@ -595,20 +595,20 @@ export class NandGateElm extends AndGateElm {
         if (xb === undefined) super(xa, ya);
         else super(xa, ya, xb, yb!, f!, st!);
     }
-    isInverting(): boolean {
+    override isInverting(): boolean {
         return true;
     }
-    getGateName(): string {
+    override getGateName(): string {
         if (this.hasFlag(GateElm.FLAG_INVERT_INPUTS)) return "OR gate";
         return "NAND gate";
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 151;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "@".charCodeAt(0);
     }
-    drawAsAndGate(): boolean {
+    override drawAsAndGate(): boolean {
         return !this.hasFlag(GateElm.FLAG_DEMORGAN);
     }
 }
@@ -638,7 +638,7 @@ export class OrGateElm extends GateElm {
     // redundant on top of it, so it's removed rather than patched to also
     // move the bubble -- large gates now touch flush, same as small ones.
 
-    getGateText(): string {
+    override getGateText(): string {
         return "≥1";
     }
 
@@ -647,10 +647,10 @@ export class OrGateElm extends GateElm {
         for (let i = 0; i !== this.inputCount; i++) f = f || this.getInput(i);
         return f;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 152;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "3".charCodeAt(0);
     }
     // false = drawn as OR, true = drawn as AND; FLAG_DEMORGAN and FLAG_INVERT_INPUTS
@@ -667,20 +667,20 @@ export class NorGateElm extends OrGateElm {
         if (xb === undefined) super(xa, ya);
         else super(xa, ya, xb, yb!, f!, st!);
     }
-    getGateName(): string {
+    override getGateName(): string {
         if (this.hasFlag(GateElm.FLAG_INVERT_INPUTS)) return "AND gate";
         return "NOR gate";
     }
-    isInverting(): boolean {
+    override isInverting(): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 153;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "#".charCodeAt(0);
     }
-    drawAsAndGate(): boolean {
+    override drawAsAndGate(): boolean {
         return this.hasFlag(GateElm.FLAG_DEMORGAN);
     }
 }
@@ -692,36 +692,36 @@ export class XorGateElm extends OrGateElm {
         if (xb === undefined) super(xa, ya);
         else super(xa, ya, xb, yb!, f!, st!);
     }
-    getGateName(): string {
+    override getGateName(): string {
         return "XOR gate";
     }
-    getGateText(): string {
+    override getGateText(): string {
         return "=1";
     }
-    isXorGateElm(): boolean {
+    override isXorGateElm(): boolean {
         return true;
     }
-    calcFunction(): boolean {
+    override calcFunction(): boolean {
         let f = false;
         for (let i = 0; i !== this.inputCount; i++) f = f !== this.getInput(i);
         return f;
     }
     // skip "Invert Inputs" (index 3 in GateElm); shift higher indices down
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n >= 3) return super.getEditInfo(n + 1);
         return super.getEditInfo(n);
     }
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n >= 3) super.setEditValue(n + 1, ei);
         else super.setEditValue(n, ei);
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 154;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "4".charCodeAt(0);
     }
-    drawAsAndGate(): boolean {
+    override drawAsAndGate(): boolean {
         return false;
     }
 }
@@ -733,19 +733,19 @@ export class XnorGateElm extends XorGateElm {
         if (xb === undefined) super(xa, ya);
         else super(xa, ya, xb, yb!, f!, st!);
     }
-    getGateName(): string {
+    override getGateName(): string {
         return "XNOR gate";
     }
-    isInverting(): boolean {
+    override isInverting(): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 431;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "$".charCodeAt(0);
     }
-    drawAsAndGate(): boolean {
+    override drawAsAndGate(): boolean {
         return false;
     }
 }

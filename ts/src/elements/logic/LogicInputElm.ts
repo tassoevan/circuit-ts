@@ -64,35 +64,35 @@ export class LogicInputElm extends SwitchElm {
         return (this.flags & (LogicInputElm.FLAG_TERNARY | LogicInputElm.FLAG_NUMERIC)) !== 0;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "L".charCodeAt(0);
     }
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         if (this.hiV !== 5) CircuitXMLSerializer.dumpAttr(elem, "hi", this.hiV);
         if (this.loV !== 0) CircuitXMLSerializer.dumpAttr(elem, "lo", this.loV);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.hiV = xml.parseDoubleAttr("hi", this.hiV);
         this.loV = xml.parseDoubleAttr("lo", this.loV);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = this.interpPoint(this.point1, this.point2, 1 - 12 / this.dn);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.save();
         const f = new Font("SansSerif", Font.BOLD, 20);
         g.setFont(f);
@@ -109,46 +109,46 @@ export class LogicInputElm extends SwitchElm {
         g.restore();
     }
 
-    getSwitchRect(): Rectangle {
+    override getSwitchRect(): Rectangle {
         return new Rectangle(this.x2 - 10, this.y2 - 10, 20, 20);
     }
 
-    setCurrent(_vs: any, c: number): void {
+    override setCurrent(_vs: any, c: number): void {
         this.current = c;
     }
-    calculateCurrent(): void {}
+    override calculateCurrent(): void {}
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource);
     }
 
-    isLogicInputElm(): boolean {
+    override isLogicInputElm(): boolean {
         return true;
     }
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return false;
     }
-    isRemovableWire(): boolean {
+    override isRemovableWire(): boolean {
         return false;
     }
 
-    doStep(): void {
+    override doStep(): void {
         let v = this.position === 0 ? this.loV : this.hiV;
         if (this.isTernary()) v = this.loV + this.position * (this.hiV - this.loV) * 0.5;
         CircuitElm.sim.updateVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource, v);
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
-    getElmType(): string {
+    override getElmType(): string {
         return "logic input";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "logic input";
         arr[1] = this.position === 0 ? "low" : "high";
         if (this.isNumeric()) arr[1] = "" + this.position;
@@ -156,11 +156,11 @@ export class LogicInputElm extends SwitchElm {
         arr[2] = "I = " + CircuitElm.getCurrentText(this.getCurrent());
     }
 
-    hasGroundConnection(_n1: number): boolean {
+    override hasGroundConnection(_n1: number): boolean {
         return true;
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, 0, 0);
             ei.checkbox = new Checkbox("Momentary Switch", this.momentary);
@@ -182,7 +182,7 @@ export class LogicInputElm extends SwitchElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.momentary = ei.checkbox!.getState();
         if (n === 1) this.hiV = ei.value;
         if (n === 2) this.loV = ei.value;
@@ -198,20 +198,20 @@ export class LogicInputElm extends SwitchElm {
         if (n === 5) this.setKeyShortcutEditValue(ei);
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         router.addWire(this.point1.x, this.point1.y, this.lead1!.x, this.lead1!.y);
         router.addObstacle(this.x2 - 10, this.y2 - 10, this.x2 + 10, this.y2 + 10);
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "i".charCodeAt(0);
     }
 
-    getCurrentIntoNode(_n: number): number {
+    override getCurrentIntoNode(_n: number): number {
         return this.current;
     }
 
-    validate(): boolean {
+    override validate(): boolean {
         return this.validateRailNode(0);
     }
 }

@@ -4,7 +4,7 @@ export class PDarlingtonElm extends DarlingtonElm {
     constructor(xx: number, yy: number) {
         super(xx, yy, true);
     }
-    getDumpClass(): Function {
+    override getDumpClass(): Function {
         return DarlingtonElm;
     }
 }

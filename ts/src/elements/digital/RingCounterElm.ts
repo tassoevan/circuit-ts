@@ -37,13 +37,13 @@ export class RingCounterElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "ring counter";
     }
-    needsBits(): boolean {
+    override needsBits(): boolean {
         return true;
     }
-    defaultBitCount(): number {
+    override defaultBitCount(): number {
         return 10;
     }
     hasClockInhibit(): boolean {
@@ -77,14 +77,14 @@ export class RingCounterElm extends ChipElm {
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.hasClockInhibit() ? this.bits + 3 : this.bits + 2;
     }
     getVoltageSourceCount(): number {
         return this.bits;
     }
 
-    execute(): void {
+    override execute(): void {
         let i: number;
 
         let running = true;
@@ -107,10 +107,10 @@ export class RingCounterElm extends ChipElm {
         this.lastClock = this.pins[0].value;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Invert reset pin", this.hasInvertReset());
@@ -120,7 +120,7 @@ export class RingCounterElm extends ChipElm {
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.checkbox!.getState()) this.flags &= ~RingCounterElm.FLAG_RESET_HIGH;
             else this.flags |= RingCounterElm.FLAG_RESET_HIGH;
@@ -137,7 +137,7 @@ export class RingCounterElm extends ChipElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 163;
     }
 }

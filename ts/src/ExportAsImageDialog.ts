@@ -83,7 +83,7 @@ export class ExportAsImageDialog extends Dialog {
         hp.appendChild(cancelButton);
     }
 
-    apply(): boolean {
+    override apply(): boolean {
         let fname = this.textBox.value;
         if (!fname.includes(".")) fname += this.ext;
         const a = document.createElement("a");

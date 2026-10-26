@@ -63,35 +63,35 @@ export class CurrentElm extends CircuitElm {
     isVoltageLimited(): boolean {
         return this.maxVoltage > 0;
     }
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return this.isVoltageLimited();
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.lastVoltDiff = 0;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "cu", this.currentValue);
         if (this.maxVoltage > 0) CircuitXMLSerializer.dumpAttr(elem, "mv", this.maxVoltage);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.currentValue = xml.parseDoubleAttr("cu", this.currentValue);
         this.maxVoltage = xml.parseDoubleAttr("mv", 0);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "i".charCodeAt(0);
     }
-    isCurrentElm(): boolean {
+    override isCurrentElm(): boolean {
         return true;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(26);
         this.ashaft1 = this.interpPoint(this.lead1!, this.lead2!, 0.25);
@@ -101,7 +101,7 @@ export class CurrentElm extends CircuitElm {
         this.arrow = this.calcArrow(this.center, p2, 4, 4);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const cr = 12;
         this.draw2Leads(g);
         this.setVoltageColor(g, (this.nodes[0].v + this.nodes[1].v) / 2);
@@ -126,7 +126,7 @@ export class CurrentElm extends CircuitElm {
     }
 
     // we defer stamping current sources until we can tell if they have a current path or not
-    stamp(): void {
+    override stamp(): void {
         const sim = SimulationManager.theSim!;
         if (this.broken) {
             // no current path; stamping a current source would cause a matrix error
@@ -148,7 +148,7 @@ export class CurrentElm extends CircuitElm {
     //   vd < 0.95*Vmax  ->  i ~= currentValue  (tanh arg ~= -2.5)
     //   vd > Vmax       ->  i ~= 0              (tanh arg ~= +2.5)
     // tanh is centered at 0.975*Vmax with scale vt = vWidth/5.
-    doStep(): void {
+    override doStep(): void {
         if (this.broken || !this.isVoltageLimited()) return;
 
         const sim = SimulationManager.theSim!;
@@ -195,33 +195,33 @@ export class CurrentElm extends CircuitElm {
         this.current = i;
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Current (A)", this.currentValue, 0, 0.1);
         if (n === 1) return new EditInfo("Max Voltage (V, 0=unlimited)", this.maxVoltage, 0, 0).setUnitStep();
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.currentValue = ei.value;
         if (n === 1 && ei.value >= 0) this.maxVoltage = ei.value;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "current source";
         let i = this.getBasicInfo(arr);
         arr[i++] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
         if (this.isVoltageLimited()) arr[i++] = "Vmax = " + CircuitElm.getVoltageText(this.maxVoltage);
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[1].v - this.nodes[0].v;
     }
 
-    getPower(): number {
+    override getPower(): number {
         return -this.getVoltageDiff() * this.current;
     }
 
-    validate(): boolean {
+    override validate(): boolean {
         const fpi = new FindPathInfo(FindPathInfo.INDUCT, this, this.getNode(1), SimulationManager.theSim);
         this.setBroken(!fpi.findPath(this.getNode(0)));
         return true;

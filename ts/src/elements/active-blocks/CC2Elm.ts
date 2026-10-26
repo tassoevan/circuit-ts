@@ -41,17 +41,17 @@ export class CC2Elm extends ChipElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ga", this.gain);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.gain = xml.parseDoubleAttr("ga", this.gain);
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "CC2";
     }
 
@@ -65,22 +65,22 @@ export class CC2Elm extends ChipElm {
         this.pins[2] = new Pin(this, 1, ChipElm.SIDE_E, "Z");
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "CCII";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = this.gain === 1 ? "CCII+~" : "CCII-~"; // ~ is for localization
         arr[1] = "X,Y = " + CircuitElm.getVoltageText(this.nodes[0].v);
         arr[2] = "Z = " + CircuitElm.getVoltageText(this.nodes[2].v);
         arr[3] = "I = " + CircuitElm.getCurrentText(this.pins[0].current);
     }
 
-    isDigitalChip(): boolean {
+    override isDigitalChip(): boolean {
         return false;
     }
 
-    stamp(): void {
+    override stamp(): void {
         // X voltage = Y voltage
         CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[0], this.pins[0].voltSource!);
         CircuitElm.sim.stampVCVS(CircuitNode.ground, this.nodes[1], 1, this.pins[0].voltSource!);
@@ -88,28 +88,28 @@ export class CC2Elm extends ChipElm {
         CircuitElm.sim.stampCCCS(CircuitNode.ground, this.nodes[2], this.pins[0].voltSource!, this.gain);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         super.calculateCurrent();
         this.pins[2].current = this.pins[0].current * this.gain;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.drawChip(g);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3;
     }
     getVoltageSourceCount(): number {
         return 1;
     }
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 179;
     }
-    getMatrixConnection(_n1: number, _n2: number): boolean {
+    override getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 }

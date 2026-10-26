@@ -37,10 +37,10 @@ export class GroundElm extends CircuitElm {
     // this is needed for old subcircuits which have GroundElm dumped
     readonly FLAG_OLD_STYLE = 1;
 
-    getDragVertical(_requestedVertical: boolean): boolean {
+    override getDragVertical(_requestedVertical: boolean): boolean {
         return true;
     }
-    getDragLength(): number {
+    override getDragLength(): number {
         return 32;
     }
 
@@ -61,26 +61,26 @@ export class GroundElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         if (this.symbolType != 0) CircuitXMLSerializer.dumpAttr(elem, "sy", this.symbolType);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.symbolType = xml.parseIntAttr("sy", 0);
     }
 
-    isGroundElm(): boolean {
+    override isGroundElm(): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return "g".charCodeAt(0);
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1;
     }
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setVoltageColor(g, 0);
         CircuitElm.drawThickLine(g, this.point1, this.point2);
         if (this.symbolType == 0) {
@@ -128,44 +128,44 @@ export class GroundElm extends CircuitElm {
     isOldStyle(): boolean {
         return (this.flags & this.FLAG_OLD_STYLE) != 0;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return this.isOldStyle() ? 1 : 0;
     }
-    stamp(): void {
+    override stamp(): void {
         if (this.isOldStyle()) CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[0], this.voltSource, 0);
     }
-    setCurrent(_vs: any, c: number): void {
+    override setCurrent(_vs: any, c: number): void {
         this.current = this.isOldStyle() ? -c : c;
     }
 
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return true;
     }
-    isRemovableWire(): boolean {
+    override isRemovableWire(): boolean {
         return true;
     }
     static firstGround: Point | null = null;
     static resetNodeList(): void {
         GroundElm.firstGround = null;
     }
-    getConnectedPost(_n?: number): Point {
+    override getConnectedPost(_n?: number): Point {
         if (GroundElm.firstGround != null) return GroundElm.firstGround;
         GroundElm.firstGround = this.point1;
         return null!;
     }
 
     //	void setCurrent(int x, double c) { current = -c; }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return 0;
     }
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "ground";
         arr[1] = "I = " + CircuitElm.getCurrentText(this.getCurrent());
     }
-    hasGroundConnection(_n1: number): boolean {
+    override hasGroundConnection(_n1: number): boolean {
         return true;
     }
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         router.addWire(this.point1.x, this.point1.y, this.point2.x, this.point2.y);
         const pa = new Point(),
             pb = new Point();
@@ -173,11 +173,11 @@ export class GroundElm extends CircuitElm {
         router.addObstacle(pa.x, pa.y, pb.x, pb.y);
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "g".charCodeAt(0);
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n == 0) {
             const ei = new EditInfo("Symbol", 0);
             ei.choice = new Choice();
@@ -191,14 +191,14 @@ export class GroundElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n == 0) GroundElm.lastSymbolType = this.symbolType = ei.choice!.getSelectedIndex();
     }
 
-    getCurrentIntoNode(_n: number): number {
+    override getCurrentIntoNode(_n: number): number {
         return -this.current;
     }
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
 }

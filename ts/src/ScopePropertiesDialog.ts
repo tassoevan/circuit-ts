@@ -875,7 +875,7 @@ export class ScopePropertiesDialog extends Dialog {
         if (!this.scope.isManualScale()) this.updateManualScaleUi();
     }
 
-    closeDialog(): void {
+    override closeDialog(): void {
         super.closeDialog();
         this.apply();
     }
@@ -897,7 +897,7 @@ export class ScopePropertiesDialog extends Dialog {
         }
     }
 
-    apply(): boolean {
+    override apply(): boolean {
         const scope = this.scope;
         let label: string | null = this.labelTextBox.value;
         if (label.length === 0) label = null;

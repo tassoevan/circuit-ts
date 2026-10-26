@@ -78,16 +78,16 @@ export class SRAMElm extends ChipElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "ab", this.addressBits);
         CircuitXMLSerializer.dumpAttr(elem, "db", this.dataBits);
     }
-    dumpXmlState(doc: Document, elem: Element): void {
+    override dumpXmlState(doc: Document, elem: Element): void {
         super.dumpXmlState(doc, elem);
         if (this.map.size > 0) elem.appendChild(doc.createTextNode(this.contentsToString()));
     }
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.addressBits = xml.parseIntAttr("ab", this.addressBits);
         this.dataBits = xml.parseIntAttr("db", this.dataBits);
@@ -99,19 +99,19 @@ export class SRAMElm extends ChipElm {
         this.setupPins();
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         if ((this.flags & SRAMElm.FLAG_RELOAD_ON_RESET) !== 0 && this.initialMap !== null)
             this.map = new Map(this.initialMap);
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
-    allowBus(): boolean {
+    override allowBus(): boolean {
         return true;
     }
-    getChipName(): string {
+    override getChipName(): string {
         return "Static RAM";
     }
     setupPins(): void {
@@ -143,10 +143,10 @@ export class SRAMElm extends ChipElm {
         this.makeBitPins(this.dataBits, this.sizeY - dataY, ChipElm.SIDE_E, this.dataNodes, "D", true, false, true);
         this.allocNodes();
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 2 + this.addressBits + this.dataBits;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Address Bits", this.addressBits, 1, 1).setDimensionless();
         if (n === 1) return new EditInfo("# of Data Bits", this.dataBits, 1, 1).setDimensionless();
         if (n === 2) {
@@ -274,7 +274,7 @@ export class SRAMElm extends ChipElm {
         return parseIntStrict(str);
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 2 && ei.value <= 16) {
                 this.addressBits = Math.floor(ei.value);
@@ -312,14 +312,14 @@ export class SRAMElm extends ChipElm {
     getVoltageSourceCount(): number {
         return this.dataBits;
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return this.dataBits;
     }
-    setVoltageSource(j: number, vs: VoltageSource): void {
+    override setVoltageSource(j: number, vs: VoltageSource): void {
         super.setVoltageSource(j, vs);
         vs.setNodes(CircuitNode.ground, this.nodes[this.internalNodes + j]);
     }
-    getMatrixConnection(n1: number, n2: number): boolean {
+    override getMatrixConnection(n1: number, n2: number): boolean {
         // each internal node connects to its corresponding data pin
         for (let i = 0; i !== this.dataBits; i++)
             if (this.comparePair(n1, n2, this.internalNodes + i, this.dataNodes + i)) return true;
@@ -328,7 +328,7 @@ export class SRAMElm extends ChipElm {
 
     address: number = 0;
 
-    stamp(): void {
+    override stamp(): void {
         for (let i = 0; i !== this.dataBits; i++) {
             const p = this.pins[i + this.dataNodes];
             CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[this.internalNodes + i], p.voltSource!);
@@ -337,7 +337,7 @@ export class SRAMElm extends ChipElm {
         }
     }
 
-    doStep(): void {
+    override doStep(): void {
         const writeEnabled = this.nodes[0].v < this.getThreshold();
         const outputEnabled = this.nodes[1].v < this.getThreshold() && !writeEnabled;
 
@@ -367,7 +367,7 @@ export class SRAMElm extends ChipElm {
         }
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         let data = 0;
         const writeEnabled = this.nodes[0].v < this.getThreshold();
         if (!writeEnabled) return;
@@ -378,7 +378,7 @@ export class SRAMElm extends ChipElm {
         }
         this.map.set(this.address, data);
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 413;
     }
 }

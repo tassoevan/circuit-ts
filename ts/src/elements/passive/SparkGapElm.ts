@@ -54,14 +54,14 @@ export class SparkGapElm extends CircuitElm {
         this.resistance = this.offresistance;
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 187;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "on", this.onresistance);
         CircuitXMLSerializer.dumpAttr(elem, "of", this.offresistance);
@@ -69,7 +69,7 @@ export class SparkGapElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "ho", this.holdcurrent);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.onresistance = xml.parseDoubleAttr("on", this.onresistance);
         this.offresistance = xml.parseDoubleAttr("of", this.offresistance);
@@ -80,7 +80,7 @@ export class SparkGapElm extends CircuitElm {
     arrow1!: Polygon;
     arrow2!: Polygon;
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const dist = 16;
         const alen = 8;
@@ -91,7 +91,7 @@ export class SparkGapElm extends CircuitElm {
         this.arrow2 = this.calcArrow(this.point2, p1, alen, alen);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, 8);
         this.draw2Leads(g);
         this.setVoltageColor(g, this.nodes[0].v);
@@ -104,33 +104,33 @@ export class SparkGapElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         const vd = this.nodes[0].v - this.nodes[1].v;
         this.current = vd / this.resistance;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.state = false;
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         if (Math.abs(this.current) < this.holdcurrent) this.state = false;
         const vd = this.nodes[0].v - this.nodes[1].v;
         if (Math.abs(vd) > this.breakdown) this.state = true;
     }
 
-    doStep(): void {
+    override doStep(): void {
         this.resistance = this.state ? this.onresistance : this.offresistance;
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.resistance);
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[0]);
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "spark gap";
         this.getBasicInfo(arr);
         arr[3] = this.state ? "on" : "off";
@@ -139,10 +139,10 @@ export class SparkGapElm extends CircuitElm {
         arr[6] = "Vbreakdown = " + CircuitElm.getUnitText(this.breakdown, "V");
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("On resistance (ohms)", this.onresistance, 0, 0);
         if (n === 1) return new EditInfo("Off resistance (ohms)", this.offresistance, 0, 0);
         if (n === 2) return new EditInfo("Breakdown voltage", this.breakdown, 0, 0);
@@ -150,7 +150,7 @@ export class SparkGapElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (ei.value > 0 && n === 0) this.onresistance = ei.value;
         if (ei.value > 0 && n === 1) this.offresistance = ei.value;
         if (ei.value > 0 && n === 2) this.breakdown = ei.value;

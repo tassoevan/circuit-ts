@@ -48,7 +48,7 @@ export class DFlipFlopElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "D flip-flop";
     }
 
@@ -76,7 +76,7 @@ export class DFlipFlopElm extends ChipElm {
         }
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 4 + (this.hasReset() ? 1 : 0) + (this.hasSet() ? 1 : 0);
     }
 
@@ -84,7 +84,7 @@ export class DFlipFlopElm extends ChipElm {
         return 2;
     }
 
-    execute(): void {
+    override execute(): void {
         let isSet = false;
         let isReset = false;
 
@@ -104,14 +104,14 @@ export class DFlipFlopElm extends ChipElm {
         this.lastClock = this.pins[3].value;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 155;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Reset Pin", this.hasReset());
@@ -130,7 +130,7 @@ export class DFlipFlopElm extends ChipElm {
         return super.getChipEditInfo(n);
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.checkbox!.getState()) this.flags |= DFlipFlopElm.FLAG_RESET;
             else this.flags &= ~DFlipFlopElm.FLAG_RESET | DFlipFlopElm.FLAG_SET;

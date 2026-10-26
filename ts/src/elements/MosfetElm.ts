@@ -201,7 +201,7 @@ export class MosfetElm extends CircuitElm {
         return this.model.capGS > 0 || this.model.capGD > 0;
     }
 
-    updateModels(): void {
+    override updateModels(): void {
         this.setup();
         this.setPoints();
     }
@@ -227,7 +227,7 @@ export class MosfetElm extends CircuitElm {
         return 0.02;
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
@@ -261,7 +261,7 @@ export class MosfetElm extends CircuitElm {
         return this.bodyDiodeSymbolShown;
     }
 
-    reset(): void {
+    override reset(): void {
         this.lastv1 = this.lastv2 = this.curcount = 0;
         this.curcount_body1 = this.curcount_body2 = this.curcount_gate = this.curcount_source = this.curcount_drain = 0;
         this.capVoltGS = this.capVoltGD = this.capCurGS = this.capCurGD = 0;
@@ -270,25 +270,25 @@ export class MosfetElm extends CircuitElm {
         this.diodeB2.reset();
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "f".charCodeAt(0);
     }
 
-    isMosfetElm(): boolean {
+    override isMosfetElm(): boolean {
         return true;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modelName);
     }
 
-    dumpXmlModel(doc: Document): void {
+    override dumpXmlModel(doc: Document): void {
         if (!(this.model.builtIn || this.model.dumped)) this.model.dumpXml(doc);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         this.flags = 0;
         super.undumpXml(xml);
         const modelName = xml.parseStringAttr("mo", null);
@@ -304,7 +304,7 @@ export class MosfetElm extends CircuitElm {
         this.pnp = (this.flags & this.FLAG_PNP) !== 0 ? -1 : 1;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.hs);
 
         // draw source/drain terminals
@@ -449,30 +449,30 @@ export class MosfetElm extends CircuitElm {
 
     // post 0 = gate, 1 = source for NPN, 2 = drain for NPN, 3 = body (if present)
     // for PNP, 1 is drain, 2 is source
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return n === 0 ? this.point1 : n === 1 ? this.src[0] : n === 2 ? this.drn[0] : this.body[0];
     }
 
-    getCurrent(): number {
+    override getCurrent(): number {
         return this.ids;
     }
-    getPower(): number {
+    override getPower(): number {
         return (
             this.ids * (this.nodes[2].v - this.nodes[1].v) -
             this.diodeCurrent1 * (this.nodes[1].v - this.nodes[this.bodyTerminal].v) -
             this.diodeCurrent2 * (this.nodes[2].v - this.nodes[this.bodyTerminal].v)
         );
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.hasBodyTerminal() ? 4 : 3;
     }
 
-    addRoutingObstacle(router: WireRouter): void {
+    override addRoutingObstacle(router: WireRouter): void {
         router.addObstacle([this.gate[0], this.gate[2], this.src[0], this.drn[0], this.src[2], this.drn[2]]);
         router.addWire(this.point1.x, this.point1.y, this.gate[1].x, this.gate[1].y);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
 
         // find the coordinates of the various points we need to draw
@@ -557,7 +557,7 @@ export class MosfetElm extends CircuitElm {
     mode: number = 0;
     gm: number = 0;
 
-    startIteration(): void {
+    override startIteration(): void {
         if (CircuitElm.sim.timeStep <= 0) return;
         if (this.model.capGS > 0) {
             this.geqGS = this.model.capGS / CircuitElm.sim.timeStep;
@@ -569,7 +569,7 @@ export class MosfetElm extends CircuitElm {
         }
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
         CircuitElm.sim.stampNonLinear(this.nodes[2]);
         if (this.hasGateCaps()) CircuitElm.sim.stampNonLinear(this.nodes[0]);
@@ -606,7 +606,7 @@ export class MosfetElm extends CircuitElm {
         return true;
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         this.calculate(true);
 
         // fix current if body is connected to source or drain
@@ -624,7 +624,7 @@ export class MosfetElm extends CircuitElm {
         }
     }
 
-    doStep(): void {
+    override doStep(): void {
         this.calculate(false);
     }
 
@@ -786,26 +786,26 @@ export class MosfetElm extends CircuitElm {
         if (this.model.capGD > 0) arr[idx] = "Cgd = " + CircuitElm.getUnitText(this.model.capGD, "F");
     }
 
-    getElmType(): string {
+    override getElmType(): string {
         return "MOSFET";
     }
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         this.getFetInfo(arr, "MOSFET");
     }
-    getScopeText(_v: number): string {
+    override getScopeText(_v: number): string {
         return Locale.LS((this.pnp === -1 ? "p-" : "n-") + "MOSFET");
     }
-    canViewInScope(): boolean {
+    override canViewInScope(): boolean {
         return true;
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[2].v - this.nodes[1].v;
     }
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         if (this.hasGateCaps()) return true;
         return !(n1 === 0 || n2 === 0);
     }
-    getMatrixConnection(_n1: number, _n2: number): boolean {
+    override getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
     models!: MosfetModel[];
@@ -817,10 +817,10 @@ export class MosfetElm extends CircuitElm {
         return true;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Model", 0, -1, -1);
             this.models = MosfetModel.getModelList(this.isJfet());
@@ -860,7 +860,7 @@ export class MosfetElm extends CircuitElm {
         this.setup();
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.model = this.models[ei.choice!.getSelectedIndex()];
             this.modelName = this.model.name;
@@ -896,7 +896,7 @@ export class MosfetElm extends CircuitElm {
         this.setPoints();
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0) {
             // gate current from cap currents (cap current flows out of gate)
             let gateCur = 0;
@@ -919,17 +919,17 @@ export class MosfetElm extends CircuitElm {
         return -this.ids + this.diodeCurrent2 + capCur;
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         if (this.x === this.x2) this.flags ^= this.FLAG_FLIP;
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         if (this.y === this.y2) this.flags ^= this.FLAG_FLIP;
         super.flipY(c2, count);
     }
 
-    flipXY(xmy: number, count: number): void {
+    override flipXY(xmy: number, count: number): void {
         this.flags ^= this.FLAG_FLIP;
         super.flipXY(xmy, count);
     }
@@ -939,10 +939,10 @@ export class NMosfetElm extends MosfetElm {
     constructor(xx: number, yy: number) {
         super(xx, yy, false);
     }
-    getDumpClass(): typeof MosfetElm {
+    override getDumpClass(): typeof MosfetElm {
         return MosfetElm;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "N".charCodeAt(0);
     }
 }
@@ -951,10 +951,10 @@ export class PMosfetElm extends MosfetElm {
     constructor(xx: number, yy: number) {
         super(xx, yy, true);
     }
-    getDumpClass(): typeof MosfetElm {
+    override getDumpClass(): typeof MosfetElm {
         return MosfetElm;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "P".charCodeAt(0);
     }
 }

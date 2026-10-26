@@ -20,7 +20,7 @@
 import { CircuitElm } from "../CircuitElm";
 
 export class GraphicElm extends CircuitElm {
-    isGraphicElm(): boolean {
+    override isGraphicElm(): boolean {
         return true;
     }
     constructor(xx: number, yy: number);
@@ -33,7 +33,7 @@ export class GraphicElm extends CircuitElm {
         }
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 0;
     }
 }

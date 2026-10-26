@@ -60,7 +60,7 @@ export class LampElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "te", this.temp);
         CircuitXMLSerializer.dumpAttr(elem, "np", this.nom_pow);
@@ -69,7 +69,7 @@ export class LampElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "co", this.coolTime);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.temp = xml.parseDoubleAttr("te", this.temp);
         this.nom_pow = xml.parseDoubleAttr("np", this.nom_pow);
@@ -78,7 +78,7 @@ export class LampElm extends CircuitElm {
         this.coolTime = xml.parseDoubleAttr("co", this.coolTime);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 181;
     }
 
@@ -87,7 +87,7 @@ export class LampElm extends CircuitElm {
     bulb!: Point;
     bulbR: number = 0;
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.temp = this.roomTemp;
         this.startIteration(); // set resistance
@@ -95,7 +95,7 @@ export class LampElm extends CircuitElm {
 
     readonly filament_len = 24;
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const llen = 16;
         this.calcLeads(llen);
@@ -130,7 +130,7 @@ export class LampElm extends CircuitElm {
         return "#ffffff";
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const v1 = this.nodes[0].v;
         const v2 = this.nodes[1].v;
         this.setBbox(this.point1, this.point2, 4);
@@ -167,17 +167,17 @@ export class LampElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.current = (this.nodes[0].v - this.nodes[1].v) / this.resistance;
         if (this.resistance === 0) this.current = 0;
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[0]);
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
@@ -189,7 +189,7 @@ export class LampElm extends CircuitElm {
         this.resistance = nom_r * (1.26104 - 4.90662 * Math.sqrt(17.1839 / tp - 0.00318794) - 7.8569 / (tp - 187.56));
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         this.updateResistance();
         const cap = 1.57e-4 * this.nom_pow;
         const capw = (cap * this.warmTime) / 0.4;
@@ -199,11 +199,11 @@ export class LampElm extends CircuitElm {
         this.temp -= (CircuitElm.sim.timeStep * (this.temp - this.roomTemp)) / (capc * cr);
     }
 
-    doStep(): void {
+    override doStep(): void {
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], this.resistance);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "lamp";
         this.getBasicInfo(arr);
         arr[3] = "R = " + CircuitElm.getUnitText(this.resistance, Locale.ohmString);
@@ -211,7 +211,7 @@ export class LampElm extends CircuitElm {
         arr[5] = "T = " + Math.trunc(this.temp) + " K";
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Nominal Power", this.nom_pow, 0, 0).setPositive();
         if (n === 1) return new EditInfo("Nominal Voltage", this.nom_v, 0, 0).setPositive().setUnitStep();
         if (n === 2) return new EditInfo("Warmup Time (s)", this.warmTime, 0, 0).setPositive();
@@ -219,22 +219,22 @@ export class LampElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) this.nom_pow = ei.value;
         if (n === 1 && ei.value > 0) this.nom_v = ei.value;
         if (n === 2 && ei.value > 0) this.warmTime = ei.value;
         if (n === 3 && ei.value > 0) this.coolTime = ei.value;
     }
 
-    getScopeValue(x: number): number {
+    override getScopeValue(x: number): number {
         return x === VAL_R ? this.resistance : super.getScopeValue(x);
     }
 
-    getScopeUnits(x: number): number {
+    override getScopeUnits(x: number): number {
         return x === VAL_R ? UNITS_OHMS : super.getScopeUnits(x);
     }
 
-    canShowValueInScope(x: number): boolean {
+    override canShowValueInScope(x: number): boolean {
         return x === VAL_R;
     }
 }

@@ -97,11 +97,11 @@ export class ThreePhaseMotorElm extends CircuitElm {
         this.nodeCurrents = [];
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 427;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "rs", this.Rs);
         CircuitXMLSerializer.dumpAttr(elem, "rr", this.Rr);
@@ -112,7 +112,7 @@ export class ThreePhaseMotorElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "j", this.J);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.Rs = xml.parseDoubleAttr("rs", this.Rs);
         this.Rr = xml.parseDoubleAttr("rr", this.Rr);
@@ -127,7 +127,7 @@ export class ThreePhaseMotorElm extends CircuitElm {
         return this.angle;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.posts = this.newPointArray(6);
         this.leads = this.newPointArray(6);
@@ -142,27 +142,27 @@ export class ThreePhaseMotorElm extends CircuitElm {
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 6;
     }
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return this.posts[n];
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return 7;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 2;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.filteredSpeed = this.speed = 0;
         this.coilCurSourceValues = new Array(this.coilCount).fill(0);
         this.coilCurrents = new Array(this.coilCount).fill(0);
     }
 
-    stamp(): void {
+    override stamp(): void {
         const n001 = this.nodes[this.n001_ind];
         const n002 = this.nodes[this.n002_ind];
         const n003 = this.nodes[this.n003_ind];
@@ -223,7 +223,7 @@ export class ThreePhaseMotorElm extends CircuitElm {
         this.nodeCurrents = new Array(this.getNodeCount()).fill(0);
     }
 
-    setVoltageSource(n: number, v: VoltageSource): void {
+    override setVoltageSource(n: number, v: VoltageSource): void {
         this.voltSources[n] = v;
         if (n === 0) v.setNodes(this.nodes[this.n002_ind], CircuitNode.ground);
         else v.setNodes(this.nodes[this.n006_ind], CircuitNode.ground);
@@ -232,7 +232,7 @@ export class ThreePhaseMotorElm extends CircuitElm {
     vs1value: number = 0;
     vs2value: number = 0;
 
-    startIteration(): void {
+    override startIteration(): void {
         for (let i = 0; i !== this.coilCount; i++) this.coilCurSourceValues[i] = this.coilCurrents[i];
         const torque =
             ((this.Zp * Math.sqrt(3)) / 2) *
@@ -250,7 +250,7 @@ export class ThreePhaseMotorElm extends CircuitElm {
             this.Zp * this.speed * (1.5 * this.Lm * this.coilCurrents[0] + 1.5 * this.Lr * this.coilCurrents[3]);
     }
 
-    doStep(): void {
+    override doStep(): void {
         for (let i = 0; i !== this.coilCount; i++) {
             const n1 = this.coilNodes[i * 2],
                 n2 = this.coilNodes[i * 2 + 1];
@@ -270,7 +270,7 @@ export class ThreePhaseMotorElm extends CircuitElm {
         );
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         if (!this.nodeCurrents) return;
         this.nodeCurrents.fill(0);
         for (let i = 0; i !== this.coilCount; i++) {
@@ -289,16 +289,16 @@ export class ThreePhaseMotorElm extends CircuitElm {
         }
     }
 
-    hasGroundConnection(_n1: number): boolean {
+    override hasGroundConnection(_n1: number): boolean {
         return false;
     }
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 
     readonly cr = 37;
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.cr);
         for (let i = 0; i !== 6; i++) {
             this.setVoltageColor(g, this.nodes[i].v);
@@ -362,7 +362,7 @@ export class ThreePhaseMotorElm extends CircuitElm {
         c.y = Math.round(a.y * (1 - f) + b.y * f + gg * gy);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "3-Phase Motor";
         this.getBasicInfo(arr);
         arr[3] =
@@ -371,14 +371,14 @@ export class ThreePhaseMotorElm extends CircuitElm {
             CircuitElm.getUnitText((60 * Math.abs(this.filteredSpeed)) / (2 * CircuitElm.pi), Locale.LS("RPM"));
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         return n % 2 === 1 ? this.coilCurrents[Math.trunc(n / 2)] : -this.coilCurrents[Math.trunc(n / 2)];
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Stator Inductance (H)", this.Ls, 0, 0);
         if (n === 1) return new EditInfo("Rotor Inductance (H)", this.Lr, 0, 0);
         if (n === 2)
@@ -395,7 +395,7 @@ export class ThreePhaseMotorElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (ei.value > 0 && n === 0) this.Ls = ei.value;
         if (ei.value > 0 && n === 1) this.Lr = ei.value;
         if (ei.value > 0 && ei.value < 1 && n === 2) this.Lm = ei.value * Math.sqrt(this.Ls * this.Lr);
@@ -405,10 +405,10 @@ export class ThreePhaseMotorElm extends CircuitElm {
         if (ei.value > 0 && n === 6) this.J = ei.value;
     }
 
-    canFlipX(): boolean {
+    override canFlipX(): boolean {
         return false;
     }
-    canFlipY(): boolean {
+    override canFlipY(): boolean {
         return false;
     }
 }

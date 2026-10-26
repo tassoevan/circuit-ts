@@ -42,7 +42,7 @@ export class AnalogSwitch2Elm extends AnalogSwitchElm {
         }
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(32);
         this.adjustLeadsToGrid(this.isFlippedX(), this.isFlippedY());
@@ -62,11 +62,11 @@ export class AnalogSwitch2Elm extends AnalogSwitchElm {
         this.ctlPoint = this.interpPoint(this.lead1!, this.lead2!, 0.5, this.openhs);
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 4;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.openhs);
 
         // draw first lead
@@ -102,26 +102,26 @@ export class AnalogSwitch2Elm extends AnalogSwitchElm {
         }
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         if (n === 0) return this.point1;
         if (n === 3) return this.ctlPoint;
         return this.swposts[n - 1];
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 160;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "as2";
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.current = this.open
             ? (this.nodes[0].v - this.nodes[2].v) / this.r_on
             : (this.nodes[0].v - this.nodes[1].v) / this.r_on;
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[0]);
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
         CircuitElm.sim.stampNonLinear(this.nodes[2]);
@@ -131,7 +131,7 @@ export class AnalogSwitch2Elm extends AnalogSwitchElm {
         }
     }
 
-    doStep(): void {
+    override doStep(): void {
         this.open = this.nodes[3].v < this.threshold;
         if (this.hasFlag(this.FLAG_INVERT)) this.open = !this.open;
         if (this.open) {
@@ -147,22 +147,22 @@ export class AnalogSwitch2Elm extends AnalogSwitchElm {
     // switch position), since getConnection() is used to determine the
     // matrix closures, and that can't depend on "open," which changes
     // every step -- see comment in AnalogSwitchElm.getConnection()
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         return n1 !== 3 && n2 !== 3;
     }
 
-    hasGroundConnection(n: number): boolean {
+    override hasGroundConnection(n: number): boolean {
         return this.needsPulldown() && (n === 1 || n === 2);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "analog switch (SPDT)";
         arr[1] = "I = " + CircuitElm.getCurrentDText(this.getCurrent());
     }
 
     // for SPDT the switch is never fully open, so "Normally closed" doesn't
     // apply; the flag instead swaps which throw terminal is NO vs NC
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Swap NO/NC", this.hasFlag(this.FLAG_INVERT));
@@ -171,7 +171,7 @@ export class AnalogSwitch2Elm extends AnalogSwitchElm {
         return super.getEditInfo(n);
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.flags = ei.checkbox!.getState() ? this.flags | this.FLAG_INVERT : this.flags & ~this.FLAG_INVERT;
             return;
@@ -179,7 +179,7 @@ export class AnalogSwitch2Elm extends AnalogSwitchElm {
         super.setEditValue(n, ei);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0) return -this.current;
         const position = this.open ? 1 : 0;
         if (n === position + 1) return this.current;

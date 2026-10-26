@@ -40,18 +40,18 @@ export class SipoShiftElm extends ChipElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
     }
 
-    dumpXmlState(doc: Document, elem: Element): void {
+    override dumpXmlState(doc: Document, elem: Element): void {
         super.dumpXmlState(doc, elem);
         const data = new Array<boolean>(this.bits).fill(false);
         for (let i = 0; i < this.bits; i++) data[i] = this.pins[SipoShiftElm.DATA_PIN_INDEX + i].value;
         CircuitXMLSerializer.dumpAttr(elem, "dt", ChipElm.writeBitsToString(data));
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         const dt = xml.parseStringAttr("dt", null);
         if (dt !== null) {
@@ -61,16 +61,16 @@ export class SipoShiftElm extends ChipElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 189;
     }
-    getChipName(): string {
+    override getChipName(): string {
         return "SIPO shift register";
     }
-    needsBits(): boolean {
+    override needsBits(): boolean {
         return true;
     }
-    defaultBitCount(): number {
+    override defaultBitCount(): number {
         return 8;
     }
 
@@ -94,14 +94,14 @@ export class SipoShiftElm extends ChipElm {
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 2 + this.bits;
     }
     getVoltageSourceCount(): number {
         return this.bits;
     }
 
-    execute(): void {
+    override execute(): void {
         if (this.pins[1].value !== this.clockstate) {
             this.clockstate = this.pins[1].value;
             if (this.clockstate && this.bits > 0) {
@@ -113,15 +113,15 @@ export class SipoShiftElm extends ChipElm {
         }
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value !== this.bits && ei.value >= 1) {
             this.bits = Math.trunc(ei.value);
             this.setupPins();

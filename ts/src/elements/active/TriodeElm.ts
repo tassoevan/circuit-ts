@@ -60,27 +60,27 @@ export class TriodeElm extends CircuitElm {
         this.noDiagonal = true;
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    reset(): void {
+    override reset(): void {
         this.curcount = 0;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "mu", this.mu);
         CircuitXMLSerializer.dumpAttr(elem, "kg", this.kg1);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.mu = xml.parseDoubleAttr("mu", this.mu);
         this.kg1 = xml.parseDoubleAttr("kg", this.kg1);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 173;
     }
 
@@ -91,7 +91,7 @@ export class TriodeElm extends CircuitElm {
     midcath!: Point;
     circler: number = 0;
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const s = (this.flags & TriodeElm.FLAG_DSIGN_FIX) !== 0 ? this.dsign : 1;
         const flip = (this.flags & TriodeElm.FLAG_FLIP) !== 0 ? -s : s;
@@ -121,7 +121,7 @@ export class TriodeElm extends CircuitElm {
         this.cath[0] = this.interpPoint(this.point2, this.plate[1], -farw / nearw, cathw);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.setColor("#888888");
         CircuitElm.drawThickCircle(g, this.point2.x, this.point2.y, this.circler);
         this.setBbox(this.point1, this.plate[0], 16);
@@ -153,28 +153,28 @@ export class TriodeElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 2) return this.currentc;
         if (n === 0) return -this.currentp;
         return -this.currentg;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return n === 0 ? this.plate[0] : n === 1 ? this.grid[0] : this.cath[0];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3;
     }
 
-    getPower(): number {
+    override getPower(): number {
         return (
             (this.nodes[this.plateN].v - this.nodes[this.cathN].v) * this.currentc +
             (this.nodes[this.gridN].v - this.nodes[this.cathN].v) * this.currentg
         );
     }
 
-    getCurrent(): number {
+    override getCurrent(): number {
         return this.currentc;
     }
 
@@ -186,7 +186,7 @@ export class TriodeElm extends CircuitElm {
     lastv1: number = 0;
     lastv2: number = 0;
 
-    doStep(): void {
+    override doStep(): void {
         const vs = [this.nodes[0].v, this.nodes[1].v, this.nodes[2].v];
         if (vs[1] > this.lastv1 + 0.5) vs[1] = this.lastv1 + 0.5;
         if (vs[1] < this.lastv1 - 0.5) vs[1] = this.lastv1 - 0.5;
@@ -234,13 +234,13 @@ export class TriodeElm extends CircuitElm {
         CircuitElm.sim.stampRightSide(this.nodes[this.cathN], -rs);
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[0]);
         CircuitElm.sim.stampNonLinear(this.nodes[1]);
         CircuitElm.sim.stampNonLinear(this.nodes[2]);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "triode";
         const vac = this.nodes[this.plateN].v - this.nodes[this.cathN].v;
         const vgc = this.nodes[this.gridN].v - this.nodes[this.cathN].v;
@@ -253,47 +253,47 @@ export class TriodeElm extends CircuitElm {
     }
 
     // grid not connected to other terminals
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         return !(n1 === 1 || n2 === 1);
     }
-    getMatrixConnection(_n1: number, _n2: number): boolean {
+    override getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("mu", this.mu, 0, 0).setDimensionless().setPositive();
         if (n === 1) return new EditInfo("kg1", this.kg1, 0, 0).setDimensionless().setPositive();
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.mu = ei.value;
         if (n === 1) this.kg1 = ei.value;
     }
 
-    canViewInScope(): boolean {
+    override canViewInScope(): boolean {
         return true;
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[this.plateN].v - this.nodes[this.cathN].v;
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         if (this.x === this.x2) this.flags ^= TriodeElm.FLAG_FLIP;
         if ((this.flags & TriodeElm.FLAG_DSIGN_FIX) === 0 && this.x !== this.x2) this.flags ^= TriodeElm.FLAG_FLIP;
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         if (this.y === this.y2) this.flags ^= TriodeElm.FLAG_FLIP;
         if ((this.flags & TriodeElm.FLAG_DSIGN_FIX) === 0 && this.y !== this.y2) this.flags ^= TriodeElm.FLAG_FLIP;
         super.flipY(c2, count);
     }
 
-    flipXY(xmy: number, count: number): void {
+    override flipXY(xmy: number, count: number): void {
         this.flags ^= TriodeElm.FLAG_FLIP;
         super.flipXY(xmy, count);
     }

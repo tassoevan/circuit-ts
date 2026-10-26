@@ -48,27 +48,27 @@ export class CounterElm extends ChipElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "in", this.invertreset);
         CircuitXMLSerializer.dumpAttr(elem, "mo", this.modulus);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.invertreset = xml.parseBooleanAttr("in", this.invertreset);
         this.modulus = xml.parseIntAttr("mo", this.modulus);
         this.pins[1].bubble = this.invertreset;
     }
 
-    needsBits(): boolean {
+    override needsBits(): boolean {
         return true;
     }
-    allowBus(): boolean {
+    override allowBus(): boolean {
         return true;
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         if (this.modulus === 0) return "Counter";
         return Locale.LS("Counter") + Locale.LS(" (mod ") + this.modulus + ")";
     }
@@ -88,7 +88,7 @@ export class CounterElm extends ChipElm {
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.hasUpDown() ? this.bits + 3 : this.bits + 2;
     }
 
@@ -103,7 +103,7 @@ export class CounterElm extends ChipElm {
         return this.hasFlag(CounterElm.FLAG_NEGATIVE_EDGE);
     }
 
-    execute(): void {
+    override execute(): void {
         const neg = this.negativeEdgeTriggered();
         if (this.pins[0].value !== neg && this.lastClock === neg) {
             let value = 0;
@@ -129,10 +129,10 @@ export class CounterElm extends ChipElm {
         this.lastClock = this.pins[0].value;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Invert reset pin", this.invertreset);
@@ -153,7 +153,7 @@ export class CounterElm extends ChipElm {
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.invertreset = ei.checkbox!.getState();
             this.setupPins();
@@ -179,10 +179,10 @@ export class CounterElm extends ChipElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 164;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "ctr";
     }
 }

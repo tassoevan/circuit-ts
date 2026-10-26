@@ -82,11 +82,11 @@ export class DCMotorElm extends CircuitElm {
         this.indInertia.setup(this.J, 0, Inductor.FLAG_BACK_EULER);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 415;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "in", this.inductance);
         CircuitXMLSerializer.dumpAttr(elem, "rs", this.resistance);
@@ -98,7 +98,7 @@ export class DCMotorElm extends CircuitElm {
         CircuitXMLSerializer.dumpAttr(elem, "ta", this.tau);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.inductance = xml.parseDoubleAttr("in", this.inductance);
         this.resistance = xml.parseDoubleAttr("rs", this.resistance);
@@ -118,30 +118,30 @@ export class DCMotorElm extends CircuitElm {
         return this.angle;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(36);
         this.motorCenter = this.interpPoint(this.point1, this.point2, 0.5);
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 2;
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return 4;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 2;
     }
 
-    setVoltageSource(n: number, v: VoltageSource): void {
+    override setVoltageSource(n: number, v: VoltageSource): void {
         this.voltSources[n] = v;
         if (n === 0) v.setNodes(this.nodes[3], this.nodes[1]);
         else v.setNodes(this.nodes[4], CircuitNode.ground);
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.ind.reset();
         this.indInertia.reset();
@@ -149,7 +149,7 @@ export class DCMotorElm extends CircuitElm {
         this.inertiaCurrent = 0;
     }
 
-    stamp(): void {
+    override stamp(): void {
         this.ind.stamp(this.nodes[0], this.nodes[2]);
         CircuitElm.sim.stampResistor(this.nodes[2], this.nodes[3], this.resistance);
         CircuitElm.sim.stampVoltageSource(this.nodes[3], this.nodes[1], this.voltSources[0]);
@@ -158,13 +158,13 @@ export class DCMotorElm extends CircuitElm {
         CircuitElm.sim.stampVoltageSource(this.nodes[4], CircuitNode.ground, this.voltSources[1]);
     }
 
-    startIteration(): void {
+    override startIteration(): void {
         this.ind.startIteration(this.nodes[0].v - this.nodes[2].v);
         this.indInertia.startIteration(this.nodes[4].v - this.nodes[5].v);
         this.angle = this.angle + this.speed * CircuitElm.sim.timeStep;
     }
 
-    doStep(): void {
+    override doStep(): void {
         CircuitElm.sim.updateVoltageSource(
             this.nodes[4],
             CircuitNode.ground,
@@ -181,17 +181,17 @@ export class DCMotorElm extends CircuitElm {
         this.indInertia.doStep(this.nodes[4].v - this.nodes[5].v);
     }
 
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         this.coilCurrent = this.ind.calculateCurrent(this.nodes[0].v - this.nodes[2].v);
         this.inertiaCurrent = this.indInertia.calculateCurrent(this.nodes[4].v - this.nodes[5].v);
         this.speed = this.inertiaCurrent;
     }
 
-    setCurrent(vs: VoltageSource, c: number): void {
+    override setCurrent(vs: VoltageSource, c: number): void {
         if (vs === this.voltSources[0]) this.current = c;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const cr = 18;
         this.setBbox(this.point1, this.point2, cr);
         this.draw2Leads(g);
@@ -235,7 +235,7 @@ export class DCMotorElm extends CircuitElm {
         c.y = Math.round(a.y * (1 - f) + b.y * f + gg * gy);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "DC Motor";
         this.getBasicInfo(arr);
         arr[3] =
@@ -247,10 +247,10 @@ export class DCMotorElm extends CircuitElm {
         arr[6] = "P = " + CircuitElm.getUnitText(this.getPower(), "W");
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Armature inductance (H)", this.inductance, 0, 0).setPositive();
         if (n === 1) return new EditInfo("Armature Resistance (ohms)", this.resistance, 0, 0).setPositive();
         if (n === 2) return new EditInfo("Torque constant (Nm/A)", this.K, 0, 0).setPositive();
@@ -260,7 +260,7 @@ export class DCMotorElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) {
             this.inductance = ei.value;
             this.ind.setup(this.inductance, this.current, Inductor.FLAG_BACK_EULER);

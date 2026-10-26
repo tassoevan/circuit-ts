@@ -78,14 +78,14 @@ export class TextElm extends GraphicElm {
         this.lines.push(s);
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "si", this.size);
         CircuitXMLSerializer.dumpAttr(elem, "te", this.text);
         if (this.color != null) CircuitXMLSerializer.dumpAttr(elem, "co", this.color);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.size = xml.parseIntAttr("si", this.size);
         this.text = xml.parseStringAttr("te", this.text) ?? this.text;
@@ -93,18 +93,18 @@ export class TextElm extends GraphicElm {
         this.split();
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return "x".charCodeAt(0);
     }
 
-    drag(xx: number, yy: number): void {
+    override drag(xx: number, yy: number): void {
         this.x = xx;
         this.y = yy;
         this.x2 = xx + 16;
         this.y2 = yy;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.save();
         g.setColor(
             this.needsHighlight()
@@ -138,7 +138,7 @@ export class TextElm extends GraphicElm {
         g.restore();
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Text", 0, -1, -1);
             ei.textArea = { value: this.text.replace(/\\n/g, "\n") };
@@ -159,7 +159,7 @@ export class TextElm extends GraphicElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.text = (this.editTextArea.element as HTMLTextAreaElement).value.replace(/\n/g, "\\n");
             this.split();
@@ -176,16 +176,16 @@ export class TextElm extends GraphicElm {
     }
 
     //    isCenteredText(): boolean { return (this.flags & FLAG_CENTER) !== 0; }
-    getElmType(): string {
+    override getElmType(): string {
         return "text";
     }
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = this.text;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "t".charCodeAt(0);
     }
-    canViewInScope(): boolean {
+    override canViewInScope(): boolean {
         return false;
     }
 }

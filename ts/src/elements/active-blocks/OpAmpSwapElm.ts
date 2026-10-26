@@ -24,10 +24,10 @@ export class OpAmpSwapElm extends OpAmpElm {
         super(xx, yy);
         this.flags |= this.FLAG_SWAP;
     }
-    getDumpClass(): Function {
+    override getDumpClass(): Function {
         return OpAmpElm;
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return "A".charCodeAt(0);
     }
 }

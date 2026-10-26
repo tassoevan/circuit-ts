@@ -50,7 +50,7 @@ export class MonostableElm extends ChipElm {
         this.reset();
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "Monostable";
     }
 
@@ -68,20 +68,20 @@ export class MonostableElm extends ChipElm {
         this.pins[2].lineOver = true;
     }
 
-    reset(): void {
+    override reset(): void {
         super.reset();
         this.pins[2].value = true;
         this.triggered = this.prevInputValue = false;
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3;
     }
     getVoltageSourceCount(): number {
         return 2;
     }
 
-    execute(): void {
+    override execute(): void {
         const trigValue = this.pins[0].value !== this.invertTrigger();
         if (trigValue && this.prevInputValue !== trigValue && (this.retriggerable || !this.triggered)) {
             this.lastRisingEdge = CircuitElm.sim.t;
@@ -97,24 +97,24 @@ export class MonostableElm extends ChipElm {
         this.prevInputValue = trigValue;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "rt", this.retriggerable);
         CircuitXMLSerializer.dumpAttr(elem, "dl", this.delay);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.retriggerable = xml.parseBooleanAttr("rt", this.retriggerable);
         this.delay = xml.parseDoubleAttr("dl", this.delay);
         this.reset();
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 194;
     }
 
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("", 0, -1, -1);
             ei.checkbox = new Checkbox("Retriggerable", this.retriggerable);
@@ -125,7 +125,7 @@ export class MonostableElm extends ChipElm {
         return super.getChipEditInfo(n);
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.retriggerable = ei.checkbox!.getState();
         if (n === 1) this.delay = ei.value;
         if (n === 2) {
@@ -136,7 +136,7 @@ export class MonostableElm extends ChipElm {
         super.setChipEditValue(n, ei);
     }
 
-    addJSMethods(): void {
+    override addJSMethods(): void {
         super.addJSMethods();
         const p = this._jsProxy!;
         p["getPeriod"] = () => this.delay;

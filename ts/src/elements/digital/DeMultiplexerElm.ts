@@ -72,18 +72,18 @@ export class DeMultiplexerElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "Demultiplexer";
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "se", this.selectBitCount);
         if (this.outputMode !== 0) CircuitXMLSerializer.dumpAttr(elem, "om", this.outputMode);
         if (this.dataBusWidth !== 4) CircuitXMLSerializer.dumpAttr(elem, "dw", this.dataBusWidth);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.selectBitCount = xml.parseIntAttr("se", this.selectBitCount);
         this.outputMode = xml.parseIntAttr("om", 0);
@@ -203,7 +203,7 @@ export class DeMultiplexerElm extends ChipElm {
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         const D = DeMultiplexerElm;
         if (!this.dataBusWidth || !this.selectBitCount || !this.outputCount) return 0;
         if (this.outputMode === D.OUTPUT_MODE_BUS_BUS)
@@ -222,7 +222,7 @@ export class DeMultiplexerElm extends ChipElm {
         return sel;
     }
 
-    execute(): void {
+    override execute(): void {
         const D = DeMultiplexerElm;
         const selectedValue = this.readSelectValue();
 
@@ -234,17 +234,17 @@ export class DeMultiplexerElm extends ChipElm {
             this.pins[this.outputPin + selectedValue * width + i].value = this.pins[this.inputPin + i].value;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 185;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "dmux";
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         const D = DeMultiplexerElm;
         if (n === 0) return new EditInfo("# of Select Bits", this.selectBitCount).setDimensionless();
         if (n === 1) {
@@ -263,7 +263,7 @@ export class DeMultiplexerElm extends ChipElm {
         return null;
     }
 
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         const D = DeMultiplexerElm;
         if (n === 0) {
             if (ei.value >= 1 && ei.value <= 6) {

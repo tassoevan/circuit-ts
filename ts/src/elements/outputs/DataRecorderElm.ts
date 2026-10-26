@@ -45,35 +45,35 @@ export class DataRecorderElm extends CircuitElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "dc", this.dataCount);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.setDataCount(xml.parseIntAttr("dc", this.dataCount));
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 210;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1;
     }
 
-    reset(): void {
+    override reset(): void {
         this.dataPtr = 0;
         this.dataFull = false;
         this.lastTimeStepCount = 0;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = this.interpPoint(this.point1, this.point2, 1 - 8 / this.dn);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.save();
         const selected = this.needsHighlight();
         const f = new Font("SansSerif", selected ? Font.BOLD : 0, 14);
@@ -89,17 +89,17 @@ export class DataRecorderElm extends CircuitElm {
         g.restore();
     }
 
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[0].v;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "data export";
         arr[1] = "V = " + CircuitElm.getVoltageText(this.nodes[0].v);
         arr[2] = (this.dataFull ? this.dataCount : this.dataPtr) + "/" + this.dataCount;
     }
 
-    stepFinished(): void {
+    override stepFinished(): void {
         if (this.lastTimeStepCount === CircuitElm.sim.timeStepCount) return;
         this.data[this.dataPtr++] = this.nodes[0].v;
         this.lastTimeStepCount = CircuitElm.sim.timeStepCount;
@@ -125,10 +125,10 @@ export class DataRecorderElm extends CircuitElm {
         return url;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             return new EditInfo("# of Data Points", this.dataCount, -1, -1).setDimensionless().setPositive();
         }
@@ -163,7 +163,7 @@ export class DataRecorderElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.value > 0) this.setDataCount(Math.trunc(ei.value));
     }
 }

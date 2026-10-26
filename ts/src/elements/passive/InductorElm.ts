@@ -63,14 +63,14 @@ export class InductorElm extends CircuitElm {
             this.allocNodes();
         }
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return "l".charCodeAt(0);
     }
-    isInductorElm(): boolean {
+    override isInductorElm(): boolean {
         return true;
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "l", this.inductance);
         CircuitXMLSerializer.dumpAttr(elem, "ic", this.initialCurrent);
@@ -78,11 +78,11 @@ export class InductorElm extends CircuitElm {
         if (this.seriesResistance !== 0) CircuitXMLSerializer.dumpAttr(elem, "sr", this.seriesResistance);
     }
 
-    dumpXmlState(_doc: Document, elem: Element): void {
+    override dumpXmlState(_doc: Document, elem: Element): void {
         CircuitXMLSerializer.dumpAttr(elem, "i", this.current);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.inductance = xml.parseDoubleAttr("l", this.inductance);
         this.initialCurrent = xml.parseDoubleAttr("ic", this.initialCurrent);
@@ -96,11 +96,11 @@ export class InductorElm extends CircuitElm {
         this.allocNodes();
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(32);
     }
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         const v1 = this.nodes[0].v;
         const v2 = this.nodes[1].v;
         const hs = 8;
@@ -115,7 +115,7 @@ export class InductorElm extends CircuitElm {
         this.doDots(g);
         this.drawPosts(g);
     }
-    reset(): void {
+    override reset(): void {
         this.curcount = 0;
         this.current = this.initialCurrent;
         this.ind.resetTo(this.initialCurrent);
@@ -130,29 +130,29 @@ export class InductorElm extends CircuitElm {
     getIndNode2(): number {
         return this.seriesResistance > 0 ? 2 : 1;
     }
-    stamp(): void {
+    override stamp(): void {
         this.ind.stamp(this.nodes[0], this.nodes[this.getIndNode2()]);
         if (this.seriesResistance > 0)
             CircuitElm.sim.stampResistor(this.nodes[1], this.nodes[2], this.seriesResistance);
     }
-    startIteration(): void {
+    override startIteration(): void {
         this.ind.startIteration(this.nodes[0].v - this.nodes[this.getIndNode2()].v);
     }
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return this.ind.nonLinear();
     }
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         const voltdiff = this.nodes[0].v - this.nodes[this.getIndNode2()].v;
         this.current = this.ind.calculateCurrent(voltdiff);
     }
-    doStep(): void {
+    override doStep(): void {
         const voltdiff = this.nodes[0].v - this.nodes[this.getIndNode2()].v;
         this.ind.doStep(voltdiff);
     }
-    getInternalNodeCount(): number {
+    override getInternalNodeCount(): number {
         return this.seriesResistance > 0 ? 1 : 0;
     }
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = this.saturationCurrent > 0 ? "inductor (sat)" : "inductor";
         this.getBasicInfo(arr);
         arr[3] = "L = " + CircuitElm.getUnitText(this.inductance, "H");
@@ -164,11 +164,11 @@ export class InductorElm extends CircuitElm {
         }
     }
 
-    getScopeText(_v: number): string {
+    override getScopeText(_v: number): string {
         return Locale.LS("inductor") + ", " + CircuitElm.getUnitText(this.inductance, "H");
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Inductance (H)", this.inductance, 1e-2, 10).setPositive();
         if (n === 1) {
             const ei = new EditInfo("", 0, -1, -1);
@@ -181,7 +181,7 @@ export class InductorElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.inductance = ei.value;
         if (n === 1) {
             if (ei.checkbox!.getState()) this.flags &= ~Inductor.FLAG_BACK_EULER;
@@ -201,7 +201,7 @@ export class InductorElm extends CircuitElm {
         this.ind.setup(this.inductance, this.current, this.flags, this.saturationCurrent);
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return "L".charCodeAt(0);
     }
     getInductance(): number {
@@ -228,7 +228,7 @@ export class InductorElm extends CircuitElm {
     isIdealInductor(): boolean {
         return this.seriesResistance === 0;
     }
-    validate(): boolean {
+    override validate(): boolean {
         const fpi = new FindPathInfo(FindPathInfo.INDUCT, this, this.getNode(1), CircuitElm.sim);
         if (!fpi.findPath(this.getNode(0))) this.reset();
         return true;

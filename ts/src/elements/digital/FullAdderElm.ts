@@ -38,7 +38,7 @@ export class FullAdderElm extends ChipElm {
     }
     static readonly FLAG_BITS = 2;
 
-    getChipName(): string {
+    override getChipName(): string {
         return "Adder";
     }
     carryIn: number = 0;
@@ -60,14 +60,14 @@ export class FullAdderElm extends ChipElm {
         this.pins[this.carryIn] = new Pin(this, bitsY * 2, ChipElm.SIDE_W, "Cin");
         this.allocNodes();
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.bits * 3 + 2;
     }
     getVoltageSourceCount(): number {
         return this.bits + 1;
     }
 
-    execute(): void {
+    override execute(): void {
         let c = this.pins[this.carryIn].value ? 1 : 0;
         for (let i = 0; i !== this.bits; i++) {
             const v = (this.pins[i].value ? 1 : 0) + (this.pins[i + this.bits].value ? 1 : 0) + c;
@@ -76,24 +76,24 @@ export class FullAdderElm extends ChipElm {
         }
         this.writeOutput(this.carryOut, c === 1);
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 196;
     }
-    needsBits(): boolean {
+    override needsBits(): boolean {
         return (this.flags & FullAdderElm.FLAG_BITS) !== 0;
     }
-    allowBus(): boolean {
+    override allowBus(): boolean {
         return this.needsBits();
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless().setPositive();
         return super.getChipEditInfo(n);
     }
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.bits = Math.floor(ei.value);
             this.flags |= FullAdderElm.FLAG_BITS;

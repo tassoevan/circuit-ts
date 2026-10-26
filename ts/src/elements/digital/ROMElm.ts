@@ -34,15 +34,15 @@ export class ROMElm extends SRAMElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "ROM";
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 436;
     }
 
     // no WE pin; just OE + address + data
-    setupPins(): void {
+    override setupPins(): void {
         if (this.addressBits === undefined) this.addressBits = 0;
         if (this.addressBits === 0) this.addressBits = this.dataBits = 4;
         this.sizeX = 2;
@@ -74,11 +74,11 @@ export class ROMElm extends SRAMElm {
         this.allocNodes();
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 1 + this.addressBits + this.dataBits;
     }
 
-    doStep(): void {
+    override doStep(): void {
         const outputEnabled = this.nodes[0].v < this.getThreshold();
 
         // get address
@@ -107,5 +107,5 @@ export class ROMElm extends SRAMElm {
     }
 
     // no writing
-    stepFinished(): void {}
+    override stepFinished(): void {}
 }

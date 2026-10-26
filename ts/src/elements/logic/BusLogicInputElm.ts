@@ -47,7 +47,7 @@ export class BusLogicInputElm extends SwitchElm {
         }
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "bw", this.busWidth);
         if (this.value !== 0) CircuitXMLSerializer.dumpAttr(elem, "va", this.value);
@@ -55,7 +55,7 @@ export class BusLogicInputElm extends SwitchElm {
         if (this.loV !== 0) CircuitXMLSerializer.dumpAttr(elem, "lo", this.loV);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.busWidth = xml.parseIntAttr("bw", this.busWidth);
         this.value = xml.parseIntAttr("va", 0);
@@ -63,27 +63,27 @@ export class BusLogicInputElm extends SwitchElm {
         this.loV = xml.parseDoubleAttr("lo", this.loV);
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 0;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.busWidth;
     }
-    getNumHandles(): number {
+    override getNumHandles(): number {
         return 1;
     }
-    getPostWidth(_n: number): number {
+    override getPostWidth(_n: number): number {
         return this.busWidth;
     }
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return this.busWidth;
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return new Point(this.x, this.y, n);
     }
 
-    setVoltageSource(n: number, v: VoltageSource): void {
+    override setVoltageSource(n: number, v: VoltageSource): void {
         if (this.voltageSources === null || this.voltageSources.length !== this.busWidth) {
             this.voltageSources = new Array(this.busWidth);
             this.currents = new Array(this.busWidth).fill(0);
@@ -91,7 +91,7 @@ export class BusLogicInputElm extends SwitchElm {
         this.voltageSources[n] = v;
     }
 
-    setCurrent(vs: VoltageSource, c: number): void {
+    override setCurrent(vs: VoltageSource, c: number): void {
         for (let i = 0; i < this.busWidth; i++)
             if (this.voltageSources![i] === vs) {
                 this.currents![i] = this.current = c;
@@ -99,16 +99,16 @@ export class BusLogicInputElm extends SwitchElm {
             }
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         return this.currents ? this.currents[n] : 0;
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.lead1 = new Point();
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         g.save();
         const fontSize = 20;
         g.context.font = "bold " + fontSize + "px SansSerif";
@@ -134,57 +134,57 @@ export class BusLogicInputElm extends SwitchElm {
         g.restore();
     }
 
-    getSwitchRect(): Rectangle {
+    override getSwitchRect(): Rectangle {
         return new Rectangle(this.x2 - 10, this.y2 - 10, 20, 20);
     }
 
-    toggle(): void {
+    override toggle(): void {
         this.value++;
         if (this.value >= 1 << this.busWidth) this.value = 0;
     }
 
-    stamp(): void {
+    override stamp(): void {
         for (let i = 0; i < this.busWidth; i++) {
             const v = (this.value & (1 << i)) !== 0 ? this.hiV : this.loV;
             CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[i], this.voltageSources![i], v);
         }
     }
 
-    calculateCurrent(): void {}
-    hasGroundConnection(_n: number): boolean {
+    override calculateCurrent(): void {}
+    override hasGroundConnection(_n: number): boolean {
         return true;
     }
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return false;
     }
-    isRemovableWire(): boolean {
+    override isRemovableWire(): boolean {
         return false;
     }
 
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "bli";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "bus input (" + this.busWidth + ")";
         arr[1] = "value = " + this.value;
         arr[2] = "hex = 0x" + this.value.toString(16).toUpperCase();
     }
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return true;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("Bus Width", this.busWidth, 2, 32).setDimensionless();
         if (n === 1) return new EditInfo("Value", this.value).setDimensionless();
         if (n === 2) return new EditInfo("High Voltage", this.hiV).setUnitStep();
         if (n === 3) return new EditInfo("Low Voltage", this.loV).setUnitStep();
         return null;
     }
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 2) {
                 this.busWidth = Math.floor(ei.value);

@@ -32,10 +32,10 @@ export class BusSplitterElm extends ChipElm {
             super(xxOrXa, yyOrYa, xb, yb!, f!, st!);
         }
     }
-    getChipName(): string {
+    override getChipName(): string {
         return "Bus Splitter";
     }
-    needsBits(): boolean {
+    override needsBits(): boolean {
         return true;
     }
 
@@ -60,42 +60,42 @@ export class BusSplitterElm extends ChipElm {
 
     currents: number[] = [];
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return this.bits * 2;
     }
-    getBusWidth(): number {
+    override getBusWidth(): number {
         return this.bits;
     }
     getVoltageSourceCount(): number {
         return 0;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         // bus pin i connects to individual pin i+bits
         return Math.abs(n1 - n2) === this.bits;
     }
 
-    isBusSplitterElm(): boolean {
+    override isBusSplitterElm(): boolean {
         return true;
     }
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return true;
     }
-    isRemovableWire(): boolean {
+    override isRemovableWire(): boolean {
         return true;
     }
 
-    getConnectedPost(n?: number): Point {
+    override getConnectedPost(n?: number): Point {
         // bus bit n connects to individual pin n+bits
         return this.getPost((n ?? 0) + this.bits);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n < this.bits) return -this.currents[n];
         return this.currents[n - this.bits];
     }
 
-    setWireCurrent(bit: number, c: number): void {
+    override setWireCurrent(bit: number, c: number): void {
         this.currents[bit] = c;
         this.pins[bit + this.bits].current = c;
         // update total bus current on pin 0 (the only bus-side pin that gets drawn)
@@ -104,18 +104,18 @@ export class BusSplitterElm extends ChipElm {
         this.pins[0].current = -total;
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 433;
     }
-    getXmlDumpType(): string {
+    override getXmlDumpType(): string {
         return "bs";
     }
 
-    getChipEditInfo(n: number): EditInfo | null {
+    override getChipEditInfo(n: number): EditInfo | null {
         if (n === 0) return new EditInfo("# of Bits", this.bits, 1, 1).setDimensionless();
         return null;
     }
-    setChipEditValue(n: number, ei: EditInfo): void {
+    override setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             if (ei.value >= 2) {
                 this.bits = Math.floor(ei.value);

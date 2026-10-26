@@ -56,7 +56,7 @@ export class ComparatorElm extends CompositeElm {
         }
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 401;
     }
 
@@ -67,11 +67,11 @@ export class ComparatorElm extends CompositeElm {
         this.flags = (this.flags & ~this.FLAG_SMALL) | (s === 1 ? this.FLAG_SMALL : 0);
     }
 
-    getConnection(_n1: number, _n2: number): boolean {
+    override getConnection(_n1: number, _n2: number): boolean {
         return false;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, this.opheight * 2);
         this.setVoltageColor(g, this.nodes[0].v);
         CircuitElm.drawThickLine(g, this.in1p[0], this.in1p[1]);
@@ -91,7 +91,7 @@ export class ComparatorElm extends CompositeElm {
         this.drawPosts(g);
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         if (this.dn > 150 && this.isCreating()) this.setSize(2);
         let ww = this.opwidth;
@@ -115,23 +115,23 @@ export class ComparatorElm extends CompositeElm {
         this.setPost(2, this.point2);
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "Comparator";
         arr[1] = "V+ = " + CircuitElm.getVoltageText(this.nodes[1].v);
         arr[2] = "V- = " + CircuitElm.getVoltageText(this.nodes[0].v);
     }
 
-    flipX(c2: number, count: number): void {
+    override flipX(c2: number, count: number): void {
         if (this.dx === 0) this.flags ^= this.FLAG_SWAP;
         super.flipX(c2, count);
     }
 
-    flipY(c2: number, count: number): void {
+    override flipY(c2: number, count: number): void {
         if (this.dy === 0) this.flags ^= this.FLAG_SWAP;
         super.flipY(c2, count);
     }
 
-    flipXY(xmy: number, count: number): void {
+    override flipXY(xmy: number, count: number): void {
         this.flags ^= this.FLAG_SWAP;
         super.flipXY(xmy, count);
     }

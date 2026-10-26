@@ -33,7 +33,7 @@ export class PhaseCompElm extends ChipElm {
         }
     }
 
-    getChipName(): string {
+    override getChipName(): string {
         return "phase comparator";
     }
 
@@ -47,11 +47,11 @@ export class PhaseCompElm extends ChipElm {
         this.pins[2].output = true;
     }
 
-    nonLinear(): boolean {
+    override nonLinear(): boolean {
         return true;
     }
 
-    stamp(): void {
+    override stamp(): void {
         CircuitElm.sim.stampNonLinearVS(this.pins[2].voltSource!);
         CircuitElm.sim.stampNonLinear(CircuitNode.ground);
         CircuitElm.sim.stampNonLinear(this.nodes[2]);
@@ -60,7 +60,7 @@ export class PhaseCompElm extends ChipElm {
     ff1: boolean = false;
     ff2: boolean = false;
 
-    startIteration(): void {
+    override startIteration(): void {
         const v1 = this.nodes[0].v > this.getThreshold();
         const v2 = this.nodes[1].v > this.getThreshold();
         if (v1 && !this.pins[0].value) this.ff1 = true;
@@ -70,7 +70,7 @@ export class PhaseCompElm extends ChipElm {
         this.pins[1].value = v2;
     }
 
-    doStep(): void {
+    override doStep(): void {
         const out = this.ff1 ? this.highVoltage : this.ff2 ? 0 : -1;
         if (out !== -1)
             CircuitElm.sim.stampVoltageSource(CircuitNode.ground, this.nodes[2], this.pins[2].voltSource, out);
@@ -80,19 +80,19 @@ export class PhaseCompElm extends ChipElm {
         }
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 3;
     }
     getVoltageSourceCount(): number {
         return 1;
     }
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getDumpType(): number {
+    override getDumpType(): number {
         return 161;
     }
-    getMatrixConnection(_n1: number, _n2: number): boolean {
+    override getMatrixConnection(_n1: number, _n2: number): boolean {
         return true;
     }
 }

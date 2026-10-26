@@ -45,12 +45,12 @@ export class CrossSwitchElm extends SwitchElm {
         this.allocNodes();
     }
 
-    getDumpType(): number {
+    override getDumpType(): number {
         return 430;
     }
 
-    readonly openhs = 16;
-    readonly posCount = 2;
+    override readonly openhs = 16;
+    override readonly posCount = 2;
     poleLeads!: Point[];
     throwLeads!: Point[];
     polePosts!: Point[];
@@ -71,7 +71,7 @@ export class CrossSwitchElm extends SwitchElm {
         }
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         this.calcLeads(32);
         this.ensureArrays();
@@ -109,7 +109,7 @@ export class CrossSwitchElm extends SwitchElm {
         this.interpPoint(this.point1, this.point2, this.crossPoints[5], 1 + dp * 3, -this.openhs * 4);
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         this.setBbox(this.point1, this.point2, 1);
         this.adjustBbox(this.crossPoints[2], this.crossPoints[5]);
 
@@ -186,18 +186,18 @@ export class CrossSwitchElm extends SwitchElm {
         CircuitElm.drawPost(g, this.crossPoints[4]);
     }
 
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n === 0 || n === 2) return -this.currents[Math.trunc(n / 2)];
         if (this.position === 0) return this.currents[Math.trunc(n / 2)];
         return this.currents[1 - Math.trunc(n / 2)];
     }
 
-    setCurrent(vs: VoltageSource, c: number): void {
+    override setCurrent(vs: VoltageSource, c: number): void {
         if (vs === this.voltageSources[0]) this.currents[0] = c;
         else this.currents[1] = c;
     }
 
-    getSwitchRect(): Rectangle {
+    override getSwitchRect(): Rectangle {
         return new Rectangle(this.poleLeads[0].x, this.poleLeads[0].y, 0, 0)
             .union(new Rectangle(this.throwLeads[1].x, this.throwLeads[1].y, 0, 0))
             .union(
@@ -210,16 +210,16 @@ export class CrossSwitchElm extends SwitchElm {
             );
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         if (n === 0 || n === 2) return this.polePosts[Math.trunc(n / 2)];
         if (n === 1) return this.crossPoints[2];
         return this.crossPoints[5];
     }
 
-    getPostCount(): number {
+    override getPostCount(): number {
         return 2 * this.poleCount;
     }
-    calculateCurrent(): void {
+    override calculateCurrent(): void {
         if (this.resistance > 0) {
             for (let i = 0; i !== this.poleCount; i++) {
                 const dst = this.position === 0 ? i * 2 + 1 : 3 - i * 2;
@@ -228,13 +228,13 @@ export class CrossSwitchElm extends SwitchElm {
         }
     }
 
-    setVoltageSource(j: number, vs: VoltageSource): void {
+    override setVoltageSource(j: number, vs: VoltageSource): void {
         this.ensureArrays();
         this.voltageSources[j] = vs;
         vs.setNodes(this.nodes[j * 2], this.nodes[j * 2 + 1]);
     }
 
-    stamp(): void {
+    override stamp(): void {
         this.ensureArrays();
         if (this.position === 0) {
             for (let i = 0; i !== this.poleCount; i++) {
@@ -263,34 +263,34 @@ export class CrossSwitchElm extends SwitchElm {
         }
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return this.resistance > 0 ? 0 : this.poleCount;
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         if (this.position === 0) return this.comparePair(n1, n2, 0, 1) || this.comparePair(n1, n2, 2, 3);
         else return this.comparePair(n1, n2, 0, 3) || this.comparePair(n1, n2, 2, 1);
     }
 
-    isWireEquivalent(): boolean {
+    override isWireEquivalent(): boolean {
         return this.resistance === 0;
     }
 
     // optimizing out this element is too complicated to be worth it (see #646)
-    isRemovableWire(): boolean {
+    override isRemovableWire(): boolean {
         return false;
     }
-    getElmType(): string {
+    override getElmType(): string {
         return "cross switch";
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "cross switch";
         for (let i = 0; i !== this.poleCount; i++)
             arr[i + 1] = "I" + (i + 1) + " = " + CircuitElm.getCurrentDText(this.currents[i]);
     }
 
-    validate(): boolean {
+    override validate(): boolean {
         if (this.resistance > 0) return true;
         for (let i = 0; i !== this.poleCount; i++) {
             const dst = this.position === 0 ? i * 2 + 1 : 3 - i * 2;
@@ -303,11 +303,11 @@ export class CrossSwitchElm extends SwitchElm {
         return true;
     }
 
-    getShortcut(): number {
+    override getShortcut(): number {
         return 0;
     }
 
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) return EditInfo.createCheckbox("IEC Symbol", this.useIECSymbol());
         if (n === 1) return this.getKeyShortcutEditInfo();
         if (n === 2) {
@@ -318,7 +318,7 @@ export class CrossSwitchElm extends SwitchElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
             this.flags = ei.changeFlag(this.flags, SwitchElm.FLAG_IEC);
             this.setPoints();

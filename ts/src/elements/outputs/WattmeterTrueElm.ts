@@ -75,27 +75,27 @@ export class WattmeterTrueElm extends CircuitElm {
         this.curcounts = [0, 0];
     }
 
-    dumpXml(doc: Document, elem: Element): void {
+    override dumpXml(doc: Document, elem: Element): void {
         super.dumpXml(doc, elem);
         CircuitXMLSerializer.dumpAttr(elem, "w", this.width);
         CircuitXMLSerializer.dumpAttr(elem, "meter", this.meter);
     }
 
-    undumpXml(xml: CircuitXMLDeserializer): void {
+    override undumpXml(xml: CircuitXMLDeserializer): void {
         super.undumpXml(xml);
         this.width = xml.parseIntAttr("w", this.width);
         this.meter = xml.parseIntAttr("meter", this.meter);
         this.setup();
     }
 
-    getVoltageSourceCount(): number {
+    override getVoltageSourceCount(): number {
         return 1;
     }
-    getPostCount(): number {
+    override getPostCount(): number {
         return 4;
     }
 
-    drag(xx: number, yy: number): void {
+    override drag(xx: number, yy: number): void {
         xx = this.snapGrid(xx);
         yy = this.snapGrid(yy);
         const w1 = Math.max(CircuitElm.app.gridSize, CircuitElm.abs(yy - this.y));
@@ -112,7 +112,7 @@ export class WattmeterTrueElm extends CircuitElm {
         this.setPoints();
     }
 
-    setPoints(): void {
+    override setPoints(): void {
         super.setPoints();
         const ds = this.dy === 0 ? CircuitElm.sign(this.dx) : -CircuitElm.sign(this.dy);
 
@@ -149,11 +149,11 @@ export class WattmeterTrueElm extends CircuitElm {
         this.maxTextLen = Math.max(Math.abs(r1.x - r4.x) - 5, 5);
     }
 
-    getPost(n: number): Point {
+    override getPost(n: number): Point {
         return this.posts[n];
     }
 
-    stamp(): void {
+    override stamp(): void {
         // 2  3
         // 0  1
         // zero-valued voltage source from 2 to 3, so we can measure current
@@ -162,11 +162,11 @@ export class WattmeterTrueElm extends CircuitElm {
         CircuitElm.sim.stampResistor(this.nodes[0], this.nodes[1], 1e8);
     }
 
-    setVoltageSource(j: number, vs: VoltageSource): void {
+    override setVoltageSource(j: number, vs: VoltageSource): void {
         this.voltSources[j] = vs;
     }
 
-    draw(g: Graphics): void {
+    override draw(g: Graphics): void {
         for (let i = 0; i !== 2; i++) this.curcounts[i] = this.updateDotCountImpl(this.currents[i], this.curcounts[i]);
         let flip = 1;
         for (let i = 0; i !== 4; i++) {
@@ -219,7 +219,7 @@ export class WattmeterTrueElm extends CircuitElm {
     // Average over whole cycles, delimited by rising crossings of the long-run mean
     // (ported from WattmeterElm.stepFinished(), which fixed the same averaging
     // against local extrema of the power waveform that this element used to do).
-    stepFinished(): void {
+    override stepFinished(): void {
         const p = this.getPower();
         const dt = CircuitElm.sim.timeStep;
         this.cycleTime += dt;
@@ -287,29 +287,29 @@ export class WattmeterTrueElm extends CircuitElm {
         }
     }
 
-    setCurrent(vn: VoltageSource, c: number): void {
+    override setCurrent(vn: VoltageSource, c: number): void {
         this.currents[vn === this.voltSources[1] ? 0 : 1] = c;
     }
-    getCurrentIntoNode(n: number): number {
+    override getCurrentIntoNode(n: number): number {
         if (n % 2 === 0) return -this.currents[Math.trunc(n / 2)];
         else return this.currents[Math.trunc(n / 2)];
     }
 
-    getConnection(n1: number, n2: number): boolean {
+    override getConnection(n1: number, n2: number): boolean {
         return Math.trunc(n1 / 2) === Math.trunc(n2 / 2);
     }
-    hasGroundConnection(_n1: number): boolean {
+    override hasGroundConnection(_n1: number): boolean {
         return false;
     }
 
-    getInfo(arr: string[]): void {
+    override getInfo(arr: string[]): void {
         arr[0] = "wattmeter";
         this.getBasicInfo(arr);
         arr[3] = "P = " + CircuitElm.getUnitText(this.getVoltageDiff() * this.getCurrent(), "W");
         arr[4] = "P = " + CircuitElm.getUnitText(this.getAveragePower(), "W");
     }
 
-    getPower(): number {
+    override getPower(): number {
         return this.getVoltageDiff() * this.getCurrent();
     }
 
@@ -328,30 +328,30 @@ export class WattmeterTrueElm extends CircuitElm {
         return value;
     }
 
-    canViewInScope(): boolean {
+    override canViewInScope(): boolean {
         return true;
     }
-    getCurrent(): number {
+    override getCurrent(): number {
         return this.currents[1];
     }
-    getVoltageDiff(): number {
+    override getVoltageDiff(): number {
         return this.nodes[1].v - this.nodes[0].v;
     }
     getAveragePower(): number {
         return this.avgPower;
     }
 
-    canFlipX(): boolean {
+    override canFlipX(): boolean {
         return false;
     }
-    canFlipY(): boolean {
+    override canFlipY(): boolean {
         return false;
     }
 
-    showPropertiesOnCreate(): boolean {
+    override showPropertiesOnCreate(): boolean {
         return false;
     }
-    getEditInfo(n: number): EditInfo | null {
+    override getEditInfo(n: number): EditInfo | null {
         if (n === 0) {
             const ei = new EditInfo("Value", this.selectedValue, -1, -1);
             ei.choice = new Choice();
@@ -363,7 +363,7 @@ export class WattmeterTrueElm extends CircuitElm {
         return null;
     }
 
-    setEditValue(n: number, ei: EditInfo): void {
+    override setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.meter = ei.choice!.getSelectedIndex();
     }
 }
