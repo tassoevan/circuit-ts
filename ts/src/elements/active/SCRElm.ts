@@ -41,8 +41,8 @@ export class SCRElm extends CircuitElm {
     readonly gnode = 2;
     readonly inode = 3;
     readonly FLAG_GATE_FIX = 1;
-    diode: Diode;
-    dir: number;
+    diode!: Diode;
+    dir!: number;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
@@ -114,14 +114,14 @@ export class SCRElm extends CircuitElm {
     curcount_g: number = 0;
     lastvac: number = 0;
     lastvag: number = 0;
-    gresistance: number;
-    triggerI: number;
-    holdingI: number;
+    gresistance!: number;
+    triggerI!: number;
+    holdingI!: number;
 
     readonly hs = 8;
-    poly: Polygon;
-    cathode: Point[];
-    gate: Point[];
+    poly!: Polygon;
+    cathode!: Point[];
+    gate!: Point[];
 
     applyGateFix(): boolean {
         return (this.flags & this.FLAG_GATE_FIX) !== 0;
@@ -247,7 +247,7 @@ export class SCRElm extends CircuitElm {
         );
     }
 
-    aresistance: number;
+    aresistance!: number;
 
     stamp(): void {
         CircuitElm.sim.stampNonLinear(this.nodes[this.anode]);

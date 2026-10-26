@@ -94,8 +94,8 @@ export class SevenSegElm extends ChipElm {
     getChipName(): string {
         return this.segmentCount + "-segment display";
     }
-    darkred: Color;
-    lightgray: Color;
+    darkred!: Color;
+    lightgray!: Color;
 
     setupPins(): void {
         if (!this.pinCount) return;
@@ -192,7 +192,7 @@ export class SevenSegElm extends ChipElm {
         1, 2, 1, 1, 1, 2, 2, 1, 1, 1, 2, 1, 1, 0, 2, 0, 1, 1, 1,
     ];
 
-    diodes: Diode[];
+    diodes!: Diode[];
 
     stamp(): void {
         super.stamp();

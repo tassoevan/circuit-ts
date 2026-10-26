@@ -75,14 +75,14 @@ export class DPDTSwitchElm extends SwitchElm {
 
     readonly openhs = 16;
     readonly posCount = 2;
-    poleLeads: Point[];
-    throwLeads: Point[];
-    polePosts: Point[];
-    throwPosts: Point[];
-    linePoints: Point[];
-    voltageSources: VoltageSource[];
-    currents: number[];
-    curcounts: number[];
+    poleLeads!: Point[];
+    throwLeads!: Point[];
+    polePosts!: Point[];
+    throwPosts!: Point[];
+    linePoints!: Point[];
+    voltageSources!: VoltageSource[];
+    currents!: number[];
+    curcounts!: number[];
 
     // voltageSources/currents/curcounts are normally (re)allocated in setPoints(), but elements
     // inside a CompositeElm/subcircuit never get setPoints() called, so allocate lazily here too.

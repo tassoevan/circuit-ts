@@ -34,9 +34,9 @@ export class DelayBufferElm extends CircuitElm {
     delay: number = 0;
     threshold: number = 2.5;
     highVoltage: number = 5;
-    center: Point;
-    gatePoly: Polygon;
-    delayEndTime: number;
+    center!: Point;
+    gatePoly!: Polygon;
+    delayEndTime!: number;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);

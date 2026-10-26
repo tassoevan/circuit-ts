@@ -28,10 +28,10 @@ import { StringTokenizer } from "../../StringTokenizer";
 import { parseIntStrict } from "../../NumberParse";
 
 export class DataRecorderElm extends CircuitElm {
-    dataCount: number;
+    dataCount!: number;
     dataPtr: number = 0;
     lastTimeStepCount: number = 0;
-    data: number[];
+    data!: number[];
     dataFull: boolean = false;
 
     constructor(xx: number, yy: number);

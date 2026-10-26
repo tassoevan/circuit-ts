@@ -27,19 +27,19 @@ import { Polygon } from "../../Polygon";
 
 export class GyratorElm extends CircuitElm {
     gyrResistance: number;
-    ptEnds: Point[];
-    ptStub: Point[];
-    boxTL: Point;
-    boxTR: Point;
-    boxBL: Point;
-    boxBR: Point;
-    arrowTail: Point;
-    arrowHead: Point;
-    arrowPoly: Polygon;
+    ptEnds!: Point[];
+    ptStub!: Point[];
+    boxTL!: Point;
+    boxTR!: Point;
+    boxBL!: Point;
+    boxBR!: Point;
+    arrowTail!: Point;
+    arrowHead!: Point;
+    arrowPoly!: Polygon;
     currents: number[];
     curcounts: number[];
     width: number;
-    flip: number;
+    flip!: number;
 
     static readonly FLAG_VERTICAL = 8;
     static readonly FLAG_FLIP = 16;

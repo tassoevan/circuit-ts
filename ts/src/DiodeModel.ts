@@ -32,8 +32,8 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
     static modelMap: Map<string, DiodeModel>;
 
     flags: number = 0;
-    name: string;
-    description: string | null;
+    name!: string;
+    description!: string | null;
     saturationCurrent: number;
     seriesResistance: number;
     emissionCoefficient: number;
@@ -53,11 +53,11 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
     // Electron thermal voltage at SPICE's default temperature of 27 C (300.15 K):
     static readonly vt = 0.025865;
     // The diode's "scale voltage", the voltage increase which will raise current by a factor of e.
-    vscale: number;
+    vscale!: number;
     // The multiplicative equivalent of dividing by vscale (for speed).
-    vdcoef: number;
+    vdcoef!: number;
     // voltage drop @ 1A
-    fwdrop: number;
+    fwdrop!: number;
 
     constructor();
     constructor(copy: DiodeModel);

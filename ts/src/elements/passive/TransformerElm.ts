@@ -33,15 +33,15 @@ export class TransformerElm extends CircuitElm {
     ratio: number;
     couplingCoef: number;
     saturationCurrent: number = 0; // 0 = disabled (linear core)
-    ptEnds: Point[];
-    ptCoil: Point[];
-    ptCore: Point[];
+    ptEnds!: Point[];
+    ptCoil!: Point[];
+    ptCore!: Point[];
     currents: number[];
     curcounts: number[];
-    dots: Point[] | null;
+    dots!: Point[] | null;
     width: number;
     polarity: number;
-    flip: number;
+    flip!: number;
     static readonly FLAG_REVERSE = 4;
     static readonly FLAG_VERTICAL = 8;
     static readonly FLAG_FLIP = 16;

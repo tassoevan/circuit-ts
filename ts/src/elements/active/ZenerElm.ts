@@ -60,7 +60,7 @@ export class ZenerElm extends DiodeElm {
     readonly hs = 8;
     declare poly: Polygon;
     declare cathode: Point[];
-    wing: Point[];
+    wing!: Point[];
 
     setPoints(): void {
         super.setPoints();

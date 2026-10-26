@@ -32,9 +32,9 @@ import { parseIntStrict } from "../../NumberParse";
 
 export class MBBSwitchElm extends SwitchElm {
     link: number = 0;
-    voltSources: VoltageSource[];
-    currents: number[];
-    curcounts: number[];
+    voltSources!: VoltageSource[];
+    currents!: number[];
+    curcounts!: number[];
     both: boolean = false;
 
     constructor(xx: number, yy: number);
@@ -71,8 +71,8 @@ export class MBBSwitchElm extends SwitchElm {
     }
 
     readonly openhs = 16;
-    swposts: Point[];
-    swpoles: Point[];
+    swposts!: Point[];
+    swpoles!: Point[];
 
     setPoints(): void {
         super.setPoints();

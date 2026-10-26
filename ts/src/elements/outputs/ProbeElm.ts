@@ -78,7 +78,7 @@ export class ProbeElm extends CircuitElm {
     periodLength: number = 0;
     pulseStart: number = 0;
 
-    center: Point;
+    center!: Point;
 
     // optional name, drawn next to the reading and usable as v(label) in an expression
     label: string = "";

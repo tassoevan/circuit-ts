@@ -33,7 +33,7 @@ export class RelayModel implements Editable, Comparable<RelayModel> {
     static modelMap: Map<string, RelayModel>;
 
     flags: number = 0;
-    name: string;
+    name!: string;
     description: string | null = null;
     inductance: number;
     r_on: number;

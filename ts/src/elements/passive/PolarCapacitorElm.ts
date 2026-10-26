@@ -58,7 +58,7 @@ export class PolarCapacitorElm extends CapacitorElm {
         this.maxNegativeVoltage = xml.parseDoubleAttr("mv", this.maxNegativeVoltage);
     }
 
-    plusPoint: Point;
+    plusPoint!: Point;
 
     setPoints(): void {
         super.setPoints();

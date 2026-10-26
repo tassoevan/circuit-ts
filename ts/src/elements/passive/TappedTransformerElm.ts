@@ -32,11 +32,11 @@ export class TappedTransformerElm extends CircuitElm {
     inductance: number;
     ratio: number;
     couplingCoef: number;
-    flip: number;
+    flip!: number;
     static readonly FLAG_FLIP = 1;
-    ptEnds: Point[];
-    ptCoil: Point[];
-    ptCore: Point[];
+    ptEnds!: Point[];
+    ptCoil!: Point[];
+    ptCore!: Point[];
     currents: number[];
     curcounts: number[];
     voltdiff: number[];

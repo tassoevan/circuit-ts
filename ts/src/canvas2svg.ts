@@ -300,7 +300,7 @@ class C2SContext {
     lineDash: number[] | string | null = STYLES.lineDash.canvas;
 
     private __document: Document;
-    private __canvas: HTMLCanvasElement;
+    private __canvas!: HTMLCanvasElement;
     private __ctx: CanvasRenderingContext2D;
     private __stack: StyleState[];
     private __groupStack: SVGElement[];
@@ -308,9 +308,9 @@ class C2SContext {
     private __ids: Record<string, string>;
     private __defs: SVGElement;
     private __currentElement: SVGElement;
-    private __currentElementsToStyle: { element: SVGElement; children: SVGElement[] } | null;
-    private __currentDefaultPath: string;
-    private __currentPosition: { x?: number; y?: number };
+    private __currentElementsToStyle!: { element: SVGElement; children: SVGElement[] } | null;
+    private __currentDefaultPath!: string;
+    private __currentPosition!: { x?: number; y?: number };
     private __fontUnderline?: string;
     private __fontHref?: string;
 

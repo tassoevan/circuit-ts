@@ -146,9 +146,9 @@ export abstract class GateElm extends CircuitElm {
         return this.getClassName().replace("GateElm", "");
     }
 
-    inPosts: Point[];
-    inGates: Point[];
-    inputStates: boolean[];
+    inPosts!: Point[];
+    inGates!: Point[];
+    inputStates!: boolean[];
     ww: number = 0;
 
     setPoints(): void {
@@ -382,8 +382,8 @@ export abstract class GateElm extends CircuitElm {
         this.drawPosts(g);
     }
 
-    gatePoly: Polygon;
-    schmittPoly: Polygon;
+    gatePoly!: Polygon;
+    schmittPoly!: Polygon;
     pcircle: Point | null = null;
     linePoints: Point[] | null = null;
     icircles: Point[] | null = null;

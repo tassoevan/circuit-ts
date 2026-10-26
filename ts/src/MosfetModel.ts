@@ -33,8 +33,8 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     static readonly FLAG_JFET = 1;
 
     flags: number = 0;
-    name: string;
-    description: string | null;
+    name!: string;
+    description!: string | null;
     threshold: number; // Vt: threshold voltage (V)
     beta: number; // transconductance parameter (A/V^2)
     lambda: number = 0; // channel-length modulation (1/V), 0=ideal

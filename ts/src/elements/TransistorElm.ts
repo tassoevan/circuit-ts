@@ -47,7 +47,7 @@ export class TransistorElm extends CircuitElm {
     beta: number;
     gmin: number = 0;
     modelName: string;
-    model: TransistorModel;
+    model!: TransistorModel;
     static lastModelName: string = "default"; // never changes??
     static readonly FLAG_FLIP = 1;
     static readonly FLAG_CIRCLE = 2;
@@ -183,9 +183,9 @@ export class TransistorElm extends CircuitElm {
     ceqBE: number = 0; // companion current sources (computed in startIteration)
     ceqBC: number = 0;
 
-    rectPoly: Polygon;
-    arrowPoly: Polygon;
-    circleCenter: Point;
+    rectPoly!: Polygon;
+    arrowPoly!: Polygon;
+    circleCenter!: Point;
 
     hasCircle(): boolean {
         return (TransistorElm.globalFlags & TransistorElm.FLAG_CIRCLE) !== 0;
@@ -254,10 +254,10 @@ export class TransistorElm extends CircuitElm {
         return (this.nodes[0].v - this.nodes[2].v) * this.ib + (this.nodes[1].v - this.nodes[2].v) * this.ic;
     }
 
-    rect: Point[];
-    coll: Point[];
-    emit: Point[];
-    base: Point;
+    rect!: Point[];
+    coll!: Point[];
+    emit!: Point[];
+    base!: Point;
 
     setPoints(): void {
         // these flags apply to all transistors
@@ -710,7 +710,7 @@ export class TransistorElm extends CircuitElm {
         }
     }
 
-    models: TransistorModel[];
+    models!: TransistorModel[];
 
     showPropertiesOnCreate(): boolean {
         return false;

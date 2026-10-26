@@ -37,9 +37,9 @@ export class LEDElm extends DiodeElm {
 
     static lastLEDModelName: string = "default-led";
 
-    ledLead1: Point;
-    ledLead2: Point;
-    ledCenter: Point;
+    ledLead1!: Point;
+    ledLead2!: Point;
+    ledCenter!: Point;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);

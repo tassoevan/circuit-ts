@@ -35,7 +35,7 @@ export class CustomLogicElm extends ChipElm {
     postCount: number = 0;
     inputCount: number = 0;
     outputCount: number = 0;
-    model: CustomLogicModel;
+    model!: CustomLogicModel;
     lastValues: boolean[] = [];
     patternValues: boolean[] = new Array(26).fill(false);
     highImpedance: boolean[] = [];

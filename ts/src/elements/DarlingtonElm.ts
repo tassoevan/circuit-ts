@@ -32,13 +32,13 @@ import { TransistorElm } from "./TransistorElm";
 import { parseIntStrict } from "../NumberParse";
 
 export class DarlingtonElm extends CompositeElm {
-    private rectPoly: Polygon;
-    private arrowPoly: Polygon;
-    private rect: Point[];
-    private coll: Point[];
-    private emit: Point[];
-    private base: Point;
-    private coll2: Point[];
+    private rectPoly!: Polygon;
+    private arrowPoly!: Polygon;
+    private rect!: Point[];
+    private coll!: Point[];
+    private emit!: Point[];
+    private base!: Point;
+    private coll2!: Point[];
 
     pnp: number; // +1 for NPN, -1 for PNP
     private curcount_c: number = 0;

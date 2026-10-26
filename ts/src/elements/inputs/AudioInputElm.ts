@@ -30,8 +30,8 @@ import { VoltageElm } from "../VoltageElm";
 import { parseIntStrict, parseFloatStrict } from "../../NumberParse";
 
 class AudioFileEntry {
-    fileName: string;
-    data: Float32Array;
+    fileName!: string;
+    data!: Float32Array;
 }
 
 export class AudioInputElm extends RailElm {

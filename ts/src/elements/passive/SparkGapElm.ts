@@ -77,8 +77,8 @@ export class SparkGapElm extends CircuitElm {
         this.holdcurrent = xml.parseDoubleAttr("ho", this.holdcurrent);
     }
 
-    arrow1: Polygon;
-    arrow2: Polygon;
+    arrow1!: Polygon;
+    arrow2!: Polygon;
 
     setPoints(): void {
         super.setPoints();

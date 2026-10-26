@@ -34,9 +34,9 @@ export class InverterElm extends CircuitElm {
     static readonly FLAG_DEMORGAN = 1 << 3;
     slewRate: number; // V/ns
     highVoltage: number;
-    gatePoly: Polygon;
-    pcircle: Point;
-    center: Point;
+    gatePoly!: Polygon;
+    pcircle!: Point;
+    center!: Point;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);

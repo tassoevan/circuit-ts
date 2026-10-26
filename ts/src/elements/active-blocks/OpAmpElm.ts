@@ -30,10 +30,10 @@ import { CircuitXMLDeserializer } from "../../CircuitXMLDeserializer";
 import { parseFloatStrict } from "../../NumberParse";
 
 export class OpAmpElm extends CircuitElm {
-    opsize: number;
-    opheight: number;
-    opwidth: number;
-    opaddtext: number;
+    opsize!: number;
+    opheight!: number;
+    opwidth!: number;
+    opaddtext!: number;
     maxOut: number;
     minOut: number;
     gain: number = 100000; // (an old text-format op-amp with FLAG_GAIN but no gain value gets the default)
@@ -131,11 +131,11 @@ export class OpAmpElm extends CircuitElm {
         return this.nodes[2].v * this.current;
     }
 
-    in1p: Point[];
-    in2p: Point[];
-    textp: Point[];
-    triangle: Polygon;
-    plusFont: Font;
+    in1p!: Point[];
+    in2p!: Point[];
+    textp!: Point[];
+    triangle!: Polygon;
+    plusFont!: Font;
 
     setSize(s: number): void {
         this.opsize = s;

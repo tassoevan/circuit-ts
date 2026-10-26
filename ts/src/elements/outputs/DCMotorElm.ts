@@ -49,7 +49,7 @@ export class DCMotorElm extends CircuitElm {
     coilCurrent: number = 0;
     inertiaCurrent: number = 0;
     voltSources: VoltageSource[] = new Array(2);
-    motorCenter: Point;
+    motorCenter!: Point;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);

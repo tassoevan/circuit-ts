@@ -34,7 +34,7 @@ export class LogicOutputElm extends CircuitElm {
     static readonly FLAG_NUMERIC = 2;
     static readonly FLAG_PULLDOWN = 4;
     threshold: number;
-    value: string;
+    value!: string;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);

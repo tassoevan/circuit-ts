@@ -42,7 +42,7 @@ export class TimerElm extends ChipElm {
         return TimerElm.FLAG_RESET | TimerElm.FLAG_GROUND;
     }
 
-    ground: CircuitNode;
+    ground!: CircuitNode;
     out: boolean = false;
     triggerSuppressed: boolean = false;
 

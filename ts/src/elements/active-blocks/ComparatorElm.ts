@@ -31,14 +31,14 @@ export class ComparatorElm extends CompositeElm {
 
     readonly FLAG_SMALL = 2;
     readonly FLAG_SWAP = 4;
-    opsize: number;
-    opheight: number;
-    opwidth: number;
-    in1p: Point[];
-    in2p: Point[];
-    textp: Point[];
-    triangle: Polygon;
-    plusFont: Font;
+    opsize!: number;
+    opheight!: number;
+    opwidth!: number;
+    in1p!: Point[];
+    in2p!: Point[];
+    textp!: Point[];
+    triangle!: Polygon;
+    plusFont!: Font;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);

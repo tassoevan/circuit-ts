@@ -37,9 +37,9 @@ export class Pin {
     side: number;
     side0: number;
     text: string;
-    post: Point;
-    stub: Point;
-    textloc: Point;
+    post!: Point;
+    stub!: Point;
+    textloc!: Point;
     bubbleX: number = 0;
     bubbleY: number = 0;
     voltSource: VoltageSource | null = null;
@@ -162,9 +162,9 @@ export abstract class ChipElm extends CircuitElm {
     bits: number = 0;
     highVoltage: number = 5;
     bitOrder: number = 0;
-    pins: Pin[];
-    rectPointsX: number[];
-    rectPointsY: number[];
+    pins!: Pin[];
+    rectPointsX!: number[];
+    rectPointsY!: number[];
     sizeX: number = 0;
     sizeY: number = 0;
     flippedSizeX: number = 0;

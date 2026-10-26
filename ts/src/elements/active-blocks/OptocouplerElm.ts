@@ -43,8 +43,8 @@ export class OptocouplerElm extends CompositeElm {
     private static modelString = "DiodeElm 6 1\rCCCSElm 1 2 3 4\rNTransistorElm 3 4 5";
     private static modelExternalNodes = [6, 2, 4, 5];
 
-    diode: DiodeElm;
-    transistor: TransistorElm;
+    diode!: DiodeElm;
+    transistor!: TransistorElm;
     stubs: Point[] = new Array(4);
     models: DiodeModel[] = [];
 

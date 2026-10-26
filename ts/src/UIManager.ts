@@ -483,19 +483,19 @@ export class UIManager {
     static theUI: UIManager;
 
     app: CirSim;
-    menus: Menus;
-    scopeManager: ScopeManager;
+    menus!: Menus;
+    scopeManager!: ScopeManager;
 
-    resetButton: HTMLButtonElement;
-    runStopButton: HTMLButtonElement;
+    resetButton!: HTMLButtonElement;
+    runStopButton!: HTMLButtonElement;
     dumpMatrixButton: HTMLButtonElement | null = null;
-    powerLabel: HTMLElement;
-    titleLabel: HTMLElement;
-    speedBar: Scrollbar;
-    currentBar: Scrollbar;
-    powerBar: Scrollbar;
+    powerLabel!: HTMLElement;
+    titleLabel!: HTMLElement;
+    speedBar!: Scrollbar;
+    currentBar!: Scrollbar;
+    powerBar!: Scrollbar;
     contextPanel: HTMLElement | null = null;
-    mouse: MouseManager;
+    mouse!: MouseManager;
 
     mouseModeStr: string = "Select";
 
@@ -512,26 +512,26 @@ export class UIManager {
     hideMenu: boolean = false;
     lastCursorStyle: string | null = null;
 
-    toolbar: Toolbar;
-    subcircuitBar: SubcircuitBar;
+    toolbar!: Toolbar;
+    subcircuitBar!: SubcircuitBar;
 
-    layoutPanel: HTMLElement;
-    verticalPanel: HTMLElement;
-    canvasWrapper: HTMLElement;
-    buttonPanel: HTMLElement;
+    layoutPanel!: HTMLElement;
+    verticalPanel!: HTMLElement;
+    canvasWrapper!: HTMLElement;
+    buttonPanel!: HTMLElement;
     mainMenuItems: CheckboxMenuItem[] = [];
     mainMenuItemNames: string[] = [];
-    sidePanelCheckboxLabel: HTMLElement;
+    sidePanelCheckboxLabel!: HTMLElement;
 
     loadFileInput: LoadFile | null = null;
     iFrame: HTMLIFrameElement | null = null;
-    elmList: CircuitElm[];
+    elmList!: CircuitElm[];
 
     // stack of enclosing subcircuits when viewing composite internals
     subcircuitStack: any[] = [];
 
-    cv: HTMLCanvasElement;
-    cvcontext: CanvasRenderingContext2D;
+    cv!: HTMLCanvasElement;
+    cvcontext!: CanvasRenderingContext2D;
 
     // canvas width/height in px (before device pixel ratio scaling)
     canvasWidth: number = 0;

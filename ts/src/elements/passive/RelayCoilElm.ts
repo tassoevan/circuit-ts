@@ -37,10 +37,10 @@ export class RelayCoilElm extends CircuitElm {
     label: string;
     onCurrent: number;
     offCurrent: number;
-    coilPosts: Point[];
-    coilLeads: Point[];
+    coilPosts!: Point[];
+    coilLeads!: Point[];
     outline: Point[];
-    extraPoints: Point[];
+    extraPoints!: Point[];
     coilCurrent: number = 0;
     coilCurCount: number = 0;
     avgCurrent: number = 0;

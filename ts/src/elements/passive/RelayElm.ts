@@ -89,18 +89,18 @@ export class RelayElm extends CircuitElm {
         return this.model == null ? 1 : this.model.poleCount;
     }
 
-    ind: Inductor;
-    coilPosts: Point[];
-    coilLeads: Point[];
-    swposts: Point[][];
-    swpoles: Point[][];
-    ptSwitch: Point[];
-    lines: Point[];
+    ind!: Inductor;
+    coilPosts!: Point[];
+    coilLeads!: Point[];
+    swposts!: Point[][];
+    swpoles!: Point[][];
+    ptSwitch!: Point[];
+    lines!: Point[];
     outline: Point[] = this.newPointArray(4);
     coilCurrent: number;
-    switchCurrent: number[];
-    coilCurCount: number;
-    switchCurCount: number[];
+    switchCurrent!: number[];
+    coilCurCount!: number;
+    switchCurCount!: number[];
 
     // fractional position, between 0 and 1 inclusive
     d_position: number = 0;
@@ -108,17 +108,17 @@ export class RelayElm extends CircuitElm {
     // integer position, can be 0 (off), 1 (on), 2 (in between)
     i_position: number = 0;
 
-    openhs: number;
-    dflip: number;
+    openhs!: number;
+    dflip!: number;
     onState: boolean = false;
     readonly nSwitch0 = 0;
     readonly nSwitch1 = 1;
     readonly nSwitch2 = 2;
-    nCoil1: number;
-    nCoil2: number;
-    nCoil3: number;
-    currentOffset1: number;
-    currentOffset2: number;
+    nCoil1!: number;
+    nCoil2!: number;
+    nCoil3!: number;
+    currentOffset1!: number;
+    currentOffset2!: number;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
@@ -632,7 +632,7 @@ export class RelayElm extends CircuitElm {
             CircuitElm.getVoltageDText(this.nodes[this.nCoil1].v - this.nodes[this.nCoil2].v);
     }
 
-    models: RelayModel[];
+    models!: RelayModel[];
 
     showPropertiesOnCreate(): boolean {
         return false;

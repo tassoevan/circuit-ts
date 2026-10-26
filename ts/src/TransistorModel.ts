@@ -32,9 +32,9 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
     static modelMap: Map<string, TransistorModel>;
 
     flags: number = 0;
-    name: string;
+    name!: string;
     description: string | null = null;
-    satCur: number;
+    satCur!: number;
     invRollOffF: number = 0;
     BEleakCur: number = 0;
     leakBEemissionCoeff: number = 1.5;

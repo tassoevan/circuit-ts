@@ -40,10 +40,10 @@ export class DiodeElm extends CircuitElm {
     static readonly FLAG_FWDROP = 1;
     static readonly FLAG_MODEL = 2;
     modelName: string;
-    model: DiodeModel;
+    model!: DiodeModel;
     static lastModelName: string = "default";
-    hasResistance: boolean;
-    diodeEndNode: number;
+    hasResistance!: boolean;
+    diodeEndNode!: number;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
@@ -118,8 +118,8 @@ export class DiodeElm extends CircuitElm {
     }
 
     readonly hs = 8;
-    poly: Polygon;
-    cathode: Point[];
+    poly!: Polygon;
+    cathode!: Point[];
 
     setPoints(): void {
         super.setPoints();
@@ -197,7 +197,7 @@ export class DiodeElm extends CircuitElm {
         if (this.model.oldStyle) arr[4] = "Vf = " + CircuitElm.getVoltageText(this.model.fwdrop);
     }
 
-    models: DiodeModel[];
+    models!: DiodeModel[];
 
     showPropertiesOnCreate(): boolean {
         return false;

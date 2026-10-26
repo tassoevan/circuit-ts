@@ -30,7 +30,7 @@ import { HookRegistry } from "./HookRegistry";
 
 export class CircuitXMLDeserializer {
     app: CirSim;
-    currentXmlElement: Element;
+    currentXmlElement!: Element;
     currentElm: CircuitElm | null = null;
 
     constructor(app: CirSim) {

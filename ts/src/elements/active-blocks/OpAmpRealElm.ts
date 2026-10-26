@@ -84,20 +84,20 @@ export class OpAmpRealElm extends CompositeElm {
     modelType: number;
     readonly opheight = 16;
     readonly opwidth = 32;
-    curCounts: number[];
+    curCounts!: number[];
     slewRate: number;
     currentLimit: number;
     capValue: number = 0;
     readonly defaultCurrentLimit = 0.0231;
     readonly FLAG_SWAP = 2;
 
-    in1p: Point[];
-    in2p: Point[];
-    textp: Point[];
-    rail1p: Point[];
-    rail2p: Point[];
-    triangle: Polygon;
-    plusFont: Font;
+    in1p!: Point[];
+    in2p!: Point[];
+    textp!: Point[];
+    rail1p!: Point[];
+    rail2p!: Point[];
+    triangle!: Polygon;
+    plusFont!: Font;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);

@@ -31,18 +31,18 @@ import { StringTokenizer } from "../../StringTokenizer";
 import { parseIntStrict, parseFloatStrict } from "../../NumberParse";
 
 export class CustomTransformerElm extends CircuitElm {
-    coilCurrents: number[];
-    coilInductances: number[];
-    coilCurCounts: number[];
-    coilCurSourceValues: number[];
-    coilPolarities: number[];
-    nodeCurrents: number[];
-    nodeCurCounts: number[];
+    coilCurrents!: number[];
+    coilInductances!: number[];
+    coilCurCounts!: number[];
+    coilCurSourceValues!: number[];
+    coilPolarities!: number[];
+    nodeCurrents!: number[];
+    nodeCurCounts!: number[];
     static readonly FLAG_FLIP = 1;
-    flip: number;
+    flip!: number;
 
     // node number n of first node of each coil (second node = n+1)
-    coilNodes: number[];
+    coilNodes!: number[];
 
     coilCount: number = 0;
     nodeCount: number = 0;
@@ -50,9 +50,9 @@ export class CustomTransformerElm extends CircuitElm {
     // number of primary coils
     primaryCoils: number = 0;
 
-    nodePoints: Point[];
-    nodeTaps: Point[];
-    ptCore: Point[];
+    nodePoints!: Point[];
+    nodeTaps!: Point[];
+    ptCore!: Point[];
     description: string;
     inductance: number;
     couplingCoef: number;

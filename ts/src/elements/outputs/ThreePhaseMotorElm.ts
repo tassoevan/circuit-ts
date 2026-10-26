@@ -49,10 +49,10 @@ export class ThreePhaseMotorElm extends CircuitElm {
     nodeCurrents: number[];
     voltSources: VoltageSource[];
     J: number;
-    posts: Point[];
-    leads: Point[];
+    posts!: Point[];
+    leads!: Point[];
     curcounts: number[];
-    motorCenter: Point;
+    motorCenter!: Point;
 
     readonly n001_ind = 6;
     readonly n002_ind = 7;

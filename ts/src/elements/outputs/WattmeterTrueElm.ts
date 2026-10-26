@@ -33,9 +33,9 @@ import { VoltageSource } from "../../VoltageSource";
 // terminal pairs of the (old) WattmeterElm for both purposes.
 export class WattmeterTrueElm extends CircuitElm {
     width: number = 0;
-    voltSources: VoltageSource[];
-    currents: number[];
-    curcounts: number[];
+    voltSources!: VoltageSource[];
+    currents!: number[];
+    curcounts!: number[];
 
     meter: number = 0;
     readonly PM_INST = 0;
@@ -55,11 +55,11 @@ export class WattmeterTrueElm extends CircuitElm {
     wasAboveMid: boolean = false;
     haveFullCycle: boolean = false;
 
-    posts: Point[];
-    inner: Point[];
-    rectPointsX: number[];
-    rectPointsY: number[];
-    center: Point;
+    posts!: Point[];
+    inner!: Point[];
+    rectPointsX!: number[];
+    rectPointsY!: number[];
+    center!: Point;
     maxTextLen: number = 0;
 
     constructor(xx: number, yy: number);

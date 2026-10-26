@@ -32,9 +32,9 @@ export class JfetElm extends MosfetElm {
     diode: Diode;
     gateCurrent: number = 0;
 
-    gatePoly: Polygon;
+    gatePoly!: Polygon;
     declare arrowPoly: Polygon;
-    gatePt: Point;
+    gatePt!: Point;
     curcountg: number = 0;
     curcounts: number = 0;
     curcountd: number = 0;

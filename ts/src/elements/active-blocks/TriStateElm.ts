@@ -39,18 +39,18 @@ export class TriStateElm extends CircuitElm {
     r_off_ground: number;
     highVoltage: number;
     busWidth: number = 1;
-    voltageSources: VoltageSource[];
+    voltageSources!: VoltageSource[];
 
     readonly FLAG_FLIP = 1;
     readonly FLAG_FLIP_X = 2;
     readonly FLAG_FLIP_Y = 4;
 
     open: boolean = false;
-    ps: Point;
-    point3: Point;
-    lead3: Point;
-    busLead1: Point;
-    gatePoly: Polygon;
+    ps!: Point;
+    point3!: Point;
+    lead3!: Point;
+    busLead1!: Point;
+    gatePoly!: Polygon;
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);

@@ -81,8 +81,8 @@ export class MemristorElm extends CircuitElm {
         this.mobility = xml.parseDoubleAttr("mo", this.mobility);
     }
 
-    ps3: Point;
-    ps4: Point;
+    ps3!: Point;
+    ps4!: Point;
 
     setPoints(): void {
         super.setPoints();

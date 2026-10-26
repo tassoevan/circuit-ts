@@ -23,14 +23,14 @@ import { SimulationManager } from "./SimulationManager";
 export class Inductor {
     static readonly FLAG_BACK_EULER = 2;
     nodes: CircuitNode[];
-    flags: number;
+    flags!: number;
     sim: SimulationManager;
 
-    inductance: number;
-    compResistance: number;
-    current: number;
-    curSourceValue: number;
-    saturationCurrent: number; // 0 = disabled (linear), >0 = saturation onset current (A)
+    inductance!: number;
+    compResistance!: number;
+    current!: number;
+    curSourceValue!: number;
+    saturationCurrent!: number; // 0 = disabled (linear), >0 = saturation onset current (A)
     constructor(s: SimulationManager) {
         this.sim = s;
         this.nodes = new Array(2);

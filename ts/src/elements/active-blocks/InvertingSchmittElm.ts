@@ -34,7 +34,7 @@ export class InvertingSchmittElm extends CircuitElm {
     slewRate: number; // V/ns
     lowerTrigger: number;
     upperTrigger: number;
-    state: boolean;
+    state!: boolean;
     logicOnLevel: number;
     logicOffLevel: number;
 

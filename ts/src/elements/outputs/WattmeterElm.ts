@@ -31,9 +31,9 @@ import { parseIntStrict } from "../../NumberParse";
 
 export class WattmeterElm extends CircuitElm {
     width: number = 0;
-    voltSources: VoltageSource[];
-    currents: number[];
-    curcounts: number[];
+    voltSources!: VoltageSource[];
+    currents!: number[];
+    curcounts!: number[];
     meter: number = 0;
     readonly PM_INST = 0;
     readonly PM_AVG = 1;
@@ -49,11 +49,11 @@ export class WattmeterElm extends CircuitElm {
     wasAboveMid: boolean = false;
     haveFullCycle: boolean = false;
 
-    posts: Point[];
-    inner: Point[];
-    rectPointsX: number[];
-    rectPointsY: number[];
-    center: Point;
+    posts!: Point[];
+    inner!: Point[];
+    rectPointsX!: number[];
+    rectPointsY!: number[];
+    center!: Point;
     maxTextLen: number = 0;
 
     constructor(xx: number, yy: number);

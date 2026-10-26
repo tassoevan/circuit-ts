@@ -65,24 +65,24 @@ export class Diode {
     // Electron thermal voltage at SPICE's default temperature of 27 C (300.15 K):
     static readonly vt = 0.025865;
     // The diode's "scale voltage", the voltage increase which will raise current by a factor of e.
-    vscale: number;
+    vscale!: number;
     // The multiplicative equivalent of dividing by vscale (for speed).
-    vdcoef: number;
+    vdcoef!: number;
     // The Zener breakdown curve is represented by a steeper exponential, one like the ideal
     // Shockley curve, but flipped and translated. This curve removes the moderating influence
     // of emcoef, replacing vscale and vdcoef with vt and vzcoef.
     // vzcoef is the multiplicative equivalent of dividing by vt (for speed).
     static readonly vzcoef = 1 / Diode.vt;
     // User-specified diode parameters for forward voltage drop and Zener voltage.
-    fwdrop: number;
-    zvoltage: number;
+    fwdrop!: number;
+    zvoltage!: number;
     // The diode current's scale factor, calculated from the user-specified forward voltage drop.
-    leakage: number;
+    leakage!: number;
     // Voltage offset for Zener breakdown exponential, calculated from user-specified Zener voltage.
-    zoffset: number;
+    zoffset!: number;
     // Critical voltages for limiting the normal diode and Zener breakdown exponentials.
-    vcrit: number;
-    vzcrit: number;
+    vcrit!: number;
+    vzcrit!: number;
     lastvoltdiff: number = 0;
 
     limitStep(vnew: number, vold: number): number {

@@ -41,8 +41,8 @@ export class CapacitorElm extends CircuitElm {
     initialVoltage: number;
     capNode2: number;
     curSourceValue: number;
-    plate1: Point[];
-    plate2: Point[];
+    plate1!: Point[];
+    plate2!: Point[];
     static readonly FLAG_BACK_EULER = 2;
     static readonly FLAG_RESISTANCE = 4;
 
@@ -122,7 +122,7 @@ export class CapacitorElm extends CircuitElm {
     }
 
     // used for PolarCapacitorElm
-    platePoints: Point[];
+    platePoints!: Point[];
 
     setPoints(): void {
         super.setPoints();

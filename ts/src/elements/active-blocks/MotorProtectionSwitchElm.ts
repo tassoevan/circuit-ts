@@ -35,8 +35,8 @@ export class MotorProtectionSwitchElm extends CircuitElm {
     resistance: number;
     heats: number[];
     i2t: number;
-    posts: Point[];
-    leads: Point[];
+    posts!: Point[];
+    leads!: Point[];
     currents: number[];
     curcounts: number[];
     blown: boolean = false;

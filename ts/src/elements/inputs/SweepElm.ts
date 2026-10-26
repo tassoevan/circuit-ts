@@ -34,7 +34,7 @@ export class SweepElm extends CircuitElm {
     maxF: number;
     minF: number;
     sweepTime: number;
-    frequency: number;
+    frequency!: number;
     static readonly FLAG_LOG = 1;
     static readonly FLAG_BIDIR = 2;
 

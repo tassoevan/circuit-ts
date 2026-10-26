@@ -53,9 +53,9 @@ export class MosfetElm extends CircuitElm {
     readonly FLAG_SHOW_BODY_DIODE_LEGACY = 128;
     bodyTerminal: number = 0;
 
-    vt: number;
+    vt!: number;
     // beta = 1/(RdsON*(Vgs-Vt))
-    beta: number;
+    beta!: number;
     // junction capacitance state (backward euler companion model)
     capVoltGS: number = 0;
     capVoltGD: number = 0;
@@ -65,8 +65,8 @@ export class MosfetElm extends CircuitElm {
     geqGD: number = 0;
     ceqGS: number = 0;
     ceqGD: number = 0;
-    diodeB1: Diode;
-    diodeB2: Diode;
+    diodeB1!: Diode;
+    diodeB2!: Diode;
     diodeCurrent1: number = 0;
     diodeCurrent2: number = 0;
     bodyCurrent: number = 0;
@@ -76,36 +76,36 @@ export class MosfetElm extends CircuitElm {
     curcount_source: number = 0;
     curcount_drain: number = 0;
     modelName: string;
-    model: MosfetModel;
+    model!: MosfetModel;
     static lastModelName: string = "default";
 
     // cached copies of the model's drawing/behavior settings, refreshed in setup().  Cached
     // (rather than read from model directly) because getPostCount() is called from the base
     // CircuitElm constructor before our own "model" field is assigned; see DiodeElm.hasResistance
     // for the same pattern.
-    bulkShown: boolean;
-    digitalSymbolShown: boolean;
-    bodyDiodeSimulated: boolean;
-    bodyTerminalShown: boolean;
-    bodyDiodeSymbolShown: boolean;
+    bulkShown!: boolean;
+    digitalSymbolShown!: boolean;
+    bodyDiodeSimulated!: boolean;
+    bodyTerminalShown!: boolean;
+    bodyDiodeSymbolShown!: boolean;
 
     readonly hs = 16;
 
     // points for source and drain (swapped on PNP)
-    src: Point[];
-    drn: Point[];
+    src!: Point[];
+    drn!: Point[];
 
     // points for gate, body, and circle on PNP digital
-    gate: Point[];
-    body: Point[];
-    pcircle: Point;
-    pcircler: number;
-    arrowPoly: Polygon;
-    bodyDiodePoly: Polygon;
-    bodyDiodePoly2: Polygon;
-    bodyDiodeCathode: Point[];
-    bodyDiodeCathode2: Point[];
-    bodyDiodeLeads: Point[];
+    gate!: Point[];
+    body!: Point[];
+    pcircle!: Point;
+    pcircler!: number;
+    arrowPoly!: Polygon;
+    bodyDiodePoly!: Polygon;
+    bodyDiodePoly2!: Polygon;
+    bodyDiodeCathode!: Point[];
+    bodyDiodeCathode2!: Point[];
+    bodyDiodeLeads!: Point[];
 
     constructor(xx: number, yy: number);
     constructor(xx: number, yy: number, pnpflag: boolean);
@@ -808,7 +808,7 @@ export class MosfetElm extends CircuitElm {
     getMatrixConnection(n1: number, n2: number): boolean {
         return true;
     }
-    models: MosfetModel[];
+    models!: MosfetModel[];
 
     // does this element support D/S swapping?  JfetElm overrides this to false since its
     // setPoints() doesn't honor FLAG_FLIP.  (The rest of the mosfet-only options - bulk

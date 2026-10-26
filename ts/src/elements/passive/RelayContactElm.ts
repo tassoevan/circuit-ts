@@ -33,9 +33,9 @@ import { parseIntStrict, parseFloatStrict } from "../../NumberParse";
 export class RelayContactElm extends CircuitElm {
     r_on: number;
     r_off: number;
-    swposts: Point[];
-    swpoles: Point[];
-    ptSwitch: Point;
+    swposts!: Point[];
+    swpoles!: Point[];
+    ptSwitch!: Point;
     switchCurrent: number = 0;
     switchCurCount: number = 0;
     label: string;
@@ -46,7 +46,7 @@ export class RelayContactElm extends CircuitElm {
     openhs: number = 0;
     readonly nSwitch0 = 0;
     readonly nSwitch1 = 1;
-    extraPoints: Point[];
+    extraPoints!: Point[];
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
