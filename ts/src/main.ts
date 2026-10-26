@@ -3,9 +3,6 @@ import { CirSim } from "./CirSim";
 import { JSInterface } from "./JSInterface";
 import { HookRegistry } from "./HookRegistry";
 import { Locale } from "./Locale";
-import "./canvas2svg.js";
-
-// canvas2svg.js sets window.C2S; used by ImageExporter for SVG export
 
 HookRegistry.createJSInterface = (app: any) => new JSInterface(app);
 

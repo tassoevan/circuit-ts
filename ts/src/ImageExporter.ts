@@ -22,6 +22,7 @@ import { Graphics } from "./Graphics";
 import { CircuitElm } from "./CircuitElm";
 import { Color } from "./Color";
 import { Rectangle } from "./Rectangle";
+import { C2S } from "./canvas2svg";
 
 export class ImageExporter {
     static readonly CAC_PRINT = 0;
@@ -139,7 +140,7 @@ export class ImageExporter {
         const hmargin = 100;
         const w = bounds.width + wmargin;
         const h = bounds.height + hmargin;
-        const context = new window.C2S(w, h);
+        const context = new C2S(w, h);
         this.drawCircuitInContext(context, ImageExporter.CAC_SVG, bounds, w, h);
         return context.getSerializedSvg();
     }

@@ -19,9 +19,6 @@ declare global {
         ShortcutsDialog: typeof ShortcutsDialog;
         SliderDialog: typeof SliderDialog;
         SubcircuitDialog: typeof SubcircuitDialog;
-        C2S: {
-            new (width: number, height: number): CanvasRenderingContext2D & { getSerializedSvg(): string };
-        };
         recorderBlob?: string;
         CircuitJS1?: any;
         oncircuitjsloaded?: (jsinterface: any) => void;

@@ -59,6 +59,7 @@ import {
     MIN_MAN_SCALE,
     multa,
 } from "./ScopeConstants";
+import { C2S } from "./canvas2svg";
 
 // also bit positions 25, 26, 27 should not be used because they might be set by old trigger mode code
 
@@ -1275,7 +1276,7 @@ export class Scope {
     }
 
     exportSVG(transparent: boolean = false): void {
-        const context = new window.C2S(this.rect.width, this.rect.height);
+        const context = new C2S(this.rect.width, this.rect.height);
         this.drawForExport(context, transparent);
         Scope.downloadSVG(context.getSerializedSvg(), "scope.svg");
     }
