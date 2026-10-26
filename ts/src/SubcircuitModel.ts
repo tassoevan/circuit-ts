@@ -29,7 +29,7 @@ import { CirSim } from "./CirSim";
 import { StringTokenizer } from "./StringTokenizer";
 import { HookRegistry } from "./HookRegistry";
 import { parseIntStrict } from "./NumberParse";
-import type { GroundElm } from "./GroundElm";
+import type { GroundElm } from "./elements/inputs/GroundElm";
 
 // model for subcircuits
 
@@ -224,7 +224,6 @@ export class SubcircuitModel {
 
             if (ce == null) {
                 console.log("can't create element in convertOldFormatToXml", ceType);
-                debugger;
             }
 
             if (elmTokenizer.hasMoreTokens()) {

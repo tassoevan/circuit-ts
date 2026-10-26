@@ -1,1 +1,0 @@
-export { NTransistorElm } from "./TransistorElm";

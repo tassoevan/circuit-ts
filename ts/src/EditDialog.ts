@@ -21,7 +21,7 @@ import { Dialog } from "./Dialog";
 import { CirSim } from "./CirSim";
 import { UIManager } from "./UIManager";
 import { CircuitElm } from "./CircuitElm";
-import { VoltageElm } from "./VoltageElm";
+import { VoltageElm } from "./elements/VoltageElm";
 import type { Editable } from "./Editable";
 import { EditInfo } from "./EditInfo";
 import { Locale } from "./Locale";

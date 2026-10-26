@@ -1,1 +1,0 @@
-export { NJfetElm } from "./JfetElm";

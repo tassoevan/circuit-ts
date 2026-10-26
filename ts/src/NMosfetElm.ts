@@ -1,1 +1,0 @@
-export { NMosfetElm } from "./MosfetElm";

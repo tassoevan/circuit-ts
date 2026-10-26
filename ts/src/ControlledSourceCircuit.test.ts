@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { CircuitElm } from "./CircuitElm";
 import { SimulationManager } from "./SimulationManager";
-import { ControlledCurrentElm } from "./ControlledCurrentElm";
-import { LabeledNodeElm } from "./LabeledNodeElm";
-import { ResistorElm } from "./ResistorElm";
-import { GroundElm } from "./GroundElm";
-import { RailElm } from "./RailElm";
+import { ControlledCurrentElm } from "./elements/active-blocks/ControlledCurrentElm";
+import { LabeledNodeElm } from "./elements/outputs/LabeledNodeElm";
+import { ResistorElm } from "./elements/ResistorElm";
+import { GroundElm } from "./elements/inputs/GroundElm";
+import { RailElm } from "./elements/inputs/RailElm";
 
 const off = { getState: () => false };
 

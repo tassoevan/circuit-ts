@@ -20,7 +20,7 @@
 import { EditDialog } from "./EditDialog";
 import { CirSim } from "./CirSim";
 import { RelayModel } from "./RelayModel";
-import type { RelayElm } from "./RelayElm";
+import type { RelayElm } from "./elements/passive/RelayElm";
 
 export class EditRelayModelDialog extends EditDialog {
     model: RelayModel;

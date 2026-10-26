@@ -20,7 +20,7 @@
 import { EditDialog } from "./EditDialog";
 import { CirSim } from "./CirSim";
 import { TransistorModel } from "./TransistorModel";
-import type { TransistorElm } from "./TransistorElm";
+import type { TransistorElm } from "./elements/TransistorElm";
 
 export class EditTransistorModelDialog extends EditDialog {
     model: TransistorModel;

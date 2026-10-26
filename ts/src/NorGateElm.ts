@@ -1,1 +1,0 @@
-export { NorGateElm } from "./GateElm";

@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { CircuitElm } from "./CircuitElm";
 import { CircuitNode } from "./CircuitNode";
-import { CompositeElm } from "./CompositeElm";
+import { CompositeElm } from "./elements/CompositeElm";
 import { CirSim } from "./CirSim";
 import { ElementFactory } from "./ElementFactory";
-import { ResistorElm } from "./ResistorElm";
-import { ControlledCurrentElm } from "./ControlledCurrentElm";
+import { ResistorElm } from "./elements/ResistorElm";
+import { ControlledCurrentElm } from "./elements/active-blocks/ControlledCurrentElm";
 
 const off = { getState: () => false };
 

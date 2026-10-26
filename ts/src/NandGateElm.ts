@@ -1,1 +1,0 @@
-export { NandGateElm } from "./GateElm";

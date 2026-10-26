@@ -18,7 +18,7 @@
 */
 
 import { Scope } from "./Scope";
-import type { ScopeElm } from "./ScopeElm";
+import type { ScopeElm } from "./elements/ScopeElm";
 import { ScopePopupMenu } from "./ScopePopupMenu";
 import { CircuitElm } from "./CircuitElm";
 import { CirSim } from "./CirSim";

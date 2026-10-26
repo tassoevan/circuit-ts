@@ -18,8 +18,8 @@
 */
 
 import { CirSim } from "./CirSim";
-import { WireElm } from "./WireElm";
-import { RoutedWireElm } from "./RoutedWireElm";
+import { WireElm } from "./elements/wires/WireElm";
+import { RoutedWireElm } from "./elements/wires/RoutedWireElm";
 import { Point } from "./Point";
 import { parseIntStrict } from "./NumberParse";
 

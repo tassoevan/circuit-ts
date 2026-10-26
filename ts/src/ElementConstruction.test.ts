@@ -2,13 +2,13 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { CircuitElm } from "./CircuitElm";
 import { CircuitNode } from "./CircuitNode";
 import { VoltageSource } from "./VoltageSource";
-import { VCCSElm } from "./VCCSElm";
-import { VCVSElm } from "./VCVSElm";
-import { CCCSElm } from "./CCCSElm";
-import { CCVSElm } from "./CCVSElm";
-import { ControlledSourceElm } from "./ControlledSourceElm";
-import { ControlledVoltageElm } from "./ControlledVoltageElm";
-import { ControlledCurrentElm } from "./ControlledCurrentElm";
+import { VCCSElm } from "./elements/active-blocks/VCCSElm";
+import { VCVSElm } from "./elements/active-blocks/VCVSElm";
+import { CCCSElm } from "./elements/active-blocks/CCCSElm";
+import { CCVSElm } from "./elements/active-blocks/CCVSElm";
+import { ControlledSourceElm } from "./elements/ControlledSourceElm";
+import { ControlledVoltageElm } from "./elements/active-blocks/ControlledVoltageElm";
+import { ControlledCurrentElm } from "./elements/active-blocks/ControlledCurrentElm";
 
 // registerElements() constructs one of every element at startup.  ChipElm's constructor
 // calls setupPins()/allocNodes() before subclass field initializers have run, so anything

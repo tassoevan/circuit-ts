@@ -39,7 +39,7 @@ import { ImportFromTextDialog } from "./ImportFromTextDialog";
 import { EditSubcircuitModelDialog } from "./EditSubcircuitModelDialog";
 import "./GetCircuitAsSubcircuit";
 import { Scope } from "./Scope";
-import { ScopeElm } from "./ScopeElm";
+import { ScopeElm } from "./elements/ScopeElm";
 import { parseIntStrict } from "./NumberParse";
 
 export class CommandManager {

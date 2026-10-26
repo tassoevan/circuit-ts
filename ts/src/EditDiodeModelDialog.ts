@@ -20,7 +20,7 @@
 import { EditDialog } from "./EditDialog";
 import { CirSim } from "./CirSim";
 import { DiodeModel } from "./DiodeModel";
-import type { DiodeElm } from "./DiodeElm";
+import type { DiodeElm } from "./elements/active/DiodeElm";
 
 export class EditDiodeModelDialog extends EditDialog {
     model: DiodeModel;

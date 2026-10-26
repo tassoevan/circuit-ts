@@ -27,7 +27,7 @@ import { Color } from "./Color";
 import { Graphics } from "./Graphics";
 import { Rectangle } from "./Rectangle";
 import { Point } from "./Point";
-import { SwitchElm } from "./SwitchElm";
+import { SwitchElm } from "./elements/passive/SwitchElm";
 import { Locale } from "./Locale";
 import { ExportAsLocalFileDialog } from "./ExportAsLocalFileDialog";
 import { SubcircuitModel } from "./SubcircuitModel";
@@ -39,7 +39,7 @@ import { SubcircuitBar } from "./SubcircuitBar";
 import { MyCommand } from "./MyCommand";
 import { parseIntStrict, parseFloatStrict } from "./NumberParse";
 import { CommandPaletteRegistry } from "./CommandPaletteRegistry";
-import type { RoutedWireElm } from "./RoutedWireElm";
+import type { RoutedWireElm } from "./elements/wires/RoutedWireElm";
 
 // GWT KeyCodes equivalents
 const KEY_BACKSPACE = 8;

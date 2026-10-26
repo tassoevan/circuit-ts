@@ -20,7 +20,7 @@
 import { EditDialog } from "./EditDialog";
 import { CirSim } from "./CirSim";
 import { MosfetModel } from "./MosfetModel";
-import type { MosfetElm } from "./MosfetElm";
+import type { MosfetElm } from "./elements/MosfetElm";
 
 export class EditMosfetModelDialog extends EditDialog {
     model: MosfetModel;

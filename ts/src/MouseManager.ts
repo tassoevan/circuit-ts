@@ -27,10 +27,10 @@ import { Graphics } from "./Graphics";
 import { Rectangle } from "./Rectangle";
 import { Locale } from "./Locale";
 import { ScrollValuePopup } from "./ScrollValuePopup";
-import type { SwitchElm } from "./SwitchElm";
-import type { RoutedWireElm } from "./RoutedWireElm";
-import type { SubcircuitElm } from "./SubcircuitElm";
-import type { ScopeElm } from "./ScopeElm";
+import type { SwitchElm } from "./elements/passive/SwitchElm";
+import type { RoutedWireElm } from "./elements/wires/RoutedWireElm";
+import type { SubcircuitElm } from "./elements/active-blocks/SubcircuitElm";
+import type { ScopeElm } from "./elements/ScopeElm";
 
 // mode constants
 export class MouseManager {

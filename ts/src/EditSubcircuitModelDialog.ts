@@ -18,15 +18,15 @@
 */
 
 import { Dialog } from "./Dialog";
-import { SubcircuitChipElm } from "./SubcircuitChipElm";
+import { SubcircuitChipElm } from "./elements/SubcircuitChipElm";
 import { SubcircuitModel } from "./SubcircuitModel";
 import { ExtListEntry } from "./ExtListEntry";
-import { ChipElm } from "./ChipElm";
+import { ChipElm } from "./elements/ChipElm";
 import { Graphics } from "./Graphics";
 import { Locale } from "./Locale";
 import { CirSim } from "./CirSim";
 import { SimulationManager } from "./SimulationManager";
-import { SubcircuitElm } from "./SubcircuitElm";
+import { SubcircuitElm } from "./elements/active-blocks/SubcircuitElm";
 
 export class EditSubcircuitModelDialog extends Dialog {
     model: SubcircuitModel = null!;

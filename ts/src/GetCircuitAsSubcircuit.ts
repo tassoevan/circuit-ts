@@ -17,7 +17,7 @@
     along with CircuitJS1.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ChipElm } from "./ChipElm";
+import { ChipElm } from "./elements/ChipElm";
 import { CircuitElm } from "./CircuitElm";
 import { CircuitXMLSerializer } from "./CircuitXMLSerializer";
 import { SubcircuitModel } from "./SubcircuitModel";
@@ -25,10 +25,10 @@ import { CustomLogicModel } from "./CustomLogicModel";
 import { DiodeModel } from "./DiodeModel";
 import { ExtListEntry } from "./ExtListEntry";
 import { HookRegistry } from "./HookRegistry";
-import { LabeledNodeElm } from "./LabeledNodeElm";
+import { LabeledNodeElm } from "./elements/outputs/LabeledNodeElm";
 import { RelayModel } from "./RelayModel";
 import { SimulationManager } from "./SimulationManager";
-import { SwitchElm } from "./SwitchElm";
+import { SwitchElm } from "./elements/passive/SwitchElm";
 import { TransistorModel } from "./TransistorModel";
 import { MosfetModel } from "./MosfetModel";
 
