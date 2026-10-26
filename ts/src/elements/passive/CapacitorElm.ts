@@ -48,6 +48,8 @@ export class CapacitorElm extends CircuitElm {
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
+    // either of the above, as forwarded by subclass constructors
+    constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer);
     constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
         if (xb === undefined) {
             super(xa, ya);
@@ -141,14 +143,14 @@ export class CapacitorElm extends CircuitElm {
 
         // draw first lead and plate
         this.setVoltageColor(g, this.nodes[0].v);
-        CircuitElm.drawThickLine(g, this.point1, this.lead1);
+        CircuitElm.drawThickLine(g, this.point1, this.lead1!);
         this.setPowerColor(g, false);
         CircuitElm.drawThickLine(g, this.plate1[0], this.plate1[1]);
         if (this.showPower()) g.setColor(Color.gray);
 
         // draw second lead and plate
         this.setVoltageColor(g, this.nodes[1].v);
-        CircuitElm.drawThickLine(g, this.point2, this.lead2);
+        CircuitElm.drawThickLine(g, this.point2, this.lead2!);
         this.setPowerColor(g, false);
         if (this.platePoints == null) CircuitElm.drawThickLine(g, this.plate2[0], this.plate2[1]);
         else {
@@ -159,8 +161,8 @@ export class CapacitorElm extends CircuitElm {
 
         this.updateDotCount();
         if (!this.isCreating()) {
-            this.drawDots(g, this.point1, this.lead1, this.curcount);
-            this.drawDots(g, this.point2, this.lead2, -this.curcount);
+            this.drawDots(g, this.point1, this.lead1!, this.curcount);
+            this.drawDots(g, this.point2, this.lead2!, -this.curcount);
         }
         this.drawPosts(g);
         if (this.showValues()) {

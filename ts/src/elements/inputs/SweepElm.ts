@@ -259,12 +259,12 @@ export class SweepElm extends CircuitElm {
         if (n === 2) this.sweepTime = ei.value;
         if (n === 3) {
             this.flags &= ~SweepElm.FLAG_LOG;
-            if (ei.checkbox.getState()) this.flags |= SweepElm.FLAG_LOG;
+            if (ei.checkbox!.getState()) this.flags |= SweepElm.FLAG_LOG;
         }
         if (n === 4) this.maxV = ei.value;
         if (n === 5) {
             this.flags &= ~SweepElm.FLAG_BIDIR;
-            if (ei.checkbox.getState()) this.flags |= SweepElm.FLAG_BIDIR;
+            if (ei.checkbox!.getState()) this.flags |= SweepElm.FLAG_BIDIR;
         }
         this.setParams();
     }

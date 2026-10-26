@@ -109,7 +109,7 @@ function getDominantBaseline(textBaseline: string) {
 
 //helper function to get the xlink:href of a canvas or image
 function getImageHref(image: HTMLCanvasElement | HTMLImageElement) {
-    return image.nodeName === "CANVAS" ? (image as HTMLCanvasElement).toDataURL() : image.getAttribute("src");
+    return image.nodeName === "CANVAS" ? (image as HTMLCanvasElement).toDataURL() : image.getAttribute("src")!;
 }
 
 // Unpack entities lookup where the numbers are in radix 32 to reduce the size
@@ -242,7 +242,7 @@ class SvgCanvasGradient {
         if (color.indexOf("rgba") !== -1) {
             //separate alpha value, since webkit can't handle it
             const regex = /rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d?\.?\d*)\s*\)/gi;
-            const matches = regex.exec(color);
+            const matches = regex.exec(color)!;
             stop.setAttribute(
                 "stop-color",
                 format("rgb({r},{g},{b})", { r: matches[1], g: matches[2], b: matches[3] }),
@@ -352,7 +352,7 @@ class C2SContext {
             this.__ctx = options.ctx;
         } else {
             this.__canvas = this.__document.createElement("canvas");
-            this.__ctx = this.__canvas.getContext("2d");
+            this.__ctx = this.__canvas.getContext("2d")!;
         }
 
         this.__stack = [this.__getStyleState()];
@@ -447,20 +447,20 @@ class C2SContext {
                     if (value.__ctx) {
                         //copy over defs
                         while (value.__ctx.__defs.childNodes.length) {
-                            const id = (value.__ctx.__defs.childNodes[0] as Element).getAttribute("id");
+                            const id = (value.__ctx.__defs.childNodes[0] as Element).getAttribute("id")!;
                             this.__ids[id] = id;
                             this.__defs.appendChild(value.__ctx.__defs.childNodes[0]);
                         }
                     }
                     currentElement.setAttribute(
                         style.apply,
-                        format("url(#{id})", { id: value.__root.getAttribute("id") }),
+                        format("url(#{id})", { id: value.__root.getAttribute("id")! }),
                     );
                 } else if (value instanceof SvgCanvasGradient) {
                     //gradient
                     currentElement.setAttribute(
                         style.apply,
-                        format("url(#{id})", { id: value.__root.getAttribute("id") }),
+                        format("url(#{id})", { id: value.__root.getAttribute("id")! }),
                     );
                 } else if (style.apply.indexOf(type) !== -1 && style.svg !== value) {
                     if (
@@ -470,7 +470,7 @@ class C2SContext {
                     ) {
                         //separate alpha value, since illustrator can't handle it
                         const regex = /rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d?\.?\d*)\s*\)/gi;
-                        const matches = regex.exec(value);
+                        const matches = regex.exec(value)!;
                         currentElement.setAttribute(
                             style.svgAttr,
                             format("rgb({r},{g},{b})", { r: matches[1], g: matches[2], b: matches[3] }),
@@ -492,7 +492,7 @@ class C2SContext {
                             }
                         }
                         //otherwise only update attribute if right type, and not svg default
-                        currentElement.setAttribute(attr, String(value));
+                        currentElement.setAttribute(attr!, String(value));
                     }
                 }
             }
@@ -503,7 +503,7 @@ class C2SContext {
      * Will return the closest group or svg node. May return the current element.
      * @private
      */
-    private __closestGroupOrSvg(node?: Node): SVGElement {
+    private __closestGroupOrSvg(node?: Node | null): SVGElement {
         node = node || this.__currentElement;
         if (node.nodeName === "g" || node.nodeName === "svg") {
             return node as SVGElement;
@@ -570,14 +570,12 @@ class C2SContext {
      * Sets current element to parent, or just root if already root
      */
     restore() {
-        this.__currentElement = this.__groupStack.pop();
+        const group = this.__groupStack.pop();
         this.__currentElementsToStyle = null;
         //Clearing canvas will make the poped group invalid, currentElement is set to the root group node.
-        if (!this.__currentElement) {
-            this.__currentElement = this.__root.childNodes[1] as SVGElement;
-        }
+        this.__currentElement = group ?? (this.__root.childNodes[1] as SVGElement);
         const state = this.__stack.pop();
-        this.__applyStyleState(state);
+        if (state !== undefined) this.__applyStyleState(state);
     }
 
     /**
@@ -1001,7 +999,7 @@ class C2SContext {
     private __parseFont() {
         const regex =
             /^\s*(?=(?:(?:[-a-z]+\s*){0,2}(italic|oblique))?)(?=(?:(?:[-a-z]+\s*){0,2}(small-caps))?)(?=(?:(?:[-a-z]+\s*){0,2}(bold(?:er)?|lighter|[1-9]00))?)(?:(?:normal|\1|\2|\3)\s*){0,3}((?:xx?-)?(?:small|large)|medium|smaller|larger|[.\d]+(?:%|in|[cem]m|ex|p[ctx]))(?:\s*\/\s*(normal|[.\d]+(?:%|in|[cem]m|ex|p[ctx])))?\s*([-,'"\sa-z0-9]+?)\s*$/i;
-        const fontPart = regex.exec(this.font);
+        const fontPart = regex.exec(this.font)!;
         const data: FontData = {
             style: fontPart[1] || "normal",
             size: fontPart[4] || "10px",
@@ -1287,7 +1285,7 @@ class C2SContext {
             if (svg.childNodes && svg.childNodes.length > 1) {
                 const defs = svg.childNodes[0];
                 while (defs.childNodes.length) {
-                    const id = (defs.childNodes[0] as Element).getAttribute("id");
+                    const id = (defs.childNodes[0] as Element).getAttribute("id")!;
                     this.__ids[id] = id;
                     this.__defs.appendChild(defs.childNodes[0]);
                 }
@@ -1317,7 +1315,7 @@ class C2SContext {
                 const canvas = this.__document.createElement("canvas");
                 canvas.width = dw;
                 canvas.height = dh;
-                const context = canvas.getContext("2d");
+                const context = canvas.getContext("2d")!;
                 context.drawImage(image, sx, sy, sw, sh, 0, 0, dw, dh);
                 image = canvas;
             }

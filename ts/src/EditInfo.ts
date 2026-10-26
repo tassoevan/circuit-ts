@@ -94,11 +94,11 @@ export class EditInfo {
         return this;
     }
     changeFlag(flags: number, bit: number): number {
-        if (this.checkbox.getState()) return flags | bit;
+        if (this.checkbox!.getState()) return flags | bit;
         return flags & ~bit;
     }
     changeFlagInverted(flags: number, bit: number): number {
-        if (!this.checkbox.getState()) return flags | bit;
+        if (!this.checkbox!.getState()) return flags | bit;
         return flags & ~bit;
     }
     setError(s: string): void {

@@ -396,7 +396,7 @@ export class BatteryElm extends CircuitElm {
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 0 && ei.choice != null) {
             const oldType = this.batteryType;
-            const sel = ei.choice.getSelectedIndex();
+            const sel = ei.choice!.getSelectedIndex();
             this.batteryType = sel >= BatteryElm.batteryTypeNames.length ? BatteryElm.BT_CUSTOM : sel;
             if (this.batteryType !== BatteryElm.BT_CUSTOM) {
                 this.socVoltageTable = BatteryElm.batteryTypeTables[this.batteryType];

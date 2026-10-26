@@ -100,7 +100,7 @@ export class CirSim {
     undoManager: UndoManager = null!;
     imageExporter: any = null;
     commands: any = null; // CommandManager
-    scopeManager: ScopeManager = null;
+    scopeManager: ScopeManager = null!;
     loader: any = null; // CircuitLoader
     jsInterface: any = null;
 
@@ -698,7 +698,7 @@ export class CirSim {
         return ElementFactory.create(name, x1, y1, x2, y2, f, st);
     }
 
-    static constructElement(n: string, x1: number, y1?: number): CircuitElm {
+    static constructElement(n: string, x1: number, y1?: number): CircuitElm | null {
         const elm = ElementFactory.create(n, x1, y1 ?? 0);
         if (elm != null) return elm;
 

@@ -87,9 +87,9 @@ export abstract class CompositeElm extends CircuitElm {
             if (sp < 0) continue;
             const ceType = line.substring(0, sp);
             const nodeStr = line.substring(sp + 1);
-            let newce: CircuitElm = CirSim.constructElement(ceType, 0, 0);
+            let newce = CirSim.constructElement(ceType, 0, 0);
             if (stIn != null) {
-                const tint = newce.getDumpType();
+                const tint = newce!.getDumpType();
                 let dumpedCe = stIn.nextToken();
                 if (this.useEscape()) dumpedCe = CustomLogicModel.unescape(dumpedCe);
                 const stCe = new StringTokenizer(dumpedCe, this.useEscape() ? " " : "_");
@@ -148,7 +148,7 @@ export abstract class CompositeElm extends CircuitElm {
                 (className === "GroundElm" && childElem.getAttribute("x") != null)
             )
                 continue;
-            const newce: CircuitElm = CirSim.constructElement(className, 0, 0);
+            const newce = CirSim.constructElement(className, 0, 0)!;
             if (newce.isGroundElm()) (newce as GroundElm).setOldStyle();
             xml.parseChildElement(childElem);
             newce.undumpXml(xml);

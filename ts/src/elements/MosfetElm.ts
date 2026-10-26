@@ -291,15 +291,15 @@ export class MosfetElm extends CircuitElm {
     undumpXml(xml: CircuitXMLDeserializer): void {
         this.flags = 0;
         super.undumpXml(xml);
-        this.modelName = xml.parseStringAttr("mo", null);
-        if (this.modelName == null) {
+        const modelName = xml.parseStringAttr("mo", null);
+        if (modelName == null) {
             // pre-model circuit file: vt/be were dumped directly on the element, and the
             // drawing/behavior options were packed into our own flags
             const vt0 = xml.parseDoubleAttr("vt", this.getDefaultThreshold());
             const beta0 = xml.parseDoubleAttr("be", this.getBackwardCompatibilityBeta());
             this.model = this.legacyModel(vt0, beta0, this.flags);
             this.modelName = this.model.name;
-        }
+        } else this.modelName = modelName;
         this.setup();
         this.pnp = (this.flags & this.FLAG_PNP) !== 0 ? -1 : 1;
     }

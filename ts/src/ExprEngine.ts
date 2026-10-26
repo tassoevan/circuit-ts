@@ -241,7 +241,7 @@ export class ExprEngine {
         const e = this.expr!;
 
         for (let i = 0; i !== n; i++) this.setInputValue(i, this.getInputValue(i));
-        this.state.t = SimulationManager.theSim.t;
+        this.state.t = SimulationManager.theSim!.t;
         const v0 = sgn * e.eval(this.state);
         this.value = v0;
         let rs = v0;

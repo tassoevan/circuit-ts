@@ -78,7 +78,7 @@ export class CCCSElm extends VCCSElm {
     }
 
     stamp(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         if (this.isSpiceStyle()) {
             for (let i = 0; i !== this.inputCount; i += 2)
                 this.pins[i + 1].voltSource = this.voltageSources[i / 2].getVoltageSource();
@@ -94,7 +94,7 @@ export class CCCSElm extends VCCSElm {
     }
 
     doStep(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
 
         if (this.broken) {
             this.pins[this.inputCount].current = 0;
@@ -162,7 +162,7 @@ export class CCCSElm extends VCCSElm {
 
     // our output is a current source from O- to O+ (v0 isn't negated as it is in VCCSElm)
     stampInputDerivative(pos: CircuitNode, neg: CircuitNode, dx: number): void {
-        SimulationManager.theSim.stampVCCurrentSource(
+        SimulationManager.theSim!.stampVCCurrentSource(
             this.nodes[this.inputCount + 1],
             this.nodes[this.inputCount],
             pos,
@@ -172,7 +172,7 @@ export class CCCSElm extends VCCSElm {
     }
 
     stampInputDerivativeVS(ivs: VoltageSource, dx: number): void {
-        SimulationManager.theSim.stampCCCS(this.nodes[this.inputCount + 1], this.nodes[this.inputCount], ivs, dx);
+        SimulationManager.theSim!.stampCCCS(this.nodes[this.inputCount + 1], this.nodes[this.inputCount], ivs, dx);
     }
 
     stepFinished(): void {

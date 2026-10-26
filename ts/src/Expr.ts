@@ -193,7 +193,7 @@ export class Expr {
             case Expr.E_NODEV:
                 return es.nodeValues[this.value];
             case Expr.E_NODEDVDT:
-                return (es.nodeValues[this.value] - es.lastNodeValues[this.value]) / SimulationManager.theSim.timeStep;
+                return (es.nodeValues[this.value] - es.lastNodeValues[this.value]) / SimulationManager.theSim!.timeStep;
             case Expr.E_SIN:
                 return Math.sin(left!.eval(es));
             case Expr.E_COS:
@@ -273,13 +273,13 @@ export class Expr {
             case Expr.E_LASTOUTPUT:
                 return es.lastOutput;
             case Expr.E_TIMESTEP:
-                return SimulationManager.theSim.timeStep;
+                return SimulationManager.theSim!.timeStep;
             default:
                 if (this.type >= Expr.E_LASTA) return es.lastValues[this.type - Expr.E_LASTA];
                 if (this.type >= Expr.E_DADT)
                     return (
                         (es.values[this.type - Expr.E_DADT] - es.lastValues[this.type - Expr.E_DADT]) /
-                        SimulationManager.theSim.timeStep
+                        SimulationManager.theSim!.timeStep
                     );
                 if (this.type >= Expr.E_A) return es.values[this.type - Expr.E_A];
                 console.error("unknown Expr type");

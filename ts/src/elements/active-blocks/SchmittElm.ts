@@ -81,7 +81,7 @@ export class SchmittElm extends InvertingSchmittElm {
         CircuitElm.drawPolygon(g, this.symbolPoly);
         g.setLineWidth(1);
         this.curcount = this.updateDotCountImpl(this.current, this.curcount);
-        this.drawDots(g, this.lead2, this.point2, this.curcount);
+        this.drawDots(g, this.lead2!, this.point2, this.curcount);
     }
     setPoints(): void {
         super.setPoints();

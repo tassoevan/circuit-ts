@@ -194,7 +194,7 @@ export class CommandManager {
             const sm = this.app.scopeManager;
             if (n < sm.scopeCount + (sm.countScopeElms?.() ?? 0)) {
                 if (n < sm.scopeCount) sm.scopes[n].addElm(this.app.mouse.menuElm);
-                else sm.getNthScopeElm(n - sm.scopeCount).elmScope.addElm(this.app.mouse.menuElm);
+                else sm.getNthScopeElm(n - sm.scopeCount)!.elmScope.addElm(this.app.mouse.menuElm);
             }
             sm.scopeMenuSelected = -1;
         }

@@ -117,10 +117,10 @@ export class BusLogicInputElm extends SwitchElm {
         this.interpPoint(
             this.point1,
             this.point2,
-            this.lead1,
+            this.lead1!,
             1 - (Math.floor(g.context.measureText(s).width) / 2 + 8) / this.dn,
         );
-        this.setBbox(this.point1, this.lead1, 0);
+        this.setBbox(this.point1, this.lead1!, 0);
         this.drawCenteredText(g, s, this.x2, this.y2, true);
         this.setVoltageColor(g, this.nodes[0].v);
         CircuitElm.drawThickLine(g, this.point1, this.lead1!, 5);

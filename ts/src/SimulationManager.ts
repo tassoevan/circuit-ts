@@ -1406,7 +1406,7 @@ export class SimulationManager {
                 this.converged = true;
                 this.subIterations = subiter;
                 for (let mi = 0; mi !== this.matrices!.length; mi++) {
-                    const m = this.matrices![mi];
+                    const m: CircuitMatrix = this.matrices![mi];
                     for (i = 0; i !== m.size; i++) m.rightSide[i] = m.origRightSide[i];
                     if (m.nonLinear) {
                         if (this.usingSparse) {

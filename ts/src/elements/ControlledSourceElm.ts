@@ -139,7 +139,7 @@ export abstract class ControlledSourceElm extends CircuitElm {
 
     // same widening schedule VCCSElm uses, so a hard-to-converge expression still settles
     protected getConvergeLimit(): number {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         if (sim.subIterations < 10) return 0.001;
         if (sim.subIterations < 200) return 0.01;
         return 0.1;

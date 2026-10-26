@@ -51,14 +51,14 @@ export class VCVSElm extends VCCSElm {
     }
 
     stamp(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         const vs = this.pins[this.inputCount].voltSource!;
         sim.stampNonLinearVS(vs);
         sim.stampVoltageSource(this.nodes[this.inputCount + 1], this.nodes[this.inputCount], vs);
     }
 
     doStep(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
 
         // check convergence
         if (!this.engine.checkConvergence(this.getConvergeLimit())) sim.converged = false;
@@ -81,14 +81,14 @@ export class VCVSElm extends VCCSElm {
 
     // our output is a voltage source, so derivatives go into its matrix row
     stampInputDerivative(pos: CircuitNode, neg: CircuitNode, dx: number): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         const vn = this.pins[this.inputCount].voltSource!;
         sim.stampMatrixNV(vn, pos, -dx);
         sim.stampMatrixNV(vn, neg, dx);
     }
 
     stampInputDerivativeVS(ivs: VoltageSource, dx: number): void {
-        SimulationManager.theSim.stampMatrixVV(this.pins[this.inputCount].voltSource!, ivs, -dx);
+        SimulationManager.theSim!.stampMatrixVV(this.pins[this.inputCount].voltSource!, ivs, -dx);
     }
 
     stepFinished(): void {

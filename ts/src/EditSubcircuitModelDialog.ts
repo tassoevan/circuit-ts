@@ -389,7 +389,7 @@ export class EditSubcircuitModelDialog extends Dialog {
             const y1 = Math.min(this.rubberBandY1, this.rubberBandY2);
             const y2 = Math.max(this.rubberBandY1, this.rubberBandY2);
             const firstSel =
-                this.selectedPins.size > 0 ? this.model.extList[this.selectedPins.values().next().value].side : -1;
+                this.selectedPins.size > 0 ? this.model.extList[this.selectedPins.values().next().value!].side : -1;
             let selSide = firstSel;
             for (let i = 0; i < this.postCount; i++) {
                 if (this.chip.pins[i].busZ > 0) continue;
@@ -420,7 +420,7 @@ export class EditSubcircuitModelDialog extends Dialog {
             const y1 = Math.min(this.rubberBandY1, this.rubberBandY2);
             const y2 = Math.max(this.rubberBandY1, this.rubberBandY2);
             let selSide2 =
-                this.selectedPins.size > 0 ? this.model.extList[this.selectedPins.values().next().value].side : -1;
+                this.selectedPins.size > 0 ? this.model.extList[this.selectedPins.values().next().value!].side : -1;
             if (selSide2 === -1) {
                 for (let i = 0; i < this.postCount; i++) {
                     if (this.chip.pins[i].busZ > 0) continue;
@@ -590,7 +590,7 @@ export class EditSubcircuitModelDialog extends Dialog {
             } else {
                 const hSide = this.model.extList[hoveredPin].side;
                 let ok = this.selectedPins.size === 0;
-                if (!ok) ok = this.model.extList[this.selectedPins.values().next().value].side === hSide;
+                if (!ok) ok = this.model.extList[this.selectedPins.values().next().value!].side === hSide;
                 if (ok) this.selectedPins.add(hoveredPin);
             }
         } else {

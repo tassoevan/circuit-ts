@@ -365,7 +365,7 @@ export class PotElm extends CircuitElm {
     }
 
     stamp(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         this.resistance1 = this.maxResistance * this.position;
         this.resistance2 = this.maxResistance * (1 - this.position);
         sim.stampResistor(this.nodes[0], this.nodes[2], this.resistance1);

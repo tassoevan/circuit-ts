@@ -90,7 +90,7 @@ export class Pin {
             this.bubbleY = ya + day * 10 * chip.csize;
         }
         if (this.clock) {
-            if (this.clockPointsX === null) {
+            if (this.clockPointsX === null || this.clockPointsY === null) {
                 this.clockPointsX = new Array(3);
                 this.clockPointsY = new Array(3);
             }
@@ -192,6 +192,8 @@ export abstract class ChipElm extends CircuitElm {
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
+    // either of the above, as forwarded by subclass constructors
+    constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer);
     constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
         if (xb === undefined) {
             super(xa, ya);

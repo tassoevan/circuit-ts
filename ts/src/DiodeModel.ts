@@ -258,7 +258,7 @@ export class DiodeModel implements Editable, Comparable<DiodeModel> {
     }
 
     static undumpModelXml(xml: CircuitXMLDeserializer): DiodeModel {
-        const name = xml.parseStringAttr("nm", null);
+        const name = xml.parseStringAttr("nm", null)!;
         const dm = DiodeModel.getModelWithName(name);
         dm.undumpXml(xml);
         return dm;

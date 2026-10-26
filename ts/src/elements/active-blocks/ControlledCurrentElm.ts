@@ -81,7 +81,7 @@ export class ControlledCurrentElm extends ControlledSourceElm {
     }
 
     stamp(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         if (this.broken) {
             // no current path; stamping a current source would cause a matrix error
             sim.stampResistor(this.nodes[0], this.nodes[1], 1e8);
@@ -92,7 +92,7 @@ export class ControlledCurrentElm extends ControlledSourceElm {
     }
 
     doStep(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         if (this.broken || this.expr == null) {
             this.current = 0;
             return;
@@ -108,11 +108,11 @@ export class ControlledCurrentElm extends ControlledSourceElm {
 
     // our output is a current source from post 1 to post 2
     stampInputDerivative(pos: CircuitNode, neg: CircuitNode, dx: number): void {
-        SimulationManager.theSim.stampVCCurrentSource(this.nodes[0], this.nodes[1], pos, neg, dx);
+        SimulationManager.theSim!.stampVCCurrentSource(this.nodes[0], this.nodes[1], pos, neg, dx);
     }
 
     stampInputDerivativeVS(ivs: VoltageSource, dx: number): void {
-        SimulationManager.theSim.stampCCCS(this.nodes[0], this.nodes[1], ivs, dx);
+        SimulationManager.theSim!.stampCCCS(this.nodes[0], this.nodes[1], ivs, dx);
     }
 
     // a current source with nowhere for the current to go is a matrix error, so check

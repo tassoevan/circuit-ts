@@ -34,7 +34,7 @@
 
     // Recommended Options
     "strict": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "strictPropertyInitialization": false,
     "jsx": "react-jsx",
     "verbatimModuleSyntax": true,

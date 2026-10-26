@@ -407,7 +407,7 @@ export class TransistorModel implements Editable, Comparable<TransistorModel> {
     }
 
     static undumpModelXml(xml: CircuitXMLDeserializer): TransistorModel {
-        const name = xml.parseStringAttr("nm", null);
+        const name = xml.parseStringAttr("nm", null)!;
         const tm = TransistorModel.getModelWithName(name);
         tm.undumpXml(xml);
         return tm;

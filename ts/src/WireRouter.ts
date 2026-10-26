@@ -26,7 +26,7 @@ interface RoutableElm {
     x2: number;
     y2: number;
     getPostCount(): number;
-    getPost(n: number): Point;
+    getPost(n: number): Point | null;
     addRoutingObstacle(router: WireRouter): void;
 }
 
@@ -203,7 +203,7 @@ export class WireRouter {
             if (wire === ce) continue;
             ce.addRoutingObstacle(this);
             for (let i = 0; i < ce.getPostCount(); i++) {
-                const p = ce.getPost(i);
+                const p = ce.getPost(i)!;
                 this.addObstaclePoint(p.x, p.y);
             }
         }

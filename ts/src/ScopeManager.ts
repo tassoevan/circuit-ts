@@ -36,7 +36,7 @@ export class ScopeManager {
     menuPlot: number = -1;
     scopeHeightFraction: number = 0.2;
     oldScopeCount: number = -1;
-    scopePopupMenu: ScopePopupMenu | null = null;
+    scopePopupMenu: ScopePopupMenu = null!;
 
     // GWT MenuBar/MenuItem skipped; init() and composeSelectScopeMenu() are stubs.
     selectScopeMenuBar: any = null;

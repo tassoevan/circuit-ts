@@ -140,7 +140,7 @@ export class VCCSElm extends ChipElm {
     }
 
     stamp(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         sim.stampNonLinear(this.nodes[this.inputCount]);
         sim.stampNonLinear(this.nodes[this.inputCount + 1]);
     }
@@ -150,7 +150,7 @@ export class VCCSElm extends ChipElm {
     }
 
     protected getConvergeLimit(): number {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         if (sim.subIterations < 10) return 0.001;
         if (sim.subIterations < 200) return 0.01;
         return 0.1;
@@ -165,7 +165,7 @@ export class VCCSElm extends ChipElm {
     }
 
     doStep(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
 
         if (this.broken) {
             this.pins[this.inputCount].current = 0;
@@ -190,7 +190,7 @@ export class VCCSElm extends ChipElm {
 
     // our output is a current source from C+ to C-
     stampInputDerivative(pos: CircuitNode, neg: CircuitNode, dx: number): void {
-        SimulationManager.theSim.stampVCCurrentSource(
+        SimulationManager.theSim!.stampVCCurrentSource(
             this.nodes[this.inputCount],
             this.nodes[this.inputCount + 1],
             pos,
@@ -200,7 +200,7 @@ export class VCCSElm extends ChipElm {
     }
 
     stampInputDerivativeVS(vs: VoltageSource, dx: number): void {
-        SimulationManager.theSim.stampCCCS(this.nodes[this.inputCount], this.nodes[this.inputCount + 1], vs, dx);
+        SimulationManager.theSim!.stampCCCS(this.nodes[this.inputCount], this.nodes[this.inputCount + 1], vs, dx);
     }
 
     stepFinished(): void {

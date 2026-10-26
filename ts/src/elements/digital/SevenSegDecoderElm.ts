@@ -254,7 +254,7 @@ export class SevenSegDecoderElm extends ChipElm {
 
     setChipEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
-            this.segmentType = ei.choice.getSelectedIndex();
+            this.segmentType = ei.choice!.getSelectedIndex();
             this.setupPins();
             this.setPoints();
             return;

@@ -51,7 +51,7 @@ export class JfetElm extends MosfetElm {
             super(xa, ya, false);
         }
         this.noDiagonal = true;
-        this.diode = new Diode(SimulationManager.theSim);
+        this.diode = new Diode(SimulationManager.theSim!);
         this.diode.setupForDefaultModel();
     }
 

@@ -246,7 +246,7 @@ export class RelayModel implements Editable, Comparable<RelayModel> {
     }
 
     static undumpModelXml(xml: CircuitXMLDeserializer): RelayModel {
-        const name = xml.parseStringAttr("nm", null);
+        const name = xml.parseStringAttr("nm", null)!;
         const rm = RelayModel.getModelWithName(name);
         rm.undumpXml(xml);
         return rm;

@@ -85,6 +85,6 @@ export class ImportFromDropbox {
             // see File types below. By default, all extensions are allowed.
             // extensions: ['.pdf', '.doc', '.docx'],
         };
-        window.Dropbox.choose(options);
+        window.Dropbox!.choose(options);
     }
 }

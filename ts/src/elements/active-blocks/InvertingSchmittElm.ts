@@ -99,7 +99,7 @@ export class InvertingSchmittElm extends CircuitElm {
         g.setLineWidth(1);
         CircuitElm.drawThickCircle(g, this.pcircle.x, this.pcircle.y, 3);
         this.curcount = this.updateDotCountImpl(this.current, this.curcount);
-        this.drawDots(g, this.lead2, this.point2, this.curcount);
+        this.drawDots(g, this.lead2!, this.point2, this.curcount);
     }
     gatePoly: Polygon = null!;
     symbolPoly: Polygon = null!;

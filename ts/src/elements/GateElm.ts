@@ -513,7 +513,7 @@ export abstract class GateElm extends CircuitElm {
         }
         if (n === 1) this.highVoltage = GateElm.lastHighVoltage = ei.value;
         if (n === 2) {
-            if (ei.checkbox.getState()) this.flags |= GateElm.FLAG_SCHMITT;
+            if (ei.checkbox!.getState()) this.flags |= GateElm.FLAG_SCHMITT;
             else this.flags &= ~GateElm.FLAG_SCHMITT;
             GateElm.lastSchmitt = this.hasSchmittInputs();
             this.setPoints();

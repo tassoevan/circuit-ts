@@ -761,7 +761,7 @@ export class TransistorElm extends CircuitElm {
             this.setup();
         }
         if (n === 1) {
-            if (ei.checkbox.getState()) this.flags |= TransistorElm.FLAG_FLIP;
+            if (ei.checkbox!.getState()) this.flags |= TransistorElm.FLAG_FLIP;
             else this.flags &= ~TransistorElm.FLAG_FLIP;
             this.setPoints();
         }
@@ -770,7 +770,7 @@ export class TransistorElm extends CircuitElm {
             return;
         }
         if (n === 3) {
-            this.model = this.models[ei.choice.getSelectedIndex()];
+            this.model = this.models[ei.choice!.getSelectedIndex()];
             this.modelName = this.model.name;
             this.setup();
             ei.newDialog = true;

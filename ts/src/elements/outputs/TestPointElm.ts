@@ -453,7 +453,7 @@ export class TestPointElm extends CircuitElm {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0) this.meter = this.meterChoices()[ei.choice.getSelectedIndex()];
+        if (n === 0) this.meter = this.meterChoices()[ei.choice!.getSelectedIndex()];
         if (n === 1) this.label = ei.textf ? ei.textf.value : (ei.text ?? "TP");
     }
 

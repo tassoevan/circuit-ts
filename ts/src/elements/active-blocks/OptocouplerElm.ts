@@ -185,14 +185,14 @@ export class OptocouplerElm extends CompositeElm {
             this.posts[1].x + 32 * dflip,
             this.posts[1].y,
         );
-        this.stubs[0] = this.diode.getPost(0);
-        this.stubs[1] = this.diode.getPost(1);
+        this.stubs[0] = this.diode.getPost(0)!;
+        this.stubs[1] = this.diode.getPost(1)!;
 
         const midp = Math.trunc((this.posts[2].y + this.posts[3].y) / 2);
         this.transistor.setFlipped(this.isFlippedY());
         this.transistor.setPosition(this.posts[2].x - 40 * dflip, midp, this.posts[2].x - 24 * dflip, midp);
-        this.stubs[2] = this.transistor.getPost(1);
-        this.stubs[3] = this.transistor.getPost(2);
+        this.stubs[2] = this.transistor.getPost(1)!;
+        this.stubs[3] = this.transistor.getPost(2)!;
     }
 
     isFlippedX(): boolean {

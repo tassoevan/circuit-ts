@@ -74,7 +74,7 @@ export class VoltageElm extends CircuitElm {
     constructor(xa: number, ya: number, xbOrWf?: number, yb?: number, f?: number, st?: StringTokenizer) {
         if (yb === undefined) {
             super(xa, ya);
-            this.waveform = xbOrWf;
+            this.waveform = xbOrWf ?? VoltageElm.WF_DC;
             this.maxVoltage = 5;
             this.frequency = 60;
             this.dutyCycle = 0.5;
@@ -86,7 +86,7 @@ export class VoltageElm extends CircuitElm {
             this.flags |= VoltageElm.FLAG_SHOW_VOLTAGE;
             this.reset();
         } else {
-            super(xa, ya, xbOrWf, yb!, f!);
+            super(xa, ya, xbOrWf!, yb!, f!);
             this.maxVoltage = 5;
             this.frequency = 40;
             this.waveform = VoltageElm.WF_DC;
@@ -677,7 +677,7 @@ export class VoltageElm extends CircuitElm {
         }
         if (n == 1) {
             const ow = this.waveform;
-            this.waveform = ei.choice.getSelectedIndex();
+            this.waveform = ei.choice!.getSelectedIndex();
             if (this.waveform == VoltageElm.WF_DC && ow != VoltageElm.WF_DC) {
                 ei.newDialog = true;
                 this.bias = 0;
@@ -696,7 +696,7 @@ export class VoltageElm extends CircuitElm {
             if (n2 == 0 && ei.choice != null) {
                 const oldFlags = this.flags;
                 this.flags =
-                    ei.choice.getSelectedIndex() == 1
+                    ei.choice!.getSelectedIndex() == 1
                         ? this.flags | VoltageElm.FLAG_TIME_SPEC
                         : this.flags & ~VoltageElm.FLAG_TIME_SPEC;
                 if (this.flags != oldFlags) ei.newDialog = true;

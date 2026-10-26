@@ -71,13 +71,13 @@ export class ControlledVoltageElm extends ControlledSourceElm {
     }
 
     stamp(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         sim.stampNonLinearVS(this.voltSource!);
         sim.stampVoltageSource(this.nodes[0], this.nodes[1], this.voltSource);
     }
 
     doStep(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         if (this.expr == null) return;
 
         if (!this.engine.checkConvergence(this.getConvergeLimit())) sim.converged = false;
@@ -95,13 +95,13 @@ export class ControlledVoltageElm extends ControlledSourceElm {
 
     // our output is a voltage source, so derivatives go into its matrix row
     stampInputDerivative(pos: CircuitNode, neg: CircuitNode, dx: number): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         sim.stampMatrixNV(this.voltSource!, pos, -dx);
         sim.stampMatrixNV(this.voltSource!, neg, dx);
     }
 
     stampInputDerivativeVS(ivs: VoltageSource, dx: number): void {
-        SimulationManager.theSim.stampMatrixVV(this.voltSource!, ivs, -dx);
+        SimulationManager.theSim!.stampMatrixVV(this.voltSource!, ivs, -dx);
     }
 
     setCurrent(_vs: VoltageSource, c: number): void {

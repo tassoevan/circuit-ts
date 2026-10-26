@@ -192,7 +192,7 @@ export class GroundElm extends CircuitElm {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n == 0) GroundElm.lastSymbolType = this.symbolType = ei.choice.getSelectedIndex();
+        if (n == 0) GroundElm.lastSymbolType = this.symbolType = ei.choice!.getSelectedIndex();
     }
 
     getCurrentIntoNode(n: number): number {

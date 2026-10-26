@@ -107,7 +107,7 @@ export class InductorElm extends CircuitElm {
         this.setBbox(this.point1, this.point2, hs);
         this.draw2Leads(g);
         this.setPowerColor(g, false);
-        this.drawCoil(g, 8, this.lead1, this.lead2, v1, v2);
+        this.drawCoil(g, 8, this.lead1!, this.lead2!, v1, v2);
         if (this.showValues()) {
             const s = CircuitElm.getShortUnitText(this.inductance, "H");
             this.drawValues(g, s, hs);

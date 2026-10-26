@@ -268,7 +268,7 @@ export class SubcircuitElm extends CompositeElm {
                 className === "GraphicElm" ||
                 (className === "GroundElm" && childElem.getAttribute("x") !== null)
             ) {
-                ce = CirSim.constructElement(className, 0, 0);
+                ce = CirSim.constructElement(className, 0, 0)!;
                 xml.parseChildElement(childElem);
                 ce.undumpXml(xml);
                 allElms.push(ce);
@@ -388,7 +388,7 @@ export class SubcircuitElm extends CompositeElm {
     setEditValue(n: number, ei: EditInfo): void {
         if (this.model != null && this.model.internal) n += 2;
         if (n === 0) {
-            this.model = this.models[ei.choice.getSelectedIndex()];
+            this.model = this.models[ei.choice!.getSelectedIndex()];
             SubcircuitElm.lastModelName = this.modelName = this.model.name;
             this.updateModels();
             this.setPoints();

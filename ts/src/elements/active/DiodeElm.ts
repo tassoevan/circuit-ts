@@ -241,7 +241,7 @@ export class DiodeElm extends CircuitElm {
 
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) {
-            this.model = this.models[ei.choice.getSelectedIndex()];
+            this.model = this.models[ei.choice!.getSelectedIndex()];
             this.modelName = this.model.name;
             this.setup();
             ei.newDialog = true;

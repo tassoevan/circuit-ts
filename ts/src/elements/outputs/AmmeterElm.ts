@@ -304,8 +304,8 @@ export class AmmeterElm extends CircuitElm {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0) this.meter = ei.choice.getSelectedIndex();
-        if (n === 1) this.scale = ei.choice.getSelectedIndex();
+        if (n === 0) this.meter = ei.choice!.getSelectedIndex();
+        if (n === 1) this.scale = ei.choice!.getSelectedIndex();
         if (n === 2) this.flags = ei.changeFlag(this.flags, AmmeterElm.FLAG_CIRCLE);
         if (n === 3) this.label = ei.textf ? ei.textf.value : (ei.text ?? "");
     }

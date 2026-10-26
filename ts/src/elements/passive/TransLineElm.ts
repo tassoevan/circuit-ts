@@ -167,7 +167,7 @@ export class TransLineElm extends CircuitElm {
             CircuitElm.drawThickLine(g, this.posts[i], this.inner[i]);
         }
 
-        if (this.voltageL != null) {
+        if (this.voltageL != null && this.voltageR != null) {
             for (let i = 0; i !== segments; i++) {
                 const ix1 = (ix0 - Math.trunc((this.lenSteps * i) / segments)) % this.lenSteps;
                 const ix2 = (ix0 - Math.trunc((this.lenSteps * (segments - 1 - i)) / segments)) % this.lenSteps;
@@ -218,7 +218,7 @@ export class TransLineElm extends CircuitElm {
     }
 
     startIteration(): void {
-        if (this.voltageL == null) {
+        if (this.voltageL == null || this.voltageR == null) {
             CircuitElm.sim.stop("Transmission line delay too large!", this);
             return;
         }

@@ -43,6 +43,8 @@ export class CurrentElm extends CircuitElm {
 
     constructor(xx: number, yy: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
+    // either of the above, as forwarded by subclass constructors
+    constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer);
     constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer) {
         if (xb === undefined) {
             super(xa, ya);
@@ -125,7 +127,7 @@ export class CurrentElm extends CircuitElm {
 
     // we defer stamping current sources until we can tell if they have a current path or not
     stamp(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         if (this.broken) {
             // no current path; stamping a current source would cause a matrix error
             sim.stampResistor(this.nodes[0], this.nodes[1], 1e8);
@@ -149,7 +151,7 @@ export class CurrentElm extends CircuitElm {
     doStep(): void {
         if (this.broken || !this.isVoltageLimited()) return;
 
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         let vd = this.nodes[1].v - this.nodes[0].v;
 
         const vStart = 0.95 * this.maxVoltage;

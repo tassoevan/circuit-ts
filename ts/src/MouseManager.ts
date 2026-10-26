@@ -863,7 +863,7 @@ export class MouseManager {
             this.mousePost = -1;
             // look for post close to the mouse pointer
             for (let i = 0; i < newMouseElm.getPostCount(); i++) {
-                const pt = newMouseElm.getPost(i);
+                const pt = newMouseElm.getPost(i)!;
                 if (Graphics.distanceSq(pt.x, pt.y, gx, gy) < 26) this.mousePost = i;
             }
         }
@@ -1305,7 +1305,6 @@ export class MouseManager {
             this.sim.needAnalyze();
             this.sim.undoManager?.pushUndo();
         }
-        if (this.dragElm != null) this.dragElm.delete();
         this.dragElm = null;
         this.sim.repaint();
         return createdElm;

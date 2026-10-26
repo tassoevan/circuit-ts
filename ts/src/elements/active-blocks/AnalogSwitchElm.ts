@@ -163,7 +163,7 @@ export class AnalogSwitchElm extends CircuitElm {
     }
 
     stamp(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         sim.stampNonLinear(this.nodes[0]);
         sim.stampNonLinear(this.nodes[1]);
         if (this.needsPulldown()) {
@@ -173,7 +173,7 @@ export class AnalogSwitchElm extends CircuitElm {
     }
 
     doStep(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         this.open = this.nodes[2].v < this.threshold;
         if (this.hasFlag(this.FLAG_INVERT)) this.open = !this.open;
         if (!(this.needsPulldown() && this.open)) {

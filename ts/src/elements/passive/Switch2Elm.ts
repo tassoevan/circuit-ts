@@ -224,7 +224,7 @@ export class Switch2Elm extends SwitchElm {
     setEditValue(n: number, ei: EditInfo): void {
         /*if (n == 1) {
             flags &= ~FLAG_CENTER_OFF;
-            if (ei.checkbox.getState())
+            if (ei.checkbox!.getState())
                 flags |= FLAG_CENTER_OFF;
             if (hasCenterOff())
                 momentary = false;

@@ -497,7 +497,7 @@ export class Scope {
         this.setValueNum(val);
     }
 
-    setText(s: string): void {
+    setText(s: string | null): void {
         this.text = s;
     }
 

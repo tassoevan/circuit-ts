@@ -229,6 +229,8 @@ export abstract class CircuitElm implements Editable {
     constructor(xx: number, yy: number);
     // create element between xa,ya and xb,yb from undump
     constructor(xa: number, ya: number, xb: number, yb: number, f: number);
+    // either of the above, as forwarded by subclass constructors
+    constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number);
     constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number) {
         if (xb === undefined) {
             // create new element with one post at xx,yy, to be dragged out by user

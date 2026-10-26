@@ -153,15 +153,15 @@ export class LogicOutputElm extends CircuitElm {
     setEditValue(n: number, ei: EditInfo): void {
         if (n === 0) this.threshold = ei.value;
         if (n === 1) {
-            if (ei.checkbox.getState()) this.flags |= LogicOutputElm.FLAG_PULLDOWN;
+            if (ei.checkbox!.getState()) this.flags |= LogicOutputElm.FLAG_PULLDOWN;
             else this.flags &= ~LogicOutputElm.FLAG_PULLDOWN;
         }
         if (n === 2) {
-            if (ei.checkbox.getState()) this.flags |= LogicOutputElm.FLAG_NUMERIC;
+            if (ei.checkbox!.getState()) this.flags |= LogicOutputElm.FLAG_NUMERIC;
             else this.flags &= ~LogicOutputElm.FLAG_NUMERIC;
         }
         if (n === 3) {
-            if (ei.checkbox.getState()) this.flags |= LogicOutputElm.FLAG_TERNARY;
+            if (ei.checkbox!.getState()) this.flags |= LogicOutputElm.FLAG_TERNARY;
             else this.flags &= ~LogicOutputElm.FLAG_TERNARY;
         }
     }

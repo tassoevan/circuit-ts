@@ -230,14 +230,14 @@ export class SubcircuitModel {
                 const dumpedCe = CustomLogicModel.unescape(elmTokenizer.nextToken());
                 const stCe = new StringTokenizer(dumpedCe, " ");
                 const ceFlags = parseIntStrict(stCe.nextToken());
-                ce = CirSim.createCe(ce.getDumpType(), 0, 0, 0, 0, ceFlags, stCe);
+                ce = CirSim.createCe(ce!.getDumpType(), 0, 0, 0, 0, ceFlags, stCe);
             }
 
-            if (ce.isGroundElm()) (ce as GroundElm).setOldStyle();
+            if (ce!.isGroundElm()) (ce as GroundElm).setOldStyle();
 
-            const child = this.elmDoc.createElement(ce.getXmlDumpType());
+            const child = this.elmDoc.createElement(ce!.getXmlDumpType());
             CircuitXMLSerializer.dumpAttr(child, "nn", nn);
-            ce.dumpXml(this.elmDoc, child);
+            ce!.dumpXml(this.elmDoc, child);
             child.removeAttribute("x");
             root.appendChild(child);
         }

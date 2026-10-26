@@ -1201,7 +1201,7 @@ export class UIManager {
         }
 
         if (this.mouse.tempMouseMode === MouseManager.MODE_SELECT && this.mouse.getMouseElm() != null) {
-            this.mouse.getMouseElm().drawHandles(g, CircuitElm.selectColor);
+            this.mouse.getMouseElm()!.drawHandles(g, CircuitElm.selectColor);
             if (this.mouse.getMouseElm()!.isRoutedWireElm() && this.mouse.mouseCursorX >= 0) {
                 const rw = this.mouse.getMouseElm() as RoutedWireElm;
                 const gx = this.mouse.inverseTransformX(this.mouse.mouseCursorX);
@@ -1376,7 +1376,7 @@ export class UIManager {
             const info: (string | null)[] = new Array(10).fill(null);
             if (this.mouse.getMouseElm() != null) {
                 if (this.mouse.mousePost === -1) {
-                    this.mouse.getMouseElm().getInfo(info);
+                    this.mouse.getMouseElm()!.getInfo(info as string[]);
                     info[0] = Locale.LS(info[0]!);
                     if (info[1] != null) info[1] = Locale.LS(info[1]);
 
@@ -1386,15 +1386,15 @@ export class UIManager {
                         for (ni = 0; info[ni] != null && ni < info.length - 1; ni++);
                         try {
                             let nodeStr = "nodes:";
-                            for (let nn = 0; nn < this.mouse.getMouseElm().getNodeCount(); nn++)
-                                nodeStr += " " + this.mouse.getMouseElm().getNode(nn).index;
+                            for (let nn = 0; nn < this.mouse.getMouseElm()!.getNodeCount(); nn++)
+                                nodeStr += " " + this.mouse.getMouseElm()!.getNode(nn).index;
                             info[ni] = nodeStr;
                         } catch (e) {}
                     }
                 } else {
                     info[0] =
                         "V = " +
-                        CircuitElm.getUnitText(this.mouse.getMouseElm().getPostVoltage(this.mouse.mousePost), "V");
+                        CircuitElm.getUnitText(this.mouse.getMouseElm()!.getPostVoltage(this.mouse.mousePost), "V");
                 }
             } else {
                 info[0] = "t = " + CircuitElm.getTimeText(this.app.sim.t);

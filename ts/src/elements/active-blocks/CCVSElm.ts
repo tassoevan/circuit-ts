@@ -80,7 +80,7 @@ export class CCVSElm extends VCCSElm {
     }
 
     stamp(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         if (this.isSpiceStyle()) {
             for (let i = 0; i !== this.inputCount; i += 2)
                 this.pins[i + 1].voltSource = this.voltageSources[i / 2].getVoltageSource();
@@ -98,7 +98,7 @@ export class CCVSElm extends VCCSElm {
     }
 
     doStep(): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
 
         if (this.isSpiceStyle()) {
             for (let i = 0; i !== this.inputPairCount; i++)
@@ -160,13 +160,13 @@ export class CCVSElm extends VCCSElm {
 
     // our output is a voltage source, so derivatives go into its matrix row
     stampInputDerivative(pos: CircuitNode, neg: CircuitNode, dx: number): void {
-        const sim = SimulationManager.theSim;
+        const sim = SimulationManager.theSim!;
         sim.stampMatrixNV(this.outputVS!, pos, -dx);
         sim.stampMatrixNV(this.outputVS!, neg, dx);
     }
 
     stampInputDerivativeVS(ivs: VoltageSource, dx: number): void {
-        SimulationManager.theSim.stampMatrixVV(this.outputVS!, ivs, -dx);
+        SimulationManager.theSim!.stampMatrixVV(this.outputVS!, ivs, -dx);
     }
 
     stepFinished(): void {

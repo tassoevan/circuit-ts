@@ -175,6 +175,8 @@ export class CircuitXMLDeserializer {
         return v === "true";
     }
 
+    parseStringAttr(attr: string, def: string): string;
+    parseStringAttr(attr: string, def: string | null): string | null;
     parseStringAttr(attr: string, def: string | null): string | null {
         let s = this.currentXmlElement.getAttribute(attr);
         if (s == null) return def;

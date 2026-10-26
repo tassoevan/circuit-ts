@@ -295,7 +295,7 @@ export class MosfetModel implements Editable, Comparable<MosfetModel> {
     }
 
     static undumpModelXml(xml: CircuitXMLDeserializer): MosfetModel {
-        const name = xml.parseStringAttr("nm", null);
+        const name = xml.parseStringAttr("nm", null)!;
         const dm = MosfetModel.getModelWithName(name);
         dm.undumpXml(xml);
         return dm;

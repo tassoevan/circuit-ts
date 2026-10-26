@@ -201,11 +201,11 @@ export class WireElm extends CircuitElm {
     }
     setEditValue(n: number, ei: EditInfo): void {
         if (n == 0) {
-            if (ei.checkbox.getState()) this.flags |= WireElm.FLAG_SHOWCURRENT;
+            if (ei.checkbox!.getState()) this.flags |= WireElm.FLAG_SHOWCURRENT;
             else this.flags &= ~WireElm.FLAG_SHOWCURRENT;
         }
         if (n == 1) {
-            if (ei.checkbox.getState()) this.flags |= WireElm.FLAG_SHOWVOLTAGE;
+            if (ei.checkbox!.getState()) this.flags |= WireElm.FLAG_SHOWVOLTAGE;
             else this.flags &= ~WireElm.FLAG_SHOWVOLTAGE;
         }
         if (n == 2) this.flags = ei.changeFlag(this.flags, WireElm.FLAG_SHOW_BUS_VALUE);
@@ -235,7 +235,7 @@ export class WireElm extends CircuitElm {
         return WireElm.pointOnWireInteriorForPoints(px, py, pts);
     }
 
-    split(px: number, py: number): WireElm {
+    split(px: number, py: number): WireElm | null {
         const newWire = new WireElm(px, py);
         newWire.drag(this.x2, this.y2);
         this.drag(px, py);

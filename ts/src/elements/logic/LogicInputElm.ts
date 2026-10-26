@@ -183,15 +183,15 @@ export class LogicInputElm extends SwitchElm {
     }
 
     setEditValue(n: number, ei: EditInfo): void {
-        if (n === 0) this.momentary = ei.checkbox.getState();
+        if (n === 0) this.momentary = ei.checkbox!.getState();
         if (n === 1) this.hiV = ei.value;
         if (n === 2) this.loV = ei.value;
         if (n === 3) {
-            if (ei.checkbox.getState()) this.flags |= LogicInputElm.FLAG_NUMERIC;
+            if (ei.checkbox!.getState()) this.flags |= LogicInputElm.FLAG_NUMERIC;
             else this.flags &= ~LogicInputElm.FLAG_NUMERIC;
         }
         if (n === 4) {
-            if (ei.checkbox.getState()) this.flags |= LogicInputElm.FLAG_TERNARY;
+            if (ei.checkbox!.getState()) this.flags |= LogicInputElm.FLAG_TERNARY;
             else this.flags &= ~LogicInputElm.FLAG_TERNARY;
             this.posCount = this.isTernary() ? 3 : 2;
         }

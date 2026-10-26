@@ -45,6 +45,8 @@ export class SwitchElm extends CircuitElm {
     constructor(xx: number, yy: number);
     constructor(xx: number, yy: number, mm: boolean);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
+    // either of the above, as forwarded by subclass constructors
+    constructor(xa: number, ya: number, xb?: number, yb?: number, f?: number, st?: StringTokenizer);
     constructor(xa: number, ya: number, xbOrMm?: number | boolean, yb?: number, f?: number, st?: StringTokenizer) {
         if (yb === undefined) {
             super(xa, ya);
@@ -278,11 +280,14 @@ export class SwitchElm extends CircuitElm {
             this.setPoints();
         }
         if (n === 2) {
-            this.label = ei.textf!.value;
-            if (this.label.length === 0) {
+            const label: string = ei.textf!.value;
+            if (label.length === 0) {
                 this.label = null;
                 this.flags &= ~SwitchElm.FLAG_LABEL;
-            } else this.flags |= SwitchElm.FLAG_LABEL;
+            } else {
+                this.label = label;
+                this.flags |= SwitchElm.FLAG_LABEL;
+            }
         }
         if (n === 3) this.setKeyShortcutEditValue(ei);
         if (n === 4) this.resistance = ei.value;

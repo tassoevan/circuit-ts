@@ -130,8 +130,8 @@ export class AudioOutputElm extends CircuitElm {
         const pct = this.dataFull ? textWidth : Math.floor((textWidth * this.dataPtr) / this.dataCount);
         g.fillRect(this.x2 - Math.floor(textWidth / 2), this.y2 - 10, pct, 20);
         g.setColor(selected ? CircuitElm.selectColor : CircuitElm.whiteColor);
-        this.interpPoint(this.point1, this.point2, this.lead1, 1 - (textWidth / 2 + 8) / this.dn);
-        this.setBbox(this.point1, this.lead1, 0);
+        this.interpPoint(this.point1, this.point2, this.lead1!, 1 - (textWidth / 2 + 8) / this.dn);
+        this.setBbox(this.point1, this.lead1!, 0);
         this.drawCenteredText(g, s, this.x2, this.y2, true);
         this.setVoltageColor(g, this.nodes[0].v);
         if (selected) g.setColor(CircuitElm.selectColor);

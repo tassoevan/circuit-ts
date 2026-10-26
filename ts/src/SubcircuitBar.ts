@@ -76,6 +76,7 @@ export class SubcircuitBar {
         this.contextSaveButton = this.createButton("Save", () => {
             const app = CirSim.theApp;
             const modelName = app.getEditingModelName();
+            if (modelName === null) return;
             const dlg = new EditSubcircuitModelDialog();
             if (!dlg.createModel()) return;
             // Look up existing model before setName() inserts the new one under the same key
@@ -94,6 +95,7 @@ export class SubcircuitBar {
         this.contextSaveCopyButton = this.createButton("Save Copy", () => {
             const app = CirSim.theApp;
             const modelName = app.getEditingModelName();
+            if (modelName === null) return;
             const dlg = new EditSubcircuitModelDialog();
             if (!dlg.createModel()) return;
             const existingModel = SubcircuitModel.getModelWithName(modelName);
