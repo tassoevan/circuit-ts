@@ -1465,8 +1465,8 @@ export abstract class CircuitElm implements Editable {
             // Test if the current mouseElm is a ScopeElm and, if so, does it belong to this elm
             (CircuitElm.mouseElmRef !== null &&
                 CircuitElm.mouseElmRef.isScopeElm() &&
-                (CircuitElm.mouseElmRef as any).elmScope != null &&
-                (CircuitElm.mouseElmRef as any).elmScope.getElm() === this) ||
+                CircuitElm.mouseElmRef.elmScope != null &&
+                CircuitElm.mouseElmRef.elmScope.getElm() === this) ||
             this.isOnHighlightedNet()
         );
     }

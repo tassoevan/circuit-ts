@@ -44,9 +44,9 @@ const imports = elmFiles.map((name) => `import { ${name} } from "./${name}";`).j
 const foNames = Object.keys(FACTORY_ONLY).sort();
 const foImports = foNames.map((name) => `import { ${name} } from "./${FACTORY_ONLY[name]}";`).join("\n");
 
-const foFactoryLines = foNames.map((name) => `    ElementFactory.registerClass("${name}", ${name} as any);`).join("\n");
+const foFactoryLines = foNames.map((name) => `    ElementFactory.registerClass("${name}", ${name});`).join("\n");
 
-const factoryLines = elmFiles.map((name) => `    ElementFactory.registerClass("${name}", ${name} as any);`).join("\n");
+const factoryLines = elmFiles.map((name) => `    ElementFactory.registerClass("${name}", ${name});`).join("\n");
 
 const makeRegLine = (name) => {
     const extra = SPECIAL_CTORS[name];

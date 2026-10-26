@@ -613,10 +613,10 @@ export class UIManager {
         this.app.menus = this.menus = new Menus(this.app);
         this.menus.init();
         CommandPaletteRegistry.buildStatic(this.app); // after menus so mainMenuItems exist
-        (CirSim as any).dumpTypeMap = (CirSim as any).dumpTypeMap || new Map();
-        (CirSim as any).xmlDumpTypeMap = (CirSim as any).xmlDumpTypeMap || new Map();
-        (CirSim as any).dumpTypeMap.set(403, "ScopeElm");
-        (CirSim as any).xmlDumpTypeMap.set("Scope", "ScopeElm");
+        CirSim.dumpTypeMap = CirSim.dumpTypeMap || new Map();
+        CirSim.xmlDumpTypeMap = CirSim.xmlDumpTypeMap || new Map();
+        CirSim.dumpTypeMap.set(403, "ScopeElm");
+        CirSim.xmlDumpTypeMap.set("Scope", "ScopeElm");
 
         this.menus.recoverItem.setEnabled(this.app.recovery != null);
 
@@ -662,9 +662,9 @@ export class UIManager {
             !this.hideMenu &&
                 !noEditing &&
                 !hideSidebar &&
-                (this.app as any).startCircuit == null &&
-                (this.app as any).startCircuitText == null &&
-                (this.app as any).startCircuitLink == null,
+                this.app.startCircuit == null &&
+                this.app.startCircuitText == null &&
+                this.app.startCircuitLink == null,
         );
         this.menus.showPropsOnCreateCheckItem.setState(
             this.getOptionFromStorage("showPropsOnCreate", this.menus.toolbarCheckItem.getState()),
@@ -1287,7 +1287,7 @@ export class UIManager {
 
         perfmon.stopContext(); // updateCircuit
 
-        if ((this.app as any).developerMode) {
+        if (this.app.developerMode) {
             let height = 15;
             const increment = 15;
             g.drawString("Framerate: " + CircuitElm.showFormat.format(this.framerate), 10, height);
@@ -1379,7 +1379,7 @@ export class UIManager {
                     info[0] = Locale.LS(info[0]!);
                     if (info[1] != null) info[1] = Locale.LS(info[1]);
 
-                    if ((this.app as any).developerMode) {
+                    if (this.app.developerMode) {
                         // show node numbers for debugging
                         let ni: number;
                         for (ni = 0; info[ni] != null && ni < info.length - 1; ni++);
@@ -1500,7 +1500,7 @@ export class UIManager {
 
     updateToolbar(): void {
         if (this.mouse.dragElm != null) this.toolbar.setModeLabel(Locale.LS("Drag Mouse"));
-        else this.toolbar.setModeLabel(Locale.LS("Mode: ") + (this.app as any).classToLabelMap?.get(this.mouseModeStr));
+        else this.toolbar.setModeLabel(Locale.LS("Mode: ") + this.app.classToLabelMap?.get(this.mouseModeStr));
         this.toolbar.highlightButton(this.mouseModeStr);
     }
 
@@ -1540,7 +1540,7 @@ export class UIManager {
     }
 
     updateContextButtons(): void {
-        this.subcircuitBar.setContextInfo((this.app as any).getEditingModelName());
+        this.subcircuitBar.setContextInfo(this.app.getEditingModelName());
     }
 
     setMouseMode(mode: number): void {
@@ -1985,8 +1985,8 @@ export class UIManager {
     }
 
     getClassCheckItem(s: string, t: string): CheckboxMenuItem {
-        if ((this.app as any).classToLabelMap == null) (this.app as any).classToLabelMap = new Map<string, string>();
-        (this.app as any).classToLabelMap.set(t, s);
+        if (this.app.classToLabelMap == null) this.app.classToLabelMap = new Map<string, string>();
+        this.app.classToLabelMap.set(t, s);
 
         let shortcut = "";
         let elm: any = null;
@@ -2134,7 +2134,7 @@ export class UIManager {
     }
 
     getLabelTextForClass(cls: string): string | undefined {
-        return (this.app as any).classToLabelMap?.get(cls);
+        return this.app.classToLabelMap?.get(cls);
     }
 
     static min(a: number, b: number): number {

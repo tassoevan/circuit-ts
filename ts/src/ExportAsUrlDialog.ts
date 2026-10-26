@@ -53,7 +53,7 @@ export class ExportAsUrlDialog extends Dialog {
         this.closeOnEnter = false;
 
         const start = window.location.href.split("?");
-        const compressed = (window as any).LZString.compressToEncodedURIComponent(dump);
+        const compressed = window.LZString.compressToEncodedURIComponent(dump);
         const query = "?ctz=" + compressed;
         const url = start[0] + query;
         const requrl = encodeURIComponent(query);

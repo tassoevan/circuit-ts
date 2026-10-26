@@ -96,4 +96,4 @@ export class ScopeExportImageDialog extends Dialog {
 }
 
 // Register on window so Scope can access without a circular import
-(window as any).ScopeExportImageDialog = ScopeExportImageDialog;
+window.ScopeExportImageDialog = ScopeExportImageDialog;

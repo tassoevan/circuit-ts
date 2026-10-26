@@ -107,6 +107,7 @@ export class MosfetElm extends CircuitElm {
     bodyDiodeCathode2: Point[];
     bodyDiodeLeads: Point[];
 
+    constructor(xx: number, yy: number);
     constructor(xx: number, yy: number, pnpflag: boolean);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xa: number, ya: number, xbOrPnp?: number | boolean, yb?: number, f?: number, st?: StringTokenizer) {

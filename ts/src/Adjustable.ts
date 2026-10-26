@@ -300,4 +300,4 @@ export class Adjustable {
 }
 
 // Register on window so CircuitXMLDeserializer and CircuitLoader can access without a circular import
-(window as any).Adjustable = Adjustable;
+window.Adjustable = Adjustable;

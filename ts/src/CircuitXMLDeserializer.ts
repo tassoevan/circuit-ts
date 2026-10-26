@@ -128,7 +128,7 @@ export class CircuitXMLDeserializer {
             }
             if (tagName === "adj") {
                 this.currentXmlElement = elem;
-                (window as any).Adjustable?.undumpXml(this, this.app);
+                window.Adjustable?.undumpXml(this, this.app);
                 continue;
             }
             const x = elem.getAttribute("x");

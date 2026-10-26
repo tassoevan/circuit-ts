@@ -68,9 +68,10 @@ export class VoltageElm extends CircuitElm {
 
     static readonly defaultPulseDuty = 1 / (2 * Math.PI);
 
+    constructor(xx: number, yy: number);
     constructor(xx: number, yy: number, wf: number);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
-    constructor(xa: number, ya: number, xbOrWf: number, yb?: number, f?: number, st?: StringTokenizer) {
+    constructor(xa: number, ya: number, xbOrWf?: number, yb?: number, f?: number, st?: StringTokenizer) {
         if (yb === undefined) {
             super(xa, ya);
             this.waveform = xbOrWf;

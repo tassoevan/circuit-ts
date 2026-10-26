@@ -200,4 +200,4 @@ export class ShortcutsDialog extends Dialog {
 }
 
 // Register on window so CommandManager can access without a circular import
-(window as any).ShortcutsDialog = ShortcutsDialog;
+window.ShortcutsDialog = ShortcutsDialog;

@@ -134,4 +134,4 @@ export class SubcircuitDialog extends Dialog {
     }
 }
 
-(window as any).SubcircuitDialog = SubcircuitDialog;
+window.SubcircuitDialog = SubcircuitDialog;

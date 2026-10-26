@@ -173,7 +173,7 @@ export class AudioInputElm extends RailElm {
 
     // fetch audio data for a selected file
     static fetchLoadFileData(elm: AudioInputElm, file: File): void {
-        const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const context = new AudioContext();
         elm.setSamplingRate(context.sampleRate);
         const reader = new FileReader();
         reader.onload = (e) => {

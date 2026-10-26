@@ -141,8 +141,7 @@ export class ScopeManager {
         let i;
         for (i = 0; i !== this.scopeCount; i++) if (this.scopes[i].viewingWire()) return false;
         for (const ce of this.sim.elmList)
-            if ((ce as CircuitElm).isScopeElm() && (ce as any).elmScope !== null && (ce as any).elmScope.viewingWire())
-                return false;
+            if ((ce as CircuitElm).isScopeElm() && ce.elmScope !== null && ce.elmScope.viewingWire()) return false;
         return true;
     }
 
@@ -253,7 +252,7 @@ export class ScopeManager {
         // Remove any scopeElms for elements that no longer exist
         for (let i = this.sim.elmList.length - 1; i >= 0; i--) {
             const ce = this.sim.elmList[i] as CircuitElm;
-            if (ce.isScopeElm() && (ce as any).elmScope !== null && (ce as any).elmScope.needToRemove()) {
+            if (ce.isScopeElm() && ce.elmScope !== null && ce.elmScope.needToRemove()) {
                 ce.delete();
                 this.sim.elmList.splice(i, 1);
 

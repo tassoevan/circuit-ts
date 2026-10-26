@@ -53,4 +53,4 @@ export class AboutBox extends Dialog {
     }
 }
 
-(window as any).AboutBox = AboutBox;
+window.AboutBox = AboutBox;

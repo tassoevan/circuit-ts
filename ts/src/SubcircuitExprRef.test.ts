@@ -10,7 +10,7 @@ import { ControlledCurrentElm } from "./ControlledCurrentElm";
 const off = { getState: () => false };
 
 beforeAll(() => {
-    (CircuitElm as any).app = (CircuitElm as any).app ?? {
+    CircuitElm.app = (CircuitElm as any).app ?? {
         menus: {
             showValuesCheckItem: off,
             powerCheckItem: off,
@@ -20,9 +20,9 @@ beforeAll(() => {
         },
     };
     // registerElements() needs the whole app, so register just what this test loads
-    ElementFactory.registerClass("ResistorElm", ResistorElm as any);
-    ElementFactory.registerClass("ControlledCurrentElm", ControlledCurrentElm as any);
-    (CirSim as any).xmlDumpTypeMap = new Map<string, string>([
+    ElementFactory.registerClass("ResistorElm", ResistorElm);
+    ElementFactory.registerClass("ControlledCurrentElm", ControlledCurrentElm);
+    CirSim.xmlDumpTypeMap = new Map<string, string>([
         ["r", "ResistorElm"],
         ["ci", "ControlledCurrentElm"],
     ]);

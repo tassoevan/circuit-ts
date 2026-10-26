@@ -281,8 +281,8 @@ export class CirSim {
             if (this.stopMessage == null && this.startCircuitLink != null) {
                 this.loader.readCircuit("");
                 this.menus.getSetupList(false);
-                (window as any).ImportFromDropboxDialog?.setSim(this);
-                (window as any).ImportFromDropboxDialog?.doImportDropboxLink(this.startCircuitLink, false);
+                window.ImportFromDropboxDialog?.setSim(this);
+                window.ImportFromDropboxDialog?.doImportDropboxLink(this.startCircuitLink, false);
             } else {
                 this.loader.readCircuit("");
                 if (this.stopMessage == null && this.startCircuit != null) {
@@ -751,7 +751,7 @@ export class CirSim {
     }
 
     decompress(dump: string): string {
-        return (window as any).LZString.decompressFromEncodedURIComponent(dump);
+        return window.LZString.decompressFromEncodedURIComponent(dump);
     }
 
     // instance wrappers for Java compatibility

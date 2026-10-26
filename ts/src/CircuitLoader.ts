@@ -200,7 +200,7 @@ export class CircuitLoader {
                         break;
                     }
                     if (tint === 38) {
-                        const adj = new (window as any).Adjustable(st, this.app);
+                        const adj = new window.Adjustable(st, this.app);
                         if (adj.elm != null) this.app.adjustables.push(adj);
                         break;
                     }

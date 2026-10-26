@@ -1258,7 +1258,7 @@ export class Scope {
     }
 
     exportImage(): void {
-        CirSim.dialogShowing = new (window as any).ScopeExportImageDialog(this);
+        CirSim.dialogShowing = new window.ScopeExportImageDialog(this);
         CirSim.dialogShowing.show();
     }
 
@@ -1275,7 +1275,7 @@ export class Scope {
     }
 
     exportSVG(transparent: boolean = false): void {
-        const context = new (window as any).C2S(this.rect.width, this.rect.height);
+        const context = new window.C2S(this.rect.width, this.rect.height);
         this.drawForExport(context, transparent);
         Scope.downloadSVG(context.getSerializedSvg(), "scope.svg");
     }

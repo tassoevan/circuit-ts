@@ -311,4 +311,4 @@ export class SliderDialog extends Dialog {
 }
 
 // Register on window so CommandManager can access without a circular import
-(window as any).SliderDialog = SliderDialog;
+window.SliderDialog = SliderDialog;

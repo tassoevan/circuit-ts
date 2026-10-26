@@ -1759,7 +1759,7 @@ export class SimulationManager {
     getLabeledNodeVoltage(name: string): number {
         for (let i = 0; i < this.elmList.length; i++) {
             const ce = this.elmList[i];
-            if (ce.isLabeledNodeElm() && (ce as any).getName() === name) return ce.nodes[0].v;
+            if (ce.isLabeledNodeElm() && ce.getName() === name) return ce.nodes[0].v;
         }
         return 0;
     }

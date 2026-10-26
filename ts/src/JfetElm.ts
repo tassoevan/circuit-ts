@@ -39,6 +39,7 @@ export class JfetElm extends MosfetElm {
     curcounts: number = 0;
     curcountd: number = 0;
 
+    constructor(xx: number, yy: number);
     constructor(xx: number, yy: number, pnpflag: boolean);
     constructor(xa: number, ya: number, xb: number, yb: number, f: number, st: StringTokenizer);
     constructor(xa: number, ya: number, xbOrPnp?: number | boolean, yb?: number, f?: number, st?: StringTokenizer) {

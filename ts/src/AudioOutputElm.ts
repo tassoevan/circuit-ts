@@ -315,7 +315,7 @@ export class AudioOutputElm extends CircuitElm {
         view.setUint32(40, numSamples * 2, true);
         for (let i = 0; i < numSamples; i++) view.setInt16(44 + i * 2, intSamples[i], true);
 
-        const d = document as any;
+        const d = document;
         if (d.audioBlob) {
             if (d.audioObject) d.audioObject.parentNode?.removeChild(d.audioObject);
             URL.revokeObjectURL(d.audioBlob);
@@ -331,7 +331,7 @@ export class AudioOutputElm extends CircuitElm {
     }
 
     static getLastBlob(): string | null {
-        return (document as any).audioBlob ?? null;
+        return document.audioBlob ?? null;
     }
 
     play(): void {
