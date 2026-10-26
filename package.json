@@ -9,6 +9,7 @@
     "build": "npm run build -w ts",
     "preview": "npm run preview -w ts --",
     "test": "npm test -w ts",
+    "typecheck": "npm run typecheck -w ts",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt",
